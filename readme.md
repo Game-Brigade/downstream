@@ -1,6 +1,8 @@
 Downstream
 
-I pulled from lab 4 because it has box2d integrated and whatnot
+I pulled from lab 4 because it has box2d integrated and whatnot.
+
+I'm adding my code to edu/cornell/gdiac/physics/fish 
 
 todo:
 
