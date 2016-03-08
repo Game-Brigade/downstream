@@ -19,16 +19,16 @@ import edu.cornell.gdiac.physics.obstacle.*;
 public class TetherModel extends BoxObstacle {
 
   /** Width of this tether, used for collision detection */
-  private static final int TETHER_WIDTH = 40;
+  private static final int TETHER_DEFAULT_WIDTH = 40;
   
   /** Height of this tether, used for collision detection */
-  private static final int TETHER_HEIGHT = 40;
+  private static final int TETHER_DEFAULT_HEIGHT = 40;
   
   /** The range at which the player can enter orbit around this tether */
-  private static final int TETHER_RANGE = 400;
+  private static final int TETHER_DEFAULT_RANGE = 400;
 
   /** The radius at which the player orbits a tether */
-  private static final int TETHER_RADIUS = 200;
+  private static final int TETHER_DEFAULT_RADIUS = 20;
   
   private static final BodyDef.BodyType TETHER_BODY_TYPE = BodyDef.BodyType.StaticBody;
 
@@ -43,8 +43,14 @@ public class TetherModel extends BoxObstacle {
   };
 
   public TetherModel(float x, float y, TetherType type) {
-    super(x, y, TETHER_WIDTH, TETHER_HEIGHT);
+    super(x, y, TETHER_DEFAULT_WIDTH, TETHER_DEFAULT_HEIGHT);
     setType(type);
+    setBodyType(TETHER_BODY_TYPE);
+  }
+  
+  public TetherModel(float x, float y, float w, float h) {
+    super(x,y,w,h);
+    setType(TetherType.Lilipad);
     setBodyType(TETHER_BODY_TYPE);
   }
 
@@ -52,11 +58,15 @@ public class TetherModel extends BoxObstacle {
     type = newType;
   }
 
-  public Vector2 calculateAttractiveForce(PlayerFishModel player) {
+  public Vector2 calculateAttractiveForce(Obstacle player) {
     Vector2 direction = this.getPosition().sub(player.getPosition());
     float radius = direction.len();
-    float forceMagnitude = (float) (player.getMass() * Math.pow(player.getLinearVelocity().len(),2) / radius);
+    float forceMagnitude = (float) (player.getMass() * player.getLinearVelocity().len2() / radius);
     return direction.setLength(forceMagnitude);
+  }
+  
+  public int getRadius() {
+    return TETHER_DEFAULT_RADIUS;
   }
 
 }

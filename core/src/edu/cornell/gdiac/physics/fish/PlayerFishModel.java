@@ -42,27 +42,34 @@ public class PlayerFishModel extends BoxObstacle {
 
   /** Create a new player at x,y. */
   public PlayerFishModel(float x, float y) {
-    super(x, y, PLAYER_FISH_WIDTH, PLAYER_FISH_HEIGHT);
-    setBodyType(PLAYER_FISH_BODY_TYPE);
-    setDensity(PLAYER_DEFAULT_DENSITY);
-    setDensity(PLAYER_DEFAULT_DENSITY);
-    setFriction(PLAYER_DEFAULT_FRICTION);
-    setRestitution(PLAYER_DEFAULT_RESTITUTION);
-    setName("player");
-    force = new Vector2();
-    health = 1;
+      super(x, y, PLAYER_FISH_WIDTH, PLAYER_FISH_HEIGHT);
+      setBodyType(PLAYER_FISH_BODY_TYPE);
+      setDensity(PLAYER_DEFAULT_DENSITY);
+      setDensity(PLAYER_DEFAULT_DENSITY);
+      setFriction(PLAYER_DEFAULT_FRICTION);
+      setRestitution(PLAYER_DEFAULT_RESTITUTION);
+      setName("player");
+      force = new Vector2();
+      health = 1;
   }
 
   public boolean isAlive() {
-    return health > 0;
+      return health > 0;
   }
 
   public void applyTetherForce(Vector2 tetherForce) {
-    body.applyForceToCenter(tetherForce, true);
-  }
+      body.applyForceToCenter(tetherForce, true);
+}
 
-  public void applyTetherForce(TetherModel tether) {
-    applyTetherForce(tether.calculateAttractiveForce(this));
-  }
+public void applyTetherForce(TetherModel tether) {
+      applyTetherForce(tether.calculateAttractiveForce(this));
+}
+
+public Vector2 getInitialTangentPoint(TetherModel tether) {
+    float slope = getVY() / getVX();
+    float xtan = (slope * getX() - getY() + tether.getX() / slope + tether.getY()) / (slope + 1 / slope);
+    float ytan = slope * xtan - slope * getX() + getY();
+    return new Vector2(xtan, ytan);
+}
 
 }
