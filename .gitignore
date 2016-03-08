@@ -1,4 +1,4 @@
-/build/
-.gradle
-/desktop/
+build/
+.gradle/
+desktop/
 .class

@@ -1,10 +1,7 @@
 /*
- * RocketWorldController.java
+ * Fish.java
  *
- * This is one of the files that you are expected to modify. Please limit changes to 
- * the regions that say INSERT CODE HERE.
- *
- * Author: Walker M. White
+ * Author: Walker M. White && Dashiell Brown
  * Based on original PhysicsDemo Lab by Don Holden, 2007
  * LibGDX version, 2/6/2015
  */
@@ -33,12 +30,10 @@ import edu.cornell.gdiac.physics.obstacle.*;
  * place nicely with the static assets.
  */
 public class FishController extends WorldController implements ContactListener {
-	/** Reference to the rocket texture */
-	private static final String ROCK_TEXTURE = "rocket/rocket.png";
-	/** The reference for the afterburner textures  */
-	private static final String MAIN_FIRE_TEXTURE = "rocket/flames.png";
-	private static final String RGHT_FIRE_TEXTURE = "rocket/flames-right.png";
-	private static final String LEFT_FIRE_TEXTURE = "rocket/flames-left.png";
+	/** Reference to the fish texture */
+	private static final String ROCK_TEXTURE = "rocket/fish3.png";
+	/** The reference for the tether textures  */
+	private static final String TETHER_TEXTURE = "rocket/lilipad.png";
 	/** Reference to the crate image assets */
 	private static final String CRATE_PREF = "rocket/crate0";
 	/** How many crate assets we have */
@@ -55,6 +50,8 @@ public class FishController extends WorldController implements ContactListener {
 	
 	/** Texture assets for the rocket */
 	private TextureRegion rocketTexture;
+	/** Texture assets for the lilipads */
+	private TextureRegion tetherTexture;
 	/** Texture filmstrip for the main afterburner */
 	private FilmStrip mainTexture;
 	/** Texture filmstrip for the main afterburner */
@@ -92,12 +89,9 @@ public class FishController extends WorldController implements ContactListener {
 		// Ship textures
 		manager.load(ROCK_TEXTURE, Texture.class);
 		assets.add(ROCK_TEXTURE);
-		manager.load(MAIN_FIRE_TEXTURE, Texture.class);
-		assets.add(MAIN_FIRE_TEXTURE);
-		manager.load(LEFT_FIRE_TEXTURE, Texture.class);
-		assets.add(LEFT_FIRE_TEXTURE);
-		manager.load(RGHT_FIRE_TEXTURE, Texture.class);
-		assets.add(RGHT_FIRE_TEXTURE);
+		
+		manager.load(TETHER_TEXTURE, Texture.class);
+		assets.add(TETHER_TEXTURE);
 		
 		// Ship sounds
 		manager.load(MAIN_FIRE_SOUND, Sound.class);
@@ -133,6 +127,7 @@ public class FishController extends WorldController implements ContactListener {
 		}
 		
 		rocketTexture = createTexture(manager,ROCK_TEXTURE,false);
+		tetherTexture = createTexture(manager,TETHER_TEXTURE,false);
 		
 		SoundController sounds = SoundController.getInstance();
 		sounds.allocate(manager,MAIN_FIRE_SOUND);
@@ -249,7 +244,7 @@ public class FishController extends WorldController implements ContactListener {
 		tether.setRestitution(0.0f);
 		tether.setSensor(true);
 		tether.setDrawScale(scale);
-		tether.setTexture(goalTile);
+		tether.setTexture(tetherTexture);
 		addObject(tether);
 		tethers.add(tether);
 		
@@ -260,7 +255,7 @@ public class FishController extends WorldController implements ContactListener {
 		tether.setRestitution(0.0f);
 		tether.setSensor(true);
 		tether.setDrawScale(scale);
-		tether.setTexture(goalTile);
+		tether.setTexture(tetherTexture);
 		addObject(tether);
 		tethers.add(tether);
 		
@@ -271,7 +266,7 @@ public class FishController extends WorldController implements ContactListener {
 		tether.setRestitution(0.0f);
 		tether.setSensor(true);
 		tether.setDrawScale(scale);
-		tether.setTexture(goalTile);
+		tether.setTexture(tetherTexture);
 		addObject(tether);
 		tethers.add(tether);
 		
@@ -282,7 +277,7 @@ public class FishController extends WorldController implements ContactListener {
 		tether.setRestitution(0.0f);
 		tether.setSensor(true);
 		tether.setDrawScale(scale);
-		tether.setTexture(goalTile);
+		tether.setTexture(tetherTexture);
 		addObject(tether);
 		tethers.add(tether);
 		
