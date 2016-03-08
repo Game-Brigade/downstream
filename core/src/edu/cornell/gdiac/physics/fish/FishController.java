@@ -178,7 +178,7 @@ public class FishController extends WorldController implements ContactListener {
 	/** The fourth lily position */
 	private static Vector2 LILY_POS3 = new Vector2();
 	/** The initial position of the player avatar */
-	private static Vector2 FISH_POS = new Vector2();
+	private static Vector2 AVATAR_POS = new Vector2();
 	
 
 	// Physics objects for the game
@@ -321,29 +321,15 @@ public class FishController extends WorldController implements ContactListener {
 			addObject(obj);
 		}
 
-		// Create dude
-		dwidth = avatarTexture.getRegionWidth() / scale.x;
-		dheight = avatarTexture.getRegionHeight() / scale.y;
-		avatar = new PlayerFishModel(DUDE_POS.x, DUDE_POS.y, dwidth, dheight);
+		// Create player avatar
+		float dwidth = avatarTexture.getRegionWidth() / scale.x;
+		float dheight = avatarTexture.getRegionHeight() / scale.y;
+		avatar = new PlayerFishModel(AVATAR_POS.x, AVATAR_POS.y, dwidth, dheight);
 		avatar.setDrawScale(scale);
 		avatar.setTexture(avatarTexture);
 		addObject(avatar);
 
-		// Create rope bridge
-		dwidth = bridgeTexture.getRegionWidth() / scale.x;
-		dheight = bridgeTexture.getRegionHeight() / scale.y;
-		RopeBridge bridge = new RopeBridge(BRIDGE_POS.x, BRIDGE_POS.y, BRIDGE_WIDTH, dwidth, dheight);
-		bridge.setTexture(bridgeTexture);
-		bridge.setDrawScale(scale);
-		addObject(bridge);
-
-		// Create spinning platform
-		dwidth = barrierTexture.getRegionWidth() / scale.x;
-		dheight = barrierTexture.getRegionHeight() / scale.y;
-		Spinner spinPlatform = new Spinner(SPIN_POS.x, SPIN_POS.y, dwidth, dheight);
-		spinPlatform.setDrawScale(scale);
-		spinPlatform.setTexture(barrierTexture);
-		addObject(spinPlatform);
+		
 	}
 
 	/**
