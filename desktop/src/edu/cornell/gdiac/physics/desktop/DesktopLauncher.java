@@ -39,6 +39,6 @@ public class DesktopLauncher {
 		config.resizable = false;
 		new LwjglApplication(new GDXRoot(), config);
 		//1280x 800
-		config.fullscreen = true;
+		//config.fullscreen = true;
 	}
 }
