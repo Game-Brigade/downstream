@@ -38,5 +38,6 @@ public class DesktopLauncher {
 		config.height = 576;
 		config.resizable = false;
 		new LwjglApplication(new GDXRoot(), config);
+		//1280x 800
 	}
 }
