@@ -48,7 +48,7 @@ public class FishController extends WorldController implements ContactListener {
 	private static final String POP_FILE = "platform/plop.mp3";
 
 	/** Texture asset for character avatar */
-	private TextureRegion fishTexture;
+	private TextureRegion avatarTexture;
 	/** Texture asset for lily pad */
 	private TextureRegion lilyTexture;
 	/** Texture asset for the water background */
@@ -59,7 +59,7 @@ public class FishController extends WorldController implements ContactListener {
 	private TextureRegion enemyTexture;
 
 	/** Track asset loading from all instances and subclasses */
-	private AssetState platformAssetState = AssetState.EMPTY;
+	private AssetState fishAssetState = AssetState.EMPTY;
 
 	/**
 	 * Preloads the assets for this controller.
@@ -73,19 +73,21 @@ public class FishController extends WorldController implements ContactListener {
 	 *            Reference to global asset manager.
 	 */
 	public void preLoadContent(AssetManager manager) {
-		if (platformAssetState != AssetState.EMPTY) {
+		if (fishAssetState != AssetState.EMPTY) {
 			return;
 		}
 
-		platformAssetState = AssetState.LOADING;
+		fishAssetState = AssetState.LOADING;
 		manager.load(FISH_FILE, Texture.class);
 		assets.add(FISH_FILE);
 		manager.load(LILY_FILE, Texture.class);
-		assets.add(_FILE);
-		manager.load(BULLET_FILE, Texture.class);
-		assets.add(BULLET_FILE);
-		manager.load(ROPE_FILE, Texture.class);
-		assets.add(ROPE_FILE);
+		assets.add(LILY_FILE);
+		manager.load(WATER_FILE, Texture.class);
+		assets.add(WATER_FILE);
+		manager.load(LAND_FILE, Texture.class);
+		assets.add(LAND_FILE);
+		manager.load(ENEMY_FILE, Texture.class);
+		assets.add(ENEMY_FILE);
 
 		manager.load(JUMP_FILE, Sound.class);
 		assets.add(JUMP_FILE);
@@ -109,21 +111,22 @@ public class FishController extends WorldController implements ContactListener {
 	 *            Reference to global asset manager.
 	 */
 	public void loadContent(AssetManager manager) {
-		if (platformAssetState != AssetState.LOADING) {
+		if (fishAssetState != AssetState.LOADING) {
 			return;
 		}
 
 		avatarTexture = createTexture(manager, FISH_FILE, false);
-		barrierTexture = createTexture(manager, BARRIER_FILE, false);
-		bulletTexture = createTexture(manager, BULLET_FILE, false);
-		bridgeTexture = createTexture(manager, ROPE_FILE, false);
+		lilyTexture = createTexture(manager, LILY_FILE, false);
+		waterTexture = createTexture(manager, WATER_FILE, false);
+		landTexture = createTexture(manager, LAND_FILE, false);
+		enemyTexture = createTexture(manager, ENEMY_FILE, false);
 
 		SoundController sounds = SoundController.getInstance();
 		sounds.allocate(manager, JUMP_FILE);
 		sounds.allocate(manager, PEW_FILE);
 		sounds.allocate(manager, POP_FILE);
 		super.loadContent(manager);
-		platformAssetState = AssetState.COMPLETE;
+		fishAssetState = AssetState.COMPLETE;
 	}
 
 	// Physics constants for initialization
@@ -165,26 +168,35 @@ public class FishController extends WorldController implements ContactListener {
 			{ 1.0f, 12.5f, 7.0f, 12.5f, 7.0f, 12.0f, 1.0f, 12.0f } };
 
 	// Other game objects
-	/** The goal door position */
-	private static Vector2 GOAL_POS = new Vector2(4.0f, 14.0f);
-	/** The position of the spinning barrier */
-	private static Vector2 SPIN_POS = new Vector2(13.0f, 12.5f);
-	/** The initial position of the dude */
-	private static Vector2 FISH_POS = new Vector2(2.5f, 5.0f);
-	/** The position of the rope bridge */
-	private static Vector2 BRIDGE_POS = new Vector2(9.0f, 3.8f);
+	/** The first lily position */
+	private static Vector2 LILY_POS0 = new Vector2();
+	/** The second lily position */
+	private static Vector2 LILY_POS1 = new Vector2();
+	/** The third lily position */
+	private static Vector2 LILY_POS2 = new Vector2();
+	/** The fourth lily position */
+	private static Vector2 LILY_POS3 = new Vector2();
+	/** The initial position of the player avatar */
+	private static Vector2 FISH_POS = new Vector2();
+	
 
 	// Physics objects for the game
 	/** Reference to the character avatar */
 	private PlayerFishModel avatar;
-	/** Reference to the goalDoor (for collision detection) */
-	private BoxObstacle goalDoor;
-
+	/** Reference to the first lily (for collision detection) */
+	private TetherModel lily0;
+	/** Reference to the second lily (for collision detection) */
+	private TetherModel lily1;
+	/** Reference to the third lily (for collision detection) */
+	private TetherModel lily2;
+	/** Reference to the fourth lily (for collision detection) */
+	private TetherModel lily3;
+	
 	/** Mark set to handle more sophisticated collision callbacks */
 	protected ObjectSet<Fixture> sensorFixtures;
 
 	/**
-		 * Creates and initialize a new instance of the platformer game
+		 * Creates and initialize a new instance of the fish game
 		 *
 		 * The game has default gravity and other settings
 		 */
