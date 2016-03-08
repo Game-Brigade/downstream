@@ -67,6 +67,7 @@ public class FishController extends WorldController implements ContactListener {
 	/** Track asset loading from all instances and subclasses */
 	private AssetState rocketAssetState = AssetState.EMPTY;
 	
+	private boolean tethered;
 	/**
 	 * Preloads the assets for this controller.
 	 *
@@ -206,6 +207,7 @@ public class FishController extends WorldController implements ContactListener {
 		setComplete(false);
 		setFailure(false);
 		world.setContactListener(this);
+		tethered = false;
 	}
 	
 	/**
@@ -347,6 +349,8 @@ public class FishController extends WorldController implements ContactListener {
 		fish.setFY(thrust * input.getVertical());
 		fish.applyForce();
 		
+		if (input.didLaunch()) tethered = !tethered;
+		
 		TetherModel closestTether = tethers.get(0);
 		float closestDistance = tethers.get(0).getPosition().sub(fish.getPosition()).len2();
 		for (TetherModel tether : tethers) {
@@ -356,6 +360,7 @@ public class FishController extends WorldController implements ContactListener {
 				closestTether = tether;
 			}
 		}
+//		if (tethered &&
 		if (input.space && 
 			fish.getPosition().sub(fish.getInitialTangentPoint(closestTether)).len2() < .1) {
 			fish.applyTetherForce(closestTether);

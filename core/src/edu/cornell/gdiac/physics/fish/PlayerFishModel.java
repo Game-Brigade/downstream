@@ -62,6 +62,8 @@ public void applyTetherForce(TetherModel tether) {
 }
 
 public Vector2 getInitialTangentPoint(TetherModel tether) {
+	if (getVX() == 0) setVX(.00001f);
+	if (getVY() == 0) setVY(.00001f);
     float slope = getVY() / getVX();
     float xtan = (slope * getX() - getY() + tether.getX() / slope + tether.getY()) / (slope + 1 / slope);
     float ytan = slope * xtan - slope * getX() + getY();
