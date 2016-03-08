@@ -48,7 +48,7 @@ public abstract class WorldController implements Screen {
 	/** 
 	 * Tracks the asset state.  Otherwise subclasses will try to load assets 
 	 */
-	public enum AssetState {
+	protected enum AssetState {
 		/** No assets loaded */
 		EMPTY,
 		/** Still loading assets */
@@ -63,6 +63,11 @@ public abstract class WorldController implements Screen {
 	protected Array<String> assets;	
 	
 	// Pathnames to shared assets
+	/** The background image for the battle */
+	private static final String BACKGROUND_FILE = "rocket/pond.png";
+	/** The background image for the battle */
+	private static final String ROCK_FILE = "rocket/land.png";
+	
 	/** File to texture for walls and platforms */
 	private static String EARTH_FILE = "shared/earthtile.png";
 	/** File to texture for the win door */
@@ -77,6 +82,9 @@ public abstract class WorldController implements Screen {
 	protected TextureRegion goalTile;
 	/** The font for giving messages to the player */
 	protected BitmapFont displayFont;
+	/** The background image for the battle */
+	private static Texture background; 
+	private static Texture rocks;
 
 	/**
 	 * Preloads the assets for this controller.
@@ -99,6 +107,12 @@ public abstract class WorldController implements Screen {
 		assets.add(EARTH_FILE);
 		manager.load(GOAL_FILE,Texture.class);
 		assets.add(GOAL_FILE);
+		
+		manager.load(BACKGROUND_FILE, Texture.class);
+		assets.add(BACKGROUND_FILE);
+		
+		manager.load(ROCK_FILE, Texture.class);
+		assets.add(ROCK_FILE);
 		
 		// Load the font
 		FreetypeFontLoader.FreeTypeFontLoaderParameter size2Params = new FreetypeFontLoader.FreeTypeFontLoaderParameter();
@@ -126,6 +140,8 @@ public abstract class WorldController implements Screen {
 		// Allocate the tiles
 		earthTile = createTexture(manager,EARTH_FILE,true);
 		goalTile  = createTexture(manager,GOAL_FILE,true);
+		background    = manager.get(BACKGROUND_FILE, Texture.class);
+		rocks = manager.get(ROCK_FILE, Texture.class);
 		
 		// Allocate the font
 		if (manager.isLoaded(FONT_FILE)) {
@@ -580,11 +596,13 @@ public abstract class WorldController implements Screen {
 	 */
 	public void draw(float delta) {
 		canvas.clear();
-		
 		canvas.begin();
+		canvas.draw(background, Color.WHITE, 0, 0, canvas.getWidth(), canvas.getHeight());
+		//canvas.draw(rocks, Color.WHITE, 0, 0, canvas.getWidth(), canvas.getHeight());
 		for(Obstacle obj : objects) {
 			obj.draw(canvas);
 		}
+		
 		canvas.end();
 		
 		if (debug) {

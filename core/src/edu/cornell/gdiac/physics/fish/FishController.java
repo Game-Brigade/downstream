@@ -1,219 +1,238 @@
+/*
+ * RocketWorldController.java
+ *
+ * This is one of the files that you are expected to modify. Please limit changes to 
+ * the regions that say INSERT CODE HERE.
+ *
+ * Author: Walker M. White
+ * Based on original PhysicsDemo Lab by Don Holden, 2007
+ * LibGDX version, 2/6/2015
+ */
 package edu.cornell.gdiac.physics.fish;
 
-import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.Contact;
-import com.badlogic.gdx.physics.box2d.ContactImpulse;
-import com.badlogic.gdx.physics.box2d.ContactListener;
-import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.physics.box2d.Manifold;
-import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.utils.ObjectSet;
+import java.util.ArrayList;
 
-import edu.cornell.gdiac.physics.InputController;
-import edu.cornell.gdiac.physics.WorldController;
-import edu.cornell.gdiac.physics.WorldController.AssetState;
-import edu.cornell.gdiac.physics.fish.TetherModel.TetherType;
-import edu.cornell.gdiac.physics.obstacle.BoxObstacle;
-import edu.cornell.gdiac.physics.obstacle.Obstacle;
-import edu.cornell.gdiac.physics.obstacle.PolygonObstacle;
-import edu.cornell.gdiac.physics.obstacle.WheelObstacle;
-import edu.cornell.gdiac.physics.platform.DudeModel;
-import edu.cornell.gdiac.physics.platform.RopeBridge;
-import edu.cornell.gdiac.physics.platform.Spinner;
-import edu.cornell.gdiac.util.SoundController;
+import com.badlogic.gdx.math.*;
+import com.badlogic.gdx.assets.*;
+import com.badlogic.gdx.audio.*;
+import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.physics.box2d.*;
 
+import edu.cornell.gdiac.util.*;
+import edu.cornell.gdiac.physics.*;
+import edu.cornell.gdiac.physics.obstacle.*;
+
+/**
+ * Gameplay specific controller for the rocket lander game.
+ *
+ * You will notice that asset loading is not done with static methods this time.  
+ * Instance asset loading makes it easier to process our game modes in a loop, which 
+ * is much more scalable. However, we still want the assets themselves to be static.
+ * This is the purpose of our AssetState variable; it ensures that multiple instances
+ * place nicely with the static assets.
+ */
 public class FishController extends WorldController implements ContactListener {
+	/** Reference to the rocket texture */
+	private static final String ROCK_TEXTURE = "rocket/rocket.png";
+	/** The reference for the afterburner textures  */
+	private static final String MAIN_FIRE_TEXTURE = "rocket/flames.png";
+	private static final String RGHT_FIRE_TEXTURE = "rocket/flames-right.png";
+	private static final String LEFT_FIRE_TEXTURE = "rocket/flames-left.png";
+	/** Reference to the crate image assets */
+	private static final String CRATE_PREF = "rocket/crate0";
+	/** How many crate assets we have */
+	private static final int MAX_CRATES = 2;
 
-	/** The texture file for the character avatar (no animation) */
-	private static final String FISH_FILE = "platform/dude.png";
-	/** The texture file for the lily pad */
-	private static final String LILY_FILE = "platform/barrier.png";
-	/** The texture file for the water background */
-	private static final String WATER_FILE = "platform/bullet.png";
-	/** The texture file for the land borders */
-	private static final String LAND_FILE = "platform/ropebridge.png";
-	/** The texture file for the enemy fish */
-	private static final String ENEMY_FILE = "";
-
-	/** The sound file for a jump */
-	private static final String JUMP_FILE = "platform/jump.mp3";
-	/** The sound file for a bullet fire */
-	private static final String PEW_FILE = "platform/pew.mp3";
-	/** The sound file for a bullet collision */
-	private static final String POP_FILE = "platform/plop.mp3";
-
-	/** Texture asset for character avatar */
-	private TextureRegion avatarTexture;
-	/** Texture asset for lily pad */
-	private TextureRegion lilyTexture;
-	/** Texture asset for the water background */
-	private TextureRegion waterTexture;
-	/** Texture asset for the land borders */
-	private TextureRegion landTexture;
-	/** Texture asset for the enemy fish */
-	private TextureRegion enemyTexture;
-
+	/** The asset for the collision sound */
+	private static final String  COLLISION_SOUND = "rocket/bump.mp3";
+	/** The asset for the main afterburner sound */
+	private static final String  MAIN_FIRE_SOUND = "rocket/afterburner.mp3";
+	/** The asset for the right afterburner sound */
+	private static final String  RGHT_FIRE_SOUND = "rocket/sideburner-right.mp3";
+	/** The asset for the left afterburner sound */
+	private static final String  LEFT_FIRE_SOUND = "rocket/sideburner-left.mp3";
+	
+	/** Texture assets for the rocket */
+	private TextureRegion rocketTexture;
+	/** Texture filmstrip for the main afterburner */
+	private FilmStrip mainTexture;
+	/** Texture filmstrip for the main afterburner */
+	private FilmStrip leftTexture;
+	/** Texture filmstrip for the main afterburner */
+	private FilmStrip rghtTexture;
+	
+	/** Texture assets for the crates */
+	private TextureRegion[] crateTextures = new TextureRegion[MAX_CRATES];
 	/** Track asset loading from all instances and subclasses */
-	private AssetState fishAssetState = AssetState.EMPTY;
-
+	private AssetState rocketAssetState = AssetState.EMPTY;
+	
+	private boolean tethered;
 	/**
 	 * Preloads the assets for this controller.
 	 *
-	 * To make the game modes more for-loop friendly, we opted for nonstatic
-	 * loaders this time. However, we still want the assets themselves to be
-	 * static. So we have an AssetState that determines the current loading
-	 * state. If the assets are already loaded, this method will do nothing.
+	 * To make the game modes more for-loop friendly, we opted for nonstatic loaders
+	 * this time.  However, we still want the assets themselves to be static.  So
+	 * we have an AssetState that determines the current loading state.  If the
+	 * assets are already loaded, this method will do nothing.
 	 * 
-	 * @param manager
-	 *            Reference to global asset manager.
+	 * @param manager Reference to global asset manager.
 	 */
 	public void preLoadContent(AssetManager manager) {
-		if (fishAssetState != AssetState.EMPTY) {
+		if (rocketAssetState != AssetState.EMPTY) {
 			return;
 		}
-
-		fishAssetState = AssetState.LOADING;
-		manager.load(FISH_FILE, Texture.class);
-		assets.add(FISH_FILE);
-		manager.load(LILY_FILE, Texture.class);
-		assets.add(LILY_FILE);
-		manager.load(WATER_FILE, Texture.class);
-		assets.add(WATER_FILE);
-		manager.load(LAND_FILE, Texture.class);
-		assets.add(LAND_FILE);
-		manager.load(ENEMY_FILE, Texture.class);
-		assets.add(ENEMY_FILE);
-
-		manager.load(JUMP_FILE, Sound.class);
-		assets.add(JUMP_FILE);
-		manager.load(PEW_FILE, Sound.class);
-		assets.add(PEW_FILE);
-		manager.load(POP_FILE, Sound.class);
-		assets.add(POP_FILE);
+		
+		rocketAssetState = AssetState.LOADING;
+		for (int ii = 0; ii < crateTextures.length; ii++) {
+			manager.load(CRATE_PREF + (ii + 1) +".png", Texture.class);
+			assets.add(CRATE_PREF + (ii + 1) +".png");
+		}
+		
+		// Ship textures
+		manager.load(ROCK_TEXTURE, Texture.class);
+		assets.add(ROCK_TEXTURE);
+		manager.load(MAIN_FIRE_TEXTURE, Texture.class);
+		assets.add(MAIN_FIRE_TEXTURE);
+		manager.load(LEFT_FIRE_TEXTURE, Texture.class);
+		assets.add(LEFT_FIRE_TEXTURE);
+		manager.load(RGHT_FIRE_TEXTURE, Texture.class);
+		assets.add(RGHT_FIRE_TEXTURE);
+		
+		// Ship sounds
+		manager.load(MAIN_FIRE_SOUND, Sound.class);
+		assets.add(MAIN_FIRE_SOUND);
+		manager.load(LEFT_FIRE_SOUND, Sound.class);
+		assets.add(LEFT_FIRE_SOUND);
+		manager.load(RGHT_FIRE_SOUND, Sound.class);
+		assets.add(RGHT_FIRE_SOUND);
+		manager.load(COLLISION_SOUND, Sound.class);
+		assets.add(COLLISION_SOUND);
 
 		super.preLoadContent(manager);
 	}
 
 	/**
-	 * Load the assets for this controller.
+	 * Loads the assets for this controller.
 	 *
-	 * To make the game modes more for-loop friendly, we opted for nonstatic
-	 * loaders this time. However, we still want the assets themselves to be
-	 * static. So we have an AssetState that determines the current loading
-	 * state. If the assets are already loaded, this method will do nothing.
+	 * To make the game modes more for-loop friendly, we opted for nonstatic loaders
+	 * this time.  However, we still want the assets themselves to be static.  So
+	 * we have an AssetState that determines the current loading state.  If the
+	 * assets are already loaded, this method will do nothing.
 	 * 
-	 * @param manager
-	 *            Reference to global asset manager.
+	 * @param manager Reference to global asset manager.
 	 */
 	public void loadContent(AssetManager manager) {
-		if (fishAssetState != AssetState.LOADING) {
+		if (rocketAssetState != AssetState.LOADING) {
 			return;
 		}
-
-		avatarTexture = createTexture(manager, FISH_FILE, false);
-		lilyTexture = createTexture(manager, LILY_FILE, false);
-		waterTexture = createTexture(manager, WATER_FILE, false);
-		landTexture = createTexture(manager, LAND_FILE, false);
-		enemyTexture = createTexture(manager, ENEMY_FILE, false);
-
+		
+		for (int ii = 0; ii < crateTextures.length; ii++) {
+			String filename = CRATE_PREF + (ii + 1) +".png";
+			crateTextures[ii] = createTexture(manager,filename,false);
+		}
+		
+		rocketTexture = createTexture(manager,ROCK_TEXTURE,false);
+		
 		SoundController sounds = SoundController.getInstance();
-		sounds.allocate(manager, JUMP_FILE);
-		sounds.allocate(manager, PEW_FILE);
-		sounds.allocate(manager, POP_FILE);
+		sounds.allocate(manager,MAIN_FIRE_SOUND);
+		sounds.allocate(manager,LEFT_FIRE_SOUND);
+		sounds.allocate(manager,RGHT_FIRE_SOUND);
+		sounds.allocate(manager,COLLISION_SOUND);
+		
 		super.loadContent(manager);
-		fishAssetState = AssetState.COMPLETE;
+		rocketAssetState = AssetState.COMPLETE;
 	}
-
+	
 	// Physics constants for initialization
-	/** The new heavier gravity for this world (so it is not so floaty) */
-	private static final float DEFAULT_GRAVITY = -14.7f;
-	/** The density for most physics objects */
-	private static final float BASIC_DENSITY = 0.0f;
-	/** The density for a bullet */
-	private static final float HEAVY_DENSITY = 10.0f;
-	/** Friction of most platforms */
-	private static final float BASIC_FRICTION = 0.4f;
-	/** The restitution for all physics objects */
+	/** Density of non-crate objects */
+	private static final float BASIC_DENSITY   = 0.0f;
+	/** Density of the crate objects */
+	private static final float CRATE_DENSITY   = 1.0f;
+	/** Friction of non-crate objects */
+	private static final float BASIC_FRICTION  = 0.1f;
+	/** Friction of the crate objects */
+	private static final float CRATE_FRICTION  = 0.3f;
+	/** Collision restitution for all objects */
 	private static final float BASIC_RESTITUTION = 0.1f;
-	/** The width of the rope bridge */
-	private static final float BRIDGE_WIDTH = 14.0f;
-	/** Offset for bullet when firing */
-	private static final float BULLET_OFFSET = 0.2f;
-	/** The speed of the bullet after firing */
-	private static final float BULLET_SPEED = 20.0f;
-	/** The volume for sound effects */
-	private static final float EFFECT_VOLUME = 0.8f;
+	/** Threshold for generating sound on collision */
+	private static final float SOUND_THRESHOLD = 1.0f;
 
 	// Since these appear only once, we do not care about the magic numbers.
 	// In an actual game, this information would go in a data file.
 	// Wall vertices
+<<<<<<< HEAD
 	private static final float[][] LAND = {{}};
 
+=======
+	private static final float[] WALL1 = { 0.0f, 18.0f, 16.0f, 18.0f, 16.0f, 17.0f,
+										   8.0f, 15.0f,  1.0f, 17.0f,  2.0f,  7.0f,
+										   3.0f,  5.0f,  3.0f,  1.0f, 16.0f,  1.0f,
+										  16.0f,  0.0f,  0.0f,  0.0f};
+	private static final float[] WALL2 = {32.0f, 18.0f, 32.0f,  0.0f, 16.0f,  0.0f,
+										  16.0f,  1.0f, 31.0f,  1.0f, 30.0f, 10.0f,
+										  31.0f, 16.0f, 16.0f, 17.0f, 16.0f, 18.0f};
+	private static final float[] WALL3 = { 4.0f, 10.5f,  8.0f, 10.5f,
+            							   8.0f,  9.5f,  4.0f,  9.5f};
+	
+	private static final float[] WALLX = { 0.0f, 0.0f, 32.0f, 0.0f,
+										   16.0f, 32.0f, 0.0f, 0.0f, 16.0f};
+
+	// The positions of the crate pyramid
+//	private static final float[] BOXES = { 14.5f, 14.25f,
+//            							   13.0f, 12.00f, 16.0f, 12.00f,
+//            							   11.5f,  9.75f, 14.5f,  9.75f, 17.5f, 9.75f,
+//            							   13.0f,  7.50f, 16.0f,  7.50f,
+//            							   11.5f,  5.25f, 14.5f,  5.25f, 17.5f, 5.25f,
+//            							   10.0f,  3.00f, 13.0f,  3.00f, 16.0f, 3.00f, 19.0f, 3.0f};
+	private static final float[] BOXES = {};
+	
+	private ArrayList<TetherModel> tethers = new ArrayList<TetherModel>();
+>>>>>>> b718cce5c7df96534d332150ab5d914e863b7e36
 
 	// Other game objects
-	/** The first lily position */
-	private static Vector2 LILY_POS0 = new Vector2();
-	/** The second lily position */
-	private static Vector2 LILY_POS1 = new Vector2();
-	/** The third lily position */
-	private static Vector2 LILY_POS2 = new Vector2();
-	/** The fourth lily position */
-	private static Vector2 LILY_POS3 = new Vector2();
-	/** The initial position of the player avatar */
-	private static Vector2 AVATAR_POS = new Vector2();
-	
+	/** The initial rocket position */
+	private static Vector2 ROCK_POS = new Vector2(24, 4);
+	/** The goal door position */
+	private static Vector2 GOAL_POS = new Vector2( 6, 12);
 
 	// Physics objects for the game
-	/** Reference to the character avatar */
-	private PlayerFishModel avatar;
-	/** Reference to the first lily (for collision detection) */
-	private TetherModel lily0;
-	/** Reference to the second lily (for collision detection) */
-	private TetherModel lily1;
-	/** Reference to the third lily (for collision detection) */
-	private TetherModel lily2;
-	/** Reference to the fourth lily (for collision detection) */
-	private TetherModel lily3;
+	/** Reference to the goalDoor (for collision detection) */
+	private BoxObstacle goalDoor;
+	/** Reference to the rocket/player avatar */
+	private PlayerFishModel fish;
 	
-	/** Mark set to handle more sophisticated collision callbacks */
-	protected ObjectSet<Fixture> sensorFixtures;
+	private EnemyFish eFish;
 
 	/**
-		 * Creates and initialize a new instance of the fish game
-		 *
-		 * The game has default gravity and other settings
-		 */
-		public FishController() {
-			super(DEFAULT_WIDTH,DEFAULT_HEIGHT,DEFAULT_GRAVITY);
-			setDebug(false);
-			setComplete(false);
-			setFailure(false);
-			world.setContactListener(this);
-			sensorFixtures = new ObjectSet<Fixture>();
-		}
-
+	 * Creates and initialize a new instance of the rocket lander game
+	 *
+	 * The game has default gravity and other settings
+	 */
+	public FishController() {
+		setDebug(false);
+		setComplete(false);
+		setFailure(false);
+		world.setContactListener(this);
+		tethered = false;
+	}
+	
 	/**
 	 * Resets the status of the game so that we can play again.
 	 *
 	 * This method disposes of the world and creates a new one.
 	 */
 	public void reset() {
-		Vector2 gravity = new Vector2(world.getGravity());
-
-		for (Obstacle obj : objects) {
+		Vector2 gravity = new Vector2(world.getGravity() );
+		
+		for(Obstacle obj : objects) {
 			obj.deactivatePhysics(world);
 		}
 		objects.clear();
 		addQueue.clear();
 		world.dispose();
-
-		world = new World(gravity, false);
+		
+		world = new World(gravity,false);
 		world.setContactListener(this);
 		setComplete(false);
 		setFailure(false);
@@ -224,63 +243,55 @@ public class FishController extends WorldController implements ContactListener {
 	 * Lays out the game geography.
 	 */
 	private void populateLevel() {
-		/*
 		// Add level goal
-		float dwidth = goalTile.getRegionWidth() / scale.x;
-		float dheight = goalTile.getRegionHeight() / scale.y;
-		goalDoor = new BoxObstacle(GOAL_POS.x, GOAL_POS.y, dwidth, dheight);
-		goalDoor.setBodyType(BodyDef.BodyType.StaticBody);
-		goalDoor.setDensity(0.0f);
-		goalDoor.setFriction(0.0f);
-		goalDoor.setRestitution(0.0f);
-		goalDoor.setSensor(true);
-		goalDoor.setDrawScale(scale);
-		goalDoor.setTexture(goalTile);
-		goalDoor.setName("goal");
-		addObject(goalDoor);
-		*/
+		float dwidth  = goalTile.getRegionWidth()/scale.x;
+		float dheight = goalTile.getRegionHeight()/scale.y;
 		
-		//Add lily pads
-		lily0 = new TetherModel(0,0,TetherType.Lilipad);
-		lily0.setDensity(0);
-		lily0.setFriction(0);
-		lily0.setRestitution(0);
-		lily0.setSensor(true);
-		lily0.setDrawScale(scale);
-		lily0.setTexture(lilyTexture);
-		lily0.setName("Lily Pad 0");
-		addObject(lily0);
+		TetherModel tether = new TetherModel(10, 4, dwidth, dheight);
+		tether.setBodyType(BodyDef.BodyType.StaticBody);
+		tether.setDensity(0.0f);
+		tether.setFriction(0.0f);
+		tether.setRestitution(0.0f);
+		tether.setSensor(true);
+		tether.setDrawScale(scale);
+		tether.setTexture(goalTile);
+		addObject(tether);
+		tethers.add(tether);
 		
-		lily1 = new TetherModel(0,0,TetherType.Lilipad);
-		lily1.setDensity(0);
-		lily1.setFriction(0);
-		lily1.setRestitution(0);
-		lily1.setSensor(true);
-		lily1.setDrawScale(scale);
-		lily1.setTexture(lilyTexture);
-		lily1.setName("Lily Pad 1");
-		addObject(lily1);
+		tether = new TetherModel(6, 12, dwidth, dheight);
+		tether.setBodyType(BodyDef.BodyType.StaticBody);
+		tether.setDensity(0.0f);
+		tether.setFriction(0.0f);
+		tether.setRestitution(0.0f);
+		tether.setSensor(true);
+		tether.setDrawScale(scale);
+		tether.setTexture(goalTile);
+		addObject(tether);
+		tethers.add(tether);
 		
-		lily2 = new TetherModel(0,0,TetherType.Lilipad);
-		lily2.setDensity(0);
-		lily2.setFriction(0);
-		lily2.setRestitution(0);
-		lily2.setSensor(true);
-		lily2.setDrawScale(scale);
-		lily2.setTexture(lilyTexture);
-		lily2.setName("Lily Pad 2");
-		addObject(lily2);
+		tether = new TetherModel(28, 10, dwidth, dheight);
+		tether.setBodyType(BodyDef.BodyType.StaticBody);
+		tether.setDensity(0.0f);
+		tether.setFriction(0.0f);
+		tether.setRestitution(0.0f);
+		tether.setSensor(true);
+		tether.setDrawScale(scale);
+		tether.setTexture(goalTile);
+		addObject(tether);
+		tethers.add(tether);
 		
-		lily3 = new TetherModel(0,0,TetherType.Lilipad);
-		lily3.setDensity(0);
-		lily3.setFriction(0);
-		lily3.setRestitution(0);
-		lily3.setSensor(true);
-		lily3.setDrawScale(scale);
-		lily3.setTexture(lilyTexture);
-		lily3.setName("Lily Pad 3");
-		addObject(lily3);
+		tether = new TetherModel(16, 14, dwidth, dheight);
+		tether.setBodyType(BodyDef.BodyType.StaticBody);
+		tether.setDensity(0.0f);
+		tether.setFriction(0.0f);
+		tether.setRestitution(0.0f);
+		tether.setSensor(true);
+		tether.setDrawScale(scale);
+		tether.setTexture(goalTile);
+		addObject(tether);
+		tethers.add(tether);
 		
+<<<<<<< HEAD
 		//add land walls
 		String lname = "land";
 		for (int ii = 0; ii < LAND.length; ii++) {
@@ -306,187 +317,182 @@ public class FishController extends WorldController implements ContactListener {
 		avatar.setTexture(avatarTexture);
 		addObject(avatar);
 
+=======
+		TextureRegion texture = crateTextures[1];
+		dwidth  = texture.getRegionWidth()/scale.x;
+		dheight = texture.getRegionHeight()/scale.y;
+		eFish = new EnemyFish(20, 0, dwidth, dheight);
+		eFish.setDensity(CRATE_DENSITY);
+		eFish.setFriction(CRATE_FRICTION);
+		eFish.setRestitution(BASIC_RESTITUTION);
+		eFish.setName("crate"+ 1);
+		eFish.setDrawScale(scale);
+		eFish.setTexture(texture);
+		eFish.setBodyType(BodyDef.BodyType.StaticBody);
+		eFish.setGoal(0, 0);
+		addObject(eFish);
+>>>>>>> b718cce5c7df96534d332150ab5d914e863b7e36
 		
-	}
+//		tether = new TetherModel(1, 6, dwidth, dheight);
+//		tether.setBodyType(BodyDef.BodyType.StaticBody);
+//		tether.setDensity(0.0f);
+//		tether.setFriction(0.0f);
+//		tether.setRestitution(0.0f);
+//		tether.setSensor(true);
+//		tether.setDrawScale(scale);
+//		tether.setTexture(goalTile);
+//		addObject(tether);
+//		tethers.add(tether);
+		
+		// Create ground pieces
+//		PolygonObstacle obj;
+//		obj = new PolygonObstacle(WALL1, 0, 0);
+//		obj.setBodyType(BodyDef.BodyType.StaticBody);
+//		obj.setDensity(BASIC_DENSITY);
+//		obj.setFriction(BASIC_FRICTION);
+//		obj.setRestitution(BASIC_RESTITUTION);
+//		obj.setDrawScale(scale);
+//		obj.setTexture(earthTile);
+//		obj.setName("wall1");
+//		addObject(obj);
+//
+//		obj = new PolygonObstacle(WALL2, 0, 0);
+//		obj.setBodyType(BodyDef.BodyType.StaticBody);
+//		obj.setDensity(BASIC_DENSITY);
+//		obj.setFriction(BASIC_FRICTION);
+//		obj.setRestitution(BASIC_RESTITUTION);
+//		obj.setDrawScale(scale);
+//		obj.setTexture(earthTile);
+//		obj.setName("wall2");
+//		addObject(obj);
 
-	/**
-	 * Returns whether to process the update loop
-	 *
-	 * At the start of the update loop, we check if it is time to switch to a
-	 * new game mode. If not, the update proceeds normally.
-	 *
-	 * @param delta
-	 *            Number of seconds since last animation frame
-	 * 
-	 * @return whether to process the update loop
-	 */
-	public boolean preUpdate(float dt) {
-		if (!super.preUpdate(dt)) {
-			return false;
-		}
 
-		if (!isFailure() && avatar.getY() < -1) {
-			setFailure(true);
-			return false;
-		}
-
-		return true;
+		// Create the rocket avatar
+		dwidth  = rocketTexture.getRegionWidth()/scale.x;
+		dheight = rocketTexture.getRegionHeight()/scale.y;
+		fish = new PlayerFishModel(ROCK_POS.x, ROCK_POS.y, dwidth, dheight);
+		fish.setDrawScale(scale);
+		fish.setTexture(rocketTexture);
+	  
+		addObject(fish);
 	}
 
 	/**
 	 * The core gameplay loop of this world.
 	 *
 	 * This method contains the specific update code for this mini-game. It does
-	 * not handle collisions, as those are managed by the parent class
-	 * WorldController. This method is called after input is read, but before
-	 * collisions are resolved. The very last thing that it should do is apply
-	 * forces to the appropriate objects.
+	 * not handle collisions, as those are managed by the parent class WorldController.
+	 * This method is called after input is read, but before collisions are resolved.
+	 * The very last thing that it should do is apply forces to the appropriate objects.
 	 *
-	 * @param delta
-	 *            Number of seconds since last animation frame
+	 * @param delta Number of seconds since last animation frame
 	 */
 	public void update(float dt) {
-		// Process actions in object model
-		avatar.setMovement(InputController.getInstance().getHorizontal() * avatar.getForce());
-		avatar.setJumping(InputController.getInstance().didPrimary());
-		avatar.setShooting(InputController.getInstance().didSecondary());
-
-		// Add a bullet if we fire
-		if (avatar.isShooting()) {
-			createBullet();
+		
+		if (fish.getLinearVelocity().len2() != 0) 
+			fish.setLinearVelocity(fish.getLinearVelocity().setLength(10));
+		
+		float thrust = fish.getThrust();
+		InputController input = InputController.getInstance();
+		fish.setFX(thrust * input.getHorizontal());
+		fish.setFY(thrust * input.getVertical());
+		fish.applyForce();
+		
+		if (input.didLaunch()) tethered = !tethered;
+		
+		TetherModel closestTether = tethers.get(0);
+		float closestDistance = tethers.get(0).getPosition().sub(fish.getPosition()).len2();
+		for (TetherModel tether : tethers) {
+			float newDistance = tether.getPosition().sub(fish.getPosition()).len2();
+			if (newDistance < closestDistance) {
+				closestDistance = newDistance;
+				closestTether = tether;
+			}
 		}
-
-		avatar.applyForce();
-		if (avatar.isJumping()) {
-			SoundController.getInstance().play(JUMP_FILE, JUMP_FILE, false, EFFECT_VOLUME);
+//		if (tethered &&
+		if (input.space && 
+			fish.getPosition().sub(fish.getInitialTangentPoint(closestTether)).len2() < .1) {
+			fish.applyTetherForce(closestTether);
 		}
-
-		// If we use sound, we must remember this.
-		SoundController.getInstance().update();
+		
+		eFish.moveTowardsGoal();
+		eFish.patrol(20, 0, 20, 18);
+		
+	    SoundController.getInstance().update();
 	}
-
-	/**
-	 * Add a new bullet to the world and send it in the right direction.
-	 */
-	private void createBullet() {
-		float offset = (avatar.isFacingRight() ? BULLET_OFFSET : -BULLET_OFFSET);
-		float radius = bulletTexture.getRegionWidth() / (2.0f * scale.x);
-		WheelObstacle bullet = new WheelObstacle(avatar.getX() + offset, avatar.getY(), radius);
-
-		bullet.setName("bullet");
-		bullet.setDensity(HEAVY_DENSITY);
-		bullet.setDrawScale(scale);
-		bullet.setTexture(bulletTexture);
-		bullet.setBullet(true);
-		bullet.setGravityScale(0);
-
-		// Compute position and velocity
-		float speed = (avatar.isFacingRight() ? BULLET_SPEED : -BULLET_SPEED);
-		bullet.setVX(speed);
-		addQueuedObject(bullet);
-
-		SoundController.getInstance().play(PEW_FILE, PEW_FILE, false, EFFECT_VOLUME);
-	}
-
-	/**
-	 * Remove a new bullet from the world.
-	 *
-	 * @param bullet
-	 *            the bullet to remove
-	 */
-	public void removeBullet(Obstacle bullet) {
-		bullet.markRemoved(true);
-		SoundController.getInstance().play(POP_FILE, POP_FILE, false, EFFECT_VOLUME);
-	}
-
+	
+	/// CONTACT LISTENER METHODS
 	/**
 	 * Callback method for the start of a collision
 	 *
-	 * This method is called when we first get a collision between two objects.
-	 * We use this method to test if it is the "right" kind of collision. In
-	 * particular, we use it to test if we made it to the win door.
+	 * This method is called when we first get a collision between two objects.  We use 
+	 * this method to test if it is the "right" kind of collision.  In particular, we
+	 * use it to test if we made it to the win door.
 	 *
-	 * @param contact
-	 *            The two bodies that collided
+	 * @param contact The two bodies that collided
 	 */
 	public void beginContact(Contact contact) {
-		Fixture fix1 = contact.getFixtureA();
-		Fixture fix2 = contact.getFixtureB();
+		Body body1 = contact.getFixtureA().getBody();
+		Body body2 = contact.getFixtureB().getBody();
 
-		Body body1 = fix1.getBody();
-		Body body2 = fix2.getBody();
-
-		Object fd1 = fix1.getUserData();
-		Object fd2 = fix2.getUserData();
-
-		try {
-			Obstacle bd1 = (Obstacle) body1.getUserData();
-			Obstacle bd2 = (Obstacle) body2.getUserData();
-
-			// Test bullet collision with world
-			if (bd1.getName().equals("bullet") && bd2 != avatar) {
-				removeBullet(bd1);
-			}
-
-			if (bd2.getName().equals("bullet") && bd1 != avatar) {
-				removeBullet(bd2);
-			}
-
-			// See if we have landed on the ground.
-			if ((avatar.getSensorName().equals(fd2) && avatar != bd1)
-					|| (avatar.getSensorName().equals(fd1) && avatar != bd2)) {
-				avatar.setGrounded(true);
-				sensorFixtures.add(avatar == bd1 ? fix2 : fix1); // Could have
-																	// more than
-																	// one
-																	// ground
-			}
-
-			// Check for win condition
-			if ((bd1 == avatar && bd2 == goalDoor) || (bd1 == goalDoor && bd2 == avatar)) {
-				setComplete(true);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
+		if( (body1.getUserData() == fish   && body2.getUserData() == goalDoor) ||
+			(body1.getUserData() == goalDoor && body2.getUserData() == fish)) {
+			setComplete(true);
 		}
-
 	}
-
+	
 	/**
 	 * Callback method for the start of a collision
 	 *
-	 * This method is called when two objects cease to touch. The main use of
-	 * this method is to determine when the characer is NOT on the ground. This
-	 * is how we prevent double jumping.
+	 * This method is called when two objects cease to touch.  We do not use it.
+	 */ 
+	public void endContact(Contact contact) {}
+	
+	private Vector2 cache = new Vector2();
+	
+	/** Unused ContactListener method */
+	public void postSolve(Contact contact, ContactImpulse impulse) {}
+
+	/**
+	 * Handles any modifications necessary before collision resolution
+	 *
+	 * This method is called just before Box2D resolves a collision.  We use this method
+	 * to implement sound on contact, using the algorithms outlined similar to those in
+	 * Ian Parberry's "Introduction to Game Physics with Box2D".  
+	 * 
+	 * However, we cannot use the proper algorithms, because LibGDX does not implement 
+	 * b2GetPointStates from Box2D.  The danger with our approximation is that we may
+	 * get a collision over multiple frames (instead of detecting the first frame), and
+	 * so play a sound repeatedly.  Fortunately, the cooldown hack in SoundController
+	 * prevents this from happening.
+	 *
+	 * @param  contact  	The two bodies that collided
+	 * @param  oldManfold  	The collision manifold before contact
 	 */
-	public void endContact(Contact contact) {
-		Fixture fix1 = contact.getFixtureA();
-		Fixture fix2 = contact.getFixtureB();
 
-		Body body1 = fix1.getBody();
-		Body body2 = fix2.getBody();
+	public void preSolve(Contact contact, Manifold oldManifold) {
+		float speed = 0;
 
-		Object fd1 = fix1.getUserData();
-		Object fd2 = fix2.getUserData();
-
-		Object bd1 = body1.getUserData();
-		Object bd2 = body2.getUserData();
-
-		if ((avatar.getSensorName().equals(fd2) && avatar != bd1)
-				|| (avatar.getSensorName().equals(fd1) && avatar != bd2)) {
-			sensorFixtures.remove(avatar == bd1 ? fix2 : fix1);
-			if (sensorFixtures.size == 0) {
-				avatar.setGrounded(false);
+		// Use Ian Parberry's method to compute a speed threshold
+		Body body1 = contact.getFixtureA().getBody();
+		Body body2 = contact.getFixtureB().getBody();
+		WorldManifold worldManifold = contact.getWorldManifold();
+		Vector2 wp = worldManifold.getPoints()[0];
+		cache.set(body1.getLinearVelocityFromWorldPoint(wp));
+		cache.sub(body2.getLinearVelocityFromWorldPoint(wp));
+		speed = cache.dot(worldManifold.getNormal());
+		    
+		// Play a sound if above threshold
+		if (speed > SOUND_THRESHOLD) {
+			String s1 = ((Obstacle)body1.getUserData()).getName();
+			String s2 = ((Obstacle)body2.getUserData()).getName();
+			if (s1.equals("rocket") || s1.startsWith("crate")) {
+				SoundController.getInstance().play(s1, COLLISION_SOUND, false, 0.5f);
+			}
+			if (s2.equals("rocket") || s2.startsWith("crate")) {
+				SoundController.getInstance().play(s2, COLLISION_SOUND, false, 0.5f);
 			}
 		}
+		
 	}
-
-	/** Unused ContactListener method */
-	public void postSolve(Contact contact, ContactImpulse impulse) {
-	}
-
-	/** Unused ContactListener method */
-	public void preSolve(Contact contact, Manifold oldManifold) {
-	}
-
 }
