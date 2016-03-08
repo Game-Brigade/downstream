@@ -156,6 +156,10 @@ public class FishController extends WorldController implements ContactListener {
 	// Since these appear only once, we do not care about the magic numbers.
 	// In an actual game, this information would go in a data file.
 	// Wall vertices
+<<<<<<< HEAD
+	private static final float[][] LAND = {{}};
+
+=======
 	private static final float[] WALL1 = { 0.0f, 18.0f, 16.0f, 18.0f, 16.0f, 17.0f,
 										   8.0f, 15.0f,  1.0f, 17.0f,  2.0f,  7.0f,
 										   3.0f,  5.0f,  3.0f,  1.0f, 16.0f,  1.0f,
@@ -179,6 +183,7 @@ public class FishController extends WorldController implements ContactListener {
 	private static final float[] BOXES = {};
 	
 	private ArrayList<TetherModel> tethers = new ArrayList<TetherModel>();
+>>>>>>> b718cce5c7df96534d332150ab5d914e863b7e36
 
 	// Other game objects
 	/** The initial rocket position */
@@ -281,6 +286,33 @@ public class FishController extends WorldController implements ContactListener {
 		addObject(tether);
 		tethers.add(tether);
 		
+<<<<<<< HEAD
+		//add land walls
+		String lname = "land";
+		for (int ii = 0; ii < LAND.length; ii++) {
+			PolygonObstacle obj;
+			obj = new PolygonObstacle(LAND[ii], 0, 0);
+			obj.setBodyType(BodyDef.BodyType.StaticBody);
+			obj.setDensity(BASIC_DENSITY);
+			obj.setFriction(BASIC_FRICTION);
+			obj.setRestitution(BASIC_RESTITUTION);
+			obj.setDrawScale(scale);
+			obj.setTexture(landTexture);
+			obj.setName(lname + ii);
+			addObject(obj);
+		}
+
+		
+
+		// Create player avatar
+		float dwidth = avatarTexture.getRegionWidth() / scale.x;
+		float dheight = avatarTexture.getRegionHeight() / scale.y;
+		avatar = new PlayerFishModel(AVATAR_POS.x, AVATAR_POS.y);
+		avatar.setDrawScale(scale);
+		avatar.setTexture(avatarTexture);
+		addObject(avatar);
+
+=======
 		TextureRegion texture = crateTextures[1];
 		dwidth  = texture.getRegionWidth()/scale.x;
 		dheight = texture.getRegionHeight()/scale.y;
@@ -294,6 +326,7 @@ public class FishController extends WorldController implements ContactListener {
 		eFish.setBodyType(BodyDef.BodyType.StaticBody);
 		eFish.setGoal(0, 0);
 		addObject(eFish);
+>>>>>>> b718cce5c7df96534d332150ab5d914e863b7e36
 		
 //		tether = new TetherModel(1, 6, dwidth, dheight);
 //		tether.setBodyType(BodyDef.BodyType.StaticBody);
