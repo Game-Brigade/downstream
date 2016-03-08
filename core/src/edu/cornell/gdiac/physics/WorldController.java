@@ -48,7 +48,7 @@ public abstract class WorldController implements Screen {
 	/** 
 	 * Tracks the asset state.  Otherwise subclasses will try to load assets 
 	 */
-	protected enum AssetState {
+	public enum AssetState {
 		/** No assets loaded */
 		EMPTY,
 		/** Still loading assets */
