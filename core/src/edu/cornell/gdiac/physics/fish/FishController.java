@@ -18,6 +18,7 @@ import com.badlogic.gdx.utils.ObjectSet;
 import edu.cornell.gdiac.physics.InputController;
 import edu.cornell.gdiac.physics.WorldController;
 import edu.cornell.gdiac.physics.WorldController.AssetState;
+import edu.cornell.gdiac.physics.fish.TetherModel.TetherType;
 import edu.cornell.gdiac.physics.obstacle.BoxObstacle;
 import edu.cornell.gdiac.physics.obstacle.Obstacle;
 import edu.cornell.gdiac.physics.obstacle.PolygonObstacle;
@@ -235,6 +236,7 @@ public class FishController extends WorldController implements ContactListener {
 	 * Lays out the game geography.
 	 */
 	private void populateLevel() {
+		/*
 		// Add level goal
 		float dwidth = goalTile.getRegionWidth() / scale.x;
 		float dheight = goalTile.getRegionHeight() / scale.y;
@@ -248,7 +250,49 @@ public class FishController extends WorldController implements ContactListener {
 		goalDoor.setTexture(goalTile);
 		goalDoor.setName("goal");
 		addObject(goalDoor);
-
+		*/
+		
+		//Add lily pads
+		lily0 = new TetherModel(0,0,TetherType.Lilipad);
+		lily0.setDensity(0);
+		lily0.setFriction(0);
+		lily0.setRestitution(0);
+		lily0.setSensor(true);
+		lily0.setDrawScale(scale);
+		lily0.setTexture(lilyTexture);
+		lily0.setName("Lily Pad 0");
+		addObject(lily0);
+		
+		lily1 = new TetherModel(0,0,TetherType.Lilipad);
+		lily1.setDensity(0);
+		lily1.setFriction(0);
+		lily1.setRestitution(0);
+		lily1.setSensor(true);
+		lily1.setDrawScale(scale);
+		lily1.setTexture(lilyTexture);
+		lily1.setName("Lily Pad 1");
+		addObject(lily1);
+		
+		lily2 = new TetherModel(0,0,TetherType.Lilipad);
+		lily2.setDensity(0);
+		lily2.setFriction(0);
+		lily2.setRestitution(0);
+		lily2.setSensor(true);
+		lily2.setDrawScale(scale);
+		lily2.setTexture(lilyTexture);
+		lily2.setName("Lily Pad 2");
+		addObject(lily2);
+		
+		lily3 = new TetherModel(0,0,TetherType.Lilipad);
+		lily3.setDensity(0);
+		lily3.setFriction(0);
+		lily3.setRestitution(0);
+		lily3.setSensor(true);
+		lily3.setDrawScale(scale);
+		lily3.setTexture(lilyTexture);
+		lily3.setName("Lily Pad 3");
+		addObject(lily3);
+		
 		String wname = "wall";
 		for (int ii = 0; ii < WALLS.length; ii++) {
 			PolygonObstacle obj;
