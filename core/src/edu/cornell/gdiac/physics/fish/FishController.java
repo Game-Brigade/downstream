@@ -195,6 +195,8 @@ public class FishController extends WorldController implements ContactListener {
 	private BoxObstacle goalDoor;
 	/** Reference to the rocket/player avatar */
 	private PlayerFishModel fish;
+	
+	private EnemyFish eFish;
 
 	/**
 	 * Creates and initialize a new instance of the rocket lander game
@@ -282,6 +284,20 @@ public class FishController extends WorldController implements ContactListener {
 		addObject(tether);
 		tethers.add(tether);
 		
+		TextureRegion texture = crateTextures[1];
+		dwidth  = texture.getRegionWidth()/scale.x;
+		dheight = texture.getRegionHeight()/scale.y;
+		eFish = new EnemyFish(20, 0, dwidth, dheight);
+		eFish.setDensity(CRATE_DENSITY);
+		eFish.setFriction(CRATE_FRICTION);
+		eFish.setRestitution(BASIC_RESTITUTION);
+		eFish.setName("crate"+ 1);
+		eFish.setDrawScale(scale);
+		eFish.setTexture(texture);
+		eFish.setBodyType(BodyDef.BodyType.StaticBody);
+		eFish.setGoal(0, 0);
+		addObject(eFish);
+		
 //		tether = new TetherModel(1, 6, dwidth, dheight);
 //		tether.setBodyType(BodyDef.BodyType.StaticBody);
 //		tether.setDensity(0.0f);
@@ -360,6 +376,9 @@ public class FishController extends WorldController implements ContactListener {
 			fish.getPosition().sub(fish.getInitialTangentPoint(closestTether)).len2() < .1) {
 			fish.applyTetherForce(closestTether);
 		}
+		
+		eFish.moveTowardsGoal();
+		eFish.patrol(20, 0, 20, 18);
 		
 	    SoundController.getInstance().update();
 	}
