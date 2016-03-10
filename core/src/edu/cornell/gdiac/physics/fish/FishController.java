@@ -10,6 +10,7 @@ package edu.cornell.gdiac.physics.fish;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.math.*;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.assets.*;
 import com.badlogic.gdx.audio.*;
 import com.badlogic.gdx.graphics.*;
@@ -152,6 +153,10 @@ public class FishController extends WorldController implements ContactListener {
 	private static final float BASIC_RESTITUTION = 0.1f;
 	/** Threshold for generating sound on collision */
 	private static final float SOUND_THRESHOLD = 1.0f;
+	
+	private static final float TETHER_DENSITY = CRATE_DENSITY;
+	private static final float TETHER_FRICTION = CRATE_FRICTION;
+	private static final float TETHER_RESTITUTION = BASIC_RESTITUTION;
 
 	// Since these appear only once, we do not care about the magic numbers.
 	// In an actual game, this information would go in a data file.
@@ -239,12 +244,18 @@ public class FishController extends WorldController implements ContactListener {
 		float dwidth  = goalTile.getRegionWidth()/scale.x;
 		float dheight = goalTile.getRegionHeight()/scale.y;
 		
+		boolean sensorTethers = true;
+		
+		float rad = tetherTexture.getRegionWidth()/2;
+
+		
 		TetherModel tether = new TetherModel(12, 2, dwidth, dheight);
 		tether.setBodyType(BodyDef.BodyType.StaticBody);
-		tether.setDensity(0.0f);
-		tether.setFriction(0.0f);
-		tether.setRestitution(0.0f);
-		tether.setSensor(true);
+		tether.setName("tether"+ 1);
+		tether.setDensity(TETHER_DENSITY);
+		tether.setFriction(TETHER_FRICTION);
+		tether.setRestitution(TETHER_RESTITUTION);
+		tether.setSensor(sensorTethers);
 		tether.setDrawScale(scale);
 		tether.setTexture(tetherTexture);
 		addObject(tether);
@@ -252,10 +263,11 @@ public class FishController extends WorldController implements ContactListener {
 		
 		tether = new TetherModel(6, 12, dwidth, dheight);
 		tether.setBodyType(BodyDef.BodyType.StaticBody);
-		tether.setDensity(0.0f);
-		tether.setFriction(0.0f);
-		tether.setRestitution(0.0f);
-		tether.setSensor(true);
+		tether.setName("tether"+ 2);
+		tether.setDensity(TETHER_DENSITY);
+		tether.setFriction(TETHER_FRICTION);
+		tether.setRestitution(TETHER_RESTITUTION);
+		tether.setSensor(sensorTethers);
 		tether.setDrawScale(scale);
 		tether.setTexture(tetherTexture);
 		addObject(tether);
@@ -263,10 +275,11 @@ public class FishController extends WorldController implements ContactListener {
 		
 		tether = new TetherModel(28, 10, dwidth, dheight);
 		tether.setBodyType(BodyDef.BodyType.StaticBody);
-		tether.setDensity(0.0f);
-		tether.setFriction(0.0f);
-		tether.setRestitution(0.0f);
-		tether.setSensor(true);
+		tether.setName("tether"+ 3);
+		tether.setDensity(TETHER_DENSITY);
+		tether.setFriction(TETHER_FRICTION);
+		tether.setRestitution(TETHER_RESTITUTION);
+		tether.setSensor(sensorTethers);
 		tether.setDrawScale(scale);
 		tether.setTexture(tetherTexture);
 		addObject(tether);
@@ -274,10 +287,11 @@ public class FishController extends WorldController implements ContactListener {
 		
 		tether = new TetherModel(16, 14, dwidth, dheight);
 		tether.setBodyType(BodyDef.BodyType.StaticBody);
-		tether.setDensity(0.0f);
-		tether.setFriction(0.0f);
-		tether.setRestitution(0.0f);
-		tether.setSensor(true);
+		tether.setName("tether"+ 4);
+		tether.setDensity(TETHER_DENSITY);
+		tether.setFriction(TETHER_FRICTION);
+		tether.setRestitution(TETHER_RESTITUTION);
+		tether.setSensor(sensorTethers);
 		tether.setDrawScale(scale);
 		tether.setTexture(tetherTexture);
 		addObject(tether);
@@ -297,6 +311,7 @@ public class FishController extends WorldController implements ContactListener {
 		eFish.setBodyType(BodyDef.BodyType.StaticBody);
 		eFish.setGoal(0, 0);
 		addObject(eFish);
+		
 		
 //		tether = new TetherModel(1, 6, dwidth, dheight);
 //		tether.setBodyType(BodyDef.BodyType.StaticBody);
@@ -332,7 +347,7 @@ public class FishController extends WorldController implements ContactListener {
 //		addObject(obj);
 
 
-		// Create the rocket avatar
+		// Create the fish avatar
 		dwidth  = rocketTexture.getRegionWidth()/scale.x;
 		dheight = rocketTexture.getRegionHeight()/scale.y;
 		fish = new PlayerFishModel(ROCK_POS.x, ROCK_POS.y, dwidth, dheight);
@@ -353,15 +368,14 @@ public class FishController extends WorldController implements ContactListener {
 	 * @param delta Number of seconds since last animation frame
 	 */
 	public void update(float dt) {
-		
-		if (fish.getLinearVelocity().len2() != 0) 
-			fish.setLinearVelocity(fish.getLinearVelocity().setLength(10));
-		
+
 		float thrust = fish.getThrust();
 		InputController input = InputController.getInstance();
 		fish.setFX(thrust * input.getHorizontal());
 		fish.setFY(thrust * input.getVertical());
 		fish.applyForce();
+		
+		
 		
 		if (input.didLaunch()) tethered = !tethered;
 		
@@ -379,6 +393,33 @@ public class FishController extends WorldController implements ContactListener {
 			fish.getPosition().sub(fish.getInitialTangentPoint(closestTether)).len2() < .1) {
 			fish.applyTetherForce(closestTether);
 		}
+		
+		float angV = 3f;
+		float radius = closestTether.getPosition().dst(fish.getPosition());
+		float tetherSpeed = angV*radius;
+		
+		float MAX_SPEED = 7f;
+		float MIN_SPEED = 6f;
+		
+		int motionType = 0;
+		
+		if (fish.getLinearVelocity().len2() != 0) {
+			switch(motionType){
+			case 0:
+				fish.setLinearVelocity(fish.getLinearVelocity().setLength(MAX_SPEED));
+			case 1:
+				if (fish.getLinearVelocity().len() <= MAX_SPEED - 1 && input.accel){
+					fish.setLinearVelocity(fish.getLinearVelocity().setLength(fish.getLinearVelocity().len()+1));
+				}
+				if (fish.getLinearVelocity().len() >= MIN_SPEED + 1 && input.deccel){
+					fish.setLinearVelocity(fish.getLinearVelocity().setLength(fish.getLinearVelocity().len()-1));
+				}
+			case 2:
+				fish.setLinearVelocity(fish.getLinearVelocity().setLength(tetherSpeed));
+			}
+		}
+		
+		
 		
 		eFish.moveTowardsGoal();
 		eFish.patrol(20, 0, 20, 18);
@@ -451,10 +492,10 @@ public class FishController extends WorldController implements ContactListener {
 		if (speed > SOUND_THRESHOLD) {
 			String s1 = ((Obstacle)body1.getUserData()).getName();
 			String s2 = ((Obstacle)body2.getUserData()).getName();
-			if (s1.equals("rocket") || s1.startsWith("crate")) {
+			if (s1.equals("rocket") || s1.startsWith("crate") || s1.startsWith("tether")) {
 				SoundController.getInstance().play(s1, COLLISION_SOUND, false, 0.5f);
 			}
-			if (s2.equals("rocket") || s2.startsWith("crate")) {
+			if (s2.equals("rocket") || s2.startsWith("crate") || s2.startsWith("tether")) {
 				SoundController.getInstance().play(s2, COLLISION_SOUND, false, 0.5f);
 			}
 		}

@@ -16,7 +16,7 @@ import edu.cornell.gdiac.util.*;
 import edu.cornell.gdiac.physics.*;
 import edu.cornell.gdiac.physics.obstacle.*;
 
-public class TetherModel extends BoxObstacle {
+public class TetherModel extends WheelObstacle {
 
   /** Width of this tether, used for collision detection */
   private static final int TETHER_DEFAULT_WIDTH = 40;
@@ -28,7 +28,7 @@ public class TetherModel extends BoxObstacle {
   private static final int TETHER_DEFAULT_RANGE = 400;
 
   /** The radius at which the player orbits a tether */
-  private static final int TETHER_DEFAULT_RADIUS = 20;
+  private static final float TETHER_DEFAULT_RADIUS = .1f;
   
   private static final BodyDef.BodyType TETHER_BODY_TYPE = BodyDef.BodyType.StaticBody;
 
@@ -43,14 +43,16 @@ public class TetherModel extends BoxObstacle {
   };
 
   public TetherModel(float x, float y, TetherType type) {
-    super(x, y, TETHER_DEFAULT_WIDTH, TETHER_DEFAULT_HEIGHT);
-    setType(type);
+    //super(x, y, TETHER_DEFAULT_WIDTH, TETHER_DEFAULT_HEIGHT);
+	  super(x,y,TETHER_DEFAULT_RADIUS);
+	  setType(type);
     setBodyType(TETHER_BODY_TYPE);
   }
   
   public TetherModel(float x, float y, float w, float h) {
-    super(x,y,w,h);
-    setType(TetherType.Lilipad);
+    //super(x,y,w/4,h/4);
+	  super(x,y,TETHER_DEFAULT_RADIUS);
+	 setType(TetherType.Lilipad);
     setBodyType(TETHER_BODY_TYPE);
   }
 
@@ -65,7 +67,7 @@ public class TetherModel extends BoxObstacle {
     return direction.setLength(forceMagnitude);
   }
   
-  public int getRadius() {
+  public float getRadius() {
     return TETHER_DEFAULT_RADIUS;
   }
 

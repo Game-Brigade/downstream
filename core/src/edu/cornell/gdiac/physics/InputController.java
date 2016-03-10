@@ -85,6 +85,8 @@ public class InputController {
 	/** For the gamepad crosshair control */
 	private float momentum;
 	
+	public boolean accel;
+	public boolean deccel;
 	public boolean space;
 	
 	/** An X-Box controller (if it is connected) */
@@ -111,7 +113,7 @@ public class InputController {
 	public float getVertical() {
 		return vertical;
 	}
-	
+		
 	/**
 	 * Returns the current position of the crosshairs on the screen.
 	 *
@@ -335,6 +337,18 @@ public class InputController {
 			space = true;
 		} else {
 			space = false;
+		}
+		
+		if (Gdx.input.isKeyPressed(Input.Keys.ALT_RIGHT)) {
+			deccel = true;
+		} else {
+			deccel = false;
+		}
+		
+		if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_RIGHT)) {
+			accel = true;
+		} else {
+			accel = false;
 		}
 		
 		// Mouse results
