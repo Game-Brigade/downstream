@@ -1,4 +1,5 @@
 build/
-.gradle/
+gradle/
 desktop/
-.class
+*.class
+.DS_Store
