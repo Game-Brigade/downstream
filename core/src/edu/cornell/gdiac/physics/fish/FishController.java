@@ -308,6 +308,7 @@ public class FishController extends WorldController implements ContactListener {
 		eFish.setName("crate"+ 1);
 		eFish.setDrawScale(scale);
 		eFish.setTexture(texture);
+		eFish.setAngle((float) (Math.PI/2));
 		eFish.setBodyType(BodyDef.BodyType.StaticBody);
 		eFish.setGoal(0, 0);
 		addObject(eFish);
@@ -391,7 +392,7 @@ public class FishController extends WorldController implements ContactListener {
 //		if (tethered &&
 		if (input.space && 
 			fish.getPosition().sub(fish.getInitialTangentPoint(closestTether)).len2() < .1) {
-			fish.applyTetherForce(closestTether);
+			fish.applyTetherForce(closestTether);			
 		}
 		
 		float angV = 3f;
@@ -407,6 +408,7 @@ public class FishController extends WorldController implements ContactListener {
 			switch(motionType){
 			case 0:
 				fish.setLinearVelocity(fish.getLinearVelocity().setLength(MAX_SPEED));
+				break;
 			case 1:
 				if (fish.getLinearVelocity().len() <= MAX_SPEED - 1 && input.accel){
 					fish.setLinearVelocity(fish.getLinearVelocity().setLength(fish.getLinearVelocity().len()+1));
@@ -414,8 +416,10 @@ public class FishController extends WorldController implements ContactListener {
 				if (fish.getLinearVelocity().len() >= MIN_SPEED + 1 && input.deccel){
 					fish.setLinearVelocity(fish.getLinearVelocity().setLength(fish.getLinearVelocity().len()-1));
 				}
+				break;
 			case 2:
 				fish.setLinearVelocity(fish.getLinearVelocity().setLength(tetherSpeed));
+				break;
 			}
 		}
 		
@@ -423,6 +427,7 @@ public class FishController extends WorldController implements ContactListener {
 		
 		eFish.moveTowardsGoal();
 		eFish.patrol(20, 0, 20, 18);
+		eFish.getGoal();
 		
 	    SoundController.getInstance().update();
 	}

@@ -206,6 +206,11 @@ public class EnemyFish extends SimpleObstacle {
 	public void drawDebug(GameCanvas canvas) {
 		canvas.drawPhysics(shape,Color.YELLOW,getX(),getY(),getAngle(),drawScale.x,drawScale.y);
 	}
+	
+	public Vector2 getGoal() {
+		return this.goal;
+	}
+	
 	/** 
 	 * Sets the goal state to where the fish wants to go
 	 * @param x
@@ -228,11 +233,12 @@ public class EnemyFish extends SimpleObstacle {
 		
 		if (turnAround){
 			this.goal.set(x2, y2);
+			setAngle((float) (getAngle() + Math.PI));
 		}
 		if (turnAround2){
 			this.goal.set(x1, y1);
+			setAngle((float) (getAngle() + Math.PI));
 		}
-		
 	}
 	/**
 	 * Call during update, will move the fish towards the goal state
