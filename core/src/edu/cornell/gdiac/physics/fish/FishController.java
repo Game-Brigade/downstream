@@ -375,8 +375,7 @@ public class FishController extends WorldController implements ContactListener {
 		fish.setFX(thrust * input.getHorizontal());
 		fish.setFY(thrust * input.getVertical());
 		fish.applyForce();
-		
-		
+		fish.setLinearVelocity(fish.getLinearVelocity().setLength(8));
 		
 		if (input.didLaunch()) tethered = !tethered;
 		
@@ -404,24 +403,24 @@ public class FishController extends WorldController implements ContactListener {
 		
 		int motionType = 0;
 		
-		if (fish.getLinearVelocity().len2() != 0) {
-			switch(motionType){
-			case 0:
-				fish.setLinearVelocity(fish.getLinearVelocity().setLength(MAX_SPEED));
-				break;
-			case 1:
-				if (fish.getLinearVelocity().len() <= MAX_SPEED - 1 && input.accel){
-					fish.setLinearVelocity(fish.getLinearVelocity().setLength(fish.getLinearVelocity().len()+1));
-				}
-				if (fish.getLinearVelocity().len() >= MIN_SPEED + 1 && input.deccel){
-					fish.setLinearVelocity(fish.getLinearVelocity().setLength(fish.getLinearVelocity().len()-1));
-				}
-				break;
-			case 2:
-				fish.setLinearVelocity(fish.getLinearVelocity().setLength(tetherSpeed));
-				break;
-			}
-		}
+//		if (fish.getLinearVelocity().len2() != 0) {
+//			switch(motionType){
+//			case 0:
+//				fish.setLinearVelocity(fish.getLinearVelocity().setLength(MAX_SPEED));
+//				break;
+//			case 1:
+//				if (fish.getLinearVelocity().len() <= MAX_SPEED - 1 && input.accel){
+//					fish.setLinearVelocity(fish.getLinearVelocity().setLength(fish.getLinearVelocity().len()+1));
+//				}
+//				if (fish.getLinearVelocity().len() >= MIN_SPEED + 1 && input.deccel){
+//					fish.setLinearVelocity(fish.getLinearVelocity().setLength(fish.getLinearVelocity().len()-1));
+//				}
+//				break;
+//			case 2:
+//				fish.setLinearVelocity(fish.getLinearVelocity().setLength(tetherSpeed));
+//				break;
+//			}
+//		}
 		
 		
 		
