@@ -1,0 +1,508 @@
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500   1) /*
+ca2f299a (dashbrown         2016-03-07 22:09:22 -0500   2)  * Fish.java
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500   3)  *
+ca2f299a (dashbrown         2016-03-07 22:09:22 -0500   4)  * Author: Walker M. White && Dashiell Brown
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500   5)  * Based on original PhysicsDemo Lab by Don Holden, 2007
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500   6)  * LibGDX version, 2/6/2015
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500   7)  */
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500   8) package edu.cornell.gdiac.physics.fish;
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500   9) 
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  10) import java.util.ArrayList;
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  11) 
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  12) import com.badlogic.gdx.math.*;
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500  13) import com.badlogic.gdx.Input;
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  14) import com.badlogic.gdx.assets.*;
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  15) import com.badlogic.gdx.audio.*;
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  16) import com.badlogic.gdx.graphics.*;
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  17) import com.badlogic.gdx.graphics.g2d.*;
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  18) import com.badlogic.gdx.physics.box2d.*;
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  19) 
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  20) import edu.cornell.gdiac.util.*;
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  21) import edu.cornell.gdiac.physics.*;
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  22) import edu.cornell.gdiac.physics.obstacle.*;
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  23) 
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  24) /**
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  25)  * Gameplay specific controller for the rocket lander game.
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  26)  *
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  27)  * You will notice that asset loading is not done with static methods this time.  
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  28)  * Instance asset loading makes it easier to process our game modes in a loop, which 
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  29)  * is much more scalable. However, we still want the assets themselves to be static.
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  30)  * This is the purpose of our AssetState variable; it ensures that multiple instances
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  31)  * place nicely with the static assets.
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  32)  */
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500  33) public class FishController extends WorldController implements ContactListener {
+ca2f299a (dashbrown         2016-03-07 22:09:22 -0500  34) 	/** Reference to the fish texture */
+ca2f299a (dashbrown         2016-03-07 22:09:22 -0500  35) 	private static final String ROCK_TEXTURE = "rocket/fish3.png";
+ca2f299a (dashbrown         2016-03-07 22:09:22 -0500  36) 	/** The reference for the tether textures  */
+ca2f299a (dashbrown         2016-03-07 22:09:22 -0500  37) 	private static final String TETHER_TEXTURE = "rocket/lilipad.png";
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  38) 	/** Reference to the crate image assets */
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  39) 	private static final String CRATE_PREF = "rocket/crate0";
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  40) 	/** How many crate assets we have */
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  41) 	private static final int MAX_CRATES = 2;
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  42) 
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  43) 	/** The asset for the collision sound */
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  44) 	private static final String  COLLISION_SOUND = "rocket/bump.mp3";
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  45) 	/** The asset for the main afterburner sound */
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  46) 	private static final String  MAIN_FIRE_SOUND = "rocket/afterburner.mp3";
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  47) 	/** The asset for the right afterburner sound */
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  48) 	private static final String  RGHT_FIRE_SOUND = "rocket/sideburner-right.mp3";
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  49) 	/** The asset for the left afterburner sound */
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  50) 	private static final String  LEFT_FIRE_SOUND = "rocket/sideburner-left.mp3";
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  51) 	
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  52) 	/** Texture assets for the rocket */
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  53) 	private TextureRegion rocketTexture;
+ca2f299a (dashbrown         2016-03-07 22:09:22 -0500  54) 	/** Texture assets for the lilipads */
+ca2f299a (dashbrown         2016-03-07 22:09:22 -0500  55) 	private TextureRegion tetherTexture;
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  56) 	/** Texture filmstrip for the main afterburner */
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  57) 	private FilmStrip mainTexture;
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  58) 	/** Texture filmstrip for the main afterburner */
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  59) 	private FilmStrip leftTexture;
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  60) 	/** Texture filmstrip for the main afterburner */
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  61) 	private FilmStrip rghtTexture;
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  62) 	
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  63) 	/** Texture assets for the crates */
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  64) 	private TextureRegion[] crateTextures = new TextureRegion[MAX_CRATES];
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500  65) 	/** Track asset loading from all instances and subclasses */
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  66) 	private AssetState rocketAssetState = AssetState.EMPTY;
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  67) 	
+0e3c00aa (dashbrown         2016-03-07 21:20:57 -0500  68) 	private boolean tethered;
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500  69) 	/**
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500  70) 	 * Preloads the assets for this controller.
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500  71) 	 *
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  72) 	 * To make the game modes more for-loop friendly, we opted for nonstatic loaders
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  73) 	 * this time.  However, we still want the assets themselves to be static.  So
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  74) 	 * we have an AssetState that determines the current loading state.  If the
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  75) 	 * assets are already loaded, this method will do nothing.
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500  76) 	 * 
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  77) 	 * @param manager Reference to global asset manager.
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500  78) 	 */
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500  79) 	public void preLoadContent(AssetManager manager) {
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  80) 		if (rocketAssetState != AssetState.EMPTY) {
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500  81) 			return;
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500  82) 		}
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  83) 		
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  84) 		rocketAssetState = AssetState.LOADING;
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  85) 		for (int ii = 0; ii < crateTextures.length; ii++) {
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  86) 			manager.load(CRATE_PREF + (ii + 1) +".png", Texture.class);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  87) 			assets.add(CRATE_PREF + (ii + 1) +".png");
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  88) 		}
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  89) 		
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  90) 		// Ship textures
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  91) 		manager.load(ROCK_TEXTURE, Texture.class);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  92) 		assets.add(ROCK_TEXTURE);
+ca2f299a (dashbrown         2016-03-07 22:09:22 -0500  93) 		
+ca2f299a (dashbrown         2016-03-07 22:09:22 -0500  94) 		manager.load(TETHER_TEXTURE, Texture.class);
+ca2f299a (dashbrown         2016-03-07 22:09:22 -0500  95) 		assets.add(TETHER_TEXTURE);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  96) 		
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  97) 		// Ship sounds
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  98) 		manager.load(MAIN_FIRE_SOUND, Sound.class);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500  99) 		assets.add(MAIN_FIRE_SOUND);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 100) 		manager.load(LEFT_FIRE_SOUND, Sound.class);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 101) 		assets.add(LEFT_FIRE_SOUND);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 102) 		manager.load(RGHT_FIRE_SOUND, Sound.class);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 103) 		assets.add(RGHT_FIRE_SOUND);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 104) 		manager.load(COLLISION_SOUND, Sound.class);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 105) 		assets.add(COLLISION_SOUND);
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 106) 
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 107) 		super.preLoadContent(manager);
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 108) 	}
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 109) 
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 110) 	/**
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 111) 	 * Loads the assets for this controller.
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 112) 	 *
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 113) 	 * To make the game modes more for-loop friendly, we opted for nonstatic loaders
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 114) 	 * this time.  However, we still want the assets themselves to be static.  So
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 115) 	 * we have an AssetState that determines the current loading state.  If the
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 116) 	 * assets are already loaded, this method will do nothing.
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 117) 	 * 
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 118) 	 * @param manager Reference to global asset manager.
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 119) 	 */
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 120) 	public void loadContent(AssetManager manager) {
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 121) 		if (rocketAssetState != AssetState.LOADING) {
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 122) 			return;
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 123) 		}
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 124) 		
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 125) 		for (int ii = 0; ii < crateTextures.length; ii++) {
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 126) 			String filename = CRATE_PREF + (ii + 1) +".png";
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 127) 			crateTextures[ii] = createTexture(manager,filename,false);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 128) 		}
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 129) 		
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 130) 		rocketTexture = createTexture(manager,ROCK_TEXTURE,false);
+ca2f299a (dashbrown         2016-03-07 22:09:22 -0500 131) 		tetherTexture = createTexture(manager,TETHER_TEXTURE,false);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 132) 		
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 133) 		SoundController sounds = SoundController.getInstance();
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 134) 		sounds.allocate(manager,MAIN_FIRE_SOUND);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 135) 		sounds.allocate(manager,LEFT_FIRE_SOUND);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 136) 		sounds.allocate(manager,RGHT_FIRE_SOUND);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 137) 		sounds.allocate(manager,COLLISION_SOUND);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 138) 		
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 139) 		super.loadContent(manager);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 140) 		rocketAssetState = AssetState.COMPLETE;
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 141) 	}
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 142) 	
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 143) 	// Physics constants for initialization
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 144) 	/** Density of non-crate objects */
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 145) 	private static final float BASIC_DENSITY   = 0.0f;
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 146) 	/** Density of the crate objects */
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 147) 	private static final float CRATE_DENSITY   = 1.0f;
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 148) 	/** Friction of non-crate objects */
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 149) 	private static final float BASIC_FRICTION  = 0.1f;
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 150) 	/** Friction of the crate objects */
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 151) 	private static final float CRATE_FRICTION  = 0.3f;
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 152) 	/** Collision restitution for all objects */
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 153) 	private static final float BASIC_RESTITUTION = 0.1f;
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 154) 	/** Threshold for generating sound on collision */
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 155) 	private static final float SOUND_THRESHOLD = 1.0f;
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 156) 	
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 157) 	private static final float TETHER_DENSITY = CRATE_DENSITY;
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 158) 	private static final float TETHER_FRICTION = CRATE_FRICTION;
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 159) 	private static final float TETHER_RESTITUTION = BASIC_RESTITUTION;
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 160) 
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 161) 	// Since these appear only once, we do not care about the magic numbers.
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 162) 	// In an actual game, this information would go in a data file.
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 163) 	// Wall vertices
+5d18dc89 (oka2              2016-03-07 21:30:18 -0500 164) 	private static final float[][] LAND = {{}};
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 165) 
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 166) 	private static final float[] WALL1 = { 0.0f, 18.0f, 16.0f, 18.0f, 16.0f, 17.0f,
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 167) 										   8.0f, 15.0f,  1.0f, 17.0f,  2.0f,  7.0f,
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 168) 										   3.0f,  5.0f,  3.0f,  1.0f, 16.0f,  1.0f,
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 169) 										  16.0f,  0.0f,  0.0f,  0.0f};
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 170) 	private static final float[] WALL2 = {32.0f, 18.0f, 32.0f,  0.0f, 16.0f,  0.0f,
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 171) 										  16.0f,  1.0f, 31.0f,  1.0f, 30.0f, 10.0f,
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 172) 										  31.0f, 16.0f, 16.0f, 17.0f, 16.0f, 18.0f};
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 173) 	private static final float[] WALL3 = { 4.0f, 10.5f,  8.0f, 10.5f,
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 174)             							   8.0f,  9.5f,  4.0f,  9.5f};
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 175) 	
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 176) 	private static final float[] WALLX = { 0.0f, 0.0f, 32.0f, 0.0f,
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 177) 										   16.0f, 32.0f, 0.0f, 0.0f, 16.0f};
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 178) 
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 179) 	// The positions of the crate pyramid
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 180) //	private static final float[] BOXES = { 14.5f, 14.25f,
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 181) //            							   13.0f, 12.00f, 16.0f, 12.00f,
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 182) //            							   11.5f,  9.75f, 14.5f,  9.75f, 17.5f, 9.75f,
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 183) //            							   13.0f,  7.50f, 16.0f,  7.50f,
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 184) //            							   11.5f,  5.25f, 14.5f,  5.25f, 17.5f, 5.25f,
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 185) //            							   10.0f,  3.00f, 13.0f,  3.00f, 16.0f, 3.00f, 19.0f, 3.0f};
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 186) 	private static final float[] BOXES = {};
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 187) 	
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 188) 	private ArrayList<TetherModel> tethers = new ArrayList<TetherModel>();
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 189) 
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 190) 	// Other game objects
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 191) 	/** The initial rocket position */
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 192) 	private static Vector2 ROCK_POS = new Vector2(24, 4);
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 193) 	/** The goal door position */
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 194) 	private static Vector2 GOAL_POS = new Vector2( 6, 12);
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 195) 
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 196) 	// Physics objects for the game
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 197) 	/** Reference to the goalDoor (for collision detection) */
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 198) 	private BoxObstacle goalDoor;
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 199) 	/** Reference to the rocket/player avatar */
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 200) 	private PlayerFishModel fish;
+03463b69 (tgb57             2016-03-07 21:18:27 -0500 201) 	
+03463b69 (tgb57             2016-03-07 21:18:27 -0500 202) 	private EnemyFish eFish;
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 203) 
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 204) 	/**
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 205) 	 * Creates and initialize a new instance of the rocket lander game
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 206) 	 *
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 207) 	 * The game has default gravity and other settings
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 208) 	 */
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 209) 	public FishController() {
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 210) 		setDebug(false);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 211) 		setComplete(false);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 212) 		setFailure(false);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 213) 		world.setContactListener(this);
+0e3c00aa (dashbrown         2016-03-07 21:20:57 -0500 214) 		tethered = false;
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 215) 	}
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 216) 	
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 217) 	/**
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 218) 	 * Resets the status of the game so that we can play again.
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 219) 	 *
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 220) 	 * This method disposes of the world and creates a new one.
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 221) 	 */
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 222) 	public void reset() {
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 223) 		Vector2 gravity = new Vector2(world.getGravity() );
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 224) 		
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 225) 		for(Obstacle obj : objects) {
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 226) 			obj.deactivatePhysics(world);
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 227) 		}
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 228) 		objects.clear();
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 229) 		addQueue.clear();
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 230) 		world.dispose();
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 231) 		
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 232) 		world = new World(gravity,false);
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 233) 		world.setContactListener(this);
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 234) 		setComplete(false);
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 235) 		setFailure(false);
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 236) 		populateLevel();
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 237) 	}
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 238) 
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 239) 	/**
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 240) 	 * Lays out the game geography.
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 241) 	 */
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 242) 	private void populateLevel() {
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 243) 		// Add level goal
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 244) 		float dwidth  = goalTile.getRegionWidth()/scale.x;
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 245) 		float dheight = goalTile.getRegionHeight()/scale.y;
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 246) 		
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 247) 		boolean sensorTethers = true;
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 248) 		
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 249) 		float rad = tetherTexture.getRegionWidth()/2;
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 250) 
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 251) 		
+065cc3fc (dashbrown         2016-03-07 22:15:15 -0500 252) 		TetherModel tether = new TetherModel(12, 2, dwidth, dheight);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 253) 		tether.setBodyType(BodyDef.BodyType.StaticBody);
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 254) 		tether.setName("tether"+ 1);
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 255) 		tether.setDensity(TETHER_DENSITY);
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 256) 		tether.setFriction(TETHER_FRICTION);
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 257) 		tether.setRestitution(TETHER_RESTITUTION);
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 258) 		tether.setSensor(sensorTethers);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 259) 		tether.setDrawScale(scale);
+ca2f299a (dashbrown         2016-03-07 22:09:22 -0500 260) 		tether.setTexture(tetherTexture);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 261) 		addObject(tether);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 262) 		tethers.add(tether);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 263) 		
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 264) 		tether = new TetherModel(6, 12, dwidth, dheight);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 265) 		tether.setBodyType(BodyDef.BodyType.StaticBody);
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 266) 		tether.setName("tether"+ 2);
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 267) 		tether.setDensity(TETHER_DENSITY);
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 268) 		tether.setFriction(TETHER_FRICTION);
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 269) 		tether.setRestitution(TETHER_RESTITUTION);
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 270) 		tether.setSensor(sensorTethers);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 271) 		tether.setDrawScale(scale);
+ca2f299a (dashbrown         2016-03-07 22:09:22 -0500 272) 		tether.setTexture(tetherTexture);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 273) 		addObject(tether);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 274) 		tethers.add(tether);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 275) 		
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 276) 		tether = new TetherModel(28, 10, dwidth, dheight);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 277) 		tether.setBodyType(BodyDef.BodyType.StaticBody);
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 278) 		tether.setName("tether"+ 3);
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 279) 		tether.setDensity(TETHER_DENSITY);
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 280) 		tether.setFriction(TETHER_FRICTION);
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 281) 		tether.setRestitution(TETHER_RESTITUTION);
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 282) 		tether.setSensor(sensorTethers);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 283) 		tether.setDrawScale(scale);
+ca2f299a (dashbrown         2016-03-07 22:09:22 -0500 284) 		tether.setTexture(tetherTexture);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 285) 		addObject(tether);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 286) 		tethers.add(tether);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 287) 		
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 288) 		tether = new TetherModel(16, 14, dwidth, dheight);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 289) 		tether.setBodyType(BodyDef.BodyType.StaticBody);
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 290) 		tether.setName("tether"+ 4);
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 291) 		tether.setDensity(TETHER_DENSITY);
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 292) 		tether.setFriction(TETHER_FRICTION);
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 293) 		tether.setRestitution(TETHER_RESTITUTION);
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 294) 		tether.setSensor(sensorTethers);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 295) 		tether.setDrawScale(scale);
+ca2f299a (dashbrown         2016-03-07 22:09:22 -0500 296) 		tether.setTexture(tetherTexture);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 297) 		addObject(tether);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 298) 		tethers.add(tether);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 299) 		
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 300) 
+03463b69 (tgb57             2016-03-07 21:18:27 -0500 301) 		TextureRegion texture = crateTextures[1];
+03463b69 (tgb57             2016-03-07 21:18:27 -0500 302) 		dwidth  = texture.getRegionWidth()/scale.x;
+03463b69 (tgb57             2016-03-07 21:18:27 -0500 303) 		dheight = texture.getRegionHeight()/scale.y;
+03463b69 (tgb57             2016-03-07 21:18:27 -0500 304) 		eFish = new EnemyFish(20, 0, dwidth, dheight);
+03463b69 (tgb57             2016-03-07 21:18:27 -0500 305) 		eFish.setDensity(CRATE_DENSITY);
+03463b69 (tgb57             2016-03-07 21:18:27 -0500 306) 		eFish.setFriction(CRATE_FRICTION);
+03463b69 (tgb57             2016-03-07 21:18:27 -0500 307) 		eFish.setRestitution(BASIC_RESTITUTION);
+03463b69 (tgb57             2016-03-07 21:18:27 -0500 308) 		eFish.setName("crate"+ 1);
+03463b69 (tgb57             2016-03-07 21:18:27 -0500 309) 		eFish.setDrawScale(scale);
+03463b69 (tgb57             2016-03-07 21:18:27 -0500 310) 		eFish.setTexture(texture);
+35567013 (benstevens        2016-03-12 11:58:05 -0500 311) 		eFish.setAngle((float) (Math.PI/2));
+03463b69 (tgb57             2016-03-07 21:18:27 -0500 312) 		eFish.setBodyType(BodyDef.BodyType.StaticBody);
+03463b69 (tgb57             2016-03-07 21:18:27 -0500 313) 		eFish.setGoal(0, 0);
+03463b69 (tgb57             2016-03-07 21:18:27 -0500 314) 		addObject(eFish);
+03463b69 (tgb57             2016-03-07 21:18:27 -0500 315) 		
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 316) 		
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 317) //		tether = new TetherModel(1, 6, dwidth, dheight);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 318) //		tether.setBodyType(BodyDef.BodyType.StaticBody);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 319) //		tether.setDensity(0.0f);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 320) //		tether.setFriction(0.0f);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 321) //		tether.setRestitution(0.0f);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 322) //		tether.setSensor(true);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 323) //		tether.setDrawScale(scale);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 324) //		tether.setTexture(goalTile);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 325) //		addObject(tether);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 326) //		tethers.add(tether);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 327) 		
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 328) 		// Create ground pieces
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 329) //		PolygonObstacle obj;
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 330) //		obj = new PolygonObstacle(WALL1, 0, 0);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 331) //		obj.setBodyType(BodyDef.BodyType.StaticBody);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 332) //		obj.setDensity(BASIC_DENSITY);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 333) //		obj.setFriction(BASIC_FRICTION);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 334) //		obj.setRestitution(BASIC_RESTITUTION);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 335) //		obj.setDrawScale(scale);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 336) //		obj.setTexture(earthTile);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 337) //		obj.setName("wall1");
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 338) //		addObject(obj);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 339) //
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 340) //		obj = new PolygonObstacle(WALL2, 0, 0);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 341) //		obj.setBodyType(BodyDef.BodyType.StaticBody);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 342) //		obj.setDensity(BASIC_DENSITY);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 343) //		obj.setFriction(BASIC_FRICTION);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 344) //		obj.setRestitution(BASIC_RESTITUTION);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 345) //		obj.setDrawScale(scale);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 346) //		obj.setTexture(earthTile);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 347) //		obj.setName("wall2");
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 348) //		addObject(obj);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 349) 
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 350) 
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 351) 		// Create the fish avatar
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 352) 		dwidth  = rocketTexture.getRegionWidth()/scale.x;
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 353) 		dheight = rocketTexture.getRegionHeight()/scale.y;
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 354) 		fish = new PlayerFishModel(ROCK_POS.x, ROCK_POS.y, dwidth, dheight);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 355) 		fish.setDrawScale(scale);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 356) 		fish.setTexture(rocketTexture);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 357) 	  
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 358) 		addObject(fish);
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 359) 	}
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 360) 
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 361) 	/**
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 362) 	 * The core gameplay loop of this world.
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 363) 	 *
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 364) 	 * This method contains the specific update code for this mini-game. It does
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 365) 	 * not handle collisions, as those are managed by the parent class WorldController.
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 366) 	 * This method is called after input is read, but before collisions are resolved.
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 367) 	 * The very last thing that it should do is apply forces to the appropriate objects.
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 368) 	 *
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 369) 	 * @param delta Number of seconds since last animation frame
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 370) 	 */
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 371) 	public void update(float dt) {
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 372) 
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 373) 		float thrust = fish.getThrust();
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 374) 		InputController input = InputController.getInstance();
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 375) 		fish.setFX(thrust * input.getHorizontal());
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 376) 		fish.setFY(thrust * input.getVertical());
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 377) 		fish.applyForce();
+00000000 (Not Committed Yet 2016-03-12 12:17:56 -0500 378) 		fish.setLinearVelocity(fish.getLinearVelocity().setLength(8));
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 379) 		
+0e3c00aa (dashbrown         2016-03-07 21:20:57 -0500 380) 		if (input.didLaunch()) tethered = !tethered;
+0e3c00aa (dashbrown         2016-03-07 21:20:57 -0500 381) 		
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 382) 		TetherModel closestTether = tethers.get(0);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 383) 		float closestDistance = tethers.get(0).getPosition().sub(fish.getPosition()).len2();
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 384) 		for (TetherModel tether : tethers) {
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 385) 			float newDistance = tether.getPosition().sub(fish.getPosition()).len2();
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 386) 			if (newDistance < closestDistance) {
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 387) 				closestDistance = newDistance;
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 388) 				closestTether = tether;
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 389) 			}
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 390) 		}
+0e3c00aa (dashbrown         2016-03-07 21:20:57 -0500 391) //		if (tethered &&
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 392) 		if (input.space && 
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 393) 			fish.getPosition().sub(fish.getInitialTangentPoint(closestTether)).len2() < .1) {
+35567013 (benstevens        2016-03-12 11:58:05 -0500 394) 			fish.applyTetherForce(closestTether);			
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 395) 		}
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 396) 		
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 397) 		float angV = 3f;
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 398) 		float radius = closestTether.getPosition().dst(fish.getPosition());
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 399) 		float tetherSpeed = angV*radius;
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 400) 		
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 401) 		float MAX_SPEED = 7f;
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 402) 		float MIN_SPEED = 6f;
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 403) 		
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 404) 		int motionType = 0;
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 405) 		
+00000000 (Not Committed Yet 2016-03-12 12:17:56 -0500 406) //		if (fish.getLinearVelocity().len2() != 0) {
+00000000 (Not Committed Yet 2016-03-12 12:17:56 -0500 407) //			switch(motionType){
+00000000 (Not Committed Yet 2016-03-12 12:17:56 -0500 408) //			case 0:
+00000000 (Not Committed Yet 2016-03-12 12:17:56 -0500 409) //				fish.setLinearVelocity(fish.getLinearVelocity().setLength(MAX_SPEED));
+00000000 (Not Committed Yet 2016-03-12 12:17:56 -0500 410) //				break;
+00000000 (Not Committed Yet 2016-03-12 12:17:56 -0500 411) //			case 1:
+00000000 (Not Committed Yet 2016-03-12 12:17:56 -0500 412) //				if (fish.getLinearVelocity().len() <= MAX_SPEED - 1 && input.accel){
+00000000 (Not Committed Yet 2016-03-12 12:17:56 -0500 413) //					fish.setLinearVelocity(fish.getLinearVelocity().setLength(fish.getLinearVelocity().len()+1));
+00000000 (Not Committed Yet 2016-03-12 12:17:56 -0500 414) //				}
+00000000 (Not Committed Yet 2016-03-12 12:17:56 -0500 415) //				if (fish.getLinearVelocity().len() >= MIN_SPEED + 1 && input.deccel){
+00000000 (Not Committed Yet 2016-03-12 12:17:56 -0500 416) //					fish.setLinearVelocity(fish.getLinearVelocity().setLength(fish.getLinearVelocity().len()-1));
+00000000 (Not Committed Yet 2016-03-12 12:17:56 -0500 417) //				}
+00000000 (Not Committed Yet 2016-03-12 12:17:56 -0500 418) //				break;
+00000000 (Not Committed Yet 2016-03-12 12:17:56 -0500 419) //			case 2:
+00000000 (Not Committed Yet 2016-03-12 12:17:56 -0500 420) //				fish.setLinearVelocity(fish.getLinearVelocity().setLength(tetherSpeed));
+00000000 (Not Committed Yet 2016-03-12 12:17:56 -0500 421) //				break;
+00000000 (Not Committed Yet 2016-03-12 12:17:56 -0500 422) //			}
+00000000 (Not Committed Yet 2016-03-12 12:17:56 -0500 423) //		}
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 424) 		
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 425) 		
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 426) 		
+03463b69 (tgb57             2016-03-07 21:18:27 -0500 427) 		eFish.moveTowardsGoal();
+03463b69 (tgb57             2016-03-07 21:18:27 -0500 428) 		eFish.patrol(20, 0, 20, 18);
+35567013 (benstevens        2016-03-12 11:58:05 -0500 429) 		eFish.getGoal();
+03463b69 (tgb57             2016-03-07 21:18:27 -0500 430) 		
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 431) 	    SoundController.getInstance().update();
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 432) 	}
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 433) 	
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 434) 	/// CONTACT LISTENER METHODS
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 435) 	/**
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 436) 	 * Callback method for the start of a collision
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 437) 	 *
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 438) 	 * This method is called when we first get a collision between two objects.  We use 
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 439) 	 * this method to test if it is the "right" kind of collision.  In particular, we
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 440) 	 * use it to test if we made it to the win door.
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 441) 	 *
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 442) 	 * @param contact The two bodies that collided
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 443) 	 */
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 444) 	public void beginContact(Contact contact) {
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 445) 		Body body1 = contact.getFixtureA().getBody();
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 446) 		Body body2 = contact.getFixtureB().getBody();
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 447) 
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 448) 		if( (body1.getUserData() == fish   && body2.getUserData() == goalDoor) ||
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 449) 			(body1.getUserData() == goalDoor && body2.getUserData() == fish)) {
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 450) 			setComplete(true);
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 451) 		}
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 452) 	}
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 453) 	
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 454) 	/**
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 455) 	 * Callback method for the start of a collision
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 456) 	 *
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 457) 	 * This method is called when two objects cease to touch.  We do not use it.
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 458) 	 */ 
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 459) 	public void endContact(Contact contact) {}
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 460) 	
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 461) 	private Vector2 cache = new Vector2();
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 462) 	
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 463) 	/** Unused ContactListener method */
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 464) 	public void postSolve(Contact contact, ContactImpulse impulse) {}
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 465) 
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 466) 	/**
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 467) 	 * Handles any modifications necessary before collision resolution
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 468) 	 *
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 469) 	 * This method is called just before Box2D resolves a collision.  We use this method
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 470) 	 * to implement sound on contact, using the algorithms outlined similar to those in
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 471) 	 * Ian Parberry's "Introduction to Game Physics with Box2D".  
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 472) 	 * 
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 473) 	 * However, we cannot use the proper algorithms, because LibGDX does not implement 
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 474) 	 * b2GetPointStates from Box2D.  The danger with our approximation is that we may
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 475) 	 * get a collision over multiple frames (instead of detecting the first frame), and
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 476) 	 * so play a sound repeatedly.  Fortunately, the cooldown hack in SoundController
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 477) 	 * prevents this from happening.
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 478) 	 *
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 479) 	 * @param  contact  	The two bodies that collided
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 480) 	 * @param  oldManfold  	The collision manifold before contact
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 481) 	 */
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 482) 
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 483) 	public void preSolve(Contact contact, Manifold oldManifold) {
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 484) 		float speed = 0;
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 485) 
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 486) 		// Use Ian Parberry's method to compute a speed threshold
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 487) 		Body body1 = contact.getFixtureA().getBody();
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 488) 		Body body2 = contact.getFixtureB().getBody();
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 489) 		WorldManifold worldManifold = contact.getWorldManifold();
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 490) 		Vector2 wp = worldManifold.getPoints()[0];
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 491) 		cache.set(body1.getLinearVelocityFromWorldPoint(wp));
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 492) 		cache.sub(body2.getLinearVelocityFromWorldPoint(wp));
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 493) 		speed = cache.dot(worldManifold.getNormal());
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 494) 		    
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 495) 		// Play a sound if above threshold
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 496) 		if (speed > SOUND_THRESHOLD) {
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 497) 			String s1 = ((Obstacle)body1.getUserData()).getName();
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 498) 			String s2 = ((Obstacle)body2.getUserData()).getName();
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 499) 			if (s1.equals("rocket") || s1.startsWith("crate") || s1.startsWith("tether")) {
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 500) 				SoundController.getInstance().play(s1, COLLISION_SOUND, false, 0.5f);
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 501) 			}
+a1eb899a (benstevens        2016-03-10 11:06:51 -0500 502) 			if (s2.equals("rocket") || s2.startsWith("crate") || s2.startsWith("tether")) {
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 503) 				SoundController.getInstance().play(s2, COLLISION_SOUND, false, 0.5f);
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 504) 			}
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 505) 		}
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 506) 		
+0c6a7bcf (oka2              2016-03-07 19:05:03 -0500 507) 	}
+a46c70da (dashbrown         2016-03-07 20:55:04 -0500 508) }

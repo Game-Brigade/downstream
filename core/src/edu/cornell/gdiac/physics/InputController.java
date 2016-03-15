@@ -88,6 +88,7 @@ public class InputController {
 	public boolean accel;
 	public boolean deccel;
 	public boolean space;
+	public boolean slow;
 	
 	/** An X-Box controller (if it is connected) */
 	XBox360Controller xbox;
@@ -337,6 +338,11 @@ public class InputController {
 			space = true;
 		} else {
 			space = false;
+		}
+		if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+			slow = true;
+		} else {
+			slow = false;
 		}
 		
 		if (Gdx.input.isKeyPressed(Input.Keys.ALT_RIGHT)) {

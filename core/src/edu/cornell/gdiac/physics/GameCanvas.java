@@ -67,6 +67,12 @@ public class GameCanvas {
 	/** Rendering context for the debug outlines */
 	private ShapeRenderer debugRender;
 	
+	/** Rendering for the fish's leading line */
+	private ShapeRenderer leadingLine;
+	
+	/** Rendering for tether radius */
+	private ShapeRenderer tetherRadiusLine;
+	
 	/** Track whether or not we are active (for error checking) */
 	private DrawPass active;
 	
@@ -101,13 +107,17 @@ public class GameCanvas {
 		active = DrawPass.INACTIVE;
 		spriteBatch = new PolygonSpriteBatch();
 		debugRender = new ShapeRenderer();
+		leadingLine = new ShapeRenderer();
+		tetherRadiusLine = new ShapeRenderer();
 		
 		// Set the projection matrix (for proper scaling)
 		camera = new OrthographicCamera(getWidth(),getHeight());
 		camera.setToOrtho(false);
 		spriteBatch.setProjectionMatrix(camera.combined);
 		debugRender.setProjectionMatrix(camera.combined);
-
+		leadingLine.setProjectionMatrix(camera.combined);
+		tetherRadiusLine.setProjectionMatrix(camera.combined);
+		
 		// Initialize the cache objects
 		holder = new TextureRegion();
 		local  = new Affine2();
@@ -1084,6 +1094,7 @@ public class GameCanvas {
 		local.applyTo(vertex);
 		x1 = vertex.x; y1 = vertex.y;
 		debugRender.line(x0, y0, x1, y1);
+		System.out.println("" + x0 + " " + y0 + " " + x1 + " " + y1);
     }
     
     /** 
@@ -1150,5 +1161,27 @@ public class GameCanvas {
 		local.rotate(180.0f*angle/(float)Math.PI);
 		local.scale(sx,sy);
 		local.translate(-ox,-oy);
+	}
+	
+	public void drawLeadingLine(Vector2 start, Vector2 end) {
+		Gdx.gl.glLineWidth(1);
+        leadingLine.setProjectionMatrix(camera.combined);
+        leadingLine.begin(ShapeRenderer.ShapeType.Line);
+        leadingLine.setColor(Color.WHITE);
+        local.applyTo(start);
+        local.applyTo(end);
+        leadingLine.line(start, end);
+        leadingLine.end();
+        Gdx.gl.glLineWidth(1);
+    }
+	
+	public void drawTetherCircle(Vector2 tetherPos, float radius) {
+		tetherRadiusLine.setProjectionMatrix(camera.combined);
+		tetherRadiusLine.begin(ShapeRenderer.ShapeType.Line);
+		tetherRadiusLine.setColor(Color.WHITE);
+//		System.out.println(tetherPos);
+//		System.out.println(radius);
+		tetherRadiusLine.circle(tetherPos.x, tetherPos.y, radius);
+		tetherRadiusLine.end();
 	}
 }

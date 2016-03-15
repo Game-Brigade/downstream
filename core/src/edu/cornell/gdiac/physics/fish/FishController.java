@@ -10,11 +10,13 @@ package edu.cornell.gdiac.physics.fish;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.math.*;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.assets.*;
 import com.badlogic.gdx.audio.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.physics.box2d.*;
 
 import edu.cornell.gdiac.util.*;
@@ -66,6 +68,11 @@ public class FishController extends WorldController implements ContactListener {
 	private AssetState rocketAssetState = AssetState.EMPTY;
 	
 	private boolean tethered;
+	
+	private boolean enableSlow = false;
+	private boolean enableLeadingLine = false;
+	private boolean enableTetherRadius = false;
+	
 	/**
 	 * Preloads the assets for this controller.
 	 *
@@ -377,21 +384,17 @@ public class FishController extends WorldController implements ContactListener {
 		fish.applyForce();
 		fish.setLinearVelocity(fish.getLinearVelocity().setLength(8));
 		
+		if (enableSlow && input.slow) fish.setLinearVelocity(fish.getLinearVelocity().setLength(4));
+		
 		if (input.didLaunch()) tethered = !tethered;
 		
-		TetherModel closestTether = tethers.get(0);
-		float closestDistance = tethers.get(0).getPosition().sub(fish.getPosition()).len2();
-		for (TetherModel tether : tethers) {
-			float newDistance = tether.getPosition().sub(fish.getPosition()).len2();
-			if (newDistance < closestDistance) {
-				closestDistance = newDistance;
-				closestTether = tether;
-			}
-		}
+		TetherModel closestTether = getClosestTether();
+		
 //		if (tethered &&
 		if (input.space && 
-			fish.getPosition().sub(fish.getInitialTangentPoint(closestTether)).len2() < .1) {
-			fish.applyTetherForce(closestTether);			
+			fish.getPosition().sub(fish.getInitialTangentPoint(closestTether.getPosition())).len2() < .01) {
+			fish.applyTetherForce(closestTether);
+//			System.out.println(fish.getInitialTangentPoint(closestTether.getPosition()));
 		}
 		
 		float angV = 3f;
@@ -429,6 +432,44 @@ public class FishController extends WorldController implements ContactListener {
 		eFish.getGoal();
 		
 	    SoundController.getInstance().update();
+	}
+	
+	private TetherModel getClosestTether() {
+		TetherModel closestTether = tethers.get(0);
+		float closestDistance = tethers.get(0).getPosition().sub(fish.getPosition()).len2();
+		for (TetherModel tether : tethers) {
+			float newDistance = tether.getPosition().sub(fish.getPosition()).len2();
+			if (newDistance < closestDistance) {
+				closestDistance = newDistance;
+				closestTether = tether;
+			}
+		}
+		return closestTether;
+	}
+	
+	public void draw(float delta) {
+		super.draw(delta);
+		
+		if (enableLeadingLine) {
+			Vector2 farOff = fish.getPosition().cpy();
+			farOff.add(fish.getLinearVelocity().cpy().scl(1000));
+//			System.out.println(fish.getPosition().cpy());
+			canvas.drawLeadingLine(fish.getPosition().cpy(), farOff);
+		}
+		if (enableTetherRadius) {
+			Vector2 closestTether = getClosestTether().getPosition().cpy().scl(scale);
+			Vector2 initialTangent = fish.getInitialTangentPoint(getClosestTether().getPosition()).scl(scale);
+			float radius = closestTether.dst(initialTangent);
+//			System.out.println(fish.getInitialTangentPoint(closestTether));
+//			System.out.println(fish.getPosition());
+//			System.out.println(closestTether);
+//			System.out.println(initialTangent);
+//			System.out.println(radius);
+//			System.out.println(scale);
+			
+			canvas.drawTetherCircle(closestTether, radius);
+		}
+		
 	}
 	
 	/// CONTACT LISTENER METHODS
@@ -503,6 +544,7 @@ public class FishController extends WorldController implements ContactListener {
 				SoundController.getInstance().play(s2, COLLISION_SOUND, false, 0.5f);
 			}
 		}
-		
 	}
+	
+	
 }
