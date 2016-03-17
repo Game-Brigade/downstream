@@ -181,6 +181,10 @@ public class GameCanvas {
 		camera.update();
 	}
 	
+	public void setCameraPosition(Vector2 newPosition) {
+		camera.position.set(newPosition, 0);
+	}
+	
 	/**
 	 * Changes the width of this canvas
 	 *

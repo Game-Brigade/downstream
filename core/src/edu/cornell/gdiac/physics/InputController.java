@@ -71,8 +71,8 @@ public class InputController {
 	private boolean exitPressed;
 	private boolean exitPrevious;
 	
-	private boolean launchPressed;
-	private boolean launchPrevious;
+	private boolean tetherPressed;
+	private boolean tetherPrevious;
 	
 	/** How much did we move horizontally? */
 	private float horizontal;
@@ -211,8 +211,13 @@ public class InputController {
 		return exitPressed && !exitPrevious;
 	}
 	
-	public boolean didLaunch() {
-		return launchPressed && !launchPrevious;
+	/**
+	 * Returns true if the tether button was pressed.
+	 *
+	 * @return true if the tether button was pressed.
+	 */
+	public boolean didTether() {
+		return tetherPressed && !tetherPrevious;
 	}
 	
 	/**
@@ -248,7 +253,7 @@ public class InputController {
 		exitPrevious = exitPressed;
 		nextPrevious = nextPressed;
 		prevPrevious = prevPressed;
-		launchPrevious = launchPressed;
+		tetherPrevious = tetherPressed;
 		
 		// Check to see if a GamePad is connected
 		if (xbox.isConnected()) {
@@ -315,7 +320,7 @@ public class InputController {
 		prevPressed = (secondary && prevPressed) || (Gdx.input.isKeyPressed(Input.Keys.P));
 		nextPressed = (secondary && nextPressed) || (Gdx.input.isKeyPressed(Input.Keys.N));
 		exitPressed  = (secondary && exitPressed) || (Gdx.input.isKeyPressed(Input.Keys.ESCAPE));
-		launchPressed  = (secondary && launchPressed) || (Gdx.input.isKeyPressed(Input.Keys.SPACE));
+		tetherPressed  = (secondary && tetherPressed) || (Gdx.input.isKeyPressed(Input.Keys.SPACE));
 		
 		// Directional controls
 		horizontal = (secondary ? horizontal : 0.0f);
