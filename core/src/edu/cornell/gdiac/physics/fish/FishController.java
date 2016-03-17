@@ -36,32 +36,24 @@ public class FishController extends WorldController implements ContactListener {
 	/** Reference to the fish texture */
 	private static final String KOI_TEXTURE = "fish/fish3.png";
 	/** The reference for the tether textures  */
-	private static final String TETHER_TEXTURE = "fish/lilypad.png";
+	private static final String LILY_TEXTURE = "fish/lilypad.png";
 	/** Reference to the enemy image assets */
 	private static final String ENEMY_TEXTURE = "fish/enemy.png";
 
 	/** The asset for the collision sound */
-	private static final String  COLLISION_SOUND = "fish/bump.mp3";
-	/** The asset for the main afterburner sound */
-	private static final String  MAIN_FIRE_SOUND = "fish/afterburner.mp3";
-	/** The asset for the right afterburner sound */
-	private static final String  RGHT_FIRE_SOUND = "fish/sideburner-right.mp3";
-	/** The asset for the left afterburner sound */
-	private static final String  LEFT_FIRE_SOUND = "fish/sideburner-left.mp3";
+	//private static final String  COLLISION_SOUND = "fish/bump.mp3";
+	
 	
 	/** Texture assets for the koi */
 	private TextureRegion koiTexture;
 	/** Texture assets for the lilypads */
-	private TextureRegion tetherTexture;
+	private TextureRegion lilyTexture;
 	/** Texture assets for the enemy fish */
 	private TextureRegion enemyTexture;
 
 	/** Texture filmstrip for the main afterburner */
-	private FilmStrip mainTexture;
-	/** Texture filmstrip for the main afterburner */
-	private FilmStrip leftTexture;
-	/** Texture filmstrip for the main afterburner */
-	private FilmStrip rightTexture;
+	//private FilmStrip mainTexture;
+	
 	
 	/** Track asset loading from all instances and subclasses */
 	private AssetState fishAssetState = AssetState.EMPTY;
@@ -69,7 +61,7 @@ public class FishController extends WorldController implements ContactListener {
 	private boolean tethered;
 	
 	private boolean enableSlow = false;
-	private boolean enableLeadingLine = false;
+	private boolean enableLeadingLine = true;
 	private boolean enableTetherRadius = false;
 	
 	/**
@@ -97,18 +89,13 @@ public class FishController extends WorldController implements ContactListener {
 		manager.load(KOI_TEXTURE, Texture.class);
 		assets.add(KOI_TEXTURE);
 		
-		manager.load(TETHER_TEXTURE, Texture.class);
-		assets.add(TETHER_TEXTURE);
+		manager.load(LILY_TEXTURE, Texture.class);
+		assets.add(LILY_TEXTURE);
 		
-		// Ship sounds
-		manager.load(MAIN_FIRE_SOUND, Sound.class);
-		assets.add(MAIN_FIRE_SOUND);
-		manager.load(LEFT_FIRE_SOUND, Sound.class);
-		assets.add(LEFT_FIRE_SOUND);
-		manager.load(RGHT_FIRE_SOUND, Sound.class);
-		assets.add(RGHT_FIRE_SOUND);
-		manager.load(COLLISION_SOUND, Sound.class);
-		assets.add(COLLISION_SOUND);
+		//sounds
+		//manager.load(MAIN_FIRE_SOUND, Sound.class);
+		//assets.add(MAIN_FIRE_SOUND);
+		
 
 		super.preLoadContent(manager);
 	}
@@ -130,13 +117,11 @@ public class FishController extends WorldController implements ContactListener {
 
 		enemyTexture = createTexture(manager,ENEMY_TEXTURE,false);
 		koiTexture = createTexture(manager,KOI_TEXTURE,false);
-		tetherTexture = createTexture(manager,TETHER_TEXTURE,false);
+		lilyTexture = createTexture(manager,LILY_TEXTURE,false);
 		
 		SoundController sounds = SoundController.getInstance();
-		sounds.allocate(manager,MAIN_FIRE_SOUND);
-		sounds.allocate(manager,LEFT_FIRE_SOUND);
-		sounds.allocate(manager,RGHT_FIRE_SOUND);
-		sounds.allocate(manager,COLLISION_SOUND);
+		//sounds.allocate(manager,MAIN_FIRE_SOUND);
+		
 		
 		super.loadContent(manager);
 		fishAssetState = AssetState.COMPLETE;
@@ -248,56 +233,56 @@ public class FishController extends WorldController implements ContactListener {
 		
 		boolean sensorTethers = true;
 		
-		float rad = tetherTexture.getRegionWidth()/2;
+		float rad = lilyTexture.getRegionWidth()/2;
 
 		
-		TetherModel tether = new TetherModel(12, 2, dwidth, dheight);
-		tether.setBodyType(BodyDef.BodyType.StaticBody);
-		tether.setName("tether"+ 1);
-		tether.setDensity(TETHER_DENSITY);
-		tether.setFriction(TETHER_FRICTION);
-		tether.setRestitution(TETHER_RESTITUTION);
-		tether.setSensor(sensorTethers);
-		tether.setDrawScale(scale);
-		tether.setTexture(tetherTexture);
-		addObject(tether);
-		tethers.add(tether);
+		TetherModel lily = new TetherModel(12, 2, dwidth, dheight);
+		lily.setBodyType(BodyDef.BodyType.StaticBody);
+		lily.setName("lily"+ 1);
+		lily.setDensity(TETHER_DENSITY);
+		lily.setFriction(TETHER_FRICTION);
+		lily.setRestitution(TETHER_RESTITUTION);
+		lily.setSensor(sensorTethers);
+		lily.setDrawScale(scale);
+		lily.setTexture(lilyTexture);
+		addObject(lily);
+		tethers.add(lily);
 		
-		tether = new TetherModel(6, 12, dwidth, dheight);
-		tether.setBodyType(BodyDef.BodyType.StaticBody);
-		tether.setName("tether"+ 2);
-		tether.setDensity(TETHER_DENSITY);
-		tether.setFriction(TETHER_FRICTION);
-		tether.setRestitution(TETHER_RESTITUTION);
-		tether.setSensor(sensorTethers);
-		tether.setDrawScale(scale);
-		tether.setTexture(tetherTexture);
-		addObject(tether);
-		tethers.add(tether);
+		lily = new TetherModel(6, 12, dwidth, dheight);
+		lily.setBodyType(BodyDef.BodyType.StaticBody);
+		lily.setName("lily"+ 2);
+		lily.setDensity(TETHER_DENSITY);
+		lily.setFriction(TETHER_FRICTION);
+		lily.setRestitution(TETHER_RESTITUTION);
+		lily.setSensor(sensorTethers);
+		lily.setDrawScale(scale);
+		lily.setTexture(lilyTexture);
+		addObject(lily);
+		tethers.add(lily);
 		
-		tether = new TetherModel(28, 10, dwidth, dheight);
-		tether.setBodyType(BodyDef.BodyType.StaticBody);
-		tether.setName("tether"+ 3);
-		tether.setDensity(TETHER_DENSITY);
-		tether.setFriction(TETHER_FRICTION);
-		tether.setRestitution(TETHER_RESTITUTION);
-		tether.setSensor(sensorTethers);
-		tether.setDrawScale(scale);
-		tether.setTexture(tetherTexture);
-		addObject(tether);
-		tethers.add(tether);
+		lily = new TetherModel(28, 10, dwidth, dheight);
+		lily.setBodyType(BodyDef.BodyType.StaticBody);
+		lily.setName("lily"+ 3);
+		lily.setDensity(TETHER_DENSITY);
+		lily.setFriction(TETHER_FRICTION);
+		lily.setRestitution(TETHER_RESTITUTION);
+		lily.setSensor(sensorTethers);
+		lily.setDrawScale(scale);
+		lily.setTexture(lilyTexture);
+		addObject(lily);
+		tethers.add(lily);
 		
-		tether = new TetherModel(16, 14, dwidth, dheight);
-		tether.setBodyType(BodyDef.BodyType.StaticBody);
-		tether.setName("tether"+ 4);
-		tether.setDensity(TETHER_DENSITY);
-		tether.setFriction(TETHER_FRICTION);
-		tether.setRestitution(TETHER_RESTITUTION);
-		tether.setSensor(sensorTethers);
-		tether.setDrawScale(scale);
-		tether.setTexture(tetherTexture);
-		addObject(tether);
-		tethers.add(tether);
+		lily = new TetherModel(16, 14, dwidth, dheight);
+		lily.setBodyType(BodyDef.BodyType.StaticBody);
+		lily.setName("lily"+ 4);
+		lily.setDensity(TETHER_DENSITY);
+		lily.setFriction(TETHER_FRICTION);
+		lily.setRestitution(TETHER_RESTITUTION);
+		lily.setSensor(sensorTethers);
+		lily.setDrawScale(scale);
+		lily.setTexture(lilyTexture);
+		addObject(lily);
+		tethers.add(lily);
 		
 
 		TextureRegion texture = enemyTexture;
@@ -316,16 +301,7 @@ public class FishController extends WorldController implements ContactListener {
 		addObject(eFish);
 		
 		
-//		tether = new TetherModel(1, 6, dwidth, dheight);
-//		tether.setBodyType(BodyDef.BodyType.StaticBody);
-//		tether.setDensity(0.0f);
-//		tether.setFriction(0.0f);
-//		tether.setRestitution(0.0f);
-//		tether.setSensor(true);
-//		tether.setDrawScale(scale);
-//		tether.setTexture(goalTile);
-//		addObject(tether);
-//		tethers.add(tether);
+
 		
 		// Create ground pieces
 //		PolygonObstacle obj;
@@ -338,16 +314,7 @@ public class FishController extends WorldController implements ContactListener {
 //		obj.setTexture(earthTile);
 //		obj.setName("wall1");
 //		addObject(obj);
-//
-//		obj = new PolygonObstacle(WALL2, 0, 0);
-//		obj.setBodyType(BodyDef.BodyType.StaticBody);
-//		obj.setDensity(BASIC_DENSITY);
-//		obj.setFriction(BASIC_FRICTION);
-//		obj.setRestitution(BASIC_RESTITUTION);
-//		obj.setDrawScale(scale);
-//		obj.setTexture(earthTile);
-//		obj.setName("wall2");
-//		addObject(obj);
+
 
 
 		// Create the fish avatar
@@ -528,7 +495,8 @@ public class FishController extends WorldController implements ContactListener {
 		cache.set(body1.getLinearVelocityFromWorldPoint(wp));
 		cache.sub(body2.getLinearVelocityFromWorldPoint(wp));
 		speed = cache.dot(worldManifold.getNormal());
-		    
+		
+		/*
 		// Play a sound if above threshold
 		if (speed > SOUND_THRESHOLD) {
 			String s1 = ((Obstacle)body1.getUserData()).getName();
@@ -540,6 +508,7 @@ public class FishController extends WorldController implements ContactListener {
 				SoundController.getInstance().play(s2, COLLISION_SOUND, false, 0.5f);
 			}
 		}
+		*/
 	}
 	
 	
