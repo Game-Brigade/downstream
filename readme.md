@@ -1,5 +1,8 @@
 Downstream
 
+Previously the background was just the 1280x720 rectangle
+I changed it to repeat (so that I could have the entire "level" bigger than just what the camera sees) in a 5x5 pattern. 
+
 To use different control assists:
   At the top of FishController, set any of the fields
   "enableSlow," "enableLeadingLine," or "enableTetherRadius" to true
