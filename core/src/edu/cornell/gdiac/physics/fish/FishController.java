@@ -312,7 +312,6 @@ public class FishController extends WorldController implements ContactListener {
 	  
 		addObject(koi);
 		
-//		canvas.setViewportSize(canvas.getWidth()/2, canvas.getHeight()/2);
 	}
 
 	/**
@@ -345,7 +344,8 @@ public class FishController extends WorldController implements ContactListener {
 //		if (tethered &&
 		
 		
-		int camera_mode = 3;
+		int camera_mode = 2;
+		boolean camera_zoom = true;
 		switch(camera_mode) {
 			// laggy catch up
 			// if tethered, move quickly to center on tether, 
@@ -355,8 +355,10 @@ public class FishController extends WorldController implements ContactListener {
 					koi.getPosition().sub(koi.getInitialTangentPoint(closestTether.getPosition())).len2() < .01) {
 					koi.applyTetherForce(closestTether);
 					canvas.moveCameraTowards(closestTether.getPosition().cpy().scl(scale), CAMERA_LINEAR_VELOCITY);
+					if (camera_zoom) canvas.zoomOut();
 				} else {
 					canvas.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_LINEAR_VELOCITY/2);
+					if (camera_zoom) canvas.zoomIn();
 				}
 				break;
 			// quick catch up
@@ -367,8 +369,10 @@ public class FishController extends WorldController implements ContactListener {
 					koi.getPosition().sub(koi.getInitialTangentPoint(closestTether.getPosition())).len2() < .01) {
 					koi.applyTetherForce(closestTether);
 					canvas.moveCameraTowards(closestTether.getPosition().cpy().scl(scale), CAMERA_LINEAR_VELOCITY/2);
+					if (camera_zoom) canvas.zoomOut();
 				} else {
 					canvas.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_LINEAR_VELOCITY);
+					if (camera_zoom) canvas.zoomIn();
 				}
 				break;
 			// laggy catch up with space
@@ -380,9 +384,11 @@ public class FishController extends WorldController implements ContactListener {
 					koi.getPosition().sub(koi.getInitialTangentPoint(closestTether.getPosition())).len2() < .01) {
 					koi.applyTetherForce(closestTether);
 					canvas.moveCameraTowards(closestTether.getPosition().cpy().scl(scale), CAMERA_LINEAR_VELOCITY/2);
+					if (camera_zoom) canvas.zoomOut();
 				} else {
 					if (input.space) canvas.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_LINEAR_VELOCITY);
 					else 			 canvas.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_LINEAR_VELOCITY/2);
+					if (camera_zoom) canvas.zoomIn();
 				}
 				break;
 			// follow player

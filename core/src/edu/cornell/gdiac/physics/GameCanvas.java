@@ -163,6 +163,14 @@ public class GameCanvas {
 		camera.viewportHeight = height;
 	}
 	
+	public void zoomOut() {
+		camera.zoom = Math.min(1.5f, camera.zoom + 0.01f);
+	}
+	
+	public void zoomIn() {
+		camera.zoom = Math.max(1, camera.zoom - 0.01f);
+	}
+	
 	public void moveCameraTowards(Vector2 newPosition, float velocity) {
 		Vector2 difference = newPosition.cpy().sub(new Vector2(camera.position.x, camera.position.y));
 		if (difference.len() < velocity) {
