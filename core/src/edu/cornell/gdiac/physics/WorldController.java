@@ -23,9 +23,11 @@ import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.assets.*;
 import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.graphics.g2d.freetype.*;
+
 import edu.cornell.gdiac.util.*;
 import edu.cornell.gdiac.physics.obstacle.*;
 
@@ -141,6 +143,7 @@ public abstract class WorldController implements Screen {
 		earthTile = createTexture(manager,EARTH_FILE,true);
 		goalTile  = createTexture(manager,GOAL_FILE,true);
 		background    = manager.get(BACKGROUND_FILE, Texture.class);
+		background.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
 		rocks = manager.get(ROCK_FILE, Texture.class);
 		
 		// Allocate the font
@@ -597,7 +600,13 @@ public abstract class WorldController implements Screen {
 	public void draw(float delta) {
 		canvas.clear();
 		canvas.begin();
-		canvas.draw(background, Color.WHITE, 0, 0, canvas.getWidth(), canvas.getHeight());
+		for (int i = -5; i < 5; i++) {
+			for (int j = -5; j < 5; j++) {
+				canvas.draw(background, Color.WHITE, canvas.getWidth()*i, canvas.getHeight()*j, 
+													 canvas.getWidth(),   canvas.getHeight());
+			}
+		}
+//		canvas.draw(background, Color.WHITE, 0, 0, canvas.getWidth(), canvas.getHeight());
 		//canvas.draw(rocks, Color.WHITE, 0, 0, canvas.getWidth(), canvas.getHeight());
 		for(Obstacle obj : objects) {
 			obj.draw(canvas);

@@ -68,9 +68,12 @@ public class FishController extends WorldController implements ContactListener {
 	
 	private boolean tethered;
 	
+	private float PLAYER_LINEAR_VELOCITY = 8f;
+	private float CAMERA_LINEAR_VELOCITY = 8f;
+	
 	private boolean enableSlow = false;
 	private boolean enableLeadingLine = false;
-	private boolean enableTetherRadius = false;
+	private boolean enableTetherRadius = true;
 	
 	/**
 	 * Preloads the assets for this controller.
@@ -275,7 +278,7 @@ public class FishController extends WorldController implements ContactListener {
 		addObject(tether);
 		tethers.add(tether);
 		
-		tether = new TetherModel(28, 10, dwidth, dheight);
+		tether = new TetherModel(40, 10, dwidth, dheight);
 		tether.setBodyType(BodyDef.BodyType.StaticBody);
 		tether.setName("tether"+ 3);
 		tether.setDensity(TETHER_DENSITY);
@@ -314,41 +317,6 @@ public class FishController extends WorldController implements ContactListener {
 		eFish.setBodyType(BodyDef.BodyType.StaticBody);
 		eFish.setGoal(0, 0);
 		addObject(eFish);
-		
-		
-//		tether = new TetherModel(1, 6, dwidth, dheight);
-//		tether.setBodyType(BodyDef.BodyType.StaticBody);
-//		tether.setDensity(0.0f);
-//		tether.setFriction(0.0f);
-//		tether.setRestitution(0.0f);
-//		tether.setSensor(true);
-//		tether.setDrawScale(scale);
-//		tether.setTexture(goalTile);
-//		addObject(tether);
-//		tethers.add(tether);
-		
-		// Create ground pieces
-//		PolygonObstacle obj;
-//		obj = new PolygonObstacle(WALL1, 0, 0);
-//		obj.setBodyType(BodyDef.BodyType.StaticBody);
-//		obj.setDensity(BASIC_DENSITY);
-//		obj.setFriction(BASIC_FRICTION);
-//		obj.setRestitution(BASIC_RESTITUTION);
-//		obj.setDrawScale(scale);
-//		obj.setTexture(earthTile);
-//		obj.setName("wall1");
-//		addObject(obj);
-//
-//		obj = new PolygonObstacle(WALL2, 0, 0);
-//		obj.setBodyType(BodyDef.BodyType.StaticBody);
-//		obj.setDensity(BASIC_DENSITY);
-//		obj.setFriction(BASIC_FRICTION);
-//		obj.setRestitution(BASIC_RESTITUTION);
-//		obj.setDrawScale(scale);
-//		obj.setTexture(earthTile);
-//		obj.setName("wall2");
-//		addObject(obj);
-
 
 		// Create the fish avatar
 		dwidth  = koiTexture.getRegionWidth()/scale.x;
@@ -359,6 +327,8 @@ public class FishController extends WorldController implements ContactListener {
 		koi.setTexture(koiTexture);
 	  
 		addObject(koi);
+		
+//		canvas.setViewportSize(canvas.getWidth()/2, canvas.getHeight()/2);
 	}
 
 	/**
@@ -372,13 +342,15 @@ public class FishController extends WorldController implements ContactListener {
 	 * @param delta Number of seconds since last animation frame
 	 */
 	public void update(float dt) {
-
+//		System.out.println(canvas.camera.viewportWidth);
+//		System.out.println(canvas.camera.viewportHeight);
+		
 		float thrust = koi.getThrust();
 		InputController input = InputController.getInstance();
 		koi.setFX(thrust * input.getHorizontal());
 		koi.setFY(thrust * input.getVertical());
 		koi.applyForce();
-		koi.setLinearVelocity(koi.getLinearVelocity().setLength(8));
+		koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY));
 		
 		if (enableSlow && input.slow) koi.setLinearVelocity(koi.getLinearVelocity().setLength(4));
 		
@@ -387,11 +359,53 @@ public class FishController extends WorldController implements ContactListener {
 		TetherModel closestTether = getClosestTether();
 		
 //		if (tethered &&
-		if (input.space && 
-			koi.getPosition().sub(koi.getInitialTangentPoint(closestTether.getPosition())).len2() < .01) {
-			koi.applyTetherForce(closestTether);
-//			System.out.println(fish.getInitialTangentPoint(closestTether.getPosition()));
+		
+		
+		int camera_mode = 2;
+		switch(camera_mode) {
+			// laggy catch up
+			// if tethered, move quickly to center on tether, 
+			// else move slowly to fish
+			case 0:
+				if (input.space && 
+					koi.getPosition().sub(koi.getInitialTangentPoint(closestTether.getPosition())).len2() < .01) {
+					koi.applyTetherForce(closestTether);
+					canvas.moveCameraTowards(closestTether.getPosition().cpy().scl(scale), CAMERA_LINEAR_VELOCITY);
+				} else {
+					canvas.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_LINEAR_VELOCITY/2);
+				}
+				break;
+			// quick catch up
+			// if tethered, move slowly to tether, 
+			// else move quickly to fish
+			case 1:
+				if (input.space && 
+					koi.getPosition().sub(koi.getInitialTangentPoint(closestTether.getPosition())).len2() < .01) {
+					koi.applyTetherForce(closestTether);
+					canvas.moveCameraTowards(closestTether.getPosition().cpy().scl(scale), CAMERA_LINEAR_VELOCITY/2);
+				} else {
+					canvas.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_LINEAR_VELOCITY);
+				}
+				break;
+			// laggy catch up with space
+			// if tethered, move slowly to tether; 
+			// else if pressing space move quickly to fish, 
+			// else slowly to fish
+			case 2:
+				if (input.space && 
+					koi.getPosition().sub(koi.getInitialTangentPoint(closestTether.getPosition())).len2() < .01) {
+					koi.applyTetherForce(closestTether);
+					canvas.moveCameraTowards(closestTether.getPosition().cpy().scl(scale), CAMERA_LINEAR_VELOCITY/2);
+				} else {
+					if (input.space) canvas.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_LINEAR_VELOCITY);
+					else 			 canvas.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_LINEAR_VELOCITY/2);
+				}
+				break;
 		}
+		
+		
+		
+		
 		
 		float angV = 3f;
 		float radius = closestTether.getPosition().dst(koi.getPosition());
@@ -401,27 +415,6 @@ public class FishController extends WorldController implements ContactListener {
 		float MIN_SPEED = 6f;
 		
 		int motionType = 0;
-		
-//		if (fish.getLinearVelocity().len2() != 0) {
-//			switch(motionType){
-//			case 0:
-//				koi.setLinearVelocity(koi.getLinearVelocity().setLength(MAX_SPEED));
-//				break;
-//			case 1:
-//				if (koi.getLinearVelocity().len() <= MAX_SPEED - 1 && input.accel){
-//					koi.setLinearVelocity(koi.getLinearVelocity().setLength(koi.getLinearVelocity().len()+1));
-//				}
-//				if (koi.getLinearVelocity().len() >= MIN_SPEED + 1 && input.deccel){
-//					koi.setLinearVelocity(koi.getLinearVelocity().setLength(koi.getLinearVelocity().len()-1));
-//				}
-//				break;
-//			case 2:
-//				koi.setLinearVelocity(koi.getLinearVelocity().setLength(tetherSpeed));
-//				break;
-//			}
-//		}
-		
-		
 		
 		eFish.moveTowardsGoal();
 		eFish.patrol(20, 0, 20, 18);
@@ -449,20 +442,12 @@ public class FishController extends WorldController implements ContactListener {
 		if (enableLeadingLine) {
 			Vector2 farOff = koi.getPosition().cpy();
 			farOff.add(koi.getLinearVelocity().cpy().scl(1000));
-//			System.out.println(fish.getPosition().cpy());
 			canvas.drawLeadingLine(koi.getPosition().cpy(), farOff);
 		}
 		if (enableTetherRadius) {
 			Vector2 closestTether = getClosestTether().getPosition().cpy().scl(scale);
 			Vector2 initialTangent = koi.getInitialTangentPoint(getClosestTether().getPosition()).scl(scale);
 			float radius = closestTether.dst(initialTangent);
-//			System.out.println(fish.getInitialTangentPoint(closestTether));
-//			System.out.println(fish.getPosition());
-//			System.out.println(closestTether);
-//			System.out.println(initialTangent);
-//			System.out.println(radius);
-//			System.out.println(scale);
-			
 			canvas.drawTetherCircle(closestTether, radius);
 		}
 		

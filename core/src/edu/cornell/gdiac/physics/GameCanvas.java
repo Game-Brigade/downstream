@@ -111,7 +111,9 @@ public class GameCanvas {
 		tetherRadiusLine = new ShapeRenderer();
 		
 		// Set the projection matrix (for proper scaling)
-		camera = new OrthographicCamera(getWidth(),getHeight());
+		camera = new OrthographicCamera(getWidth(),getWidth());
+		camera.position.set(0,0,0);
+		camera.update();
 		camera.setToOrtho(false);
 		spriteBatch.setProjectionMatrix(camera.combined);
 		debugRender.setProjectionMatrix(camera.combined);
@@ -150,6 +152,25 @@ public class GameCanvas {
 	 */
 	public int getWidth() {
 		return Gdx.graphics.getWidth();
+	}
+	
+	public OrthographicCamera getCamera() {
+		return camera;
+	}
+	
+	public void setViewportSize(float width, float height) {
+		camera.viewportWidth = width;
+		camera.viewportHeight = height;
+	}
+	
+	public void moveCameraTowards(Vector2 newPosition, float velocity) {
+		Vector2 difference = newPosition.cpy().sub(new Vector2(camera.position.x, camera.position.y));
+		if (difference.len() < velocity) {
+			camera.position.set(newPosition,0);
+		} else {
+			camera.translate(difference.setLength(velocity));
+		}
+		camera.update();
 	}
 	
 	/**

@@ -70,6 +70,16 @@ public class PlayerFishModel extends RocketModel {
 		float ytan = slope * xtan - slope * getX() + getY();
 		return new Vector2(xtan, ytan);
 	}
+	
+	public Vector2 timeToIntersect(Vector2 target) {
+		return new Vector2(target.x - getX() / getLinearVelocity().x,
+						   target.y - getY() / getLinearVelocity().y);
+	}
+	
+	public boolean willIntersect(Vector2 target) {
+		Vector2 time = timeToIntersect(target);
+		return time.x > -0.009 && time.y > -0.009;
+	}
 
 	public void draw(GameCanvas canvas) {
 		super.draw(canvas);
