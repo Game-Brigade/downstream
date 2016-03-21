@@ -71,8 +71,8 @@ public class InputController {
 	private boolean exitPressed;
 	private boolean exitPrevious;
 	
-	private boolean tetherPressed;
-	private boolean tetherPrevious;
+	private boolean launchPressed;
+	private boolean launchPrevious;
 	
 	/** How much did we move horizontally? */
 	private float horizontal;
@@ -88,7 +88,6 @@ public class InputController {
 	public boolean accel;
 	public boolean deccel;
 	public boolean space;
-	public boolean slow;
 	
 	/** An X-Box controller (if it is connected) */
 	XBox360Controller xbox;
@@ -211,13 +210,8 @@ public class InputController {
 		return exitPressed && !exitPrevious;
 	}
 	
-	/**
-	 * Returns true if the tether button was pressed.
-	 *
-	 * @return true if the tether button was pressed.
-	 */
-	public boolean didTether() {
-		return tetherPressed && !tetherPrevious;
+	public boolean didLaunch() {
+		return launchPressed && !launchPrevious;
 	}
 	
 	/**
@@ -253,7 +247,7 @@ public class InputController {
 		exitPrevious = exitPressed;
 		nextPrevious = nextPressed;
 		prevPrevious = prevPressed;
-		tetherPrevious = tetherPressed;
+		launchPrevious = launchPressed;
 		
 		// Check to see if a GamePad is connected
 		if (xbox.isConnected()) {
@@ -320,7 +314,7 @@ public class InputController {
 		prevPressed = (secondary && prevPressed) || (Gdx.input.isKeyPressed(Input.Keys.P));
 		nextPressed = (secondary && nextPressed) || (Gdx.input.isKeyPressed(Input.Keys.N));
 		exitPressed  = (secondary && exitPressed) || (Gdx.input.isKeyPressed(Input.Keys.ESCAPE));
-		tetherPressed  = (secondary && tetherPressed) || (Gdx.input.isKeyPressed(Input.Keys.SPACE));
+		launchPressed  = (secondary && launchPressed) || (Gdx.input.isKeyPressed(Input.Keys.SPACE));
 		
 		// Directional controls
 		horizontal = (secondary ? horizontal : 0.0f);
@@ -343,11 +337,6 @@ public class InputController {
 			space = true;
 		} else {
 			space = false;
-		}
-		if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-			slow = true;
-		} else {
-			slow = false;
 		}
 		
 		if (Gdx.input.isKeyPressed(Input.Keys.ALT_RIGHT)) {
