@@ -69,8 +69,8 @@ public class DownstreamController extends WorldController implements ContactList
 	
 	private boolean tethered;
 	
-	private float PLAYER_LINEAR_VELOCITY = 8f;
-	private float CAMERA_LINEAR_VELOCITY = 8f;
+	private float PLAYER_LINEAR_VELOCITY = 4f;
+	private float CAMERA_LINEAR_VELOCITY = 6f;
 	
 	private boolean enableSlow = false;
 	private boolean enableLeadingLine = false;
@@ -328,17 +328,17 @@ public class DownstreamController extends WorldController implements ContactList
 		TextureRegion texture = enemyTexture;
 		dwidth  = texture.getRegionWidth()/scale.x;
 		dheight = texture.getRegionHeight()/scale.y;
-		eFish = new EnemyModel(20, 0, dwidth, dheight);
-		eFish.setDensity(ENEMY_DENSITY);
-		eFish.setFriction(ENEMY_FRICTION);
-		eFish.setRestitution(BASIC_RESTITUTION);
-		eFish.setName("enemy");
-		eFish.setDrawScale(scale);
-		eFish.setTexture(texture);
-		eFish.setAngle((float) (Math.PI/2));
-		eFish.setBodyType(BodyDef.BodyType.StaticBody);
-		eFish.setGoal(0, 0);
-		addObject(eFish);
+//		eFish = new EnemyModel(20, 0, dwidth, dheight);
+//		eFish.setDensity(ENEMY_DENSITY);
+//		eFish.setFriction(ENEMY_FRICTION);
+//		eFish.setRestitution(BASIC_RESTITUTION);
+//		eFish.setName("enemy");
+//		eFish.setDrawScale(scale);
+//		eFish.setTexture(texture);
+//		eFish.setAngle((float) (Math.PI/2));
+//		eFish.setBodyType(BodyDef.BodyType.StaticBody);
+//		eFish.setGoal(0, 0);
+//		addObject(eFish);
 
 		// Create the fish avatar
 		dwidth  = koiTexture.getRegionWidth()/scale.x;
@@ -371,11 +371,13 @@ public class DownstreamController extends WorldController implements ContactList
 		koi.setFX(thrust * input.getHorizontal());
 		koi.setFY(thrust * input.getVertical());
 		koi.applyForce();
-		koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY));
+//		koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY));
 		
 		if (enableSlow && input.slow) koi.setLinearVelocity(koi.getLinearVelocity().setLength(4));
 		
 		if (input.didTether()) {tethered = !tethered; koi.setTethered(false);}
+		if (!tethered) koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*2));
+		if (tethered) koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY));
 //		if (input.space) tethered = true; else tethered = false;
 		
 		TetherModel closestTether = getClosestTether();
@@ -481,14 +483,14 @@ public class DownstreamController extends WorldController implements ContactList
 		
 		int motionType = 0;
 		
-		if (lanterns.get(0).getRotations() <= 2){
-			eFish.moveTowardsGoal();
-			eFish.patrol(20, 0, 20, 18);
-		}
-		else{
-			eFish.setGoal(100, 100);
-			eFish.moveTowardsGoal();
-		}
+//		if (lanterns.get(0).getRotations() <= 2){
+//			eFish.moveTowardsGoal();
+//			eFish.patrol(20, 0, 20, 18);
+//		}
+//		else{
+//			eFish.setGoal(100, 100);
+//			eFish.moveTowardsGoal();
+//		}
 		
 	    SoundController.getInstance().update();
 	}
