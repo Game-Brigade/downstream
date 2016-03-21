@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>gameplay_prototype</name>
+	<name>downstream</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -17,7 +17,7 @@
 	</natures>
 	<filteredResources>
 		<filter>
-			<id>1457469452834</id>
+			<id>1458587971526</id>
 			<name></name>
 			<type>26</type>
 			<matcher>
