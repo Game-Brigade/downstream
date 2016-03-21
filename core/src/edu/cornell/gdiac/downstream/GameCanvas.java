@@ -1000,10 +1000,10 @@ public class GameCanvas {
 	 */
     public void beginDebug() {
     	debugRender.setProjectionMatrix(camera.combined);
-    	debugRender.begin(ShapeRenderer.ShapeType.Filled);
-    	debugRender.setColor(Color.RED);
-    	debugRender.circle(0, 0, 10);
-    	debugRender.end();
+//    	debugRender.begin(ShapeRenderer.ShapeType.Filled);
+//    	debugRender.setColor(Color.RED);
+//    	debugRender.circle(0, 0, 10);
+//    	debugRender.end();
     	
     	debugRender.begin(ShapeRenderer.ShapeType.Line);
     	active = DrawPass.DEBUG;

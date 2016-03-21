@@ -61,7 +61,8 @@ public class TetherModel extends WheelObstacle {
 
   public Vector2 calculateAttractiveForce(Obstacle player) {
     Vector2 direction = this.getPosition().sub(player.getPosition());
-    float radius = direction.len();
+//    float radius = direction.len();
+    float radius = 2;
     float forceMagnitude = (float) (player.getMass() * player.getLinearVelocity().len2() / radius);
     return direction.setLength(forceMagnitude);
   }

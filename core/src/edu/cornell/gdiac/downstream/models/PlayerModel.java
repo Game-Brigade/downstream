@@ -43,6 +43,8 @@ public class PlayerModel extends BoxObstacle {
 	private int health;
 
 	private Vector2 force;
+	
+	private boolean isTethered;
 
 	/** Create a new player at x,y. */
 	public PlayerModel(float x, float y, float width, float height) {
@@ -56,6 +58,7 @@ public class PlayerModel extends BoxObstacle {
 		setName("player");
 		force = new Vector2();
 		health = 1;
+		isTethered = false;
 	}
 
 	public boolean isAlive() {
@@ -88,6 +91,16 @@ public class PlayerModel extends BoxObstacle {
 		Vector2 time = timeToIntersect(target);
 		return time.x > -0.009 && time.y > -0.009;
 	}
+	
+	public boolean isTethered() {
+		return isTethered;
+	}
+	
+	public void setTethered(boolean newState) {
+		isTethered = newState;
+	}
+	
+	
 
 	
 	/**

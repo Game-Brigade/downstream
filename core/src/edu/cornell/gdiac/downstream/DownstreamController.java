@@ -339,10 +339,12 @@ public class DownstreamController extends WorldController implements ContactList
 		
 		if (enableSlow && input.slow) koi.setLinearVelocity(koi.getLinearVelocity().setLength(4));
 		
-		if (input.didTether()) tethered = !tethered;
+		if (input.didTether()) {tethered = !tethered; koi.setTethered(false);}
 //		if (input.space) tethered = true; else tethered = false;
 		
 		TetherModel closestTether = getClosestTether();
+		
+//		if (!koi.willIntersect(closestTether.getPosition())) koi.setTethered(false
 		
 //		if (tethered &&
 		
@@ -354,11 +356,12 @@ public class DownstreamController extends WorldController implements ContactList
 			// if tethered, move quickly to center on tether, 
 			// else move slowly to fish
 			case 0:
-				if (tethered && 
+				if (koi.isTethered() || tethered && 
 					koi.getPosition().sub(koi.getInitialTangentPoint(closestTether.getPosition())).len2() < .01) {
 					koi.applyTetherForce(closestTether);
 					canvas.moveCameraTowards(closestTether.getPosition().cpy().scl(scale), CAMERA_LINEAR_VELOCITY);
 					if (camera_zoom) canvas.zoomOut();
+					koi.setTethered(true);
 				} else {
 					canvas.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_LINEAR_VELOCITY/2);
 					if (camera_zoom) canvas.zoomIn();
@@ -368,11 +371,12 @@ public class DownstreamController extends WorldController implements ContactList
 			// if tethered, move slowly to tether, 
 			// else move quickly to fish
 			case 1:
-				if (tethered && 
+				if (koi.isTethered() || tethered && 
 					koi.getPosition().sub(koi.getInitialTangentPoint(closestTether.getPosition())).len2() < .01) {
 					koi.applyTetherForce(closestTether);
 					canvas.moveCameraTowards(closestTether.getPosition().cpy().scl(scale), CAMERA_LINEAR_VELOCITY/2);
 					if (camera_zoom) canvas.zoomOut();
+					koi.setTethered(true);
 				} else {
 					canvas.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_LINEAR_VELOCITY);
 					if (camera_zoom) canvas.zoomIn();
@@ -383,11 +387,12 @@ public class DownstreamController extends WorldController implements ContactList
 			// else if pressing space move quickly to fish, 
 			// else slowly to fish
 			case 2:
-				if (tethered && 
+				if (koi.isTethered() || tethered && 
 					koi.getPosition().sub(koi.getInitialTangentPoint(closestTether.getPosition())).len2() < .01) {
 					koi.applyTetherForce(closestTether);
 					canvas.moveCameraTowards(closestTether.getPosition().cpy().scl(scale), CAMERA_LINEAR_VELOCITY/2);
 					if (camera_zoom) canvas.zoomOut();
+					koi.setTethered(true);
 				} else {
 					if (tethered) canvas.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_LINEAR_VELOCITY);
 					else 			 canvas.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_LINEAR_VELOCITY/2);
@@ -396,9 +401,10 @@ public class DownstreamController extends WorldController implements ContactList
 				break;
 			// follow player
 			case 3:
-				if (tethered && 
+				if (koi.isTethered() || tethered && 
 					koi.getPosition().sub(koi.getInitialTangentPoint(closestTether.getPosition())).len2() < .01) {
 					koi.applyTetherForce(closestTether);
+					koi.setTethered(true);
 				}
 				canvas.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_LINEAR_VELOCITY);
 		}
