@@ -233,11 +233,11 @@ public class EnemyModel extends SimpleObstacle {
 		
 		if (turnAround){
 			this.goal.set(x2, y2);
-			setAngle((float) (getAngle() + Math.PI));
+			//setAngle((float) (getAngle() + Math.PI));
 		}
 		if (turnAround2){
 			this.goal.set(x1, y1);
-			setAngle((float) (getAngle() + Math.PI));
+			//setAngle((float) (getAngle() + Math.PI));
 		}
 	}
 	/**
@@ -257,8 +257,13 @@ public class EnemyModel extends SimpleObstacle {
 		else if (getY() > goal.y){
 			setY((float) (getY() - .1));
 		}
-
+		setAngle(findA(this.getPosition(), this.goal));
 	}
+	 public float findA(Vector2 target, Vector2 t2) {
+		  	float angle = (float) Math.toDegrees(Math.atan2(target.y - t2.y, target.x - t2.x));
+		  	angle = angle - 180;
+		    return (float) Math.toRadians(angle);
+		}
 
 }
 
