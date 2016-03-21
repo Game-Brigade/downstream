@@ -86,7 +86,9 @@ public class DownstreamController extends WorldController implements ContactList
 	private boolean tethered;
 	
 	private float PLAYER_LINEAR_VELOCITY = 4f;
-	private float CAMERA_LINEAR_VELOCITY = 6f;
+	private float CAMERA_MAX_LINEAR_VELOCITY = 6f;
+	private float CAMERA_CURRENT_LINEAR_VELOCITY = 0f;
+	private float CAMERA_ACCELERATION = 0.1f;
 	
 	private boolean enableSlow = false;
 	private boolean enableLeadingLine = false;
@@ -395,8 +397,8 @@ public class DownstreamController extends WorldController implements ContactList
 	 * @param delta Number of seconds since last animation frame
 	 */
 	public void update(float dt) {
-//		System.out.println(canvas.camera.viewportWidth);
-//		System.out.println(canvas.camera.viewportHeight);
+		
+		System.out.println(CAMERA_CURRENT_LINEAR_VELOCITY);
 		
 		float thrust = koi.getThrust();
 		InputController input = InputController.getInstance();
@@ -407,11 +409,19 @@ public class DownstreamController extends WorldController implements ContactList
 		
 		if (enableSlow && input.slow) koi.setLinearVelocity(koi.getLinearVelocity().setLength(4));
 		
-		if (input.didTether()) {tethered = !tethered; koi.setTethered(false);}
-		if (!tethered) koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*2));
-		if (tethered) koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY));
+		if (input.didTether()) {
+			tethered = !tethered; koi.setTethered(false);
+//			CAMERA_CURRENT_LINEAR_VELOCITY = CAMERA_MAX_LINEAR_VELOCITY/2;
+			CAMERA_CURRENT_LINEAR_VELOCITY = 2;
+		}
+		if (!tethered) {
+			koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*2));
+		}
+		if (tethered) {
+			koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY));
+		}
 //		if (input.space) tethered = true; else tethered = false;
-		
+		CAMERA_CURRENT_LINEAR_VELOCITY = Math.min(CAMERA_CURRENT_LINEAR_VELOCITY+CAMERA_ACCELERATION, CAMERA_MAX_LINEAR_VELOCITY);
 		TetherModel closestTether = getClosestTether();
 		
 		//check to see if closest tether is just attached or has been previously attached
@@ -440,7 +450,6 @@ public class DownstreamController extends WorldController implements ContactList
 					closestTether.set = false;
 				}
 		
-		
 		int camera_mode = 2;
 		boolean camera_zoom = true;
 		switch(camera_mode) {
@@ -451,11 +460,11 @@ public class DownstreamController extends WorldController implements ContactList
 				if (koi.isTethered() || tethered && 
 					koi.getPosition().sub(koi.getInitialTangentPoint(closestTether.getPosition())).len2() < .01) {
 					koi.applyTetherForce(closestTether);
-					canvas.moveCameraTowards(closestTether.getPosition().cpy().scl(scale), CAMERA_LINEAR_VELOCITY);
+					canvas.moveCameraTowards(closestTether.getPosition().cpy().scl(scale), CAMERA_CURRENT_LINEAR_VELOCITY);
 					if (camera_zoom) canvas.zoomOut();
 					koi.setTethered(true);
 				} else {
-					canvas.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_LINEAR_VELOCITY/2);
+					canvas.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_CURRENT_LINEAR_VELOCITY/2);
 					if (camera_zoom) canvas.zoomIn();
 				}
 				break;
@@ -466,11 +475,11 @@ public class DownstreamController extends WorldController implements ContactList
 				if (koi.isTethered() || tethered && 
 					koi.getPosition().sub(koi.getInitialTangentPoint(closestTether.getPosition())).len2() < .01) {
 					koi.applyTetherForce(closestTether);
-					canvas.moveCameraTowards(closestTether.getPosition().cpy().scl(scale), CAMERA_LINEAR_VELOCITY/2);
+					canvas.moveCameraTowards(closestTether.getPosition().cpy().scl(scale), CAMERA_CURRENT_LINEAR_VELOCITY/2);
 					if (camera_zoom) canvas.zoomOut();
 					koi.setTethered(true);
 				} else {
-					canvas.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_LINEAR_VELOCITY);
+					canvas.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_CURRENT_LINEAR_VELOCITY);
 					if (camera_zoom) canvas.zoomIn();
 				}
 				break;
@@ -482,12 +491,12 @@ public class DownstreamController extends WorldController implements ContactList
 				if (koi.isTethered() || tethered && 
 					koi.getPosition().sub(koi.getInitialTangentPoint(closestTether.getPosition())).len2() < .01) {
 					koi.applyTetherForce(closestTether);
-					canvas.moveCameraTowards(closestTether.getPosition().cpy().scl(scale), CAMERA_LINEAR_VELOCITY/2);
+					canvas.moveCameraTowards(closestTether.getPosition().cpy().scl(scale), CAMERA_CURRENT_LINEAR_VELOCITY/2);
 					if (camera_zoom) canvas.zoomOut();
 					koi.setTethered(true);
 				} else {
-					if (tethered) canvas.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_LINEAR_VELOCITY);
-					else 			 canvas.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_LINEAR_VELOCITY/2);
+					if (tethered) canvas.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_CURRENT_LINEAR_VELOCITY);
+					else 			 canvas.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_CURRENT_LINEAR_VELOCITY/2);
 					if (camera_zoom) canvas.zoomIn();
 				}
 				break;
@@ -498,7 +507,7 @@ public class DownstreamController extends WorldController implements ContactList
 					koi.applyTetherForce(closestTether);
 					koi.setTethered(true);
 				}
-				canvas.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_LINEAR_VELOCITY);
+				canvas.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_CURRENT_LINEAR_VELOCITY);
 		}
 		
 		
