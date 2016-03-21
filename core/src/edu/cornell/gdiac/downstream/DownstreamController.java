@@ -40,6 +40,10 @@ public class DownstreamController extends WorldController implements ContactList
 	private static final String LILY_TEXTURE = "tethers/lilypad.png";
 	/** Reference to the enemy image assets */
 	private static final String ENEMY_TEXTURE = "enemy/enemy.png";
+	/** Reference to the Lantern asset image*/
+	private static final String LANTERN_TEXTURE = "tethers/pig.png";
+	/** Reference to the Lightin Texture image */
+	private static final String LIGHTING_TEXTURE = "tethers/sun.png";
 
 	/** The asset for the collision sound */
 	//private static final String  COLLISION_SOUND = "fish/bump.mp3";
@@ -51,6 +55,10 @@ public class DownstreamController extends WorldController implements ContactList
 	private TextureRegion lilyTexture;
 	/** Texture assets for the enemy fish */
 	private TextureRegion enemyTexture;
+	/** Texture assets for lantern */
+	private TextureRegion lanternTexture;
+	/** Texture assets for light */
+	private TextureRegion lightingTexture;
 
 	/** Texture filmstrip for the main afterburner */
 	//private FilmStrip mainTexture;
@@ -96,6 +104,13 @@ public class DownstreamController extends WorldController implements ContactList
 		manager.load(LILY_TEXTURE, Texture.class);
 		assets.add(LILY_TEXTURE);
 		
+		manager.load(LANTERN_TEXTURE, Texture.class);
+		assets.add(LANTERN_TEXTURE);
+		
+		manager.load(LIGHTING_TEXTURE, Texture.class);
+		assets.add(LIGHTING_TEXTURE);
+		
+		
 		//sounds
 		//manager.load(MAIN_FIRE_SOUND, Sound.class);
 		//assets.add(MAIN_FIRE_SOUND);
@@ -122,6 +137,8 @@ public class DownstreamController extends WorldController implements ContactList
 		enemyTexture = createTexture(manager,ENEMY_TEXTURE,false);
 		koiTexture = createTexture(manager,KOI_TEXTURE,false);
 		lilyTexture = createTexture(manager,LILY_TEXTURE,false);
+		lanternTexture = createTexture(manager, LANTERN_TEXTURE, false);
+		lightingTexture = createTexture(manager, LIGHTING_TEXTURE, false);
 		
 		SoundController sounds = SoundController.getInstance();
 		//sounds.allocate(manager,MAIN_FIRE_SOUND);
@@ -177,6 +194,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private static final float[] BOXES = {};
 	
 	private ArrayList<TetherModel> tethers = new ArrayList<TetherModel>();
+	private ArrayList<TetherModel> lanterns = new ArrayList<TetherModel>();
 
 	// Other game objects
 	/** The initial koi position */
@@ -216,6 +234,8 @@ public class DownstreamController extends WorldController implements ContactList
 		for(Obstacle obj : objects) {
 			obj.deactivatePhysics(world);
 		}
+		lanterns.clear();
+		tethers.clear();
 		objects.clear();
 		addQueue.clear();
 		world.dispose();
@@ -239,8 +259,24 @@ public class DownstreamController extends WorldController implements ContactList
 		boolean sensorTethers = true;
 		
 		float rad = lilyTexture.getRegionWidth()/2;
+		
+		TetherModel lantern = new TetherModel(5, 5, dwidth, dheight, true);
+		lantern.setBodyType(BodyDef.BodyType.StaticBody);
+		lantern.setName("lantern"+ 1);
+		lantern.setDensity(TETHER_DENSITY);
+		lantern.setFriction(TETHER_FRICTION);
+		lantern.setRestitution(TETHER_RESTITUTION);
+		lantern.setSensor(sensorTethers);
+		lantern.setDrawScale(scale);
+		lantern.setTexture(lanternTexture);
+		lantern.setlightingTexture(lightingTexture);
+		lantern.setRotation(0);
+		addObject(lantern);
+		tethers.add(lantern);
+		lanterns.add(lantern);
 
-		TetherModel lily = new TetherModel(12, 2, dwidth, dheight);
+
+		TetherModel lily = new TetherModel(15, 20, dwidth, dheight);
 		lily.setBodyType(BodyDef.BodyType.StaticBody);
 		lily.setName("lily"+ 1);
 		lily.setDensity(TETHER_DENSITY);
@@ -344,9 +380,31 @@ public class DownstreamController extends WorldController implements ContactList
 		
 		TetherModel closestTether = getClosestTether();
 		
-//		if (!koi.willIntersect(closestTether.getPosition())) koi.setTethered(false
-		
-//		if (tethered &&
+		//check to see if closest tether is just attached or has been previously attached
+			if (tethered & closestTether.getEntry().x == 0f & closestTether.isLantern()){
+					//if just attached, define it as such
+					Vector2 ent = new Vector2(closestTether.getX(), closestTether.getY());
+					closestTether.setEntry(ent);
+					
+				}
+				//checks to see if the fish is within reasonable circulating distance. It will pass the if statment many times
+				if (tethered){
+					//this is because the fish moves to quickly to get an exact range, so we must find it within .5 distance
+					if ((closestTether.getEntry().x + .5 > koi.getPosition().x) && (closestTether.getEntry().x -.5 < koi.getPosition().x && closestTether.isLantern())){
+						//because of the range, we only want the first instance, so we only check if it has not been previously checked in the last frame. 
+						if (closestTether.set == false){
+							//System.out.println(closestTether.getRotations());
+							closestTether.updateRotations();
+						}
+						closestTether.set = true;
+					}
+					else{
+						closestTether.set = false;
+					}
+				}
+				else{
+					closestTether.set = false;
+				}
 		
 		
 		int camera_mode = 2;
@@ -423,9 +481,14 @@ public class DownstreamController extends WorldController implements ContactList
 		
 		int motionType = 0;
 		
-		eFish.moveTowardsGoal();
-		eFish.patrol(20, 0, 20, 18);
-		eFish.getGoal();
+		if (lanterns.get(0).getRotations() <= 2){
+			eFish.moveTowardsGoal();
+			eFish.patrol(20, 0, 20, 18);
+		}
+		else{
+			eFish.setGoal(100, 100);
+			eFish.moveTowardsGoal();
+		}
 		
 	    SoundController.getInstance().update();
 	}
