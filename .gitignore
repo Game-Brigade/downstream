@@ -1,7 +1,1 @@
-build/
-gradle/
-desktop/
-bin/
-*.class
-.DS_Store
-blame.txt
+
