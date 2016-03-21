@@ -44,6 +44,16 @@ public class DownstreamController extends WorldController implements ContactList
 	private static final String LANTERN_TEXTURE = "tethers/pig.png";
 	/** Reference to the Lightin Texture image */
 	private static final String LIGHTING_TEXTURE = "tethers/sun.png";
+	/** Reference to the 4-sided land texture */
+	private static final String LAND_4SIDE_TEXTURE = "terrain/land.png";
+	/** Reference to the left land texture */
+	private static final String LEFT_LAND_TEXTURE = "terrain/LEFT.png";
+	/** Reference to the right land texture */
+	private static final String RIGHT_LAND_TEXTURE = "terrain/RIGHT.png";
+	/** Reference to the top land texture */
+	private static final String TOP_LAND_TEXTURE = "terrain/TOP.png";
+	/** Reference to the bottom land texture */
+	private static final String BOTTOM_LAND_TEXTURE = "terrain/bottom.png";
 
 	/** The asset for the collision sound */
 	//private static final String  COLLISION_SOUND = "fish/bump.mp3";
@@ -59,6 +69,12 @@ public class DownstreamController extends WorldController implements ContactList
 	private TextureRegion lanternTexture;
 	/** Texture assets for light */
 	private TextureRegion lightingTexture;
+	/** Texture assets for the land */
+	private TextureRegion land4Texture;
+	private TextureRegion leftLandTexture;
+	private TextureRegion rightLandTexture;
+	private TextureRegion topLandTexture;
+	private TextureRegion bottomLandTexture;
 
 	/** Texture filmstrip for the main afterburner */
 	//private FilmStrip mainTexture;
@@ -110,6 +126,21 @@ public class DownstreamController extends WorldController implements ContactList
 		manager.load(LIGHTING_TEXTURE, Texture.class);
 		assets.add(LIGHTING_TEXTURE);
 		
+		manager.load(LAND_4SIDE_TEXTURE, Texture.class);
+		assets.add(LAND_4SIDE_TEXTURE);
+		
+		manager.load(LEFT_LAND_TEXTURE, Texture.class);
+		assets.add(LEFT_LAND_TEXTURE);
+		
+		manager.load(RIGHT_LAND_TEXTURE, Texture.class);
+		assets.add(RIGHT_LAND_TEXTURE);
+		
+		manager.load(TOP_LAND_TEXTURE, Texture.class);
+		assets.add(TOP_LAND_TEXTURE);
+		
+		manager.load(BOTTOM_LAND_TEXTURE, Texture.class);
+		assets.add(BOTTOM_LAND_TEXTURE);
+		
 		
 		//sounds
 		//manager.load(MAIN_FIRE_SOUND, Sound.class);
@@ -139,6 +170,11 @@ public class DownstreamController extends WorldController implements ContactList
 		lilyTexture = createTexture(manager,LILY_TEXTURE,false);
 		lanternTexture = createTexture(manager, LANTERN_TEXTURE, false);
 		lightingTexture = createTexture(manager, LIGHTING_TEXTURE, false);
+		land4Texture = createTexture(manager,LAND_4SIDE_TEXTURE,false);
+		leftLandTexture = createTexture(manager,LEFT_LAND_TEXTURE,false);
+		rightLandTexture = createTexture(manager,RIGHT_LAND_TEXTURE,false);
+		topLandTexture = createTexture(manager,TOP_LAND_TEXTURE,false);
+		bottomLandTexture = createTexture(manager,BOTTOM_LAND_TEXTURE,false);
 		
 		SoundController sounds = SoundController.getInstance();
 		//sounds.allocate(manager,MAIN_FIRE_SOUND);
@@ -175,23 +211,9 @@ public class DownstreamController extends WorldController implements ContactList
 										   8.0f, 15.0f,  1.0f, 17.0f,  2.0f,  7.0f,
 										   3.0f,  5.0f,  3.0f,  1.0f, 16.0f,  1.0f,
 										  16.0f,  0.0f,  0.0f,  0.0f};
-	private static final float[] WALL2 = {32.0f, 18.0f, 32.0f,  0.0f, 16.0f,  0.0f,
-										  16.0f,  1.0f, 31.0f,  1.0f, 30.0f, 10.0f,
-										  31.0f, 16.0f, 16.0f, 17.0f, 16.0f, 18.0f};
-	private static final float[] WALL3 = { 4.0f, 10.5f,  8.0f, 10.5f,
-            							   8.0f,  9.5f,  4.0f,  9.5f};
 	
-	private static final float[] WALLX = { 0.0f, 0.0f, 32.0f, 0.0f,
-										   16.0f, 32.0f, 0.0f, 0.0f, 16.0f};
 
-	// The positions of the crate pyramid
-//	private static final float[] BOXES = { 14.5f, 14.25f,
-//            							   13.0f, 12.00f, 16.0f, 12.00f,
-//            							   11.5f,  9.75f, 14.5f,  9.75f, 17.5f, 9.75f,
-//            							   13.0f,  7.50f, 16.0f,  7.50f,
-//            							   11.5f,  5.25f, 14.5f,  5.25f, 17.5f, 5.25f,
-//            							   10.0f,  3.00f, 13.0f,  3.00f, 16.0f, 3.00f, 19.0f, 3.0f};
-	private static final float[] BOXES = {};
+	
 	
 	private ArrayList<TetherModel> tethers = new ArrayList<TetherModel>();
 	private ArrayList<TetherModel> lanterns = new ArrayList<TetherModel>();
@@ -258,7 +280,17 @@ public class DownstreamController extends WorldController implements ContactList
 		
 		boolean sensorTethers = true;
 		
-		float rad = lilyTexture.getRegionWidth()/2;
+		/*
+		BoxObstacle land = new BoxObstacle(20,20,topLandTexture.getRegionWidth()/scale.x,topLandTexture.getRegionHeight()/scale.y);
+		land.setBodyType(BodyDef.BodyType.StaticBody);
+		land.setName("land");
+		land.setDensity(TETHER_DENSITY);
+		land.setFriction(TETHER_FRICTION);
+		land.setRestitution(TETHER_RESTITUTION);
+		land.setDrawScale(scale);
+		land.setTexture(topLandTexture);
+		addObject(land);
+		*/
 		
 		TetherModel lantern = new TetherModel(5, 5, dwidth, dheight, true);
 		lantern.setBodyType(BodyDef.BodyType.StaticBody);
