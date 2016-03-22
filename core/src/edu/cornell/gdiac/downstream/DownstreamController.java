@@ -41,9 +41,9 @@ public class DownstreamController extends WorldController implements ContactList
 	/** Reference to the enemy image assets */
 	private static final String ENEMY_TEXTURE = "enemy/enemy.png";
 	/** Reference to the Lantern asset image*/
-	private static final String LANTERN_TEXTURE = "tethers/pig.png";
+	private static final String LANTERN_TEXTURE = "tethers/notlit.png";
 	/** Reference to the Lightin Texture image */
-	private static final String LIGHTING_TEXTURE = "tethers/sun.png";
+	private static final String LIGHTING_TEXTURE = "tethers/aura.png";
 	/** Reference to the 4-sided land texture */
 	private static final String LAND_4SIDE_TEXTURE = "terrain/land.png";
 	/** Reference to the left land texture */

@@ -116,25 +116,28 @@ public class TetherModel extends WheelObstacle {
   
   public void draw(GameCanvas canvas) {
 		if (texture != null) {
-			canvas.draw(texture,Color.WHITE,origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x,getAngle(),1,1);
+			if (type == TetherType.Lilipad){
+				canvas.draw(texture,Color.WHITE,texture.getRegionHeight()/2,texture.getRegionWidth()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),1,1);
+			}
 			if (type == TetherType.Lantern){
+				canvas.draw(texture,Color.WHITE,texture.getRegionHeight()/2,texture.getRegionWidth()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),.35f,.35f);
+				//if (is)
 				if (rotations > 0){
 					sparkSize += .001f;
 					 if (rotations > 1){
-							sparkSize += .005f;
+							sparkSize += .02f;
 							if (rotations > 2){
-								sparkSize += .006f;
+								sparkSize += .2f;
 							}
 						}
 				}
-				if (rotations > 2 || sparkSize >= 2){
-					sparkSize = 2;
+				if (rotations > 2 || sparkSize >= 1.5){
+					sparkSize = 1.5f;
 				}
-				
-				canvas.draw(lightingTexture, Color.GOLDENROD, origin.x, origin.y, getX()*drawScale.x, getY()*drawScale.x, getAngle(), sparkSize, sparkSize);
-				//canvas.draw
+				//sparkSize = sparkSize / 5;
+				canvas.draw(lightingTexture,Color.WHITE, lightingTexture.getRegionWidth()/2, lightingTexture.getRegionHeight()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),sparkSize,sparkSize);
+				//System.out.println(origin);
 			}
 		}
-
-}
+  }
 }
