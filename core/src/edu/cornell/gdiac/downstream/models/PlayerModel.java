@@ -14,8 +14,8 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.physics.box2d.*;
 
 import edu.cornell.gdiac.util.*;
-import edu.cornell.gdiac.downstream.*;
 import edu.cornell.gdiac.downstream.obstacle.*;
+import edu.cornell.gdiac.downstream.GameCanvas;
 
 public class PlayerModel extends BoxObstacle {
 
@@ -46,6 +46,12 @@ public class PlayerModel extends BoxObstacle {
 	
 	private boolean isTethered;
 
+	public Vector2 pull;
+
+	public Vector2 cent;
+
+	private Vector2 dest;
+
 	/** Create a new player at x,y. */
 	public PlayerModel(float x, float y, float width, float height) {
 		super(x, y, width, height);
@@ -59,25 +65,72 @@ public class PlayerModel extends BoxObstacle {
 		force = new Vector2();
 		health = 1;
 		isTethered = false;
+		pull = Vector2.Zero;
+		cent = Vector2.Zero;
+		dest = Vector2.Zero;
 	}
 
 	public boolean isAlive() {
 		return health > 0;
 	}
 
-	public void applyTetherForce(Vector2 tetherForce) {
-		body.applyForceToCenter(tetherForce, true);
+	public void applyTetherForce(Vector2 tetherPos, float rad) {
+//		System.out.println("ayylmao");
+//		System.out.println(tetherPos);
+//		System.out.println(rad);
+		body.applyForceToCenter(calculateTetherForce(tetherPos,rad), true);
+//		System.out.println(calculateTetherForce(tetherPos,rad));
 	}
+	
 
-	public void applyTetherForce(TetherModel tether) {
-		applyTetherForce(tether.calculateAttractiveForce(this));
+	public void refreshTetherForce(Vector2 tetherPos, float rad){
+		System.out.println("sex");
+		pull = tetherPos.cpy().sub(getPosition());
+		pull.setLength(pull.len() + rad);
+		dest = getPosition().cpy().add(pull);
+		cent = getPosition().cpy().add(pull.cpy().scl(0.5f));
+//		cent = pull.cpy().setLength((pull.len()+rad)/2);
+//		cent.add(getPosition());
+//		dest = pull.cpy().setLength((pull.len()+rad));
+//		dest.add(getPosition());
 	}
+	
+	public Vector2 calculateTetherForce(Vector2 tetherPos, float rad){
+		if(isTethered()){
+			// if we have reached the inner circle
+			if(getPosition().sub(dest).len2() < .01){
+				dest = getPosition();
+				System.out.println("bitches");
+				pull = tetherPos.sub(getPosition());
+			    float forceMagnitude = (float) (getMass() * getLinearVelocity().len2() / rad);
+			    return pull.setLength(forceMagnitude);
+			} 
+			else{
+				System.out.println("FUCK");
+			    float forceMagnitude = (float) (getMass() * getLinearVelocity().len2() / (pull.len()/2));
+			    System.out.println(forceMagnitude);
+			    return cent.cpy().sub(getPosition()).setLength(forceMagnitude);			
+			}
+		}
+		else{
+			return Vector2.Zero;
+		}
+	}
+	
+	
+	public Vector2 calculateTetherForce(Vector2 tetherPos){
+	    Vector2 direction = tetherPos.sub(getPosition());
+	    float radius = 2;
+	    float forceMagnitude = (float) (getMass() * getLinearVelocity().len2() / radius);
+	    return direction.setLength(forceMagnitude);
+	  }
+	
 
-	public Vector2 getInitialTangentPoint(Vector2 tether) {
+	public Vector2 getInitialTangentPoint(Vector2 tetherPos) {
 		if (getVX() == 0) setVX(.00001f);
 		if (getVY() == 0) setVY(.00001f);
 		float slope = getVY() / getVX();
-		float xtan = (slope * getX() - getY() + tether.x / slope + tether.y) / (slope + 1 / slope);
+		float xtan = (slope * getX() - getY() + tetherPos.x / slope + tetherPos.y) / (slope + 1 / slope);
 		float ytan = slope * xtan - slope * getX() + getY();
 		return new Vector2(xtan, ytan);
 	}
