@@ -423,7 +423,7 @@ public class DownstreamController extends WorldController implements ContactList
 			koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*2));
 		}
 		if (tethered) {
-			koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY));
+			koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*1.5f));
 		}
 //		if (input.space) tethered = true; else tethered = false;
 		CAMERA_CURRENT_LINEAR_VELOCITY = Math.min(CAMERA_CURRENT_LINEAR_VELOCITY+CAMERA_ACCELERATION, CAMERA_MAX_LINEAR_VELOCITY);
