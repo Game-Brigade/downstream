@@ -407,7 +407,8 @@ public class DownstreamController extends WorldController implements ContactList
 		koi.applyForce();
 //		koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY));
 		
-		if (enableSlow && input.slow) koi.setLinearVelocity(koi.getLinearVelocity().setLength(4));
+		// unused. was testing using "s" to slow down
+//		if (enableSlow && input.slow) koi.setLinearVelocity(koi.getLinearVelocity().setLength(4));
 		
 		if (input.didTether()) {
 			tethered = !tethered; koi.setTethered(false);
@@ -425,89 +426,51 @@ public class DownstreamController extends WorldController implements ContactList
 		TetherModel closestTether = getClosestTether();
 		
 		//check to see if closest tether is just attached or has been previously attached
-			if (tethered & closestTether.getEntry().x == 0f & closestTether.isLantern()){
-					//if just attached, define it as such
-					Vector2 ent = new Vector2(closestTether.getX(), closestTether.getY());
-					closestTether.setEntry(ent);
-					
+		if (tethered & closestTether.getEntry().x == 0f & closestTether.isLantern()){
+				//if just attached, define it as such
+				Vector2 ent = new Vector2(closestTether.getX(), closestTether.getY());
+				closestTether.setEntry(ent);
+				
+			}
+			//checks to see if the fish is within reasonable circulating distance. It will pass the if statment many times
+		if (tethered){
+			//this is because the fish moves to quickly to get an exact range, so we must find it within .5 distance
+			if ((closestTether.getEntry().x + .5 > koi.getPosition().x) && (closestTether.getEntry().x -.5 < koi.getPosition().x && closestTether.isLantern())){
+				//because of the range, we only want the first instance, so we only check if it has not been previously checked in the last frame. 
+				if (closestTether.set == false){
+					//System.out.println(closestTether.getRotations());
+					closestTether.updateRotations();
 				}
-				//checks to see if the fish is within reasonable circulating distance. It will pass the if statment many times
-				if (tethered){
-					//this is because the fish moves to quickly to get an exact range, so we must find it within .5 distance
-					if ((closestTether.getEntry().x + .5 > koi.getPosition().x) && (closestTether.getEntry().x -.5 < koi.getPosition().x && closestTether.isLantern())){
-						//because of the range, we only want the first instance, so we only check if it has not been previously checked in the last frame. 
-						if (closestTether.set == false){
-							//System.out.println(closestTether.getRotations());
-							closestTether.updateRotations();
-						}
-						closestTether.set = true;
-					}
-					else{
-						closestTether.set = false;
-					}
-				}
-				else{
-					closestTether.set = false;
-				}
+				closestTether.set = true;
+			}
+			else{
+				closestTether.set = false;
+			}
+		}
+		else {
+			closestTether.set = false;
+		}
 		
 		int camera_mode = 2;
 		boolean camera_zoom = true;
-		switch(camera_mode) {
-			// laggy catch up
-			// if tethered, move quickly to center on tether, 
-			// else move slowly to fish
-			case 0:
-				if (koi.isTethered() || tethered && 
-					koi.getPosition().sub(koi.getInitialTangentPoint(closestTether.getPosition())).len2() < .01) {
-					koi.applyTetherForce(closestTether);
-					canvas.moveCameraTowards(closestTether.getPosition().cpy().scl(scale), CAMERA_CURRENT_LINEAR_VELOCITY);
-					if (camera_zoom) canvas.zoomOut();
-					koi.setTethered(true);
-				} else {
-					canvas.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_CURRENT_LINEAR_VELOCITY/2);
-					if (camera_zoom) canvas.zoomIn();
-				}
-				break;
-			// quick catch up
-			// if tethered, move slowly to tether, 
-			// else move quickly to fish
-			case 1:
-				if (koi.isTethered() || tethered && 
-					koi.getPosition().sub(koi.getInitialTangentPoint(closestTether.getPosition())).len2() < .01) {
-					koi.applyTetherForce(closestTether);
-					canvas.moveCameraTowards(closestTether.getPosition().cpy().scl(scale), CAMERA_CURRENT_LINEAR_VELOCITY/2);
-					if (camera_zoom) canvas.zoomOut();
-					koi.setTethered(true);
-				} else {
-					canvas.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_CURRENT_LINEAR_VELOCITY);
-					if (camera_zoom) canvas.zoomIn();
-				}
-				break;
-			// laggy catch up with space
-			// if tethered, move slowly to tether; 
-			// else if pressing space move quickly to fish, 
-			// else slowly to fish
-			case 2:
-				if (koi.isTethered() || tethered && 
-					koi.getPosition().sub(koi.getInitialTangentPoint(closestTether.getPosition())).len2() < .01) {
-					koi.applyTetherForce(closestTether);
-					canvas.moveCameraTowards(closestTether.getPosition().cpy().scl(scale), CAMERA_CURRENT_LINEAR_VELOCITY/2);
-					if (camera_zoom) canvas.zoomOut();
-					koi.setTethered(true);
-				} else {
-					if (tethered) canvas.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_CURRENT_LINEAR_VELOCITY);
-					else 			 canvas.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_CURRENT_LINEAR_VELOCITY/2);
-					if (camera_zoom) canvas.zoomIn();
-				}
-				break;
-			// follow player
-			case 3:
-				if (koi.isTethered() || tethered && 
-					koi.getPosition().sub(koi.getInitialTangentPoint(closestTether.getPosition())).len2() < .01) {
-					koi.applyTetherForce(closestTether);
-					koi.setTethered(true);
-				}
-				canvas.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_CURRENT_LINEAR_VELOCITY);
+		
+		// laggy catch up with space
+		// if tethered, move slowly to tether; 
+		// else if pressing space move quickly to fish, 
+		// else slowly to fish
+		
+		if (koi.isTethered() || tethered && 
+			koi.getPosition().sub(koi.getInitialTangentPoint(closestTether.getPosition())).len2() < .01) {
+			koi.applyTetherForce(closestTether);
+			canvas.moveCameraTowards(closestTether.getPosition().cpy().scl(scale), CAMERA_CURRENT_LINEAR_VELOCITY/2);
+			if (camera_zoom) canvas.zoomOut();
+			koi.setTethered(true);
+//			koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY));
+		} else {
+			if (tethered) canvas.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_CURRENT_LINEAR_VELOCITY);
+			else 			 canvas.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_CURRENT_LINEAR_VELOCITY/2);
+			if (camera_zoom) canvas.zoomIn();
+//			koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*2));
 		}
 		
 		
