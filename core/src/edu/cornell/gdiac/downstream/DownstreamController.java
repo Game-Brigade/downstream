@@ -85,8 +85,10 @@ public class DownstreamController extends WorldController implements ContactList
 	
 	private boolean tethered;
 	
-	private float PLAYER_LINEAR_VELOCITY = 8f;
-	private float CAMERA_LINEAR_VELOCITY = 8f;
+	private float PLAYER_LINEAR_VELOCITY = 4f;
+	private float CAMERA_MAX_LINEAR_VELOCITY = 8f;
+	private float CAMERA_CURRENT_LINEAR_VELOCITY = 0f;
+	private float CAMERA_ACCELERATION = 0.1f;
 	
 	private boolean enableSlow = false;
 	private boolean enableLeadingLine = false;
@@ -362,17 +364,17 @@ public class DownstreamController extends WorldController implements ContactList
 		TextureRegion texture = enemyTexture;
 		dwidth  = texture.getRegionWidth()/scale.x;
 		dheight = texture.getRegionHeight()/scale.y;
-		eFish = new EnemyModel(20, 0, dwidth, dheight);
-		eFish.setDensity(ENEMY_DENSITY);
-		eFish.setFriction(ENEMY_FRICTION);
-		eFish.setRestitution(BASIC_RESTITUTION);
-		eFish.setName("enemy");
-		eFish.setDrawScale(scale);
-		eFish.setTexture(texture);
-		eFish.setAngle((float) (Math.PI/2));
-		eFish.setBodyType(BodyDef.BodyType.StaticBody);
-		eFish.setGoal(0, 0);
-		addObject(eFish);
+//		eFish = new EnemyModel(20, 0, dwidth, dheight);
+//		eFish.setDensity(ENEMY_DENSITY);
+//		eFish.setFriction(ENEMY_FRICTION);
+//		eFish.setRestitution(BASIC_RESTITUTION);
+//		eFish.setName("enemy");
+//		eFish.setDrawScale(scale);
+//		eFish.setTexture(texture);
+//		eFish.setAngle((float) (Math.PI/2));
+//		eFish.setBodyType(BodyDef.BodyType.StaticBody);
+//		eFish.setGoal(0, 0);
+//		addObject(eFish);
 
 		// Create the fish avatar
 		dwidth  = koiTexture.getRegionWidth()/scale.x;
@@ -398,82 +400,87 @@ public class DownstreamController extends WorldController implements ContactList
 	 * @param delta Number of seconds since last animation frame
 	 */
 	public void update(float dt) {
-//		System.out.println(canvas.camera.viewportWidth);
-//		System.out.println(canvas.camera.viewportHeight);
+		
+		System.out.println(CAMERA_CURRENT_LINEAR_VELOCITY);
 		
 		float thrust = koi.getThrust();
 		InputController input = InputController.getInstance();
 		koi.setFX(thrust * input.getHorizontal());
 		koi.setFY(thrust * input.getVertical());
 		koi.applyForce();
-		koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY));
+//		koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY));
 		
-		if (enableSlow && input.slow) koi.setLinearVelocity(koi.getLinearVelocity().setLength(4));
+		// unused. was testing using "s" to slow down
+//		if (enableSlow && input.slow) koi.setLinearVelocity(koi.getLinearVelocity().setLength(4));
 		
-		
+		if (input.didTether()) {
+			tethered = !tethered; 
+			koi.setTethered(false);
+//			CAMERA_CURRENT_LINEAR_VELOCITY = CAMERA_MAX_LINEAR_VELOCITY/2;
+			CAMERA_CURRENT_LINEAR_VELOCITY = 2;
+		}
+		if (!tethered) {
+			koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*2));
+		}
+		if (tethered) {
+			koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY));
+		}
+//		if (input.space) tethered = true; else tethered = false;
+		CAMERA_CURRENT_LINEAR_VELOCITY = Math.min(CAMERA_CURRENT_LINEAR_VELOCITY+CAMERA_ACCELERATION, CAMERA_MAX_LINEAR_VELOCITY);
 		TetherModel closestTether = getClosestTether();
 
 		
-		if (input.didTether()) {tethered = !tethered; koi.setTethered(false);}
-//		if (input.space) tethered = true; else tethered = false;
-		
-		
 		//check to see if closest tether is just attached or has been previously attached
-			if (tethered & closestTether.getEntry().x == 0f & closestTether.isLantern()){
-					//if just attached, define it as such
-					Vector2 ent = new Vector2(closestTether.getX(), closestTether.getY());
-					closestTether.setEntry(ent);
-					
+		if (tethered & closestTether.getEntry().x == 0f & closestTether.isLantern()){
+				//if just attached, define it as such
+				Vector2 ent = new Vector2(closestTether.getX(), closestTether.getY());
+				closestTether.setEntry(ent);
+				
+			}
+			//checks to see if the fish is within reasonable circulating distance. It will pass the if statment many times
+		if (tethered){
+			//this is because the fish moves to quickly to get an exact range, so we must find it within .5 distance
+			if ((closestTether.getEntry().x + .5 > koi.getPosition().x) && (closestTether.getEntry().x -.5 < koi.getPosition().x && closestTether.isLantern())){
+				//because of the range, we only want the first instance, so we only check if it has not been previously checked in the last frame. 
+				if (closestTether.set == false){
+					//System.out.println(closestTether.getRotations());
+					closestTether.updateRotations();
 				}
-				//checks to see if the fish is within reasonable circulating distance. It will pass the if statment many times
-				if (tethered){
-					//this is because the fish moves to quickly to get an exact range, so we must find it within .5 distance
-					if ((closestTether.getEntry().x + .5 > koi.getPosition().x) && (closestTether.getEntry().x -.5 < koi.getPosition().x && closestTether.isLantern())){
-						//because of the range, we only want the first instance, so we only check if it has not been previously checked in the last frame. 
-						if (closestTether.set == false){
-							//System.out.println(closestTether.getRotations());
-							closestTether.updateRotations();
-						}
-						closestTether.set = true;
-					}
-					else{
-						closestTether.set = false;
-					}
-				}
-				else{
-					closestTether.set = false;
-				}
+				closestTether.set = true;
+			}
+			else{
+				closestTether.set = false;
+			}
+		}
+		else {
+			closestTether.set = false;
+		}
 		
-
-				int camera_mode = 2;
-				boolean camera_zoom = true;
-				// laggy catch up
-				// if tethered, move quickly to center on tether, 
-				// else move slowly to fish
-
-				// laggy catch up with space
-				// if tethered, move slowly to tether; 
-				// else if pressing space move quickly to fish, 
-				// else slowly to fish
-				if (koi.isTethered() || tethered && 
-						koi.getPosition().sub(koi.getInitialTangentPoint(closestTether.getPosition())).len2() < .01) {
-					if (!koi.isTethered()) {
-						System.out.println("PENIS");
-						koi.refreshTetherForce(closestTether.getPosition(), closestTether.getOrbitRadius());
-					}
-					
-					koi.applyTetherForce(closestTether.getPosition(), closestTether.getOrbitRadius());
-					
-					canvas.moveCameraTowards(closestTether.getPosition().cpy().scl(scale), CAMERA_LINEAR_VELOCITY/2);
-					if (camera_zoom) canvas.zoomOut();
-					koi.setTethered(true);
-				} else {
-					if (tethered) canvas.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_LINEAR_VELOCITY);
-					else 			 canvas.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_LINEAR_VELOCITY/2);
-					if (camera_zoom) canvas.zoomIn();
-				}
-
-
+		boolean camera_zoom = true;
+		
+		// laggy catch up with space
+		// if tethered, move slowly to tether; 
+		// else if pressing space move quickly to fish, 
+		// else slowly to fish
+		
+		if (koi.isTethered() || tethered && 
+			koi.getPosition().sub(koi.getInitialTangentPoint(closestTether.getPosition())).len2() < .01) {
+			if (!koi.isTethered()) {
+				System.out.println("PENIS");
+				koi.refreshTetherForce(closestTether.getPosition(), closestTether.getOrbitRadius());
+			}
+			koi.applyTetherForce(closestTether.getPosition(), closestTether.getOrbitRadius());
+			canvas.moveCameraTowards(closestTether.getPosition().cpy().scl(scale), CAMERA_CURRENT_LINEAR_VELOCITY/2);
+			if (camera_zoom) canvas.zoomOut();
+			koi.setTethered(true);
+//			koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY));
+		} else {
+			if (tethered) canvas.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_CURRENT_LINEAR_VELOCITY);
+			else 			 canvas.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_CURRENT_LINEAR_VELOCITY/2);
+			if (camera_zoom) canvas.zoomIn();
+//			koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*2));
+		}
+		
 		
 		koi.resolveDirection();
 
@@ -488,14 +495,14 @@ public class DownstreamController extends WorldController implements ContactList
 		
 		int motionType = 0;
 		
-		if (lanterns.get(0).getRotations() <= 2){
-			eFish.moveTowardsGoal();
-			eFish.patrol(20, 0, 20, 18);
-		}
-		else{
-			eFish.setGoal(100, 100);
-			eFish.moveTowardsGoal();
-		}
+//		if (lanterns.get(0).getRotations() <= 2){
+//			eFish.moveTowardsGoal();
+//			eFish.patrol(20, 0, 20, 18);
+//		}
+//		else{
+//			eFish.setGoal(100, 100);
+//			eFish.moveTowardsGoal();
+//		}
 		
 //		System.out.println(koi.cent);
 		
