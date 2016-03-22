@@ -280,8 +280,8 @@ public class DownstreamController extends WorldController implements ContactList
 		
 		boolean sensorTethers = true;
 		
-		/*
-		BoxObstacle land = new BoxObstacle(20,20,topLandTexture.getRegionWidth()/scale.x,topLandTexture.getRegionHeight()/scale.y);
+		
+		BoxObstacle land = new BoxObstacle(15,25,topLandTexture.getRegionWidth()/scale.x,topLandTexture.getRegionHeight()/scale.y);
 		land.setBodyType(BodyDef.BodyType.StaticBody);
 		land.setName("land");
 		land.setDensity(TETHER_DENSITY);
@@ -290,7 +290,7 @@ public class DownstreamController extends WorldController implements ContactList
 		land.setDrawScale(scale);
 		land.setTexture(topLandTexture);
 		addObject(land);
-		*/
+		
 		
 		TetherModel lantern = new TetherModel(5, 5, dwidth, dheight, true);
 		lantern.setBodyType(BodyDef.BodyType.StaticBody);
