@@ -285,11 +285,11 @@ public class DownstreamController extends WorldController implements ContactList
 		float rad = lilyTexture.getRegionWidth()/scale.x/2;
 
 		boolean sensorTethers = true;
-<<<<<<< HEAD
+
 		
 		
 		BoxObstacle land = new BoxObstacle(15,25,topLandTexture.getRegionWidth()/scale.x,topLandTexture.getRegionHeight()/scale.y);
-=======
+
 
 		/*
 		BoxObstacle land = new BoxObstacle(20,20,topLandTexture.getRegionWidth()/scale.x,topLandTexture.getRegionHeight()/scale.y);
@@ -322,7 +322,7 @@ public class DownstreamController extends WorldController implements ContactList
 		tethers.add(lily);
 
 		TetherModel lantern = new TetherModel(15, 4, rad, true);
->>>>>>> refs/remotes/origin/master
+
 		lantern.setBodyType(BodyDef.BodyType.StaticBody);
 		lantern.setName("lantern"+ 1);
 		lantern.setDensity(TETHER_DENSITY);
