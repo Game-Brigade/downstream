@@ -86,7 +86,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private boolean tethered;
 	
 	private float PLAYER_LINEAR_VELOCITY = 4f;
-	private float CAMERA_MAX_LINEAR_VELOCITY = 6f;
+	private float CAMERA_MAX_LINEAR_VELOCITY = 8f;
 	private float CAMERA_CURRENT_LINEAR_VELOCITY = 0f;
 	private float CAMERA_ACCELERATION = 0.1f;
 	
