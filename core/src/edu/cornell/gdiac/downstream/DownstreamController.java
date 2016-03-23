@@ -93,8 +93,6 @@ public class DownstreamController extends WorldController implements ContactList
 	private boolean enableSlow = false;
 	private boolean enableLeadingLine = false;
 	private boolean enableTetherRadius = true;
-	
-	private CameraController cameraController;
 
 	/**
 	 * Preloads the assets for this controller.
@@ -236,6 +234,8 @@ public class DownstreamController extends WorldController implements ContactList
 	private PlayerModel koi;
 
 	private EnemyModel eFish;
+	
+	private CameraController cameraController;
 
 	/**
 	 * Creates and initialize a new instance of Downstream
@@ -281,18 +281,38 @@ public class DownstreamController extends WorldController implements ContactList
 	 * Lays out the game geography.
 	 */
 	private void populateLevel() {
+		// Add level goal
 		
-		// create the cameraController for the level
 		cameraController = new CameraController(canvas.getCamera());
 		
-		// Add level goal
 		float dwidth;
 		float dheight;
 		float rad = lilyTexture.getRegionWidth()/scale.x/2;
 
 		boolean sensorTethers = true;
 
+		
+		
 		BoxObstacle land = new BoxObstacle(15,25,topLandTexture.getRegionWidth()/scale.x,topLandTexture.getRegionHeight()/scale.y);
+
+
+		/*
+		BoxObstacle land = new BoxObstacle(20,20,topLandTexture.getRegionWidth()/scale.x,topLandTexture.getRegionHeight()/scale.y);
+>>>>>>> refs/remotes/origin/master
+		land.setBodyType(BodyDef.BodyType.StaticBody);
+		land.setName("land");
+		land.setDensity(TETHER_DENSITY);
+		land.setFriction(TETHER_FRICTION);
+		land.setRestitution(TETHER_RESTITUTION);
+		land.setDrawScale(scale);
+		land.setTexture(topLandTexture);
+		addObject(land);
+<<<<<<< HEAD
+		
+		
+		TetherModel lantern = new TetherModel(5, 5, dwidth, dheight, true);
+=======
+		 */
 
 		TetherModel lily = new TetherModel(0, 6, rad);
 		lily.setBodyType(BodyDef.BodyType.StaticBody);
@@ -520,7 +540,7 @@ public class DownstreamController extends WorldController implements ContactList
 			//			koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY));
 		} else {
 			if (tethered) cameraController.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_CURRENT_LINEAR_VELOCITY);
-			else 			 cameraController.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_CURRENT_LINEAR_VELOCITY/2);
+			else 		  cameraController.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_CURRENT_LINEAR_VELOCITY/2);
 			if (camera_zoom) cameraController.zoomIn();
 			//			koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*2));
 		}

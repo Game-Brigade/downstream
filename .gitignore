@@ -2,8 +2,3 @@
 /build/
 .DS_Store
 /core/bin/
-/core/.settings/
-/desktop/.settings/
-/.gradle/
-.project
-desktop/src/edu/cornell/gdiac/downstream/desktop/DesktopLauncher.java

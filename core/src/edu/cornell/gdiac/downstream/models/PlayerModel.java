@@ -98,7 +98,7 @@ public class PlayerModel extends BoxObstacle {
 	public Vector2 calculateTetherForce(Vector2 tetherPos, float rad){
 		if(isTethered()){
 			// if we have reached the inner circle
-			if(getPosition().sub(dest).len2() < .05){
+			if(getPosition().sub(dest).len2() < .01){
 				dest = getPosition();
 //				System.out.println("bitches");
 				pull = tetherPos.sub(getPosition());
