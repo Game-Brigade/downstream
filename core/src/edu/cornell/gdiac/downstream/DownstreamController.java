@@ -93,6 +93,8 @@ public class DownstreamController extends WorldController implements ContactList
 	private boolean enableSlow = false;
 	private boolean enableLeadingLine = false;
 	private boolean enableTetherRadius = true;
+	
+	private CameraController cameraController;
 
 	/**
 	 * Preloads the assets for this controller.
@@ -279,6 +281,10 @@ public class DownstreamController extends WorldController implements ContactList
 	 * Lays out the game geography.
 	 */
 	private void populateLevel() {
+		
+		// create the cameraController for the level
+		cameraController = new CameraController(canvas.getCamera());
+		
 		// Add level goal
 		float dwidth;
 		float dheight;
@@ -286,28 +292,7 @@ public class DownstreamController extends WorldController implements ContactList
 
 		boolean sensorTethers = true;
 
-		
-		
 		BoxObstacle land = new BoxObstacle(15,25,topLandTexture.getRegionWidth()/scale.x,topLandTexture.getRegionHeight()/scale.y);
-
-
-		/*
-		BoxObstacle land = new BoxObstacle(20,20,topLandTexture.getRegionWidth()/scale.x,topLandTexture.getRegionHeight()/scale.y);
->>>>>>> refs/remotes/origin/master
-		land.setBodyType(BodyDef.BodyType.StaticBody);
-		land.setName("land");
-		land.setDensity(TETHER_DENSITY);
-		land.setFriction(TETHER_FRICTION);
-		land.setRestitution(TETHER_RESTITUTION);
-		land.setDrawScale(scale);
-		land.setTexture(topLandTexture);
-		addObject(land);
-<<<<<<< HEAD
-		
-		
-		TetherModel lantern = new TetherModel(5, 5, dwidth, dheight, true);
-=======
-		 */
 
 		TetherModel lily = new TetherModel(0, 6, rad);
 		lily.setBodyType(BodyDef.BodyType.StaticBody);
@@ -460,7 +445,7 @@ public class DownstreamController extends WorldController implements ContactList
 	 */
 	public void update(float dt) {
 
-		System.out.println(CAMERA_CURRENT_LINEAR_VELOCITY);
+//		System.out.println(CAMERA_CURRENT_LINEAR_VELOCITY);
 
 		float thrust = koi.getThrust();
 		InputController input = InputController.getInstance();
@@ -525,7 +510,7 @@ public class DownstreamController extends WorldController implements ContactList
 		if (koi.isTethered() || tethered && 
 				koi.getPosition().sub(koi.getInitialTangentPoint(closestTether.getPosition())).len2() < .01) {
 			if (!koi.isTethered()) {
-				System.out.println("PENIS");
+//				System.out.println("PENIS");
 				koi.refreshTetherForce(closestTether.getPosition(), closestTether.getOrbitRadius());
 			}
 			koi.applyTetherForce(closestTether.getPosition(), closestTether.getOrbitRadius());
@@ -534,9 +519,9 @@ public class DownstreamController extends WorldController implements ContactList
 			koi.setTethered(true);
 			//			koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY));
 		} else {
-			if (tethered) canvas.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_CURRENT_LINEAR_VELOCITY);
-			else 			 canvas.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_CURRENT_LINEAR_VELOCITY/2);
-			if (camera_zoom) canvas.zoomIn();
+			if (tethered) cameraController.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_CURRENT_LINEAR_VELOCITY);
+			else 			 cameraController.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_CURRENT_LINEAR_VELOCITY/2);
+			if (camera_zoom) cameraController.zoomIn();
 			//			koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*2));
 		}
 

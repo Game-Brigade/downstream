@@ -84,7 +84,7 @@ public class PlayerModel extends BoxObstacle {
 	
 
 	public void refreshTetherForce(Vector2 tetherPos, float rad){
-		System.out.println("sex");
+//		System.out.println("sex");
 		pull = tetherPos.cpy().sub(getPosition());
 		pull.setLength(pull.len() + rad);
 		dest = getPosition().cpy().add(pull);
@@ -98,17 +98,17 @@ public class PlayerModel extends BoxObstacle {
 	public Vector2 calculateTetherForce(Vector2 tetherPos, float rad){
 		if(isTethered()){
 			// if we have reached the inner circle
-			if(getPosition().sub(dest).len2() < .01){
+			if(getPosition().sub(dest).len2() < .05){
 				dest = getPosition();
-				System.out.println("bitches");
+//				System.out.println("bitches");
 				pull = tetherPos.sub(getPosition());
 			    float forceMagnitude = (float) (getMass() * getLinearVelocity().len2() / rad);
 			    return pull.setLength(forceMagnitude);
 			} 
 			else{
-				System.out.println("FUCK");
+//				System.out.println("FUCK");
 			    float forceMagnitude = (float) (getMass() * getLinearVelocity().len2() / (pull.len()/2));
-			    System.out.println(forceMagnitude);
+//			    System.out.println(forceMagnitude);
 			    return cent.cpy().sub(getPosition()).setLength(forceMagnitude);			
 			}
 		}
