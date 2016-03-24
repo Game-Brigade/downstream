@@ -286,28 +286,47 @@ public class DownstreamController extends WorldController implements ContactList
 
 		boolean sensorTethers = true;
 
-		
-		
-		BoxObstacle land = new BoxObstacle(15,25,topLandTexture.getRegionWidth()/scale.x,topLandTexture.getRegionHeight()/scale.y);
-
-
-		/*
-		BoxObstacle land = new BoxObstacle(20,20,topLandTexture.getRegionWidth()/scale.x,topLandTexture.getRegionHeight()/scale.y);
->>>>>>> refs/remotes/origin/master
+		TerrainModel land = new TerrainModel(0,20, topLandTexture.getRegionWidth()/scale.x, topLandTexture.getRegionHeight()/scale.y,6,1);
 		land.setBodyType(BodyDef.BodyType.StaticBody);
-		land.setName("land");
+		land.setName("landtop");
 		land.setDensity(TETHER_DENSITY);
 		land.setFriction(TETHER_FRICTION);
 		land.setRestitution(TETHER_RESTITUTION);
 		land.setDrawScale(scale);
 		land.setTexture(topLandTexture);
 		addObject(land);
-<<<<<<< HEAD
+		
+		land = new TerrainModel(0,-15, bottomLandTexture.getRegionWidth()/scale.x, bottomLandTexture.getRegionHeight()/scale.y,6,1);
+		land.setBodyType(BodyDef.BodyType.StaticBody);
+		land.setName("landbottom");
+		land.setDensity(TETHER_DENSITY);
+		land.setFriction(TETHER_FRICTION);
+		land.setRestitution(TETHER_RESTITUTION);
+		land.setDrawScale(scale);
+		land.setTexture(bottomLandTexture);
+		addObject(land);
 		
 		
-		TetherModel lantern = new TetherModel(5, 5, dwidth, dheight, true);
-=======
-		 */
+		land = new TerrainModel(-35,0, leftLandTexture.getRegionWidth()/scale.x, leftLandTexture.getRegionHeight()/scale.y,1,3);
+		land.setBodyType(BodyDef.BodyType.StaticBody);
+		land.setName("landleft");
+		land.setDensity(TETHER_DENSITY);
+		land.setFriction(TETHER_FRICTION);
+		land.setRestitution(TETHER_RESTITUTION);
+		land.setDrawScale(scale);
+		land.setTexture(leftLandTexture);
+		addObject(land);
+		
+		land = new TerrainModel(80,0, rightLandTexture.getRegionWidth()/scale.x, rightLandTexture.getRegionHeight()/scale.y,1,3);
+		land.setBodyType(BodyDef.BodyType.StaticBody);
+		land.setName("landright");
+		land.setDensity(TETHER_DENSITY);
+		land.setFriction(TETHER_FRICTION);
+		land.setRestitution(TETHER_RESTITUTION);
+		land.setDrawScale(scale);
+		land.setTexture(rightLandTexture);
+		addObject(land);
+
 
 		TetherModel lily = new TetherModel(0, 6, rad);
 		lily.setBodyType(BodyDef.BodyType.StaticBody);
