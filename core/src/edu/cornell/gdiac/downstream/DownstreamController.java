@@ -234,6 +234,8 @@ public class DownstreamController extends WorldController implements ContactList
 	private PlayerModel koi;
 
 	private EnemyModel eFish;
+	
+	private CameraController cameraController;
 
 	/**
 	 * Creates and initialize a new instance of Downstream
@@ -280,6 +282,9 @@ public class DownstreamController extends WorldController implements ContactList
 	 */
 	private void populateLevel() {
 		// Add level goal
+		
+		cameraController = new CameraController(canvas.getCamera());
+		
 		float dwidth;
 		float dheight;
 		float rad = lilyTexture.getRegionWidth()/scale.x/2;
@@ -479,7 +484,7 @@ public class DownstreamController extends WorldController implements ContactList
 	 */
 	public void update(float dt) {
 
-		System.out.println(CAMERA_CURRENT_LINEAR_VELOCITY);
+//		System.out.println(CAMERA_CURRENT_LINEAR_VELOCITY);
 
 		float thrust = koi.getThrust();
 		InputController input = InputController.getInstance();
@@ -544,7 +549,7 @@ public class DownstreamController extends WorldController implements ContactList
 		if (koi.isTethered() || tethered && 
 				koi.getPosition().sub(koi.getInitialTangentPoint(closestTether.getPosition())).len2() < .01) {
 			if (!koi.isTethered()) {
-				System.out.println("PENIS");
+//				System.out.println("PENIS");
 				koi.refreshTetherForce(closestTether.getPosition(), closestTether.getOrbitRadius());
 			}
 			koi.applyTetherForce(closestTether.getPosition(), closestTether.getOrbitRadius());
@@ -553,9 +558,9 @@ public class DownstreamController extends WorldController implements ContactList
 			koi.setTethered(true);
 			//			koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY));
 		} else {
-			if (tethered) canvas.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_CURRENT_LINEAR_VELOCITY);
-			else 			 canvas.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_CURRENT_LINEAR_VELOCITY/2);
-			if (camera_zoom) canvas.zoomIn();
+			if (tethered) cameraController.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_CURRENT_LINEAR_VELOCITY);
+			else 		  cameraController.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_CURRENT_LINEAR_VELOCITY/2);
+			if (camera_zoom) cameraController.zoomIn();
 			//			koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*2));
 		}
 
