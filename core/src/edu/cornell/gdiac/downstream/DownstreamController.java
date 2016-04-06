@@ -54,6 +54,8 @@ public class DownstreamController extends WorldController implements ContactList
 	private static final String TOP_LAND_TEXTURE = "terrain/top-border.png";
 	/** Reference to the bottom land texture */
 	private static final String BOTTOM_LAND_TEXTURE = "terrain/bottom-border.png";
+	/** Reference to the lotus texture */
+	private static final String LOTUS_TEXTURE= null;
 
 	/** The asset for the collision sound */
 	//private static final String  COLLISION_SOUND = "fish/bump.mp3";
