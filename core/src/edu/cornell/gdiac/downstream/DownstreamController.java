@@ -291,28 +291,7 @@ public class DownstreamController extends WorldController implements ContactList
 
 		boolean sensorTethers = true;
 
-		
-		
 		BoxObstacle land = new BoxObstacle(15,25,topLandTexture.getRegionWidth()/scale.x,topLandTexture.getRegionHeight()/scale.y);
-
-
-		/*
-		BoxObstacle land = new BoxObstacle(20,20,topLandTexture.getRegionWidth()/scale.x,topLandTexture.getRegionHeight()/scale.y);
->>>>>>> refs/remotes/origin/master
-		land.setBodyType(BodyDef.BodyType.StaticBody);
-		land.setName("land");
-		land.setDensity(TETHER_DENSITY);
-		land.setFriction(TETHER_FRICTION);
-		land.setRestitution(TETHER_RESTITUTION);
-		land.setDrawScale(scale);
-		land.setTexture(topLandTexture);
-		addObject(land);
-<<<<<<< HEAD
-		
-		
-		TetherModel lantern = new TetherModel(5, 5, dwidth, dheight, true);
-=======
-		 */
 
 		TetherModel lily = new TetherModel(0, 6, rad);
 		lily.setBodyType(BodyDef.BodyType.StaticBody);
