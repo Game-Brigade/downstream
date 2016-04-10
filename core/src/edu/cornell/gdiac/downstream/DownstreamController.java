@@ -334,7 +334,6 @@ public class DownstreamController extends WorldController implements ContactList
 		land.setTexture(rightLandTexture);
 		addObject(land);
 
-
 		TetherModel lily = new TetherModel(0, 6, rad);
 		lily.setBodyType(BodyDef.BodyType.StaticBody);
 		lily.setName("lily"+ 1);
@@ -560,8 +559,12 @@ public class DownstreamController extends WorldController implements ContactList
 			koi.setTethered(true);
 			//			koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY));
 		} else {
-			if (tethered) cameraController.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_CURRENT_LINEAR_VELOCITY);
-			else 		  cameraController.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_CURRENT_LINEAR_VELOCITY/2);
+			if (tethered) 
+				cameraController.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_CURRENT_LINEAR_VELOCITY);
+			else {
+				CAMERA_CURRENT_LINEAR_VELOCITY = Math.min(CAMERA_CURRENT_LINEAR_VELOCITY+CAMERA_ACCELERATION, CAMERA_MAX_LINEAR_VELOCITY);
+				cameraController.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_CURRENT_LINEAR_VELOCITY);
+			}
 			if (camera_zoom) cameraController.zoomIn();
 			//			koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*2));
 		}

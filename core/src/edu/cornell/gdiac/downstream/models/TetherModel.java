@@ -125,7 +125,7 @@ public class TetherModel extends WheelObstacle {
 
 			}
 			if (rotations > 1.5){
-				sparkSize = 2.0f;
+				sparkSize = 1.0f;
 			}
 
 
