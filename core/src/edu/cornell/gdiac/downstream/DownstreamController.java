@@ -134,6 +134,24 @@ public class DownstreamController extends WorldController implements ContactList
     TextureRegion[]                 closedFlowerFrames;             // #5
     SpriteBatch                     closedFlowerspriteBatch;            // #6
     TextureRegion                   closedFlowercurrentFrame;           // #7
+    
+    Animation                      	openFlowerAnimation;          // #3
+    Texture                         openFlowerSheet;              // #4
+    TextureRegion[]                 openFlowerFrames;             // #5
+    SpriteBatch                     openFlowerspriteBatch;            // #6
+    TextureRegion                   openFlowercurrentFrame;           // #7
+    
+    Animation                      	openingFlowerAnimation;          // #3
+    Texture                         openingFlowerSheet;              // #4
+    TextureRegion[]                 openingFlowerFrames;             // #5
+    SpriteBatch                     openingFlowerspriteBatch;            // #6
+    TextureRegion                   openingFlowercurrentFrame;           // #7
+
+    Animation                      	closingFlowerAnimation;          // #3
+    Texture                         closingFlowerSheet;              // #4
+    TextureRegion[]                 closingFlowerFrames;             // #5
+    SpriteBatch                     closingFlowerspriteBatch;            // #6
+    TextureRegion                   closingFlowercurrentFrame;           // #7
 
 
 	/**
@@ -266,16 +284,55 @@ public class DownstreamController extends WorldController implements ContactList
 	    closedFlowerSheet = new Texture(Gdx.files.internal("tethers/flowerclosed_spritesheet.png"));
 	    
 		//walkSheet = new Texture(Gdx.files.internal("koi/unnamed.png")); // #9
-        TextureRegion[][] tmp3 = TextureRegion.split(closedFlowerSheet, closedFlowerSheet.getWidth()/cols, closedFlowerSheet.getHeight()/rows);              // #10
+        TextureRegion[][] tmpclosed = TextureRegion.split(closedFlowerSheet, closedFlowerSheet.getWidth()/cols, closedFlowerSheet.getHeight()/rows);              // #10
         closedFlowerFrames = new TextureRegion[cols * rows];
         index = 0;
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                closedFlowerFrames[index++] = tmp3[i][j];
+                closedFlowerFrames[index++] = tmpclosed[i][j];
             }
         }
-        closedFlowerAnimation = new Animation(.2f, closedFlowerFrames);      // #11
-        closedFlowerspriteBatch = new SpriteBatch();                // #12
+        closedFlowerAnimation = new Animation(.2f, closedFlowerFrames);  
+        closedFlowerspriteBatch = new SpriteBatch(); 
+        
+        openFlowerSheet = new Texture(Gdx.files.internal("tethers/floweropen_spritesheet.png"));
+        TextureRegion[][] tmpOpen = TextureRegion.split(openFlowerSheet, openFlowerSheet.getWidth()/cols, openFlowerSheet.getHeight()/rows);              // #10
+        openFlowerFrames = new TextureRegion[cols * rows];
+        index = 0;
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                openFlowerFrames[index++] = tmpOpen[i][j];
+            }
+        }
+        openFlowerAnimation = new Animation(.2f, openFlowerFrames);  
+       	openFlowerspriteBatch = new SpriteBatch(); 
+       	
+       	cols = 8; 
+       	
+       	openingFlowerSheet = new Texture(Gdx.files.internal("tethers/flower_opening_spritesheet.png"));
+        TextureRegion[][] tmpOpening = TextureRegion.split(openingFlowerSheet, openingFlowerSheet.getWidth()/cols, openingFlowerSheet.getHeight()/rows);              // #10
+        openingFlowerFrames = new TextureRegion[cols * rows];
+        index = 0;
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                openingFlowerFrames[index++] = tmpOpening[i][j];
+            }
+        }
+        openingFlowerAnimation = new Animation(.5f, openingFlowerFrames); 
+       	openingFlowerspriteBatch = new SpriteBatch(); 
+       	
+
+       	closingFlowerSheet = new Texture(Gdx.files.internal("tethers/flower_closing_spritesheet.png"));
+        TextureRegion[][] tmpClosing = TextureRegion.split(closingFlowerSheet, closingFlowerSheet.getWidth()/cols, closingFlowerSheet.getHeight()/rows);              // #10
+        closingFlowerFrames = new TextureRegion[cols * rows];
+        index = 0;
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+            	closingFlowerFrames[index++] = tmpClosing[i][j];
+            }
+        }
+        closingFlowerAnimation = new Animation(.5f, closingFlowerFrames); 
+        closingFlowerspriteBatch = new SpriteBatch(); 
 		
 
 		enemyTexture = createTexture(manager,ENEMY_TEXTURE,false);
@@ -622,15 +679,66 @@ public class DownstreamController extends WorldController implements ContactList
 		stateTime += Gdx.graphics.getDeltaTime();           // #15
 		lilycurrentFrame = lilyAnimation.getKeyFrame(stateTime, true);
 		closedFlowercurrentFrame = closedFlowerAnimation.getKeyFrame(stateTime, true);
+		openFlowercurrentFrame = openFlowerAnimation.getKeyFrame(stateTime, true);
 		
+		//FSM to handle Lotus
 		for (int i = 0; i < tethers.size(); i++){
 			if (tethers.get(i).getTetherType() == TetherType.Lilypad){
 				tethers.get(i).setTexture(lilycurrentFrame);
-			}
+				}
 			if (tethers.get(i).getTetherType() == TetherType.Lantern){
-				tethers.get(i).setTexture(closedFlowercurrentFrame);
+				if (tethers.get(i).getOpening() == 0){
+					tethers.get(i).setTexture(closedFlowercurrentFrame);
+					if (tethers.get(i).set){
+						tethers.get(i).setOpening(1);
+					}
+				}
+				if (tethers.get(i).getOpening() == 1){
+					//TODO
+					if (!openingFlowerAnimation.isAnimationFinished(relativeTime))
+						{openingFlowercurrentFrame = openingFlowerAnimation.getKeyFrame(relativeTime, true);
+						relativeTime += Gdx.graphics.getDeltaTime();  
+						tethers.get(i).setTexture(openingFlowercurrentFrame);
+						if(!tethers.get(i).set){
+							//go to closing
+							//relativeTime = 0;
+							tethers.get(i).setOpening(3);
+						}
+						}
+					if (openingFlowerAnimation.isAnimationFinished(relativeTime)){
+						tethers.get(i).setOpening(2);
+						relativeTime = 0;
+					}
+					
+				}
+				if (tethers.get(i).getOpening() == 2){
+					tethers.get(i).setTexture(openFlowercurrentFrame);
+					/*if (tethers.get(i).set){
+						tethers.get(i).setOpening(1);
+					}*/
+				}
+				if (tethers.get(i).getOpening() == 3){ 
+					if(!tethers.get(i).set){
+						if(!closingFlowerAnimation.isAnimationFinished(relativeTime)){
+						closingFlowercurrentFrame = closingFlowerAnimation.getKeyFrame(relativeTime, true);
+						relativeTime += Gdx.graphics.getDeltaTime();  
+						tethers.get(i).setTexture(closingFlowercurrentFrame);
+						}
+						if(closingFlowerAnimation.isAnimationFinished(relativeTime)){
+							tethers.get(i).setOpening(0);
+							relativeTime = 0;
+						}
+					}
+					if(tethers.get(i).set){
+						tethers.get(i).setOpening(1);
+					}
+				}
+				if(tethers.get(i).lit){
+					tethers.get(i).setTexture(openFlowercurrentFrame);
+				}
+				}
 			}
-		}
+		
 
 		SoundController.getInstance().update();
 	}
