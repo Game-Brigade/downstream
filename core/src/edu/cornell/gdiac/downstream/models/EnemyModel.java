@@ -12,6 +12,9 @@
 package edu.cornell.gdiac.downstream.models;
 
 import com.badlogic.gdx.math.*;
+
+import java.util.ArrayList;
+
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.physics.box2d.*;
 
@@ -36,6 +39,15 @@ public class EnemyModel extends SimpleObstacle {
 	private float[] vertices;
 	
 	private Vector2 goal = new Vector2(0, 0);
+	
+	/** Cache object for transforming the force according the object angle */
+	public Affine2 affineCache = new Affine2();
+	/** Cache object for left afterburner origin */
+	public Vector2 leftOrigin = new Vector2();
+	/** Cache object for right afterburner origin */
+	public Vector2 rghtOrigin = new Vector2();
+	
+	private Vector2 lastGoal = new Vector2();
 	
 	/** 
 	 * Returns the dimensions of this box
@@ -144,6 +156,7 @@ public class EnemyModel extends SimpleObstacle {
 		shape = new PolygonShape();
 		vertices = new float[8];
 		geometry = null;
+		lastGoal = new Vector2(x,y);
 		
 		// Initialize
 		resize(width, height);	
@@ -227,43 +240,97 @@ public class EnemyModel extends SimpleObstacle {
 	 * @param x2
 	 * @param y2
 	 */
+	
+	public void patrol(ArrayList<Vector2> goals){
+		
+		for(int i = 0; i < goals.size(); i++){
+			//if (getX() > (goals.get(i).x - 1)
+			
+			if ( i != goals.size() - 1 && (getX() > (goals.get(i).x - .5) && getX() < (goals.get(i).x + .5)) && (getY() > (goals.get(i).y - .5) && getY() < (goals.get(i).y + .5)))
+			{
+				this.goal.set(goals.get(i+1).x, goals.get(i+1).y);
+				setAngle(findA(this.getPosition(), this.goal));
+				lastGoal = goals.get(i);
+				
+			}
+			if ( i == goals.size() - 1 && (getX() > (goals.get(i).x - .5) && getX() < (goals.get(i).x + .5)) && (getY() > (goals.get(i).y - .5) && getY() < (goals.get(i).y + .5))){
+				this.goal.set(goals.get(0).x, goals.get(0).y);
+				setAngle(findA(this.getPosition(), this.goal));
+				lastGoal = goals.get(i);
+			}
+			
+		}
+		
+	
+	}
 	public void patrol(float x1, float y1, float x2, float y2){
 		boolean turnAround = (getX() > (x1 - 1) && getX() < (x1 + 1)) && (getY() > (y1 - 1) && getY() < (y1 + 1));
 		boolean turnAround2 = (getX() > (x2 - 1) && getX() < (x2 + 1)) && (getY() > (y2 - 1) && getY() < (y2 + 1));
 		
 		if (turnAround){
 			this.goal.set(x2, y2);
-			//setAngle((float) (getAngle() + Math.PI));
+			setAngle(findA(this.getPosition(), this.goal));
 		}
 		if (turnAround2){
 			this.goal.set(x1, y1);
-			//setAngle((float) (getAngle() + Math.PI));
+			setAngle(findA(this.getPosition(), this.goal));
 		}
 	}
 	/**
 	 * Call during update, will move the fish towards the goal state
 	 */
 	public void moveTowardsGoal(){
-		if (getX() < goal.x){
+		
+		float deltaX = lastGoal.x - goal.x;
+		float deltaY = lastGoal.y - goal.y;
+		
+		setY(getY()-deltaY/100);
+		setX(getX()-deltaX/100);
+		
+		/*if (getX() < goal.x - .1){
 			setX((float) (getX() + .1));
+			//this.setVX(5);
 		}
-		else if (getX() > goal.x){
+		else if (getX() > goal.x + .2){
 			setX((float) (getX() - .1));
+			//this.setVX(-5);
 		}
 		
-		if (getY() < goal.y){
+		if (getY() < goal.y - .2){
 			setY((float) (getY() + .1));
+			//this.setVY(5);
+			
 		}
-		else if (getY() > goal.y){
+		else if (getY() > goal.y + .1){
 			setY((float) (getY() - .1));
-		}
-		setAngle(findA(this.getPosition(), this.goal));
+
+		}*/
+		
+		//this.applyForce();
+		
 	}
 	 public float findA(Vector2 target, Vector2 t2) {
 		  	float angle = (float) Math.toDegrees(Math.atan2(target.y - t2.y, target.x - t2.x));
 		  	angle = angle - 180;
 		    return (float) Math.toRadians(angle);
 		}
+	 
+	/*public void applyForce() {
+			if (!isActive()) {
+				return;
+			}
+			
+			// Orient the force with rotation.
+			affineCache.setToRotationRad(getAngle());
+			affineCache.applyTo(force);
+			
+			//#region INSERT CODE HERE
+			// Apply force to the rocket BODY, not the rocket
+			
+			body.applyForceToCenter(force,true);
+			
+			//#endregion
+		}*/
 
 }
 
