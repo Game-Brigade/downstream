@@ -26,7 +26,7 @@ public class TetherModel extends WheelObstacle {
 	public static final float TETHER_DEFAULT_ORBIT = 2f;  
 
 	/** The range at which the player can enter orbit around this tether */
-	public static final int TETHER_DEFAULT_RANGE = 4;
+	public static final int TETHER_DEFAULT_RANGE = 8;
 
 
 

@@ -391,7 +391,7 @@ public class DownstreamController extends WorldController implements ContactList
 		for (Vector2 lotus : level.lotuses) {
 			TetherModel lantern = new TetherModel(lotus.x, lotus.y, rad, true);
 			lantern.setBodyType(BodyDef.BodyType.StaticBody);
-			lantern.setName("lantern"+ 1);
+			lantern.setName("lotus"+ 1);
 			lantern.setDensity(TETHER_DENSITY);
 			lantern.setFriction(TETHER_FRICTION);
 			lantern.setRestitution(TETHER_RESTITUTION);
@@ -505,8 +505,8 @@ public class DownstreamController extends WorldController implements ContactList
 
 			// ENEMY PATROL CODE
 			for (EnemyModel enemy : enemies) {
-				//enemy.patrol();
-				//enemy.moveTowardsGoal();
+				enemy.patrol();
+				enemy.moveTowardsGoal();
 			}
 
 			// LOTUS LIGHTING CODE
@@ -608,7 +608,7 @@ public class DownstreamController extends WorldController implements ContactList
 			Vector2 closestTether = getClosestTether().getPosition().cpy().scl(scale);
 			Vector2 initialTangent = koi.getInitialTangentPoint(getClosestTether().getPosition()).scl(scale);
 			float radius = closestTether.dst(initialTangent);
-			canvas.drawTetherCircle(closestTether, TetherModel.TETHER_DEFAULT_ORBIT*scale.len());
+			canvas.drawTetherCircle(closestTether, TetherModel.TETHER_DEFAULT_RANGE*scale.x);
 			//canvas.drawTetherCircle(koi.cent.cpy().scl(scale), koi.pull.len()/2*scale.len());
 		}
 		
