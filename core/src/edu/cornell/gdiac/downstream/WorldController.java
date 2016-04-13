@@ -447,6 +447,12 @@ public abstract class WorldController implements Screen {
 		objects.add(obj);
 		obj.activatePhysics(world);
 	}
+	
+	protected void removeObject(Obstacle obj) {
+		assert inBounds(obj) : "Object is not in bounds";
+		objects.remove(obj);
+		obj.deactivatePhysics(world);
+	}
 
 	/**
 	 * Returns true if the object is in bounds.

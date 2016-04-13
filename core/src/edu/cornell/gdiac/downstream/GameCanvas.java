@@ -163,24 +163,6 @@ public class GameCanvas {
 		camera.viewportHeight = height;
 	}
 	
-	public void zoomOut() {
-		camera.zoom = Math.min(1.5f, camera.zoom + 0.01f);
-	}
-	
-	public void zoomIn() {
-		camera.zoom = Math.max(1, camera.zoom - 0.01f);
-	}
-	
-	public void moveCameraTowards(Vector2 newPosition, float velocity) {
-		Vector2 difference = newPosition.cpy().sub(new Vector2(camera.position.x, camera.position.y));
-		if (difference.len() < velocity) {
-			camera.position.set(newPosition,0);
-		} else {
-			camera.translate(difference.setLength(velocity));
-		}
-		camera.update();
-	}
-	
 	public void setCameraPosition(Vector2 newPosition) {
 		camera.position.set(newPosition, 0);
 	}
@@ -1197,12 +1179,14 @@ public class GameCanvas {
 	}
 	
 	public void drawLeadingLine(Vector2 start, Vector2 end) {
+		start = start.cpy();
+		end = end.cpy();
 		Gdx.gl.glLineWidth(1);
         leadingLine.setProjectionMatrix(camera.combined);
         leadingLine.begin(ShapeRenderer.ShapeType.Line);
         leadingLine.setColor(Color.WHITE);
-        local.applyTo(start);
-        local.applyTo(end);
+//        local.applyTo(start);
+//        local.applyTo(end);
         leadingLine.line(start, end);
         leadingLine.end();
         Gdx.gl.glLineWidth(1);

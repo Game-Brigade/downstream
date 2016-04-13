@@ -130,6 +130,7 @@ public class TetherModel extends WheelObstacle {
 
 
 			//sparkSize = sparkSize / 5;
+//			System.out.println(lightingTexture);
 			canvas.draw(lightingTexture,Color.WHITE, lightingTexture.getRegionWidth()/2, lightingTexture.getRegionHeight()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),sparkSize,sparkSize);
 			//System.out.println(origin);
 		}

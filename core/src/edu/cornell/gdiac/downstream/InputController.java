@@ -74,6 +74,17 @@ public class InputController {
 	private boolean tetherPressed;
 	private boolean tetherPrevious;
 	
+	private boolean upPressed;
+	private boolean downPressed;
+	private boolean leftPressed;
+	private boolean rightPressed;
+	
+	private boolean leftClick;
+	private boolean leftPrevious;
+	
+	private boolean enterPressed;
+	private boolean enterPrevious;
+	
 	/** How much did we move horizontally? */
 	private float horizontal;
 	/** How much did we move vertically? */
@@ -85,10 +96,23 @@ public class InputController {
 	/** For the gamepad crosshair control */
 	private float momentum;
 	
+	private boolean zoomIn;
+	private boolean zoomOut;
+	
 	public boolean accel;
 	public boolean deccel;
 	public boolean space;
 	public boolean slow;
+	
+	public enum SelectionType {
+		Lilypad, Lantern, Enemy, Player, Wall, Goal;
+	} 
+	
+	private SelectionType currentSelection;
+	
+	public SelectionType getSelection() {
+		return currentSelection;
+	}
 	
 	/** An X-Box controller (if it is connected) */
 	XBox360Controller xbox;
@@ -220,6 +244,46 @@ public class InputController {
 		return tetherPressed && !tetherPrevious;
 	}
 	
+	public boolean getUp() {
+		return upPressed;
+	}
+	
+	public boolean getDown() {
+		return downPressed;
+	}
+	
+	public boolean getLeft() {
+		return leftPressed;
+	}
+	
+	public boolean getRight() {
+		return rightPressed;
+	}
+	
+	public boolean didEnter() {
+		return enterPressed && !enterPrevious;
+	}
+	
+	public Vector2 getClick() {
+//		return new int[] {0,0};
+		if (leftClick && !leftPrevious) {
+			return new Vector2(Gdx.input.getX(), Gdx.input.getY());
+		}
+		return null;
+	}
+	
+	public boolean getEnter() {
+		return enterPressed;
+	}
+	
+	public boolean isZoomIn() {
+		return zoomIn;
+	}
+	
+	public boolean isZoomOut() {
+		return zoomOut;
+	}
+	
 	/**
 	 * Creates a new input controller
 	 * 
@@ -254,6 +318,8 @@ public class InputController {
 		nextPrevious = nextPressed;
 		prevPrevious = prevPressed;
 		tetherPrevious = tetherPressed;
+		leftPrevious = leftClick;
+		enterPrevious = enterPressed;
 		
 		// Check to see if a GamePad is connected
 		if (xbox.isConnected()) {
@@ -321,6 +387,23 @@ public class InputController {
 		nextPressed = (secondary && nextPressed) || (Gdx.input.isKeyPressed(Input.Keys.N));
 		exitPressed  = (secondary && exitPressed) || (Gdx.input.isKeyPressed(Input.Keys.ESCAPE));
 		tetherPressed  = (secondary && tetherPressed) || (Gdx.input.isKeyPressed(Input.Keys.SPACE));
+		leftClick = (secondary && leftClick) || (Gdx.input.isButtonPressed(Input.Buttons.LEFT));
+		
+		// level editor commands
+		upPressed    = Gdx.input.isKeyPressed(Input.Keys.UP);
+		downPressed  = Gdx.input.isKeyPressed(Input.Keys.DOWN);
+		leftPressed  = Gdx.input.isKeyPressed(Input.Keys.LEFT);
+		rightPressed = Gdx.input.isKeyPressed(Input.Keys.RIGHT);
+		if (Gdx.input.isKeyPressed(Input.Keys.NUM_1)) currentSelection = SelectionType.Lilypad;
+		if (Gdx.input.isKeyPressed(Input.Keys.NUM_2)) currentSelection = SelectionType.Lantern;
+		if (Gdx.input.isKeyPressed(Input.Keys.NUM_3)) currentSelection = SelectionType.Enemy;
+		if (Gdx.input.isKeyPressed(Input.Keys.NUM_4)) currentSelection = SelectionType.Player;
+		if (Gdx.input.isKeyPressed(Input.Keys.NUM_5)) currentSelection = SelectionType.Wall;
+		if (Gdx.input.isKeyPressed(Input.Keys.NUM_6)) currentSelection = SelectionType.Goal;
+		
+		enterPressed = (secondary && enterPressed) || (Gdx.input.isKeyPressed(Input.Keys.ENTER));
+		zoomIn = Gdx.input.isKeyPressed(Input.Keys.EQUALS);
+		zoomOut = Gdx.input.isKeyPressed(Input.Keys.MINUS);
 		
 		// Directional controls
 		horizontal = (secondary ? horizontal : 0.0f);
