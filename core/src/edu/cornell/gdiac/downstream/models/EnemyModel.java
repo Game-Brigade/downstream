@@ -47,6 +47,8 @@ public class EnemyModel extends SimpleObstacle {
 	/** Cache object for right afterburner origin */
 	public Vector2 rghtOrigin = new Vector2();
 	
+	private Vector2 lastGoal = new Vector2();
+	
 	/** 
 	 * Returns the dimensions of this box
 	 *
@@ -154,6 +156,7 @@ public class EnemyModel extends SimpleObstacle {
 		shape = new PolygonShape();
 		vertices = new float[8];
 		geometry = null;
+		lastGoal = new Vector2(x,y);
 		
 		// Initialize
 		resize(width, height);	
@@ -242,17 +245,22 @@ public class EnemyModel extends SimpleObstacle {
 		
 		for(int i = 0; i < goals.size(); i++){
 			//if (getX() > (goals.get(i).x - 1)
-			if ( i != goals.size() - 1 && (getX() > (goals.get(i).x - 1) && getX() < (goals.get(i).x + 1)) && (getY() > (goals.get(i).y - 1) && getY() < (goals.get(i).y + 1)))
+			
+			if ( i != goals.size() - 1 && (getX() > (goals.get(i).x - .5) && getX() < (goals.get(i).x + .5)) && (getY() > (goals.get(i).y - .5) && getY() < (goals.get(i).y + .5)))
 			{
-				System.out.println("g" + i);
-				System.out.println("g" + goals.size());
 				this.goal.set(goals.get(i+1).x, goals.get(i+1).y);
+				setAngle(findA(this.getPosition(), this.goal));
+				lastGoal = goals.get(i);
+				
 			}
-			if ( i == goals.size() - 1 && (getX() > (goals.get(i).x - 1) && getX() < (goals.get(i).x + 1)) && (getY() > (goals.get(i).y - 1) && getY() < (goals.get(i).y + 1))){
+			if ( i == goals.size() - 1 && (getX() > (goals.get(i).x - .5) && getX() < (goals.get(i).x + .5)) && (getY() > (goals.get(i).y - .5) && getY() < (goals.get(i).y + .5))){
 				this.goal.set(goals.get(0).x, goals.get(0).y);
+				setAngle(findA(this.getPosition(), this.goal));
+				lastGoal = goals.get(i);
 			}
 			
 		}
+		
 	
 	}
 	public void patrol(float x1, float y1, float x2, float y2){
@@ -260,12 +268,10 @@ public class EnemyModel extends SimpleObstacle {
 		boolean turnAround2 = (getX() > (x2 - 1) && getX() < (x2 + 1)) && (getY() > (y2 - 1) && getY() < (y2 + 1));
 		
 		if (turnAround){
-			if (this.getName() == "enemy1"){ System.out.println("1");}
 			this.goal.set(x2, y2);
 			setAngle(findA(this.getPosition(), this.goal));
 		}
 		if (turnAround2){
-			if (this.getName() == "enemy1"){ System.out.println("2");}
 			this.goal.set(x1, y1);
 			setAngle(findA(this.getPosition(), this.goal));
 		}
@@ -274,30 +280,31 @@ public class EnemyModel extends SimpleObstacle {
 	 * Call during update, will move the fish towards the goal state
 	 */
 	public void moveTowardsGoal(){
-		if (getX() < goal.x + 1){
-			//setX((float) (getX() + .1));
-			this.setVX(5);
+		
+		float deltaX = lastGoal.x - goal.x;
+		float deltaY = lastGoal.y - goal.y;
+		
+		setY(getY()-deltaY/100);
+		setX(getX()-deltaX/100);
+		
+		/*if (getX() < goal.x - .1){
+			setX((float) (getX() + .1));
+			//this.setVX(5);
 		}
-		else if (getX() > goal.x - 1){
-			//setX((float) (getX() - .1));
-			this.setVX(-5);
+		else if (getX() > goal.x + .2){
+			setX((float) (getX() - .1));
+			//this.setVX(-5);
 		}
 		
-		if (getY() < goal.y + 1){
-			//setY((float) (getY() + .1));
-			this.setVY(5);
-			/*if (this.getName() == "enemy1"){
-				System.out.println("1");
-			}*/
+		if (getY() < goal.y - .2){
+			setY((float) (getY() + .1));
+			//this.setVY(5);
 			
 		}
-		else if (getY() > goal.y - 1){
-			//setY((float) (getY() - .1));
-			this.setVY(-5);
-			/*if (this.getName() == "enemy1"){
-				System.out.println("2");
-			}*/
-		}
+		else if (getY() > goal.y + .1){
+			setY((float) (getY() - .1));
+
+		}*/
 		
 		//this.applyForce();
 		
