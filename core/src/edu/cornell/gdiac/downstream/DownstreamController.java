@@ -40,7 +40,7 @@ public class DownstreamController extends WorldController implements ContactList
 	/** Reference to the fish texture */
 	private static final String KOI_TEXTURE = "koi/koi.png";
 	/** The reference for the tether textures  */
-	private static final String LILY_TEXTURE = "tethers/lilypad.png";
+	private static final String LILY_TEXTURE = "terrain/lilypad1_scaled.png";
 	/** Reference to the enemy image assets */
 	private static final String ENEMY_TEXTURE = "enemy/enemy.png";
 	/** Reference to the Lantern asset image*/
@@ -61,7 +61,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private static final String LOTUS_TEXTURE= null;
 
 	/** Reference to the land texture */
-	private static String EARTH_FILE = "terrain/earthtile.png";
+	private static String EARTH_FILE = "terrain/repeat tile.png";
 
 	/** Reference to the whirlpool texture */
 	private static final String WHIRLPOOL_TEXTURE = "terrain/whirlpool.png";
