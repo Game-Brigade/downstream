@@ -122,6 +122,7 @@ public class DownstreamController extends WorldController implements ContactList
 	float stateTime;  
     float relativeTime = 0;
     
+
 	Animation                      	lilyAnimation;          // #3
     Texture                         lilySheet;              // #4
     TextureRegion[]                 lilyFrames;             // #5
@@ -133,6 +134,7 @@ public class DownstreamController extends WorldController implements ContactList
     TextureRegion[]                 closedFlowerFrames;             // #5
     SpriteBatch                     closedFlowerspriteBatch;            // #6
     TextureRegion                   closedFlowercurrentFrame;           // #7
+
 
 	/**
 	 * Preloads the assets for this controller.
