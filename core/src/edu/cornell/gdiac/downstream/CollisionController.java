@@ -37,7 +37,10 @@ public class CollisionController {
 			else if(s2.startsWith("enemy")){
 				return true;
 			}
-			else if(s2.startsWith("land")){}			
+			else if(s2.startsWith("wall")){
+				koi.setTethered(false);
+				koi.setAttemptingTether(false);				
+			}			
 			else if(s2.startsWith("whirlpool")){
 				if(koi.getPosition().dst(body2.getPosition()) < .5){
 					return true;
@@ -57,7 +60,10 @@ public class CollisionController {
 			else if(s1.startsWith("enemy")){
 				return true;
 			}
-			else if(s1.startsWith("land")){}			
+			else if(s1.startsWith("wall")){
+				koi.setTethered(false);
+				koi.setAttemptingTether(false);		
+			}			
 			else if(s1.startsWith("whirlpool")){
 				if(koi.getPosition().dst(body2.getPosition()) < .5){
 					return true;
