@@ -9,6 +9,7 @@ package edu.cornell.gdiac.downstream;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
 
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.Gdx;
@@ -213,19 +214,6 @@ public class DownstreamController extends WorldController implements ContactList
 	private static final float TETHER_FRICTION = ENEMY_FRICTION;
 	private static final float TETHER_RESTITUTION = BASIC_RESTITUTION;
 
-	// Since these appear only once, we do not care about the magic numbers.
-	// In an actual game, this information would go in a data file.
-	// Wall vertices
-	private static final float[][] LAND = {{}};
-
-	private static final float[] WALL1 = { 0.0f, 18.0f, 16.0f, 18.0f, 16.0f, 17.0f,
-			8.0f, 15.0f,  1.0f, 17.0f,  2.0f,  7.0f,
-			3.0f,  5.0f,  3.0f,  1.0f, 16.0f,  1.0f,
-			16.0f,  0.0f,  0.0f,  0.0f};
-
-
-
-
 	private ArrayList<TetherModel> tethers = new ArrayList<TetherModel>();
 	private ArrayList<TetherModel> lanterns = new ArrayList<TetherModel>();
 	private ArrayList<EnemyModel> enemies = new ArrayList<EnemyModel>();
@@ -349,6 +337,27 @@ public class DownstreamController extends WorldController implements ContactList
 			addObject(obj);
 		}
 		
+		for (Map.Entry<String,ArrayList<Vector2>> entry : level.enemies.entrySet()) {
+			Vector2 enemyPos = vectorOfString(entry.getKey());
+			ArrayList<Vector2> enemyPath = entry.getValue();
+//			for (Vector2 vector : enemyPath) {vector.x /= scale.x; vector.y /= scale.y;}
+			System.out.println(enemyPath);
+			TextureRegion etexture = enemyTexture;
+			dwidth  = etexture.getRegionWidth()/scale.x;
+			dheight = etexture.getRegionHeight()/scale.y;
+			eFish = new EnemyModel(enemyPos.x, enemyPos.y, dwidth, dheight, enemyPath);
+			eFish.setDensity(ENEMY_DENSITY);
+			eFish.setFriction(ENEMY_FRICTION);
+			eFish.setRestitution(BASIC_RESTITUTION);
+			eFish.setName("enemy");
+			eFish.setDrawScale(scale);
+			eFish.setTexture(etexture);
+			eFish.setAngle((float) (Math.PI/2));
+			eFish.setBodyType(BodyDef.BodyType.StaticBody);
+			eFish.setGoal(0, 0);
+			addObject(eFish);
+			enemies.add(eFish);
+		}
 		
 		dwidth  = koiTexture.getRegionWidth()/scale.x;
 		dheight = koiTexture.getRegionHeight()/scale.y;
@@ -382,6 +391,11 @@ public class DownstreamController extends WorldController implements ContactList
 		koi.setFX(thrust * input.getHorizontal());
 		koi.setFY(thrust * input.getVertical());
 		koi.applyForce();
+		
+		for (EnemyModel enemy : enemies) {
+//			enemy.patrol();
+//			enemy.moveTowardsGoal();
+		}
 
 		if (input.didTether()) {
 			tethered = !tethered; 
@@ -520,6 +534,17 @@ public class DownstreamController extends WorldController implements ContactList
 			TetherModel t = (TetherModel) body1.getUserData();
 		}
 
+	}
+	
+	private static Vector2 vectorOfString(String s) {
+		int comma = s.indexOf(",");
+		int openParens = s.indexOf("(");
+		int closeParens = s.indexOf(")");
+		String xstr = s.substring(openParens+1,comma);
+		String ystr = s.substring(comma+1,closeParens);
+		float x = Float.parseFloat(xstr);
+		float y = Float.parseFloat(ystr);
+		return new Vector2(x,y);
 	}
 
 	/**

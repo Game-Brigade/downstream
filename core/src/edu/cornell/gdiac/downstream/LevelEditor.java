@@ -26,6 +26,7 @@ import edu.cornell.gdiac.downstream.WorldController.AssetState;
 import edu.cornell.gdiac.downstream.models.EnemyModel;
 import edu.cornell.gdiac.downstream.models.PlayerModel;
 import edu.cornell.gdiac.downstream.models.TetherModel;
+import edu.cornell.gdiac.downstream.obstacle.PolygonObstacle;
 import edu.cornell.gdiac.util.SoundController;
 
 public class LevelEditor extends WorldController {
@@ -52,6 +53,8 @@ public class LevelEditor extends WorldController {
 	private static final String BOTTOM_LAND_TEXTURE = "terrain/bottom-border.png";
 	/** Reference to the lotus texture */
 	private static final String LOTUS_TEXTURE= null;
+	/** Reference to the land texture */
+	private static String EARTH_FILE = "terrain/earthtile.png";
 
 	/** Texture assets for the koi */
 	private TextureRegion koiTexture;
@@ -69,6 +72,7 @@ public class LevelEditor extends WorldController {
 	private TextureRegion rightLandTexture;
 	private TextureRegion topLandTexture;
 	private TextureRegion bottomLandTexture;
+	private TextureRegion earthTile;
 
 	/** Track asset loading from all instances and subclasses */
 	private AssetState fishAssetState = AssetState.EMPTY;
@@ -122,6 +126,8 @@ public class LevelEditor extends WorldController {
 		manager.load(BOTTOM_LAND_TEXTURE, Texture.class);
 		assets.add(BOTTOM_LAND_TEXTURE);
 
+		manager.load(EARTH_FILE,Texture.class);
+		assets.add(EARTH_FILE);
 
 		//sounds
 		//manager.load(MAIN_FIRE_SOUND, Sound.class);
@@ -156,6 +162,7 @@ public class LevelEditor extends WorldController {
 		rightLandTexture = createTexture(manager,RIGHT_LAND_TEXTURE,false);
 		topLandTexture = createTexture(manager,TOP_LAND_TEXTURE,false);
 		bottomLandTexture = createTexture(manager,BOTTOM_LAND_TEXTURE,false);
+		earthTile = createTexture(manager,EARTH_FILE,true);
 
 		SoundController sounds = SoundController.getInstance();
 		//sounds.allocate(manager,MAIN_FIRE_SOUND);
@@ -354,6 +361,24 @@ public class LevelEditor extends WorldController {
 			settingWallPath = false;
 			didEnter = false;
 			walls.add(wallPath);
+			PolygonObstacle obj;
+			ArrayList<Float> wall = new ArrayList<Float>();
+			for (Vector2 v : wallPath) {
+				wall.add(v.x/scale.x);
+				wall.add(v.y/scale.y);
+			}
+			float[] wallFloat = new float[wall.size()];
+			for (int i = 0; i < wall.size(); i++) wallFloat[i] = wall.get(i);
+			System.out.println(Arrays.toString(wallFloat));
+			obj = new PolygonObstacle(wallFloat, 0, 0);
+			obj.setBodyType(BodyDef.BodyType.StaticBody);
+			obj.setDensity(BASIC_DENSITY);
+			obj.setFriction(BASIC_FRICTION);
+			obj.setRestitution(BASIC_RESTITUTION);
+			obj.setDrawScale(scale);
+			obj.setTexture(earthTile);
+			obj.setName("wall1");
+			addObject(obj);
 			return;
 		}
 		Vector3 click3 = canvas.getCamera().unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
@@ -450,7 +475,9 @@ public class LevelEditor extends WorldController {
 			goal = g;
 			enemies = new HashMap<String,ArrayList<Vector2>>();
 			for (Vector2 enemy : e.keySet()) {
+				for (Vector2 v : e.get(enemy)) v.scl(1/scale.x,1/scale.y);
 				enemies.put(enemy.toString(), e.get(enemy));
+				
 			}
 			lilypads = li;
 			lotuses = lo;

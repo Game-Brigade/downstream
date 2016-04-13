@@ -47,7 +47,7 @@ public class CameraController {
 	}
 	
 	public void moveCameraTowards(Vector2 newPosition) {
-		System.out.println(currentVelocity);
+//		System.out.println(currentVelocity);
 		currentVelocity = Math.min(currentVelocity+ACCELERATION,MAX_VELOCITY);
 		moveCameraTowards(newPosition, currentVelocity);
 	}

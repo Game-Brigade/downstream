@@ -39,6 +39,7 @@ public class EnemyModel extends SimpleObstacle {
 	private float[] vertices;
 	
 	private Vector2 goal = new Vector2(0, 0);
+	private ArrayList<Vector2> patrolPath = new ArrayList<Vector2>();
 	
 	/** Cache object for transforming the force according the object angle */
 	public Affine2 affineCache = new Affine2();
@@ -162,6 +163,11 @@ public class EnemyModel extends SimpleObstacle {
 		resize(width, height);	
 	}
 	
+	public EnemyModel(float x, float y, float w, float h, ArrayList<Vector2> path) {
+		this(x,y,w,h);
+		patrolPath = path;
+	}
+	
 	/**
 	 * Reset the polygon vertices in the shape to match the dimension.
 	 */
@@ -260,9 +266,12 @@ public class EnemyModel extends SimpleObstacle {
 			}
 			
 		}
-		
-	
 	}
+	
+	public void patrol() {
+		patrol(patrolPath);
+	}
+	
 	public void patrol(float x1, float y1, float x2, float y2){
 		boolean turnAround = (getX() > (x1 - 1) && getX() < (x1 + 1)) && (getY() > (y1 - 1) && getY() < (y1 + 1));
 		boolean turnAround2 = (getX() > (x2 - 1) && getX() < (x2 + 1)) && (getY() > (y2 - 1) && getY() < (y2 + 1));
