@@ -40,6 +40,7 @@ public class GDXRoot extends Game implements ScreenListener {
 	private LoadingMode loading;
 	/** Player mode for the main menu */
 	private MainMenuMode mainMenu;
+	private LevelSelectMode levelSelect;
 	/** Player mode for the pause menu */
 	//private PauseMenuMode pauseMenu;
 	/** Player mode for the the game proper (CONTROLLER CLASS) */
@@ -73,7 +74,8 @@ public class GDXRoot extends Game implements ScreenListener {
 		canvas  = new GameCanvas();
 		loading = new LoadingMode(canvas,manager,1);
 		mainMenu = new MainMenuMode(canvas,manager);
-
+		levelSelect = new LevelSelectMode(canvas,manager);
+		
 		controllers = new WorldController[2];
 		controllers[1] = new LevelEditor();
 		controllers[0] = new DownstreamController(); 
@@ -163,6 +165,26 @@ public class GDXRoot extends Game implements ScreenListener {
 			
 			mainMenu.dispose();
 			mainMenu = null;
+		}
+		
+		else if (screen == mainMenu && exitCode == WorldController.EXIT_SELECT){
+			
+			mainMenu.dispose();
+			mainMenu = null;
+			levelSelect = new LevelSelectMode(canvas,manager);
+			levelSelect.setScreenListener(this);
+			setScreen(levelSelect);
+			Gdx.input.setInputProcessor(levelSelect);
+		}
+		
+		else if (screen == levelSelect && exitCode == WorldController.EXIT_MAIN){
+			levelSelect.dispose();
+			levelSelect = null;
+			mainMenu = new MainMenuMode(canvas,manager);
+			
+			mainMenu.setScreenListener(this);
+			setScreen(mainMenu);
+			Gdx.input.setInputProcessor(mainMenu);
 		}
 		
 		else if (exitCode == WorldController.EXIT_NEXT) {

@@ -17,7 +17,7 @@ public class CameraController {
 	}
 	
 	public void zoomOut() {
-		camera.zoom = Math.min(1.5f, camera.zoom + 0.005f);
+		camera.zoom = Math.min(2.0f, camera.zoom + 0.01f);
 		camera.update();
 	}
 	
@@ -27,7 +27,7 @@ public class CameraController {
 	}
 	
 	public void zoomIn() {
-		camera.zoom = Math.max(1, camera.zoom - 0.005f);
+		camera.zoom = Math.max(1.25f, camera.zoom - 0.01f);
 		camera.update();
 	}
 

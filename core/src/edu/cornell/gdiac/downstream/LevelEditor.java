@@ -369,7 +369,8 @@ public class LevelEditor extends WorldController {
 			}
 			float[] wallFloat = new float[wall.size()];
 			for (int i = 0; i < wall.size(); i++) wallFloat[i] = wall.get(i);
-			System.out.println(Arrays.toString(wallFloat));
+//			System.out.println(Arrays.toString(wallFloat));
+			if (wallFloat.length == 0) return;
 			obj = new PolygonObstacle(wallFloat, 0, 0);
 			obj.setBodyType(BodyDef.BodyType.StaticBody);
 			obj.setDensity(BASIC_DENSITY);
@@ -444,7 +445,7 @@ public class LevelEditor extends WorldController {
 		try {
 			JsonReader reader = new JsonReader(new FileReader("level1.json"));
 			Level level = gson.fromJson(reader, Level.class);
-			System.out.println(level);
+//			System.out.println(level);
 			return level;
 		} catch (Exception e){
 			System.out.println(e);

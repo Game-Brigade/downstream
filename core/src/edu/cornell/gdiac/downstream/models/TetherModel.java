@@ -30,6 +30,7 @@ public class TetherModel extends WheelObstacle {
 
 
 
+
 	private static final BodyDef.BodyType TETHER_BODY_TYPE = BodyDef.BodyType.StaticBody;
 
 	/** The type of this tether */
@@ -44,15 +45,15 @@ public class TetherModel extends WheelObstacle {
 
 	public boolean set = false;
 
-	private boolean isTethered;
-
 	private static TextureRegion lightingTexture;
+	
+	public boolean isTethered = false;
 
 	/** Tethers can be lilipads, lanterns, or lotus flowers */
 	public enum TetherType {
 		Lilypad,
-		Lotus, 
-		LotusFade
+		Lantern,
+		Lotus
 	};
 
 	public TetherModel(float x, float y, TetherType type) {
@@ -63,7 +64,7 @@ public class TetherModel extends WheelObstacle {
 
 	public TetherModel(float x, float y, float r, boolean b){
 		super(x,y, TETHER_DEFAULT_RANGE);
-		setType(TetherType.LotusFade);
+		setType(TetherType.Lantern);
 		setBodyType(TETHER_BODY_TYPE);
 	}
 
@@ -106,28 +107,32 @@ public class TetherModel extends WheelObstacle {
 	public void setEntry(Vector2 v){
 		entry = v;
 	}
-	public boolean isLotus(){
-		return type == TetherType.Lotus || type == TetherType.LotusFade;
+	public boolean isLantern(){
+		return type == TetherType.Lantern;
 	}
 
 	public void setlightingTexture(TextureRegion t){
 		lightingTexture = t;
 	}
+	
+	public TetherType getTetherType(){
+		return type;
+	}
 
 	public void draw(GameCanvas canvas) {
 		if (texture != null) {
 			if (type == TetherType.Lilypad){
-				canvas.draw(texture,Color.WHITE,texture.getRegionHeight()/2,texture.getRegionWidth()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),1,1);
+				canvas.draw(texture,Color.WHITE,texture.getRegionHeight()/2,texture.getRegionWidth()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),.4f,.4f);
 			}
-			if (type == TetherType.LotusFade){
+			if (type == TetherType.Lantern){
 				canvas.draw(texture,Color.WHITE,texture.getRegionHeight()/2,texture.getRegionWidth()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),.35f,.35f);
-				if (sparkSize < rotations){
-					sparkSize += .005f;
+				if (sparkSize < 2 && this.set){
+					sparkSize += .01f;
 				}
 
 			}
-			if (rotations > 1.5){
-				sparkSize = 1.0f;
+			if (sparkSize >= 2){
+				sparkSize = 2f;
 			}
 
 
@@ -136,10 +141,5 @@ public class TetherModel extends WheelObstacle {
 			canvas.draw(lightingTexture,Color.WHITE, lightingTexture.getRegionWidth()/2, lightingTexture.getRegionHeight()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),sparkSize,sparkSize);
 			//System.out.println(origin);
 		}
-	}
-
-	public void setTethered(boolean b) {
-		isTethered = b;
-		
 	}
 }
