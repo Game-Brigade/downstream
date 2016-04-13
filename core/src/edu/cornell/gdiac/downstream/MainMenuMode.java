@@ -21,8 +21,7 @@ import edu.cornell.gdiac.util.ScreenListener;
 public class MainMenuMode implements Screen, InputProcessor, ControllerListener {
 	
 	
-	// Textures necessary to support the loading screen
-	//private static final String BACKGROUND_FILE = "main_menu/loading.png";
+	/** Textures necessary to support the main menu screen */
 	private static final String LOGO_FILE = "main_menu/logo-big.png";
 	private static final String PLAY_FILE = "main_menu/play-b.png";
 	private static final String SELECT_FILE = "main_menu/level-select-b.png";
@@ -37,6 +36,7 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 	private Texture select;
 	/** Edit texture */
 	private Texture edit;
+	/** Background texture */
 	private Texture background;
 	
 	/** AssetManager to be loading in the background */
@@ -69,8 +69,7 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 	private static Vector2 selectPos = new Vector2();
 	private static Vector2 backPos = new Vector2();
 	
-	/** The height of the canvas window (necessary since sprite origin != screen origin) */
-	private int heightY;
+	
 
 	/**
 	 * Creates a LoadingMode with the default budget, size and position.
@@ -102,18 +101,12 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 		playState = 0;
 		selectState = 0;
 		editState = 0;
+		active = false;
+		
 
 		active = true;
 	}
 	
-	/**
-	 * Returns true if all assets are loaded and the player is ready to go.
-	 *
-	 * @return true if the player is ready to go
-	 */
-	public boolean isReady() {
-		return playState == 2;
-	}
 	
 	/**
 	 * Called when this screen should release all resources.
@@ -123,6 +116,7 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 		edit.dispose();
 		select.dispose();
 		play.dispose();
+		background.dispose();
 	}
 
 
@@ -157,8 +151,21 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 	public void render(float delta) {
 		if (active) {
 			draw();
-
+			
+			// We are are ready, notify our listener
+			if (isReady() && listener != null) {
+				listener.exitScreen(this, WorldController.EXIT_PLAY);
+			}
 		}
+	}
+	
+	/**
+	 * Returns true if all assets are loaded and the player is ready to go.
+	 *
+	 * @return true if the player is ready to go
+	 */
+	public boolean isReady() {
+		return playState == 2;
 	}
 
 	/**
@@ -243,18 +250,18 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 	 * @return whether to hand the event to other listeners.
 	 */
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-		if (playState == 2) {
-			return true;
-		}
-
-		/*
-		float dx = screenX - play.ge
-		float dist = (screenX - centerX) * (screenX - centerX) + (screenY - centerY) * (screenY - centerY);
 		
-		if (dist < radius * radius) {
+		// Flip to match graphics coordinates
+		screenY = canvas.getHeight()-screenY;
+		float dx = Math.abs(screenX - playPos.x);
+		float dy = Math.abs(screenY - playPos.y);
+		
+		if (dx < scale*play.getWidth()/2 && dy < scale*play.getHeight()/2) {
+			System.out.println("hello");
 			playState = 1;
+			
 		}
-		*/
+		
 		return false;
 	}
 		

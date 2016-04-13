@@ -132,10 +132,11 @@ public class GDXRoot extends Game implements ScreenListener {
 		if (screen == loading) {
 			loading.dispose();
 			loading = null;
+			mainMenu.setScreenListener(this);
 			setScreen(mainMenu);
-			
+			Gdx.input.setInputProcessor(mainMenu);
 		}
-		/*
+		
 		else if (screen == mainMenu && exitCode == WorldController.EXIT_PLAY) {
 			for(int ii = 0; ii < controllers.length; ii++) {
 				controllers[ii].loadContent(manager);
@@ -149,7 +150,7 @@ public class GDXRoot extends Game implements ScreenListener {
 			mainMenu = null;
 		
 		} 
-		*/
+		
 		else if (exitCode == WorldController.EXIT_NEXT) {
 			current = (current+1) % controllers.length;
 			controllers[current].reset();

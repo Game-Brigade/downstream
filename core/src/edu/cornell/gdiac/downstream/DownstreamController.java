@@ -159,7 +159,7 @@ public class DownstreamController extends WorldController implements ContactList
 		
 		manager.load(WHIRLPOOL_FLIP_TEXTURE, Texture.class);
 		assets.add(WHIRLPOOL_FLIP_TEXTURE);
-
+/*
 		manager.load(CLICK_SOUND, Sound.class);
 		assets.add(CLICK_SOUND);
 		
@@ -171,7 +171,7 @@ public class DownstreamController extends WorldController implements ContactList
 		
 		manager.load(BELL_SOUND, Sound.class);
 		assets.add(BELL_SOUND);
-
+*/
 
 		super.preLoadContent(manager);
 	}
@@ -203,14 +203,14 @@ public class DownstreamController extends WorldController implements ContactList
 		bottomLandTexture = createTexture(manager,BOTTOM_LAND_TEXTURE,false);
 		whirlpoolTexture = createTexture(manager,WHIRLPOOL_TEXTURE,false);
 		whirlpoolFlipTexture = createTexture(manager,WHIRLPOOL_FLIP_TEXTURE,false);
-
+/*
 		SoundController sounds = SoundController.getInstance();
 		sounds.allocate(manager,CLICK_SOUND);
 		sounds.allocate(manager, LIGHTING_SOUND);
 		sounds.allocate(manager, DEATH_SOUND);
 		sounds.allocate(manager, BELL_SOUND);
 
-
+*/
 		super.loadContent(manager);
 		fishAssetState = AssetState.COMPLETE;
 	}
