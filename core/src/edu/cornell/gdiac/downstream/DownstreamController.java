@@ -127,6 +127,12 @@ public class DownstreamController extends WorldController implements ContactList
     TextureRegion[]                 lilyFrames;             // #5
     SpriteBatch                     lilyspriteBatch;            // #6
     TextureRegion                   lilycurrentFrame;           // #7
+    
+    Animation                      	closedFlowerAnimation;          // #3
+    Texture                         closedFlowerSheet;              // #4
+    TextureRegion[]                 closedFlowerFrames;             // #5
+    SpriteBatch                     closedFlowerspriteBatch;            // #6
+    TextureRegion                   closedFlowercurrentFrame;           // #7
 
 	/**
 	 * Preloads the assets for this controller.
@@ -251,12 +257,29 @@ public class DownstreamController extends WorldController implements ContactList
 	    }
 	    lilyAnimation = new Animation(.2f, lilyFrames);      // #11
 	    lilyspriteBatch = new SpriteBatch();                // #12
+	    
+	    cols = 11;
+	    rows = 1;
+	    
+	    closedFlowerSheet = new Texture(Gdx.files.internal("tethers/flowerclosed_spritesheet.png"));
+	    
+		//walkSheet = new Texture(Gdx.files.internal("koi/unnamed.png")); // #9
+        TextureRegion[][] tmp3 = TextureRegion.split(closedFlowerSheet, closedFlowerSheet.getWidth()/cols, closedFlowerSheet.getHeight()/rows);              // #10
+        closedFlowerFrames = new TextureRegion[cols * rows];
+        index = 0;
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                closedFlowerFrames[index++] = tmp3[i][j];
+            }
+        }
+        closedFlowerAnimation = new Animation(.2f, closedFlowerFrames);      // #11
+        closedFlowerspriteBatch = new SpriteBatch();                // #12
 		
 
 		enemyTexture = createTexture(manager,ENEMY_TEXTURE,false);
 		koiTexture = createTexture(manager,KOI_TEXTURE,false);
 		lilyTexture = lilyFrames[0];
-		lanternTexture = createTexture(manager, LANTERN_TEXTURE, false);
+		lanternTexture = closedFlowerFrames[0];
 		lightingTexture = createTexture(manager, LIGHTING_TEXTURE, false);
 
 		earthTile = createTexture(manager,EARTH_FILE,true);
@@ -615,10 +638,14 @@ public class DownstreamController extends WorldController implements ContactList
 		//animation
 		stateTime += Gdx.graphics.getDeltaTime();           // #15
 		lilycurrentFrame = lilyAnimation.getKeyFrame(stateTime, true);
+		closedFlowercurrentFrame = closedFlowerAnimation.getKeyFrame(stateTime, true);
 		
 		for (int i = 0; i < tethers.size(); i++){
 			if (tethers.get(i).getTetherType() == TetherType.Lilypad){
 				tethers.get(i).setTexture(lilycurrentFrame);
+			}
+			if (tethers.get(i).getTetherType() == TetherType.Lantern){
+				tethers.get(i).setTexture(closedFlowercurrentFrame);
 			}
 		}
 
