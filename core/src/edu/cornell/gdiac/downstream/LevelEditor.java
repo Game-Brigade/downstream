@@ -55,6 +55,11 @@ public class LevelEditor extends WorldController {
 	private static final String LOTUS_TEXTURE= null;
 	/** Reference to the land texture */
 	private static String EARTH_FILE = "terrain/repeat tile.png";
+	
+	/** Reference to the whirlpool texture */
+	private static final String WHIRLPOOL_TEXTURE = "terrain/whirlpool.png";
+	/** Reference to the flipped whirlpool texture */
+	private static final String WHIRLPOOL_FLIP_TEXTURE = "terrain/whirlpool_flip.png";
 
 	/** Texture assets for the koi */
 	private TextureRegion koiTexture;
@@ -73,6 +78,10 @@ public class LevelEditor extends WorldController {
 	private TextureRegion topLandTexture;
 	private TextureRegion bottomLandTexture;
 	private TextureRegion earthTile;
+	
+	/** Texture assets for whirlpools */
+	private TextureRegion whirlpoolTexture;
+	private TextureRegion whirlpoolFlipTexture;
 
 	/** Track asset loading from all instances and subclasses */
 	private AssetState fishAssetState = AssetState.EMPTY;
@@ -132,7 +141,12 @@ public class LevelEditor extends WorldController {
 		//sounds
 		//manager.load(MAIN_FIRE_SOUND, Sound.class);
 		//assets.add(MAIN_FIRE_SOUND);
-
+		
+		manager.load(WHIRLPOOL_TEXTURE, Texture.class);
+		assets.add(WHIRLPOOL_TEXTURE);
+		
+		manager.load(WHIRLPOOL_FLIP_TEXTURE, Texture.class);
+		assets.add(WHIRLPOOL_FLIP_TEXTURE);
 
 		super.preLoadContent(manager);
 	}
@@ -192,6 +206,7 @@ public class LevelEditor extends WorldController {
 	
 	private ArrayList<Vector2> lilypads;
 	private ArrayList<Vector2> lanterns;
+	private ArrayList<Vector2> wpools;
 	private HashMap<Vector2,ArrayList<Vector2>> enemies;
 	private Vector2 player;
 	private ArrayList<ArrayList<Vector2>> walls;
@@ -221,6 +236,7 @@ public class LevelEditor extends WorldController {
 		enemies = new HashMap<Vector2,ArrayList<Vector2>>();
 		enemyPath = new ArrayList<Vector2>();
 		walls = new ArrayList<ArrayList<Vector2>>();
+		wpools = new ArrayList<Vector2>();
 	}
 	
 	@Override
@@ -442,7 +458,7 @@ public class LevelEditor extends WorldController {
 	protected static Level loadFromJson() {
 		Gson gson = new Gson();
 		try {
-			JsonReader reader = new JsonReader(new FileReader("level1.json"));
+			JsonReader reader = new JsonReader(new FileReader("level2.json"));
 			Level level = gson.fromJson(reader, Level.class);
 			System.out.println(level);
 			return level;
