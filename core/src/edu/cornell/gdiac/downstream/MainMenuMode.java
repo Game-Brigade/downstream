@@ -307,9 +307,19 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 	 * @return whether to hand the event to other listeners.
 	 */
 	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-		if (playState == 1) {
-			playState = 2;
-			return false;
+		if (playState == 1 || editState == 1 || selectState == 1) {
+			if(playState == 1){
+				playState = 2;
+				return false;
+			}
+			if(editState == 1){
+				editState = 2;
+				return false;
+			}
+			if(selectState == 1){
+				selectState = 2;
+				return false;
+			}
 		}
 		return true;
 	}
