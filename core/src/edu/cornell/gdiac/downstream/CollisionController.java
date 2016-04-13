@@ -37,7 +37,12 @@ public class CollisionController {
 			else if(s2.startsWith("enemy")){
 				return true;
 			}
-			else if(s2.startsWith("land") || s2.startsWith("whirlpool")){}			
+			else if(s2.startsWith("land")){}			
+			else if(s2.startsWith("whirlpool")){
+				if(koi.getPosition().dst(body2.getPosition()) < .5){
+					return true;
+				}
+			}
 			else{
 				System.out.println("COLLISION ERROR: "+s2);
 			}
@@ -47,11 +52,17 @@ public class CollisionController {
 			if(s1.startsWith("lily") || s1.startsWith("lotus") || s1.startsWith("fade")){
 				if(!tethers.contains((TetherModel) body1.getUserData())){
 					tethers.add((TetherModel) body1.getUserData());
-				}			}
+				}			
+			}
 			else if(s1.startsWith("enemy")){
 				return true;
 			}
-			else if(s2.startsWith("land") || s2.startsWith("whirlpool")){}			
+			else if(s1.startsWith("land")){}			
+			else if(s1.startsWith("whirlpool")){
+				if(koi.getPosition().dst(body2.getPosition()) < .5){
+					return true;
+				}				
+			}
 			else{
 				System.out.println("COLLISION ERROR: "+s2);
 			}
