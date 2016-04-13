@@ -56,9 +56,16 @@ public class DownstreamController extends WorldController implements ContactList
 	private static final String BOTTOM_LAND_TEXTURE = "terrain/bottom-border.png";
 	/** Reference to the lotus texture */
 	private static final String LOTUS_TEXTURE= null;
+	/** Reference to the whirlpool texture */
+	private static final String WHIRLPOOL_TEXTURE = "terrain/whirlpool.png";
+	/** Reference to the flipped whirlpool texture */
+	private static final String WHIRLPOOL_FLIP_TEXTURE = "terrain/whirlpool_flip.png";
 
-	/** The asset for the collision sound */
-	//private static final String  COLLISION_SOUND = "fish/bump.mp3";
+	/** The assets sounds */
+	private static final String CLICK_SOUND = null;
+	private static final String LIGHTING_SOUND = null;
+	private static final String DEATH_SOUND = null;
+	private static final String BELL_SOUND = null;
 
 
 	/** Texture assets for the koi */
@@ -77,15 +84,17 @@ public class DownstreamController extends WorldController implements ContactList
 	private TextureRegion rightLandTexture;
 	private TextureRegion topLandTexture;
 	private TextureRegion bottomLandTexture;
+	/** Texture assets for whirlpools */
+	private TextureRegion whirlpoolTexture;
+	private TextureRegion whirlpoolFlipTexture;
 
-	/** Texture filmstrip for the main afterburner */
-	//private FilmStrip mainTexture;
 
 
 	/** Track asset loading from all instances and subclasses */
 	private AssetState fishAssetState = AssetState.EMPTY;
 
 	private boolean tethered;
+	private boolean whirled;
 
 	private float PLAYER_LINEAR_VELOCITY = 4f;
 	private float CAMERA_MAX_LINEAR_VELOCITY = 8f;
@@ -144,11 +153,24 @@ public class DownstreamController extends WorldController implements ContactList
 
 		manager.load(BOTTOM_LAND_TEXTURE, Texture.class);
 		assets.add(BOTTOM_LAND_TEXTURE);
+		
+		manager.load(WHIRLPOOL_TEXTURE, Texture.class);
+		assets.add(WHIRLPOOL_TEXTURE);
+		
+		manager.load(WHIRLPOOL_FLIP_TEXTURE, Texture.class);
+		assets.add(WHIRLPOOL_FLIP_TEXTURE);
 
-
-		//sounds
-		//manager.load(MAIN_FIRE_SOUND, Sound.class);
-		//assets.add(MAIN_FIRE_SOUND);
+		manager.load(CLICK_SOUND, Sound.class);
+		assets.add(CLICK_SOUND);
+		
+		manager.load(LIGHTING_SOUND, Sound.class);
+		assets.add(LIGHTING_SOUND);
+		
+		manager.load(DEATH_SOUND, Sound.class);
+		assets.add(DEATH_SOUND);
+		
+		manager.load(BELL_SOUND, Sound.class);
+		assets.add(BELL_SOUND);
 
 
 		super.preLoadContent(manager);
@@ -179,9 +201,14 @@ public class DownstreamController extends WorldController implements ContactList
 		rightLandTexture = createTexture(manager,RIGHT_LAND_TEXTURE,false);
 		topLandTexture = createTexture(manager,TOP_LAND_TEXTURE,false);
 		bottomLandTexture = createTexture(manager,BOTTOM_LAND_TEXTURE,false);
+		whirlpoolTexture = createTexture(manager,WHIRLPOOL_TEXTURE,false);
+		whirlpoolFlipTexture = createTexture(manager,WHIRLPOOL_FLIP_TEXTURE,false);
 
 		SoundController sounds = SoundController.getInstance();
-		//sounds.allocate(manager,MAIN_FIRE_SOUND);
+		sounds.allocate(manager,CLICK_SOUND);
+		sounds.allocate(manager, LIGHTING_SOUND);
+		sounds.allocate(manager, DEATH_SOUND);
+		sounds.allocate(manager, BELL_SOUND);
 
 
 		super.loadContent(manager);
@@ -206,22 +233,12 @@ public class DownstreamController extends WorldController implements ContactList
 	private static final float TETHER_FRICTION = ENEMY_FRICTION;
 	private static final float TETHER_RESTITUTION = BASIC_RESTITUTION;
 
-	// Since these appear only once, we do not care about the magic numbers.
-	// In an actual game, this information would go in a data file.
-	// Wall vertices
-	private static final float[][] LAND = {{}};
-
-	private static final float[] WALL1 = { 0.0f, 18.0f, 16.0f, 18.0f, 16.0f, 17.0f,
-			8.0f, 15.0f,  1.0f, 17.0f,  2.0f,  7.0f,
-			3.0f,  5.0f,  3.0f,  1.0f, 16.0f,  1.0f,
-			16.0f,  0.0f,  0.0f,  0.0f};
-
-
-
 
 	private ArrayList<TetherModel> tethers = new ArrayList<TetherModel>();
 	private ArrayList<TetherModel> lanterns = new ArrayList<TetherModel>();
 	private ArrayList<EnemyModel> enemies = new ArrayList<EnemyModel>();
+	private ArrayList<WhirlpoolModel> wpools = new ArrayList<WhirlpoolModel>();
+	private double rot = 0;
 
 	// Other game objects
 	/** The initial koi position */
@@ -250,6 +267,7 @@ public class DownstreamController extends WorldController implements ContactList
 		setFailure(false);
 		world.setContactListener(this);
 		tethered = false;
+		whirled = false;
 	}
 
 	/**
@@ -270,6 +288,7 @@ public class DownstreamController extends WorldController implements ContactList
 		addQueue.clear();
 		world.dispose();
 		tethered = true;
+		whirled = false;
 
 		world = new World(gravity,false);
 		world.setContactListener(this);
@@ -290,9 +309,23 @@ public class DownstreamController extends WorldController implements ContactList
 		float dwidth;
 		float dheight;
 		float rad = lilyTexture.getRegionWidth()/scale.x/2;
+		float wrad = whirlpoolTexture.getRegionWidth()/scale.x/2;
 
 		boolean sensorTethers = true;
-
+		boolean sensorPools = true;
+		
+		WhirlpoolModel pool = new WhirlpoolModel(-2, -5);
+		pool.setBodyType(BodyDef.BodyType.StaticBody);
+		pool.setName("whirlpool" + 1);
+		pool.setDensity(TETHER_DENSITY);
+		pool.setRestitution(TETHER_RESTITUTION);
+		pool.setSensor(sensorPools);
+		pool.setDrawScale(scale);
+		pool.setTexture(whirlpoolTexture);
+		addObject(pool);
+		wpools.add(pool);
+		
+		
 		TerrainModel land = new TerrainModel(0,20, topLandTexture.getRegionWidth()/scale.x, topLandTexture.getRegionHeight()/scale.y,6,1);
 		land.setBodyType(BodyDef.BodyType.StaticBody);
 		land.setName("landtop");
@@ -416,6 +449,7 @@ public class DownstreamController extends WorldController implements ContactList
 		tethers.add(lantern);
 		lanterns.add(lantern);
 
+		
 		TextureRegion etexture = enemyTexture;
 		dwidth  = etexture.getRegionWidth()/scale.x;
 		dheight = etexture.getRegionHeight()/scale.y;
@@ -468,7 +502,7 @@ public class DownstreamController extends WorldController implements ContactList
 		koi.setName("koi");
 		koi.setTexture(koiTexture);
 		koi.setTethered(false);
-
+		koi.setWhirled(false);
 		addObject(koi);
 
 	}
@@ -485,14 +519,11 @@ public class DownstreamController extends WorldController implements ContactList
 	 */
 	public void update(float dt) {
 
-//		System.out.println(CAMERA_CURRENT_LINEAR_VELOCITY);
-
 		float thrust = koi.getThrust();
 		InputController input = InputController.getInstance();
 		koi.setFX(thrust * input.getHorizontal());
 		koi.setFY(thrust * input.getVertical());
 		koi.applyForce();
-		//		koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY));
 
 		// unused. was testing using "s" to slow down
 		//		if (enableSlow && input.slow) koi.setLinearVelocity(koi.getLinearVelocity().setLength(4));
@@ -568,7 +599,19 @@ public class DownstreamController extends WorldController implements ContactList
 			if (camera_zoom) cameraController.zoomIn();
 			//			koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*2));
 		}
-
+		
+		WhirlpoolModel closestWhirlpool = getClosestWhirl();
+		
+		if (koi.getPosition().sub(koi.getInitialTangentPoint(closestWhirlpool.getPosition())).len2() < .01){
+			if (!koi.isWhirled()) {
+				koi.refreshWhirlForce(closestWhirlpool.getPosition(), closestWhirlpool.getOrbitRadius());
+			}
+			koi.applyWhirlForce(closestWhirlpool.getPosition(), closestWhirlpool.getOrbitRadius());
+			canvas.moveCameraTowards(closestWhirlpool.getPosition().cpy().scl(scale), CAMERA_CURRENT_LINEAR_VELOCITY/2);
+			if (camera_zoom) canvas.zoomOut();
+			koi.setWhirled(true);
+		}
+		
 
 		koi.resolveDirection();
 
@@ -625,6 +668,19 @@ public class DownstreamController extends WorldController implements ContactList
 		}
 		return closestTether;
 	}
+	
+	private WhirlpoolModel getClosestWhirl() {
+		WhirlpoolModel closestWhirl = wpools.get(0);
+		float closestDistance = wpools.get(0).getPosition().sub(koi.getPosition()).len2();
+		for(WhirlpoolModel w: wpools){
+			float newDistance = w.getPosition().sub(koi.getPosition()).len2();
+			if(newDistance < closestDistance){
+				closestDistance = newDistance;
+				closestWhirl = w;
+			}
+		}
+		return closestWhirl;
+	}
 
 	public void draw(float delta) {
 		super.draw(delta);
@@ -641,6 +697,7 @@ public class DownstreamController extends WorldController implements ContactList
 			canvas.drawTetherCircle(closestTether, TetherModel.TETHER_DEFAULT_ORBIT*scale.len());
 			//canvas.drawTetherCircle(koi.cent.cpy().scl(scale), koi.pull.len()/2*scale.len());
 		}
+		
 
 	}
 
@@ -667,6 +724,10 @@ public class DownstreamController extends WorldController implements ContactList
 
 		if( (body2.getUserData() == koi && (s1.startsWith("lily") || s1.startsWith("lantern")))) {
 			TetherModel t = (TetherModel) body1.getUserData();
+		}
+		
+		if( (body2.getUserData() == koi && s1.startsWith("whirlpool"))){
+			WhirlpoolModel w = (WhirlpoolModel)body1.getUserData();
 		}
 
 	}

@@ -38,6 +38,10 @@ public class GDXRoot extends Game implements ScreenListener {
 	private GameCanvas canvas; 
 	/** Player mode for the asset loading screen (CONTROLLER CLASS) */
 	private LoadingMode loading;
+	/** Player mode for the main menu */
+	private MainMenuMode mainMenu;
+	/** Player mode for the pause menu */
+	//private PauseMenuMode pauseMenu;
 	/** Player mode for the the game proper (CONTROLLER CLASS) */
 	private int current;
 	/** List of all WorldControllers */
@@ -68,12 +72,8 @@ public class GDXRoot extends Game implements ScreenListener {
 	public void create() {
 		canvas  = new GameCanvas();
 		loading = new LoadingMode(canvas,manager,1);
-		
-		// Initialize the three game worlds
-//		controllers = new WorldController[3];
-//		controllers[0] = new RocketController();
-//		controllers[1] = new PlatformController();
-//		controllers[2] = new RagdollController();
+		mainMenu = new MainMenuMode(canvas,manager);
+
 		controllers = new WorldController[1];
 		controllers[0] = new DownstreamController();
 		for(int ii = 0; ii < controllers.length; ii++) {
@@ -130,6 +130,13 @@ public class GDXRoot extends Game implements ScreenListener {
 	 */
 	public void exitScreen(Screen screen, int exitCode) {
 		if (screen == loading) {
+			loading.dispose();
+			loading = null;
+			setScreen(mainMenu);
+			
+		}
+		/*
+		else if (screen == mainMenu && exitCode == WorldController.EXIT_PLAY) {
 			for(int ii = 0; ii < controllers.length; ii++) {
 				controllers[ii].loadContent(manager);
 				controllers[ii].setScreenListener(this);
@@ -138,9 +145,12 @@ public class GDXRoot extends Game implements ScreenListener {
 			controllers[current].reset();
 			setScreen(controllers[current]);
 			
-			loading.dispose();
-			loading = null;
-		} else if (exitCode == WorldController.EXIT_NEXT) {
+			mainMenu.dispose();
+			mainMenu = null;
+		
+		} 
+		*/
+		else if (exitCode == WorldController.EXIT_NEXT) {
 			current = (current+1) % controllers.length;
 			controllers[current].reset();
 			setScreen(controllers[current]);

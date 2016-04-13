@@ -45,6 +45,8 @@ public class PlayerModel extends BoxObstacle {
 	private Vector2 force;
 	
 	private boolean isTethered;
+	
+	private boolean isWhirled;
 
 	public Vector2 pull;
 
@@ -65,6 +67,7 @@ public class PlayerModel extends BoxObstacle {
 		force = new Vector2();
 		health = 1;
 		isTethered = false;
+		isWhirled = false;
 		pull = Vector2.Zero;
 		cent = Vector2.Zero;
 		dest = Vector2.Zero;
@@ -82,18 +85,27 @@ public class PlayerModel extends BoxObstacle {
 //		System.out.println(calculateTetherForce(tetherPos,rad));
 	}
 	
+	public void applyWhirlForce(Vector2 whirlPos, float rad){
+		body.applyForceToCenter(calculateWhirlForce(whirlPos,rad), true);
+	}
+	
+	
 
 	public void refreshTetherForce(Vector2 tetherPos, float rad){
-//		System.out.println("sex");
 		pull = tetherPos.cpy().sub(getPosition());
 		pull.setLength(pull.len() + rad);
 		dest = getPosition().cpy().add(pull);
 		cent = getPosition().cpy().add(pull.cpy().scl(0.5f));
-//		cent = pull.cpy().setLength((pull.len()+rad)/2);
-//		cent.add(getPosition());
-//		dest = pull.cpy().setLength((pull.len()+rad));
-//		dest.add(getPosition());
 	}
+	
+	public void refreshWhirlForce(Vector2 whirlPos, float rad){
+		pull = whirlPos.cpy().sub(getPosition());
+		pull.setLength(pull.len() + rad);
+		dest = getPosition().cpy().add(pull);
+		cent = getPosition().cpy().add(pull.cpy().scl(0.5f));
+	}
+	
+	
 	
 	public Vector2 calculateTetherForce(Vector2 tetherPos, float rad){
 		if(isTethered()){
@@ -115,6 +127,19 @@ public class PlayerModel extends BoxObstacle {
 		else{
 			return Vector2.Zero;
 		}
+	}
+	
+	public Vector2 calculateWhirlForce(Vector2 whirlPos, float rad){
+		if(isWhirled()){
+			if(getPosition().sub(dest).len2() < .01){
+				dest = getPosition();
+				pull = whirlPos.sub(getPosition());
+				float forceMagnitude = (float)(getMass() * getLinearVelocity().len2() / rad);
+				return pull.setLength(forceMagnitude);
+			}
+		}
+		
+		return Vector2.Zero;
 	}
 	
 	
@@ -153,6 +178,13 @@ public class PlayerModel extends BoxObstacle {
 		isTethered = newState;
 	}
 	
+	public boolean isWhirled(){
+		return isWhirled;
+	}
+	
+	public void setWhirled(boolean newState){
+		isWhirled = newState;
+	}
 	
 
 	
