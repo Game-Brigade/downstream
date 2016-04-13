@@ -49,7 +49,7 @@ public class DownstreamController extends WorldController implements ContactList
 	/** Reference to the Lightin Texture image */
 	private static final String LIGHTING_TEXTURE = "tethers/aura.png";
 	/** Reference to the 4-sided land texture */
-	private static final String LAND_4SIDE_TEXTURE = "terrain/land.png";
+	private static final String LAND_4SIDE_TEXTURE = "terrain/repeat tile.png";
 	/** Reference to the left land texture */
 	private static final String LEFT_LAND_TEXTURE = "terrain/left-border.png";
 	/** Reference to the right land texture */
@@ -62,7 +62,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private static final String LOTUS_TEXTURE= null;
 
 	/** Reference to the land texture */
-	private static String EARTH_FILE = "terrain/earthtile.png";
+	private static String EARTH_FILE = "terrain/repeat tile.png";
 
 	/** Reference to the whirlpool texture */
 	private static final String WHIRLPOOL_TEXTURE = "terrain/whirlpool.png";
