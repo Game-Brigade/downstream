@@ -321,7 +321,7 @@ public class DownstreamController extends WorldController implements ContactList
 		pool.setRestitution(TETHER_RESTITUTION);
 		pool.setSensor(sensorPools);
 		pool.setDrawScale(scale);
-		pool.setTexture(whirlpoolTexture);
+		pool.setTexture(whirlpoolFlipTexture);
 		addObject(pool);
 		wpools.add(pool);
 		

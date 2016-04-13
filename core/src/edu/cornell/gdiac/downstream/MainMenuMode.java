@@ -153,8 +153,14 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 			draw();
 			
 			// We are are ready, notify our listener
-			if (isReady() && listener != null) {
+			if (startPlay() && listener != null) {
 				listener.exitScreen(this, WorldController.EXIT_PLAY);
+			}
+			if (startSelect() && listener != null){
+				listener.exitScreen(this, WorldController.EXIT_SELECT);
+			}
+			if (startEdit() && listener != null){
+				listener.exitScreen(this, WorldController.EXIT_EDIT);
 			}
 		}
 	}
@@ -164,8 +170,16 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 	 *
 	 * @return true if the player is ready to go
 	 */
-	public boolean isReady() {
+	public boolean startPlay() {
 		return playState == 2;
+	}
+	
+	public boolean startSelect(){
+		return selectState == 2;
+	}
+	
+	public boolean startEdit(){
+		return editState == 2;
 	}
 
 	/**
@@ -257,9 +271,22 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 		float dy = Math.abs(screenY - playPos.y);
 		
 		if (dx < scale*play.getWidth()/2 && dy < scale*play.getHeight()/2) {
-			System.out.println("hello");
+			//System.out.println("hello");
 			playState = 1;
-			
+		}
+		
+		dx = Math.abs(screenX - selectPos.x);
+		dy = Math.abs(screenY - selectPos.y);
+		if (dx < scale*select.getWidth()/2 && dy < scale*select.getHeight()/2) {
+			//System.out.println("hello");
+			selectState = 1;
+		}
+		
+		dx = Math.abs(screenX - editPos.x);
+		dy = Math.abs(screenY - editPos.y);
+		if (dx < scale*edit.getWidth()/2 && dy < scale*edit.getHeight()/2) {
+			//System.out.println("hello");
+			editState = 1;
 		}
 		
 		return false;
