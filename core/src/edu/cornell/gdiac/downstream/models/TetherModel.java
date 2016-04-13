@@ -26,7 +26,7 @@ public class TetherModel extends WheelObstacle {
 	public static final float TETHER_DEFAULT_ORBIT = 2f;  
 
 	/** The range at which the player can enter orbit around this tether */
-	private static final int TETHER_DEFAULT_RANGE = 4;
+	public static final int TETHER_DEFAULT_RANGE = 4;
 
 
 
@@ -44,13 +44,15 @@ public class TetherModel extends WheelObstacle {
 
 	public boolean set = false;
 
+	private boolean isTethered;
+
 	private static TextureRegion lightingTexture;
 
 	/** Tethers can be lilipads, lanterns, or lotus flowers */
 	public enum TetherType {
 		Lilypad,
-		Lantern,
-		Lotus
+		Lotus, 
+		LotusFade
 	};
 
 	public TetherModel(float x, float y, TetherType type) {
@@ -61,7 +63,7 @@ public class TetherModel extends WheelObstacle {
 
 	public TetherModel(float x, float y, float r, boolean b){
 		super(x,y, TETHER_DEFAULT_RANGE);
-		setType(TetherType.Lantern);
+		setType(TetherType.LotusFade);
 		setBodyType(TETHER_BODY_TYPE);
 	}
 
@@ -104,8 +106,8 @@ public class TetherModel extends WheelObstacle {
 	public void setEntry(Vector2 v){
 		entry = v;
 	}
-	public boolean isLantern(){
-		return type == TetherType.Lantern;
+	public boolean isLotus(){
+		return type == TetherType.Lotus || type == TetherType.LotusFade;
 	}
 
 	public void setlightingTexture(TextureRegion t){
@@ -117,7 +119,7 @@ public class TetherModel extends WheelObstacle {
 			if (type == TetherType.Lilypad){
 				canvas.draw(texture,Color.WHITE,texture.getRegionHeight()/2,texture.getRegionWidth()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),1,1);
 			}
-			if (type == TetherType.Lantern){
+			if (type == TetherType.LotusFade){
 				canvas.draw(texture,Color.WHITE,texture.getRegionHeight()/2,texture.getRegionWidth()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),.35f,.35f);
 				if (sparkSize < rotations){
 					sparkSize += .005f;
@@ -134,5 +136,10 @@ public class TetherModel extends WheelObstacle {
 			canvas.draw(lightingTexture,Color.WHITE, lightingTexture.getRegionWidth()/2, lightingTexture.getRegionHeight()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),sparkSize,sparkSize);
 			//System.out.println(origin);
 		}
+	}
+
+	public void setTethered(boolean b) {
+		isTethered = b;
+		
 	}
 }

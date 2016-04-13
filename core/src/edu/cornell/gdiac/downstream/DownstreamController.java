@@ -106,8 +106,8 @@ public class DownstreamController extends WorldController implements ContactList
 	/** Track asset loading from all instances and subclasses */
 	private AssetState fishAssetState = AssetState.EMPTY;
 
-	private boolean tethered;
 	private boolean whirled;
+	private boolean eaten;
 
 	private float PLAYER_LINEAR_VELOCITY = 4f;
 
@@ -292,7 +292,9 @@ public class DownstreamController extends WorldController implements ContactList
 
 	private EnemyModel eFish;
 	
+	private CollisionController collisionController;
 	private CameraController cameraController;
+	private TetherModel closestTether;
 
 	/**
 	 * Creates and initialize a new instance of Downstream
@@ -304,7 +306,7 @@ public class DownstreamController extends WorldController implements ContactList
 		setComplete(false);
 		setFailure(false);
 		world.setContactListener(this);
-		tethered = false;
+		eaten = false;
 		whirled = false;
 	}
 
@@ -325,8 +327,8 @@ public class DownstreamController extends WorldController implements ContactList
 		objects.clear();
 		addQueue.clear();
 		world.dispose();
-		tethered = true;
 		whirled = false;
+		eaten = false;
 
 		world = new World(gravity,false);
 		world.setContactListener(this);
@@ -451,12 +453,12 @@ public class DownstreamController extends WorldController implements ContactList
 		koi.setName("koi");
 		koi.setTexture(koiTexture);
 		koi.setTethered(false);
-
+		koi.setAttemptingTether(true);
 		koi.setWhirled(false);
 
 		addObject(koi);
 		
-		
+		collisionController = new CollisionController(koi);
 
 	}
 
@@ -471,88 +473,66 @@ public class DownstreamController extends WorldController implements ContactList
 	 * @param delta Number of seconds since last animation frame
 	 */
 	public void update(float dt) {
-
-		float thrust = koi.getThrust();
-		InputController input = InputController.getInstance();
-		koi.setFX(thrust * input.getHorizontal());
-		koi.setFY(thrust * input.getVertical());
-		koi.applyForce();
-
-		
-		for (EnemyModel enemy : enemies) {
-//			enemy.patrol();
-//			enemy.moveTowardsGoal();
-		}
-
-
-		// unused. was testing using "s" to slow down
-		//		if (enableSlow && input.slow) koi.setLinearVelocity(koi.getLinearVelocity().setLength(4));
-
-
-		if (input.didTether()) {
-			tethered = !tethered; 
-			koi.setTethered(false);
-			System.out.println("USA USA USA");
+		if(eaten){
+			objects.remove(koi);
+			setFailure(eaten);
 			cameraController.resetCameraVelocity();
-		}
-		if (!tethered) {
-			koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*2));
-		}
-		if (tethered) {
-			koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*1.5f));
-		}
+		} else{
+			closestTether = getClosestTether();
 
-		TetherModel closestTether = getClosestTether();
-
-
-		//check to see if closest tether is just attached or has been previously attached
-		if (tethered & closestTether.getEntry().x == 0f & closestTether.isLantern()){
-			//if just attached, define it as such
-			Vector2 ent = new Vector2(closestTether.getX(), closestTether.getY());
-			closestTether.setEntry(ent);
-
-		}
-		//checks to see if the fish is within reasonable circulating distance. It will pass the if statment many times
-		if (tethered){
-			//this is because the fish moves to quickly to get an exact range, so we must find it within .5 distance
-			if ((closestTether.getEntry().x + .5 > koi.getPosition().x) && (closestTether.getEntry().x -.5 < koi.getPosition().x && closestTether.isLantern())){
-				//because of the range, we only want the first instance, so we only check if it has not been previously checked in the last frame. 
-				if (closestTether.set == false){
-					//System.out.println(closestTether.getRotations());
-					closestTether.updateRotations();
+			// TETHER TOGGLE CODE
+			InputController input = InputController.getInstance();
+			if (input.didTether()) {
+				if(koi.isTethered() || koi.isAttemptingTether()){
+					koi.setTethered(false);					
+					koi.setAttemptingTether(false); 
+					cameraController.resetCameraVelocity();
 				}
-				closestTether.set = true;
-			}
-			else{
-				closestTether.set = false;
-			}
-		}
-		else {
-			closestTether.set = false;
-		}
+				else {
+					if(collisionController.inRange()){
+						koi.setAttemptingTether(true); 
+						cameraController.resetCameraVelocity();
+					}
+				}
+			}	
 
-		boolean camera_zoom = true;
-
-		// if koi is tethered: move slowly to tether, reset camera speed
-		// if koi is not tethered: accelerate to fish up to maximum speed
-		
-		if (koi.isTethered() || tethered && 
-				koi.getPosition().sub(koi.getInitialTangentPoint(closestTether.getPosition())).len2() < .01) {
-			if (!koi.isTethered()) {
-//				System.out.println("PENIS");
-				koi.refreshTetherForce(closestTether.getPosition(), closestTether.getOrbitRadius());
+			// KOI VEOLOCITY CODE
+			if (isTethered()) {
+				koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*1.5f));
+			} else{
+				koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*2));
 			}
-			koi.applyTetherForce(closestTether.getPosition(), closestTether.getOrbitRadius());
-			cameraController.moveCameraTowards(closestTether.getPosition().cpy().scl(scale));
-			if (camera_zoom) cameraController.zoomOut();
-			koi.setTethered(true);	
-		} else {
-			cameraController.moveCameraTowards(koi.getPosition().cpy().scl(scale));
-			if (camera_zoom) cameraController.zoomIn();
-		}
-		/*
+
+			// ENEMY PATROL CODE
+			for (EnemyModel enemy : enemies) {
+				//enemy.patrol();
+				//enemy.moveTowardsGoal();
+			}
+
+			// LOTUS LIGHTING CODE
+			closestTether.setTethered(isTethered() && closestTether.isLotus() && collisionController.inRangeOf(closestTether));
+
+			// TETHER FORCE CODE
+			Vector2 close = closestTether.getPosition();
+			Vector2 init = koi.getInitialTangentPoint(close);
+			if (close.dst(koi.getPosition()) > TetherModel.TETHER_DEFAULT_RANGE){
+				koi.setAttemptingTether(false);
+			}
+			// HIT TANGENT
+			if (koi.isAttemptingTether() && (koi.getPosition().sub(init).len2() < .01)) {
+				koi.setTethered(true);
+				koi.setAttemptingTether(false);
+				koi.refreshTetherForce(close, closestTether.getOrbitRadius());
+			}
+			// PAST TANGENT
+			else if (koi.isAttemptingTether() && !koi.willIntersect(init) ) {
+				koi.passAdjust(close);
+			}
+			else {}
+			koi.applyTetherForce(close, closestTether.getOrbitRadius());
+
+			/*
 		WhirlpoolModel closestWhirlpool = getClosestWhirl();
-		
 		if (koi.getPosition().sub(koi.getInitialTangentPoint(closestWhirlpool.getPosition())).len2() < .01){
 			if (!koi.isWhirled()) {
 				koi.refreshWhirlForce(closestWhirlpool.getPosition(), closestWhirlpool.getOrbitRadius());
@@ -562,25 +542,32 @@ public class DownstreamController extends WorldController implements ContactList
 			if (camera_zoom) cameraController.zoomOut();
 			koi.setWhirled(true);
 		}
-		
-*/
-		koi.resolveDirection();
+			 */
 
+			// RESOLVE FISH IMG
+			koi.resolveDirection();
 
-
-		float angV = 3f;
-		float radius = closestTether.getPosition().dst(koi.getPosition());
-		float tetherSpeed = angV*radius;
-
-		float MAX_SPEED = 7f;
-		float MIN_SPEED = 6f;
-
-		int motionType = 0;
-
+			// CAMERA ZOOM CODE
+			if (isTethered()){  
+				cameraController.moveCameraTowards(closestTether.getPosition().cpy().scl(scale));
+				cameraController.zoomOut();
+			}
+			else{
+				cameraController.moveCameraTowards(koi.getPosition().cpy().scl(scale));
+				cameraController.zoomIn();
+			}
+		}
 		SoundController.getInstance().update();
 	}
 
+	private boolean isTethered(){
+		return koi.isTethered();
+	}
+	
 	private TetherModel getClosestTether() {
+		if(collisionController.inRange()){
+			return collisionController.getClosestTetherInRange();
+		}
 		TetherModel closestTether = tethers.get(0);
 		float closestDistance = tethers.get(0).getPosition().sub(koi.getPosition()).len2();
 		for (TetherModel tether : tethers) {
@@ -639,24 +626,7 @@ public class DownstreamController extends WorldController implements ContactList
 	 * @param contact The two bodies that collided
 	 */
 	public void beginContact(Contact contact) {
-		Body body1 = contact.getFixtureA().getBody();
-		Body body2 = contact.getFixtureB().getBody();
-		String s1 = ((Obstacle)body1.getUserData()).getName();
-		String s2 = ((Obstacle)body2.getUserData()).getName();
-
-		if( (body1.getUserData() == koi && body2.getUserData() == eFish) 
-				|| (body2.getUserData() == koi && body1.getUserData() == eFish))  {
-			setFailure(true);
-		}
-
-		if( (body2.getUserData() == koi && (s1.startsWith("lily") || s1.startsWith("lantern")))) {
-			TetherModel t = (TetherModel) body1.getUserData();
-		}
-		
-		if( (body2.getUserData() == koi && s1.startsWith("whirlpool"))){
-			WhirlpoolModel w = (WhirlpoolModel)body1.getUserData();
-		}
-
+		eaten = collisionController.begin(contact);
 	}
 	
 	private static Vector2 vectorOfString(String s) {
@@ -675,7 +645,9 @@ public class DownstreamController extends WorldController implements ContactList
 	 *
 	 * This method is called when two objects cease to touch.  We do not use it.
 	 */ 
-	public void endContact(Contact contact) {}
+	public void endContact(Contact contact) {
+		collisionController.end(contact);
+	}
 
 	private Vector2 cache = new Vector2();
 
