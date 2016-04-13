@@ -22,11 +22,11 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 	
 	
 	/** Textures necessary to support the main menu screen */
-	private static final String LOGO_FILE = "main_menu/logo-big.png";
-	private static final String PLAY_FILE = "main_menu/play-b.png";
-	private static final String SELECT_FILE = "main_menu/level-select-b.png";
-	private static final String EDIT_FILE = "main_menu/level-edit-b.png";
-	private static final String BACKGROUND_FILE = "main_menu/General-background.png";
+	private static final String LOGO_FILE = "MENUS/logo-big.png";
+	private static final String PLAY_FILE = "MENUS/Main/play-b.png";
+	private static final String SELECT_FILE = "MENUS/Main/level_select-b.png";
+	private static final String EDIT_FILE = "MENUS/Main/level_edit-b.png";
+	private static final String BACKGROUND_FILE = "MENUS/general_background.png";
 	
 	/** Logo texture */
 	private Texture logo;
