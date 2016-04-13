@@ -8,6 +8,7 @@
 package edu.cornell.gdiac.downstream;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.Gdx;
@@ -18,6 +19,7 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.utils.Array;
 
 import edu.cornell.gdiac.util.*;
 import edu.cornell.gdiac.downstream.*;
@@ -56,6 +58,8 @@ public class DownstreamController extends WorldController implements ContactList
 	private static final String BOTTOM_LAND_TEXTURE = "terrain/bottom-border.png";
 	/** Reference to the lotus texture */
 	private static final String LOTUS_TEXTURE= null;
+	/** Reference to the land texture */
+	private static String EARTH_FILE = "terrain/earthtile.png";
 
 	/** The asset for the collision sound */
 	//private static final String  COLLISION_SOUND = "fish/bump.mp3";
@@ -77,6 +81,8 @@ public class DownstreamController extends WorldController implements ContactList
 	private TextureRegion rightLandTexture;
 	private TextureRegion topLandTexture;
 	private TextureRegion bottomLandTexture;
+	/** The texture for walls and platforms */
+	private TextureRegion earthTile;
 
 	/** Texture filmstrip for the main afterburner */
 	//private FilmStrip mainTexture;
@@ -88,9 +94,6 @@ public class DownstreamController extends WorldController implements ContactList
 	private boolean tethered;
 
 	private float PLAYER_LINEAR_VELOCITY = 4f;
-	private float CAMERA_MAX_LINEAR_VELOCITY = 8f;
-	private float CAMERA_CURRENT_LINEAR_VELOCITY = 0f;
-	private float CAMERA_ACCELERATION = 0.1f;
 
 	private boolean enableSlow = false;
 	private boolean enableLeadingLine = false;
@@ -144,6 +147,9 @@ public class DownstreamController extends WorldController implements ContactList
 
 		manager.load(BOTTOM_LAND_TEXTURE, Texture.class);
 		assets.add(BOTTOM_LAND_TEXTURE);
+		
+		manager.load(EARTH_FILE,Texture.class);
+		assets.add(EARTH_FILE);
 
 
 		//sounds
@@ -179,6 +185,7 @@ public class DownstreamController extends WorldController implements ContactList
 		rightLandTexture = createTexture(manager,RIGHT_LAND_TEXTURE,false);
 		topLandTexture = createTexture(manager,TOP_LAND_TEXTURE,false);
 		bottomLandTexture = createTexture(manager,BOTTOM_LAND_TEXTURE,false);
+		earthTile = createTexture(manager,EARTH_FILE,true);
 
 		SoundController sounds = SoundController.getInstance();
 		//sounds.allocate(manager,MAIN_FIRE_SOUND);
@@ -283,8 +290,11 @@ public class DownstreamController extends WorldController implements ContactList
 	 * Lays out the game geography.
 	 */
 	private void populateLevel() {
-		// Add level goal
 		
+		LevelEditor.Level level = LevelEditor.loadFromJson();
+		
+		// Add level goal
+//		System.out.println(Arrays.toString(Thread.currentThread().getStackTrace()));
 		cameraController = new CameraController(canvas.getCamera());
 		
 		float dwidth;
@@ -293,183 +303,237 @@ public class DownstreamController extends WorldController implements ContactList
 
 		boolean sensorTethers = true;
 
-		TerrainModel land = new TerrainModel(0,20, topLandTexture.getRegionWidth()/scale.x, topLandTexture.getRegionHeight()/scale.y,6,1);
-		land.setBodyType(BodyDef.BodyType.StaticBody);
-		land.setName("landtop");
-		land.setDensity(TETHER_DENSITY);
-		land.setFriction(TETHER_FRICTION);
-		land.setRestitution(TETHER_RESTITUTION);
-		land.setDrawScale(scale);
-		land.setTexture(topLandTexture);
-		addObject(land);
+//		TerrainModel land = new TerrainModel(0,20, topLandTexture.getRegionWidth()/scale.x, topLandTexture.getRegionHeight()/scale.y,6,1);
+//		land.setBodyType(BodyDef.BodyType.StaticBody);
+//		land.setName("landtop");
+//		land.setDensity(TETHER_DENSITY);
+//		land.setFriction(TETHER_FRICTION);
+//		land.setRestitution(TETHER_RESTITUTION);
+//		land.setDrawScale(scale);
+//		land.setTexture(topLandTexture);
+//		addObject(land);
+//		
+//		land = new TerrainModel(0,-15, bottomLandTexture.getRegionWidth()/scale.x, bottomLandTexture.getRegionHeight()/scale.y,6,1);
+//		land.setBodyType(BodyDef.BodyType.StaticBody);
+//		land.setName("landbottom");
+//		land.setDensity(TETHER_DENSITY);
+//		land.setFriction(TETHER_FRICTION);
+//		land.setRestitution(TETHER_RESTITUTION);
+//		land.setDrawScale(scale);
+//		land.setTexture(bottomLandTexture);
+//		addObject(land);
+//			
+//		land = new TerrainModel(-35,0, leftLandTexture.getRegionWidth()/scale.x, leftLandTexture.getRegionHeight()/scale.y,1,3);
+//		land.setBodyType(BodyDef.BodyType.StaticBody);
+//		land.setName("landleft");
+//		land.setDensity(TETHER_DENSITY);
+//		land.setFriction(TETHER_FRICTION);
+//		land.setRestitution(TETHER_RESTITUTION);
+//		land.setDrawScale(scale);
+//		land.setTexture(leftLandTexture);
+//		addObject(land);
+//		
+//		land = new TerrainModel(80,0, rightLandTexture.getRegionWidth()/scale.x, rightLandTexture.getRegionHeight()/scale.y,1,3);
+//		land.setBodyType(BodyDef.BodyType.StaticBody);
+//		land.setName("landright");
+//		land.setDensity(TETHER_DENSITY);
+//		land.setFriction(TETHER_FRICTION);
+//		land.setRestitution(TETHER_RESTITUTION);
+//		land.setDrawScale(scale);
+//		land.setTexture(rightLandTexture);
+//		addObject(land);
+
+		for (Vector2 lilypad : level.lilypads) {
+			TetherModel lily = new TetherModel(lilypad.x, lilypad.y, rad);
+			lily.setBodyType(BodyDef.BodyType.StaticBody);
+			lily.setName("lily"+ 1);
+			lily.setDensity(TETHER_DENSITY);
+			lily.setFriction(TETHER_FRICTION);
+			lily.setRestitution(TETHER_RESTITUTION);
+			lily.setSensor(sensorTethers);
+			lily.setDrawScale(scale);
+			lily.setTexture(lilyTexture);
+			addObject(lily);
+			tethers.add(lily);
+		}
 		
-		land = new TerrainModel(0,-15, bottomLandTexture.getRegionWidth()/scale.x, bottomLandTexture.getRegionHeight()/scale.y,6,1);
-		land.setBodyType(BodyDef.BodyType.StaticBody);
-		land.setName("landbottom");
-		land.setDensity(TETHER_DENSITY);
-		land.setFriction(TETHER_FRICTION);
-		land.setRestitution(TETHER_RESTITUTION);
-		land.setDrawScale(scale);
-		land.setTexture(bottomLandTexture);
-		addObject(land);
+		for (Vector2 lotus : level.lotuses) {
+			TetherModel lantern = new TetherModel(lotus.x, lotus.y, rad, true);
+			lantern.setBodyType(BodyDef.BodyType.StaticBody);
+			lantern.setName("lantern"+ 1);
+			lantern.setDensity(TETHER_DENSITY);
+			lantern.setFriction(TETHER_FRICTION);
+			lantern.setRestitution(TETHER_RESTITUTION);
+			lantern.setSensor(sensorTethers);
+			lantern.setDrawScale(scale);
+			lantern.setTexture(lanternTexture);
+			lantern.setlightingTexture(lightingTexture);
+			lantern.setRotation(0);
+			addObject(lantern);
+			tethers.add(lantern);
+			lanterns.add(lantern);
+		}
 		
+		for (ArrayList<Float> wall : level.walls) {
+			PolygonObstacle obj;
+			float[] wallFloat = new float[wall.size()];
+			for (int i = 0; i < wall.size(); i++) wallFloat[i] = wall.get(i);
+			obj = new PolygonObstacle(wallFloat, 0, 0);
+			obj.setBodyType(BodyDef.BodyType.StaticBody);
+			obj.setDensity(BASIC_DENSITY);
+			obj.setFriction(BASIC_FRICTION);
+			obj.setRestitution(BASIC_RESTITUTION);
+			obj.setDrawScale(scale);
+			obj.setTexture(earthTile);
+			obj.setName("wall1");
+			addObject(obj);
+		}
 		
-		land = new TerrainModel(-35,0, leftLandTexture.getRegionWidth()/scale.x, leftLandTexture.getRegionHeight()/scale.y,1,3);
-		land.setBodyType(BodyDef.BodyType.StaticBody);
-		land.setName("landleft");
-		land.setDensity(TETHER_DENSITY);
-		land.setFriction(TETHER_FRICTION);
-		land.setRestitution(TETHER_RESTITUTION);
-		land.setDrawScale(scale);
-		land.setTexture(leftLandTexture);
-		addObject(land);
-		
-		land = new TerrainModel(80,0, rightLandTexture.getRegionWidth()/scale.x, rightLandTexture.getRegionHeight()/scale.y,1,3);
-		land.setBodyType(BodyDef.BodyType.StaticBody);
-		land.setName("landright");
-		land.setDensity(TETHER_DENSITY);
-		land.setFriction(TETHER_FRICTION);
-		land.setRestitution(TETHER_RESTITUTION);
-		land.setDrawScale(scale);
-		land.setTexture(rightLandTexture);
-		addObject(land);
-
-		TetherModel lily = new TetherModel(0, 6, rad);
-		lily.setBodyType(BodyDef.BodyType.StaticBody);
-		lily.setName("lily"+ 1);
-		lily.setDensity(TETHER_DENSITY);
-		lily.setFriction(TETHER_FRICTION);
-		lily.setRestitution(TETHER_RESTITUTION);
-		lily.setSensor(sensorTethers);
-		lily.setDrawScale(scale);
-		lily.setTexture(lilyTexture);
-		addObject(lily);
-		tethers.add(lily);
-
-		TetherModel lantern = new TetherModel(15, 4, rad, true);
-
-		lantern.setBodyType(BodyDef.BodyType.StaticBody);
-		lantern.setName("lantern"+ 1);
-		lantern.setDensity(TETHER_DENSITY);
-		lantern.setFriction(TETHER_FRICTION);
-		lantern.setRestitution(TETHER_RESTITUTION);
-		lantern.setSensor(sensorTethers);
-		lantern.setDrawScale(scale);
-		lantern.setTexture(lanternTexture);
-		lantern.setlightingTexture(lightingTexture);
-		lantern.setRotation(0);
-		addObject(lantern);
-		tethers.add(lantern);
-		lanterns.add(lantern);
-
-		lily = new TetherModel(30, 4, rad);
-		lily.setBodyType(BodyDef.BodyType.StaticBody);
-		lily.setName("lily"+ 3);
-		lily.setDensity(TETHER_DENSITY);
-		lily.setFriction(TETHER_FRICTION);
-		lily.setRestitution(TETHER_RESTITUTION);
-		lily.setSensor(sensorTethers);
-		lily.setDrawScale(scale);
-		lily.setTexture(lilyTexture);
-		addObject(lily);
-		tethers.add(lily);
-
-
-		lily = new TetherModel(30, 14, rad);
-		lily.setBodyType(BodyDef.BodyType.StaticBody);
-		lily.setName("lily"+ 4);
-		lily.setDensity(TETHER_DENSITY);
-		lily.setFriction(TETHER_FRICTION);
-		lily.setRestitution(TETHER_RESTITUTION);
-		lily.setSensor(sensorTethers);
-		lily.setDrawScale(scale);
-		lily.setTexture(lilyTexture);
-		addObject(lily);
-		tethers.add(lily);
-
-
-		lily = new TetherModel(50, 7, rad);
-		lily.setBodyType(BodyDef.BodyType.StaticBody);
-		lily.setName("lily"+ 3);
-		lily.setDensity(TETHER_DENSITY);
-		lily.setFriction(TETHER_FRICTION);
-		lily.setRestitution(TETHER_RESTITUTION);
-		lily.setSensor(sensorTethers);
-		lily.setDrawScale(scale);
-		lily.setTexture(lilyTexture);
-		addObject(lily);
-		tethers.add(lily);
-
-
-		lantern = new TetherModel(70, 7, rad, true);
-		lantern.setBodyType(BodyDef.BodyType.StaticBody);
-		lantern.setName("lantern"+ 1);
-		lantern.setDensity(TETHER_DENSITY);
-		lantern.setFriction(TETHER_FRICTION);
-		lantern.setRestitution(TETHER_RESTITUTION);
-		lantern.setSensor(sensorTethers);
-		lantern.setDrawScale(scale);
-		lantern.setTexture(lanternTexture);
-		lantern.setlightingTexture(lightingTexture);
-		lantern.setRotation(0);
-		addObject(lantern);
-		tethers.add(lantern);
-		lanterns.add(lantern);
-
-		TextureRegion etexture = enemyTexture;
-		dwidth  = etexture.getRegionWidth()/scale.x;
-		dheight = etexture.getRegionHeight()/scale.y;
-		eFish = new EnemyModel(20, 0, dwidth, dheight);
-		eFish.setDensity(ENEMY_DENSITY);
-		eFish.setFriction(ENEMY_FRICTION);
-		eFish.setRestitution(BASIC_RESTITUTION);
-		eFish.setName("enemy");
-		eFish.setDrawScale(scale);
-		eFish.setTexture(etexture);
-		eFish.setAngle((float) (Math.PI/2));
-		eFish.setBodyType(BodyDef.BodyType.StaticBody);
-		eFish.setGoal(0, 0);
-		addObject(eFish);
-		enemies.add(eFish);
-
-		eFish = new EnemyModel(61, 18, dwidth, dheight);
-		eFish.setDensity(ENEMY_DENSITY);
-		eFish.setFriction(ENEMY_FRICTION);
-		eFish.setRestitution(BASIC_RESTITUTION);
-		eFish.setName("enemy");
-		eFish.setDrawScale(scale);
-		eFish.setTexture(etexture);
-		eFish.setAngle((float) (Math.PI/2));
-		eFish.setBodyType(BodyDef.BodyType.StaticBody);
-		eFish.setGoal(0, 0);
-		addObject(eFish);
-		enemies.add(eFish);
-
-		eFish = new EnemyModel(76, 0, dwidth, dheight);
-		eFish.setDensity(ENEMY_DENSITY);
-		eFish.setFriction(ENEMY_FRICTION);
-		eFish.setRestitution(BASIC_RESTITUTION);
-		eFish.setName("enemy");
-		eFish.setDrawScale(scale);
-		eFish.setTexture(etexture);
-		eFish.setAngle((float) (Math.PI/2));
-		eFish.setBodyType(BodyDef.BodyType.StaticBody);
-		eFish.setGoal(0, 0);
-		addObject(eFish);
-		enemies.add(eFish);
-
-
-
-		// Create the fish avatar
 		dwidth  = koiTexture.getRegionWidth()/scale.x;
 		dheight = koiTexture.getRegionHeight()/scale.y;
-		koi = new PlayerModel(KOI_POS.x, KOI_POS.y, dwidth, dheight);
+		koi = new PlayerModel(level.player.x, level.player.y, dwidth, dheight);
 		koi.setDrawScale(scale);
 		koi.setName("koi");
 		koi.setTexture(koiTexture);
 		koi.setTethered(false);
-
 		addObject(koi);
+		
+		
+//		TetherModel lily = new TetherModel(0, 6, rad);
+//		lily.setBodyType(BodyDef.BodyType.StaticBody);
+//		lily.setName("lily"+ 1);
+//		lily.setDensity(TETHER_DENSITY);
+//		lily.setFriction(TETHER_FRICTION);
+//		lily.setRestitution(TETHER_RESTITUTION);
+//		lily.setSensor(sensorTethers);
+//		lily.setDrawScale(scale);
+//		lily.setTexture(lilyTexture);
+//		addObject(lily);
+//		tethers.add(lily);
+
+//		TetherModel lantern = new TetherModel(15, 4, rad, true);
+//		lantern.setBodyType(BodyDef.BodyType.StaticBody);
+//		lantern.setName("lantern"+ 1);
+//		lantern.setDensity(TETHER_DENSITY);
+//		lantern.setFriction(TETHER_FRICTION);
+//		lantern.setRestitution(TETHER_RESTITUTION);
+//		lantern.setSensor(sensorTethers);
+//		lantern.setDrawScale(scale);
+//		lantern.setTexture(lanternTexture);
+//		lantern.setlightingTexture(lightingTexture);
+//		lantern.setRotation(0);
+//		addObject(lantern);
+//		tethers.add(lantern);
+//		lanterns.add(lantern);
+
+//		lily = new TetherModel(30, 4, rad);
+//		lily.setBodyType(BodyDef.BodyType.StaticBody);
+//		lily.setName("lily"+ 3);
+//		lily.setDensity(TETHER_DENSITY);
+//		lily.setFriction(TETHER_FRICTION);
+//		lily.setRestitution(TETHER_RESTITUTION);
+//		lily.setSensor(sensorTethers);
+//		lily.setDrawScale(scale);
+//		lily.setTexture(lilyTexture);
+//		addObject(lily);
+//		tethers.add(lily);
+
+
+//		lily = new TetherModel(30, 14, rad);
+//		lily.setBodyType(BodyDef.BodyType.StaticBody);
+//		lily.setName("lily"+ 4);
+//		lily.setDensity(TETHER_DENSITY);
+//		lily.setFriction(TETHER_FRICTION);
+//		lily.setRestitution(TETHER_RESTITUTION);
+//		lily.setSensor(sensorTethers);
+//		lily.setDrawScale(scale);
+//		lily.setTexture(lilyTexture);
+//		addObject(lily);
+//		tethers.add(lily);
+
+
+//		lily = new TetherModel(50, 7, rad);
+//		lily.setBodyType(BodyDef.BodyType.StaticBody);
+//		lily.setName("lily"+ 3);
+//		lily.setDensity(TETHER_DENSITY);
+//		lily.setFriction(TETHER_FRICTION);
+//		lily.setRestitution(TETHER_RESTITUTION);
+//		lily.setSensor(sensorTethers);
+//		lily.setDrawScale(scale);
+//		lily.setTexture(lilyTexture);
+//		addObject(lily);
+//		tethers.add(lily);
+
+
+//		lantern = new TetherModel(70, 7, rad, true);
+//		lantern.setBodyType(BodyDef.BodyType.StaticBody);
+//		lantern.setName("lantern"+ 1);
+//		lantern.setDensity(TETHER_DENSITY);
+//		lantern.setFriction(TETHER_FRICTION);
+//		lantern.setRestitution(TETHER_RESTITUTION);
+//		lantern.setSensor(sensorTethers);
+//		lantern.setDrawScale(scale);
+//		lantern.setTexture(lanternTexture);
+//		lantern.setlightingTexture(lightingTexture);
+//		lantern.setRotation(0);
+//		addObject(lantern);
+//		tethers.add(lantern);
+//		lanterns.add(lantern);
+
+//		TextureRegion etexture = enemyTexture;
+//		dwidth  = etexture.getRegionWidth()/scale.x;
+//		dheight = etexture.getRegionHeight()/scale.y;
+//		eFish = new EnemyModel(20, 0, dwidth, dheight);
+//		eFish.setDensity(ENEMY_DENSITY);
+//		eFish.setFriction(ENEMY_FRICTION);
+//		eFish.setRestitution(BASIC_RESTITUTION);
+//		eFish.setName("enemy");
+//		eFish.setDrawScale(scale);
+//		eFish.setTexture(etexture);
+//		eFish.setAngle((float) (Math.PI/2));
+//		eFish.setBodyType(BodyDef.BodyType.StaticBody);
+//		eFish.setGoal(0, 0);
+//		addObject(eFish);
+//		enemies.add(eFish);
+
+//		eFish = new EnemyModel(61, 18, dwidth, dheight);
+//		eFish.setDensity(ENEMY_DENSITY);
+//		eFish.setFriction(ENEMY_FRICTION);
+//		eFish.setRestitution(BASIC_RESTITUTION);
+//		eFish.setName("enemy");
+//		eFish.setDrawScale(scale);
+//		eFish.setTexture(etexture);
+//		eFish.setAngle((float) (Math.PI/2));
+//		eFish.setBodyType(BodyDef.BodyType.StaticBody);
+//		eFish.setGoal(0, 0);
+//		addObject(eFish);
+//		enemies.add(eFish);
+
+//		eFish = new EnemyModel(76, 0, dwidth, dheight);
+//		eFish.setDensity(ENEMY_DENSITY);
+//		eFish.setFriction(ENEMY_FRICTION);
+//		eFish.setRestitution(BASIC_RESTITUTION);
+//		eFish.setName("enemy");
+//		eFish.setDrawScale(scale);
+//		eFish.setTexture(etexture);
+//		eFish.setAngle((float) (Math.PI/2));
+//		eFish.setBodyType(BodyDef.BodyType.StaticBody);
+//		eFish.setGoal(0, 0);
+//		addObject(eFish);
+//		enemies.add(eFish);
+
+
+
+		// Create the fish avatar
+//		dwidth  = koiTexture.getRegionWidth()/scale.x;
+//		dheight = koiTexture.getRegionHeight()/scale.y;
+//		koi = new PlayerModel(KOI_POS.x, KOI_POS.y, dwidth, dheight);
+//		koi.setDrawScale(scale);
+//		koi.setName("koi");
+//		koi.setTexture(koiTexture);
+//		koi.setTethered(false);
+//
+//		addObject(koi);
 
 	}
 
@@ -492,16 +556,12 @@ public class DownstreamController extends WorldController implements ContactList
 		koi.setFX(thrust * input.getHorizontal());
 		koi.setFY(thrust * input.getVertical());
 		koi.applyForce();
-		//		koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY));
-
-		// unused. was testing using "s" to slow down
-		//		if (enableSlow && input.slow) koi.setLinearVelocity(koi.getLinearVelocity().setLength(4));
 
 		if (input.didTether()) {
 			tethered = !tethered; 
 			koi.setTethered(false);
-			//			CAMERA_CURRENT_LINEAR_VELOCITY = CAMERA_MAX_LINEAR_VELOCITY/2;
-			CAMERA_CURRENT_LINEAR_VELOCITY = 2;
+			System.out.println("USA USA USA");
+			cameraController.resetCameraVelocity();
 		}
 		if (!tethered) {
 			koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*2));
@@ -509,8 +569,7 @@ public class DownstreamController extends WorldController implements ContactList
 		if (tethered) {
 			koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*1.5f));
 		}
-		//		if (input.space) tethered = true; else tethered = false;
-		CAMERA_CURRENT_LINEAR_VELOCITY = Math.min(CAMERA_CURRENT_LINEAR_VELOCITY+CAMERA_ACCELERATION, CAMERA_MAX_LINEAR_VELOCITY);
+
 		TetherModel closestTether = getClosestTether();
 
 
@@ -542,11 +601,9 @@ public class DownstreamController extends WorldController implements ContactList
 
 		boolean camera_zoom = true;
 
-		// laggy catch up with space
-		// if tethered, move slowly to tether; 
-		// else if pressing space move quickly to fish, 
-		// else slowly to fish
-
+		// if koi is tethered: move slowly to tether, reset camera speed
+		// if koi is not tethered: accelerate to fish up to maximum speed
+		
 		if (koi.isTethered() || tethered && 
 				koi.getPosition().sub(koi.getInitialTangentPoint(closestTether.getPosition())).len2() < .01) {
 			if (!koi.isTethered()) {
@@ -554,19 +611,12 @@ public class DownstreamController extends WorldController implements ContactList
 				koi.refreshTetherForce(closestTether.getPosition(), closestTether.getOrbitRadius());
 			}
 			koi.applyTetherForce(closestTether.getPosition(), closestTether.getOrbitRadius());
-			canvas.moveCameraTowards(closestTether.getPosition().cpy().scl(scale), CAMERA_CURRENT_LINEAR_VELOCITY/2);
-			if (camera_zoom) canvas.zoomOut();
-			koi.setTethered(true);
-			//			koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY));
+			cameraController.moveCameraTowards(closestTether.getPosition().cpy().scl(scale));
+			if (camera_zoom) cameraController.zoomOut();
+			koi.setTethered(true);	
 		} else {
-			if (tethered) 
-				cameraController.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_CURRENT_LINEAR_VELOCITY);
-			else {
-				CAMERA_CURRENT_LINEAR_VELOCITY = Math.min(CAMERA_CURRENT_LINEAR_VELOCITY+CAMERA_ACCELERATION, CAMERA_MAX_LINEAR_VELOCITY);
-				cameraController.moveCameraTowards(koi.getPosition().cpy().scl(scale), CAMERA_CURRENT_LINEAR_VELOCITY);
-			}
+			cameraController.moveCameraTowards(koi.getPosition().cpy().scl(scale));
 			if (camera_zoom) cameraController.zoomIn();
-			//			koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*2));
 		}
 
 
@@ -582,33 +632,6 @@ public class DownstreamController extends WorldController implements ContactList
 		float MIN_SPEED = 6f;
 
 		int motionType = 0;
-
-		if (lanterns.get(0).getRotations() <= 1.5){
-			enemies.get(0).moveTowardsGoal();
-			enemies.get(0).patrol(20, 0, 20, 18);
-		}
-		else{
-			enemies.get(0).setGoal(1000, 1000);
-			enemies.get(0).moveTowardsGoal();
-		}
-
-		if (lanterns.get(1).getRotations() <= 1.5){
-			enemies.get(1).moveTowardsGoal();
-			enemies.get(1).patrol(61, 0, 61, 18);
-		}
-		else{
-			enemies.get(1).setGoal(1000, 1000);
-			enemies.get(1).moveTowardsGoal();
-		}
-		if (lanterns.get(1).getRotations() <= 1.5){
-			enemies.get(2).moveTowardsGoal();
-			enemies.get(2).patrol(76, 0, 76, 18);
-		}
-		else{
-			enemies.get(2).setGoal(1000, 1000);
-			enemies.get(2).moveTowardsGoal();
-		}
-
 
 		SoundController.getInstance().update();
 	}
@@ -633,6 +656,8 @@ public class DownstreamController extends WorldController implements ContactList
 			Vector2 farOff = koi.getPosition().cpy();
 			farOff.add(koi.getLinearVelocity().cpy().scl(1000));
 			canvas.drawLeadingLine(koi.getPosition().cpy(), farOff);
+//			System.out.println(koi.getPosition());
+//			System.out.println(farOff);
 		}
 		if (enableTetherRadius) {
 			Vector2 closestTether = getClosestTether().getPosition().cpy().scl(scale);
