@@ -289,34 +289,14 @@ public class EnemyModel extends SimpleObstacle {
 	 * Call during update, will move the fish towards the goal state
 	 */
 	public void moveTowardsGoal(){
-		
-		float deltaX = lastGoal.x - goal.x;
-		float deltaY = lastGoal.y - goal.y;
-		
-		setY(getY()-deltaY/100);
-		setX(getX()-deltaX/100);
-		
-		/*if (getX() < goal.x - .1){
-			setX((float) (getX() + .1));
-			//this.setVX(5);
-		}
-		else if (getX() > goal.x + .2){
-			setX((float) (getX() - .1));
-			//this.setVX(-5);
-		}
-		
-		if (getY() < goal.y - .2){
-			setY((float) (getY() + .1));
-			//this.setVY(5);
-			
-		}
-		else if (getY() > goal.y + .1){
-			setY((float) (getY() - .1));
+	
 
-		}*/
-		
-		//this.applyForce();
-		
+		float distance = Vector2.dst(lastGoal.x, lastGoal.y, goal.x, goal.y);
+
+		Vector2 direction = goal.cpy().sub(this.getPosition()).nor();
+
+		setY(getY() + direction.y *.2f);
+		setX(getX() + direction.x *.2f);
 	}
 	 public float findA(Vector2 target, Vector2 t2) {
 		  	float angle = (float) Math.toDegrees(Math.atan2(target.y - t2.y, target.x - t2.x));

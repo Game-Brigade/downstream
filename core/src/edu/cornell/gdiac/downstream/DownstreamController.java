@@ -26,6 +26,7 @@ import edu.cornell.gdiac.util.*;
 import edu.cornell.gdiac.downstream.*;
 import edu.cornell.gdiac.downstream.obstacle.*;
 import edu.cornell.gdiac.downstream.models.*;
+import edu.cornell.gdiac.downstream.models.TetherModel.TetherType;
 
 /**
  * Gameplay specific controller for Downstream.
@@ -40,7 +41,7 @@ public class DownstreamController extends WorldController implements ContactList
 	/** Reference to the fish texture */
 	private static final String KOI_TEXTURE = "koi/koi.png";
 	/** The reference for the tether textures  */
-	private static final String LILY_TEXTURE = "terrain/lilypad1_scaled.png";
+	private static final String LILY_TEXTURE = "tethers/lilypad.png";
 	/** Reference to the enemy image assets */
 	private static final String ENEMY_TEXTURE = "enemy/enemy.png";
 	/** Reference to the Lantern asset image*/
@@ -61,7 +62,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private static final String LOTUS_TEXTURE= null;
 
 	/** Reference to the land texture */
-	private static String EARTH_FILE = "terrain/repeat tile.png";
+	private static String EARTH_FILE = "terrain/earthtile.png";
 
 	/** Reference to the whirlpool texture */
 	private static final String WHIRLPOOL_TEXTURE = "terrain/whirlpool.png";
@@ -114,6 +115,18 @@ public class DownstreamController extends WorldController implements ContactList
 	private boolean enableSlow = false;
 	private boolean enableLeadingLine = false;
 	private boolean enableTetherRadius = true;
+	
+	
+	//animations
+	
+	float stateTime;  
+    float relativeTime = 0;
+    
+	Animation                      	lilyAnimation;          // #3
+    Texture                         lilySheet;              // #4
+    TextureRegion[]                 lilyFrames;             // #5
+    SpriteBatch                     lilyspriteBatch;            // #6
+    TextureRegion                   lilycurrentFrame;           // #7
 
 	/**
 	 * Preloads the assets for this controller.
@@ -222,10 +235,27 @@ public class DownstreamController extends WorldController implements ContactList
 		if (fishAssetState != AssetState.LOADING) {
 			return;
 		}
+		int cols = 11;
+		int rows = 1;
+		//animations
+		lilySheet = new Texture(Gdx.files.internal("tethers/lotus_strip.png"));
+		    
+	      	//walkSheet = new Texture(Gdx.files.internal("koi/unnamed.png")); // #9
+	    TextureRegion[][] tmplily = TextureRegion.split(lilySheet, lilySheet.getWidth()/cols, lilySheet.getHeight()/rows);              // #10
+	    lilyFrames = new TextureRegion[11 * 1];
+	    int index = 0;
+	    for (int i = 0; i < 1; i++) {
+	        for (int j = 0; j < 11; j++) {
+	                 lilyFrames[index++] = tmplily[i][j];
+	        }
+	    }
+	    lilyAnimation = new Animation(.2f, lilyFrames);      // #11
+	    lilyspriteBatch = new SpriteBatch();                // #12
+		
 
 		enemyTexture = createTexture(manager,ENEMY_TEXTURE,false);
 		koiTexture = createTexture(manager,KOI_TEXTURE,false);
-		lilyTexture = createTexture(manager,LILY_TEXTURE,false);
+		lilyTexture = lilyFrames[0];
 		lanternTexture = createTexture(manager, LANTERN_TEXTURE, false);
 		lightingTexture = createTexture(manager, LIGHTING_TEXTURE, false);
 
@@ -576,6 +606,16 @@ public class DownstreamController extends WorldController implements ContactList
 		float MIN_SPEED = 6f;
 
 		int motionType = 0;
+		
+		//animation
+		stateTime += Gdx.graphics.getDeltaTime();           // #15
+		lilycurrentFrame = lilyAnimation.getKeyFrame(stateTime, true);
+		
+		for (int i = 0; i < tethers.size(); i++){
+			if (tethers.get(i).getTetherType() == TetherType.Lilypad){
+				tethers.get(i).setTexture(lilycurrentFrame);
+			}
+		}
 
 		SoundController.getInstance().update();
 	}

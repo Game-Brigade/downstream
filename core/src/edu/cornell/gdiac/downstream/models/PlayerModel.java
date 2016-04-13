@@ -54,6 +54,10 @@ public class PlayerModel extends BoxObstacle {
 
 	private Vector2 dest;
 
+	private boolean attemptingTether;
+
+	private Vector2 temp;
+
 	/** Create a new player at x,y. */
 	public PlayerModel(float x, float y, float width, float height) {
 		super(x, y, width, height);
@@ -67,6 +71,7 @@ public class PlayerModel extends BoxObstacle {
 		force = new Vector2();
 		health = 1;
 		isTethered = false;
+		attemptingTether = true;
 		isWhirled = false;
 		pull = Vector2.Zero;
 		cent = Vector2.Zero;
@@ -78,11 +83,8 @@ public class PlayerModel extends BoxObstacle {
 	}
 
 	public void applyTetherForce(Vector2 tetherPos, float rad) {
-//		System.out.println("ayylmao");
-//		System.out.println(tetherPos);
-//		System.out.println(rad);
-		body.applyForceToCenter(calculateTetherForce(tetherPos,rad), true);
-//		System.out.println(calculateTetherForce(tetherPos,rad));
+		force = calculateTetherForce(tetherPos,rad);
+		body.applyForceToCenter(force, true);
 	}
 	
 	public void applyWhirlForce(Vector2 whirlPos, float rad){
@@ -109,24 +111,38 @@ public class PlayerModel extends BoxObstacle {
 	
 	public Vector2 calculateTetherForce(Vector2 tetherPos, float rad){
 		if(isTethered()){
-			// if we have reached the inner circle
+			// TRUE CIRCLE
 			if(getPosition().sub(dest).len2() < .01){
 				dest = getPosition();
-//				System.out.println("bitches");
+				
+				// set force direction
 				pull = tetherPos.sub(getPosition());
+				
+				// set force magnitude
 			    float forceMagnitude = (float) (getMass() * getLinearVelocity().len2() / rad);
 			    return pull.setLength(forceMagnitude);
 			} 
+			
+			// CORRECTIVE CIRCLE
 			else{
-//				System.out.println("FUCK");
 			    float forceMagnitude = (float) (getMass() * getLinearVelocity().len2() / (pull.len()/2));
-//			    System.out.println(forceMagnitude);
 			    return cent.cpy().sub(getPosition()).setLength(forceMagnitude);			
 			}
 		}
 		else{
+			if(isAttemptingTether()){
+				passAdjust(tetherPos);
+			}
 			return Vector2.Zero;
 		}
+	}
+	
+	public boolean isAttemptingTether() {
+		return attemptingTether;
+	}
+	
+	public void setAttemptingTether(boolean b) {
+		attemptingTether = b;
 	}
 	
 	public Vector2 calculateWhirlForce(Vector2 whirlPos, float rad){
@@ -142,7 +158,21 @@ public class PlayerModel extends BoxObstacle {
 		return Vector2.Zero;
 	}
 	
+	public void passAdjust(Vector2 tetherPos){
+		/*
+		Vector2 temp = getPosition().sub(tetherPos);
+		if (getLinearVelocity().dot(temp) > 0) {
+			float angle = getLinearVelocity().angle(temp);
+			setForce(getLinearVelocity().rotate90((int) angle*-1).scl(temp.len()*3));
+			applyForce();
+		}
+		*/
+	}
 	
+	private void setForce(Vector2 scl) {
+		force = scl;
+	}
+
 	public Vector2 calculateTetherForce(Vector2 tetherPos){
 	    Vector2 direction = tetherPos.sub(getPosition());
 	    float radius = 2;

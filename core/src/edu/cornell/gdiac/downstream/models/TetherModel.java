@@ -45,6 +45,8 @@ public class TetherModel extends WheelObstacle {
 	public boolean set = false;
 
 	private static TextureRegion lightingTexture;
+	
+	public boolean isTethered = false;
 
 	/** Tethers can be lilipads, lanterns, or lotus flowers */
 	public enum TetherType {
@@ -111,21 +113,25 @@ public class TetherModel extends WheelObstacle {
 	public void setlightingTexture(TextureRegion t){
 		lightingTexture = t;
 	}
+	
+	public TetherType getTetherType(){
+		return type;
+	}
 
 	public void draw(GameCanvas canvas) {
 		if (texture != null) {
 			if (type == TetherType.Lilypad){
-				canvas.draw(texture,Color.WHITE,texture.getRegionHeight()/2,texture.getRegionWidth()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),1,1);
+				canvas.draw(texture,Color.WHITE,texture.getRegionHeight()/2,texture.getRegionWidth()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),.4f,.4f);
 			}
 			if (type == TetherType.Lantern){
 				canvas.draw(texture,Color.WHITE,texture.getRegionHeight()/2,texture.getRegionWidth()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),.35f,.35f);
-				if (sparkSize < rotations){
-					sparkSize += .005f;
+				if (sparkSize < 2 && this.set){
+					sparkSize += .01f;
 				}
 
 			}
-			if (rotations > 1.5){
-				sparkSize = 1.0f;
+			if (sparkSize >= 2){
+				sparkSize = 2f;
 			}
 
 
