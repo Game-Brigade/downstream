@@ -133,20 +133,20 @@ public class DownstreamController extends WorldController implements ContactList
 		manager.load(LIGHTING_TEXTURE, Texture.class);
 		assets.add(LIGHTING_TEXTURE);
 
-		manager.load(LAND_4SIDE_TEXTURE, Texture.class);
-		assets.add(LAND_4SIDE_TEXTURE);
+//		manager.load(LAND_4SIDE_TEXTURE, Texture.class);
+//		assets.add(LAND_4SIDE_TEXTURE);
 
-		manager.load(LEFT_LAND_TEXTURE, Texture.class);
-		assets.add(LEFT_LAND_TEXTURE);
-
-		manager.load(RIGHT_LAND_TEXTURE, Texture.class);
-		assets.add(RIGHT_LAND_TEXTURE);
-
-		manager.load(TOP_LAND_TEXTURE, Texture.class);
-		assets.add(TOP_LAND_TEXTURE);
-
-		manager.load(BOTTOM_LAND_TEXTURE, Texture.class);
-		assets.add(BOTTOM_LAND_TEXTURE);
+//		manager.load(LEFT_LAND_TEXTURE, Texture.class);
+//		assets.add(LEFT_LAND_TEXTURE);
+//
+//		manager.load(RIGHT_LAND_TEXTURE, Texture.class);
+//		assets.add(RIGHT_LAND_TEXTURE);
+//
+//		manager.load(TOP_LAND_TEXTURE, Texture.class);
+//		assets.add(TOP_LAND_TEXTURE);
+//
+//		manager.load(BOTTOM_LAND_TEXTURE, Texture.class);
+//		assets.add(BOTTOM_LAND_TEXTURE);
 		
 		manager.load(EARTH_FILE,Texture.class);
 		assets.add(EARTH_FILE);
@@ -180,11 +180,11 @@ public class DownstreamController extends WorldController implements ContactList
 		lilyTexture = createTexture(manager,LILY_TEXTURE,false);
 		lanternTexture = createTexture(manager, LANTERN_TEXTURE, false);
 		lightingTexture = createTexture(manager, LIGHTING_TEXTURE, false);
-		land4Texture = createTexture(manager,LAND_4SIDE_TEXTURE,false);
-		leftLandTexture = createTexture(manager,LEFT_LAND_TEXTURE,false);
-		rightLandTexture = createTexture(manager,RIGHT_LAND_TEXTURE,false);
-		topLandTexture = createTexture(manager,TOP_LAND_TEXTURE,false);
-		bottomLandTexture = createTexture(manager,BOTTOM_LAND_TEXTURE,false);
+//		land4Texture = createTexture(manager,LAND_4SIDE_TEXTURE,false);
+//		leftLandTexture = createTexture(manager,LEFT_LAND_TEXTURE,false);
+//		rightLandTexture = createTexture(manager,RIGHT_LAND_TEXTURE,false);
+//		topLandTexture = createTexture(manager,TOP_LAND_TEXTURE,false);
+//		bottomLandTexture = createTexture(manager,BOTTOM_LAND_TEXTURE,false);
 		earthTile = createTexture(manager,EARTH_FILE,true);
 
 		SoundController sounds = SoundController.getInstance();
