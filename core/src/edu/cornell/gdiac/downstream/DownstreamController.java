@@ -49,7 +49,7 @@ public class DownstreamController extends WorldController implements ContactList
 	/** Reference to the Lightin Texture image */
 	private static final String LIGHTING_TEXTURE = "tethers/aura.png";
 	/** Reference to the 4-sided land texture */
-	private static final String LAND_4SIDE_TEXTURE = "terrain/land.png";
+	private static final String LAND_4SIDE_TEXTURE = "terrain/repeat tile.png";
 	/** Reference to the left land texture */
 	private static final String LEFT_LAND_TEXTURE = "terrain/left-border.png";
 	/** Reference to the right land texture */
@@ -62,7 +62,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private static final String LOTUS_TEXTURE= null;
 
 	/** Reference to the land texture */
-	private static String EARTH_FILE = "terrain/earthtile.png";
+	private static String EARTH_FILE = "terrain/repeat tile.png";
 
 	/** Reference to the whirlpool texture */
 	private static final String WHIRLPOOL_TEXTURE = "terrain/whirlpool.png";
@@ -122,11 +122,25 @@ public class DownstreamController extends WorldController implements ContactList
 	float stateTime;  
     float relativeTime = 0;
     
+<<<<<<< HEAD
 	Animation lilyAnimation;    
     Texture lilySheet;              
     TextureRegion[] lilyFrames;             
     SpriteBatch lilyspriteBatch;            
     TextureRegion lilycurrentFrame;           
+=======
+	Animation                      	lilyAnimation;          // #3
+    Texture                         lilySheet;              // #4
+    TextureRegion[]                 lilyFrames;             // #5
+    SpriteBatch                     lilyspriteBatch;            // #6
+    TextureRegion                   lilycurrentFrame;           // #7
+    
+    Animation                      	closedFlowerAnimation;          // #3
+    Texture                         closedFlowerSheet;              // #4
+    TextureRegion[]                 closedFlowerFrames;             // #5
+    SpriteBatch                     closedFlowerspriteBatch;            // #6
+    TextureRegion                   closedFlowercurrentFrame;           // #7
+>>>>>>> 3da5351478b6a624e3186dd2bc9fead92a29a09c
 
 	/**
 	 * Preloads the assets for this controller.
@@ -251,12 +265,29 @@ public class DownstreamController extends WorldController implements ContactList
 	    }
 	    lilyAnimation = new Animation(.2f, lilyFrames);      // #11
 	    lilyspriteBatch = new SpriteBatch();                // #12
+	    
+	    cols = 11;
+	    rows = 1;
+	    
+	    closedFlowerSheet = new Texture(Gdx.files.internal("tethers/flowerclosed_spritesheet.png"));
+	    
+		//walkSheet = new Texture(Gdx.files.internal("koi/unnamed.png")); // #9
+        TextureRegion[][] tmp3 = TextureRegion.split(closedFlowerSheet, closedFlowerSheet.getWidth()/cols, closedFlowerSheet.getHeight()/rows);              // #10
+        closedFlowerFrames = new TextureRegion[cols * rows];
+        index = 0;
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                closedFlowerFrames[index++] = tmp3[i][j];
+            }
+        }
+        closedFlowerAnimation = new Animation(.2f, closedFlowerFrames);      // #11
+        closedFlowerspriteBatch = new SpriteBatch();                // #12
 		
 
 		enemyTexture = createTexture(manager,ENEMY_TEXTURE,false);
 		koiTexture = createTexture(manager,KOI_TEXTURE,false);
 		lilyTexture = lilyFrames[0];
-		lanternTexture = createTexture(manager, LANTERN_TEXTURE, false);
+		lanternTexture = closedFlowerFrames[0];
 		lightingTexture = createTexture(manager, LIGHTING_TEXTURE, false);
 
 		earthTile = createTexture(manager,EARTH_FILE,true);
@@ -419,7 +450,7 @@ public class DownstreamController extends WorldController implements ContactList
 		for (Vector2 lotus : level.lotuses) {
 			TetherModel lantern = new TetherModel(lotus.x, lotus.y, rad, true);
 			lantern.setBodyType(BodyDef.BodyType.StaticBody);
-			lantern.setName("lantern"+ 1);
+			lantern.setName("lotus"+ 1);
 			lantern.setDensity(TETHER_DENSITY);
 			lantern.setFriction(TETHER_FRICTION);
 			lantern.setRestitution(TETHER_RESTITUTION);
@@ -534,6 +565,11 @@ public class DownstreamController extends WorldController implements ContactList
 
 		TetherModel closestTether = getClosestTether();
 
+		// ENEMY PATROL CODE
+		for (EnemyModel enemy : enemies) {
+			enemy.patrol();
+			enemy.moveTowardsGoal();
+		}
 
 		//check to see if closest tether is just attached or has been previously attached
 		if (tethered & closestTether.getEntry().x == 0f & closestTether.isLantern()){
@@ -610,10 +646,14 @@ public class DownstreamController extends WorldController implements ContactList
 		//animation
 		stateTime += Gdx.graphics.getDeltaTime();           // #15
 		lilycurrentFrame = lilyAnimation.getKeyFrame(stateTime, true);
+		closedFlowercurrentFrame = closedFlowerAnimation.getKeyFrame(stateTime, true);
 		
 		for (int i = 0; i < tethers.size(); i++){
 			if (tethers.get(i).getTetherType() == TetherType.Lilypad){
 				tethers.get(i).setTexture(lilycurrentFrame);
+			}
+			if (tethers.get(i).getTetherType() == TetherType.Lantern){
+				tethers.get(i).setTexture(closedFlowercurrentFrame);
 			}
 		}
 
@@ -661,7 +701,7 @@ public class DownstreamController extends WorldController implements ContactList
 			Vector2 closestTether = getClosestTether().getPosition().cpy().scl(scale);
 			Vector2 initialTangent = koi.getInitialTangentPoint(getClosestTether().getPosition()).scl(scale);
 			float radius = closestTether.dst(initialTangent);
-			canvas.drawTetherCircle(closestTether, TetherModel.TETHER_DEFAULT_ORBIT*scale.len());
+			canvas.drawTetherCircle(closestTether, TetherModel.TETHER_DEFAULT_RANGE*scale.x);
 			//canvas.drawTetherCircle(koi.cent.cpy().scl(scale), koi.pull.len()/2*scale.len());
 		}
 		

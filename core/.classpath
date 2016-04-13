@@ -3,7 +3,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry exported="true" kind="con" path="org.springsource.ide.eclipse.gradle.classpathcontainer"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/Omar/downstream/jars/3_23.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/Omar/downstream/jars/gson-2.6.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Teddy/Downloads/downstream-master/downstream-master/jars/gson-2.6.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
