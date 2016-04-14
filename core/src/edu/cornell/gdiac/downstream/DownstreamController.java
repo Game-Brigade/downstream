@@ -280,7 +280,7 @@ public class DownstreamController extends WorldController implements ContactList
 	    
 	    cols = 11;
 	    rows = 1;
-	    
+	    /*
 	    closedFlowerSheet = new Texture(Gdx.files.internal("tethers/flowerclosed_spritesheet.png"));
 	    
 		//walkSheet = new Texture(Gdx.files.internal("koi/unnamed.png")); // #9
@@ -334,7 +334,7 @@ public class DownstreamController extends WorldController implements ContactList
         closingFlowerAnimation = new Animation(.5f, closingFlowerFrames); 
         closingFlowerspriteBatch = new SpriteBatch(); 
 		
-
+*/
 		enemyTexture = createTexture(manager,ENEMY_TEXTURE,false);
 		koiTexture = createTexture(manager,KOI_TEXTURE,false);
 		lilyTexture = lilyFrames[0];
