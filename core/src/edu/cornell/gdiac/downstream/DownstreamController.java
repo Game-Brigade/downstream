@@ -101,7 +101,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private boolean dead;
 	private boolean whirled;
 
-	private float PLAYER_LINEAR_VELOCITY = 4f;
+	private float PLAYER_LINEAR_VELOCITY = 6f;
 
 	private boolean enableSlow = false;
 	private boolean enableLeadingLine = false;
@@ -372,6 +372,7 @@ public class DownstreamController extends WorldController implements ContactList
 
 	private ArrayList<TetherModel> tethers = new ArrayList<TetherModel>();
 	private ArrayList<TetherModel> lanterns = new ArrayList<TetherModel>();
+	private ArrayList<TetherModel> litlanterns = new ArrayList<TetherModel>();
 	private ArrayList<EnemyModel> enemies = new ArrayList<EnemyModel>();
 	private ArrayList<WhirlpoolModel> wpools = new ArrayList<WhirlpoolModel>();
 	private double rot = 0;
@@ -522,7 +523,7 @@ public class DownstreamController extends WorldController implements ContactList
 			Vector2 enemyPos = vectorOfString(entry.getKey());
 			ArrayList<Vector2> enemyPath = entry.getValue();
 //			for (Vector2 vector : enemyPath) {vector.x /= scale.x; vector.y /= scale.y;}
-			System.out.println(enemyPath);
+//			System.out.println(enemyPath);
 			TextureRegion etexture = enemyTexture;
 			dwidth  = etexture.getRegionWidth()/scale.x;
 			dheight = etexture.getRegionHeight()/scale.y;

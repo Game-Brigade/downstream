@@ -459,7 +459,7 @@ public class LevelEditor extends WorldController {
 	protected static Level loadFromJson() {
 		Gson gson = new Gson();
 		try {
-			JsonReader reader = new JsonReader(new FileReader("level2.json"));
+			JsonReader reader = new JsonReader(new FileReader("level1.json"));
 			Level level = gson.fromJson(reader, Level.class);
 //			System.out.println(level);
 			return level;
