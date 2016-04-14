@@ -40,13 +40,13 @@ import edu.cornell.gdiac.downstream.models.TetherModel.TetherType;
 public class DownstreamController extends WorldController implements ContactListener {
 	/** Reference to the fish texture */
 	private static final String KOI_TEXTURE = "koi/koi.png";
-	/** The reference for the tether textures  */
+	/** Reference to the lilypad texture  */
 	private static final String LILY_TEXTURE = "tethers/lilypad.png";
-	/** Reference to the enemy image assets */
+	/** Reference to the enemy texture */
 	private static final String ENEMY_TEXTURE = "enemy/enemy.png";
-	/** Reference to the Lantern asset image*/
+	/** Reference to the lantern texture */
 	private static final String LANTERN_TEXTURE = "tethers/notlit.png";
-	/** Reference to the Lightin Texture image */
+	/** Reference to the lighting texture */
 	private static final String LIGHTING_TEXTURE = "tethers/aura.png";
 	/** Reference to the 4-sided land texture */
 	private static final String LAND_4SIDE_TEXTURE = "terrain/repeat tile.png";
@@ -60,49 +60,40 @@ public class DownstreamController extends WorldController implements ContactList
 	private static final String BOTTOM_LAND_TEXTURE = "terrain/bottom-border.png";
 	/** Reference to the lotus texture */
 	private static final String LOTUS_TEXTURE= null;
-
-	/** Reference to the land texture */
-	private static String EARTH_FILE = "terrain/repeat tile.png";
-
+	/** Reference to the repeating land texture */
+	private static final String EARTH_FILE = "terrain/repeat tile.png";
 	/** Reference to the whirlpool texture */
 	private static final String WHIRLPOOL_TEXTURE = "terrain/whirlpool.png";
 	/** Reference to the flipped whirlpool texture */
 	private static final String WHIRLPOOL_FLIP_TEXTURE = "terrain/whirlpool_flip.png";
 
-
-	/** The assets sounds */
+	/** References to sounds */
 	private static final String CLICK_SOUND = "SOUNDS/menu_click.wav";
 	private static final String LIGHTING_SOUND = "SOUNDS/lighting_1.mp3";
 	private static final String DEATH_SOUND = "SOUNDS/fish_death.wav";
 	private static final String BACKGROUND_SOUND = "SOUNDS/background_sound.mp3";
 
-
 	/** Texture assets for the koi */
 	private TextureRegion koiTexture;
-	/** Texture assets for the lilypads */
+	/** Texture assets for lilypads */
 	private TextureRegion lilyTexture;
-	/** Texture assets for the enemy fish */
+	/** Texture assets for enemy fish */
 	private TextureRegion enemyTexture;
-	/** Texture assets for lantern */
+	/** Texture assets for lanterns */
 	private TextureRegion lanternTexture;
 	/** Texture assets for light */
 	private TextureRegion lightingTexture;
-	/** Texture assets for the land */
+	/** Texture assets for land */
 	private TextureRegion land4Texture;
 	private TextureRegion leftLandTexture;
 	private TextureRegion rightLandTexture;
 	private TextureRegion topLandTexture;
 	private TextureRegion bottomLandTexture;
-
-	/** The texture for walls and platforms */
+	/** Texture assets for walls and platforms */
 	private TextureRegion earthTile;
-
 	/** Texture assets for whirlpools */
 	private TextureRegion whirlpoolTexture;
 	private TextureRegion whirlpoolFlipTexture;
-
-
-
 
 	/** Track asset loading from all instances and subclasses */
 	private AssetState fishAssetState = AssetState.EMPTY;
@@ -115,7 +106,6 @@ public class DownstreamController extends WorldController implements ContactList
 	private boolean enableSlow = false;
 	private boolean enableLeadingLine = false;
 	private boolean enableTetherRadius = true;
-	
 	
 	//animations
 	
@@ -171,13 +161,11 @@ public class DownstreamController extends WorldController implements ContactList
 
 		fishAssetState = AssetState.LOADING;
 
-
-		manager.load(ENEMY_TEXTURE, Texture.class);
-		assets.add(ENEMY_TEXTURE);
-
-		// Ship textures
 		manager.load(KOI_TEXTURE, Texture.class);
 		assets.add(KOI_TEXTURE);
+		
+		manager.load(ENEMY_TEXTURE, Texture.class);
+		assets.add(ENEMY_TEXTURE);
 
 		manager.load(LILY_TEXTURE, Texture.class);
 		assets.add(LILY_TEXTURE);
@@ -187,31 +175,9 @@ public class DownstreamController extends WorldController implements ContactList
 
 		manager.load(LIGHTING_TEXTURE, Texture.class);
 		assets.add(LIGHTING_TEXTURE);
-
-
-//		manager.load(LAND_4SIDE_TEXTURE, Texture.class);
-//		assets.add(LAND_4SIDE_TEXTURE);
-
-//		manager.load(LEFT_LAND_TEXTURE, Texture.class);
-//		assets.add(LEFT_LAND_TEXTURE);
-//
-//		manager.load(RIGHT_LAND_TEXTURE, Texture.class);
-//		assets.add(RIGHT_LAND_TEXTURE);
-//
-//		manager.load(TOP_LAND_TEXTURE, Texture.class);
-//		assets.add(TOP_LAND_TEXTURE);
-//
-//		manager.load(BOTTOM_LAND_TEXTURE, Texture.class);
-//		assets.add(BOTTOM_LAND_TEXTURE);
 		
 		manager.load(EARTH_FILE,Texture.class);
 		assets.add(EARTH_FILE);
-
-
-		//sounds
-		//manager.load(MAIN_FIRE_SOUND, Sound.class);
-		//assets.add(MAIN_FIRE_SOUND);
-
 
 		manager.load(LAND_4SIDE_TEXTURE, Texture.class);
 		assets.add(LAND_4SIDE_TEXTURE);
@@ -280,7 +246,7 @@ public class DownstreamController extends WorldController implements ContactList
 	    
 	    cols = 11;
 	    rows = 1;
-	    /*
+	    
 	    closedFlowerSheet = new Texture(Gdx.files.internal("tethers/flowerclosed_spritesheet.png"));
 	    
 		//walkSheet = new Texture(Gdx.files.internal("koi/unnamed.png")); // #9
@@ -334,7 +300,7 @@ public class DownstreamController extends WorldController implements ContactList
         closingFlowerAnimation = new Animation(.5f, closingFlowerFrames); 
         closingFlowerspriteBatch = new SpriteBatch(); 
 		
-*/
+
 		enemyTexture = createTexture(manager,ENEMY_TEXTURE,false);
 		koiTexture = createTexture(manager,KOI_TEXTURE,false);
 		lilyTexture = lilyFrames[0];
@@ -342,7 +308,6 @@ public class DownstreamController extends WorldController implements ContactList
 		lightingTexture = createTexture(manager, LIGHTING_TEXTURE, false);
 
 		earthTile = createTexture(manager,EARTH_FILE,true);
-
 
 		land4Texture = createTexture(manager,LAND_4SIDE_TEXTURE,false);
 		leftLandTexture = createTexture(manager,LEFT_LAND_TEXTURE,false);
@@ -436,6 +401,7 @@ public class DownstreamController extends WorldController implements ContactList
 		enemies.clear();
 		lanterns.clear();
 		tethers.clear();
+		wpools.clear();
 		objects.clear();
 		addQueue.clear();
 		world.dispose();
@@ -464,7 +430,6 @@ public class DownstreamController extends WorldController implements ContactList
 		float dwidth;
 		float dheight;
 		float rad = lilyTexture.getRegionWidth()/scale.x/2;
-		float wrad = whirlpoolTexture.getRegionWidth()/scale.x/2;
 
 		boolean sensorTethers = true;
 
