@@ -152,6 +152,12 @@ public class DownstreamController extends WorldController implements ContactList
     TextureRegion[]                 closingFlowerFrames;             // #5
     SpriteBatch                     closingFlowerspriteBatch;            // #6
     TextureRegion                   closingFlowercurrentFrame;           // #7
+    
+    Animation                      	koiSAnimation;          // #3
+    Texture                         koiSSheet;              // #4
+    TextureRegion[]                 koiSFrames;             // #5
+    SpriteBatch                     koiSspriteBatch;            // #6
+    TextureRegion                   koiScurrentFrame;           // #7
 
 
 	/**
@@ -333,10 +339,25 @@ public class DownstreamController extends WorldController implements ContactList
         }
         closingFlowerAnimation = new Animation(.5f, closingFlowerFrames); 
         closingFlowerspriteBatch = new SpriteBatch(); 
+        
+        
+        cols = 9;
+        koiSSheet = new Texture(Gdx.files.internal("koi/straight koi spritesheet.png"));
+        TextureRegion[][] tmpkoiS = TextureRegion.split(koiSSheet, koiSSheet.getWidth()/cols, koiSSheet.getHeight()/rows);              // #10
+        koiSFrames = new TextureRegion[cols * rows];
+        index = 0;
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+            	koiSFrames[index++] = tmpkoiS[i][j];
+            }
+        }
+        koiSAnimation = new Animation(.1f, koiSFrames); 
+        koiSspriteBatch = new SpriteBatch(); 
 		
 
 		enemyTexture = createTexture(manager,ENEMY_TEXTURE,false);
-		koiTexture = createTexture(manager,KOI_TEXTURE,false);
+		//koiTexture = koiSFrames[0];
+		koiTexture = createTexture(manager, KOI_TEXTURE, false);
 		lilyTexture = lilyFrames[0];
 		lanternTexture = closedFlowerFrames[0];
 		lightingTexture = createTexture(manager, LIGHTING_TEXTURE, false);
@@ -663,6 +684,8 @@ public class DownstreamController extends WorldController implements ContactList
 */
 		// RESOLVE FISH IMG
 		koi.resolveDirection();
+		
+		koi.updateRestore();
 
 		// CAMERA ZOOM CODE
 		if (isTethered()){  
@@ -680,6 +703,8 @@ public class DownstreamController extends WorldController implements ContactList
 		lilycurrentFrame = lilyAnimation.getKeyFrame(stateTime, true);
 		closedFlowercurrentFrame = closedFlowerAnimation.getKeyFrame(stateTime, true);
 		openFlowercurrentFrame = openFlowerAnimation.getKeyFrame(stateTime, true);
+		koiScurrentFrame = koiSAnimation.getKeyFrame(stateTime, true);
+		//koi.setTexture(koiScurrentFrame);
 		
 		//FSM to handle Lotus
 		for (int i = 0; i < tethers.size(); i++){
