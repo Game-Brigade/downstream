@@ -40,13 +40,13 @@ import edu.cornell.gdiac.downstream.models.TetherModel.TetherType;
 public class DownstreamController extends WorldController implements ContactListener {
 	/** Reference to the fish texture */
 	private static final String KOI_TEXTURE = "koi/koi.png";
-	/** The reference for the tether textures  */
+	/** Reference to the lilypad texture  */
 	private static final String LILY_TEXTURE = "tethers/lilypad.png";
-	/** Reference to the enemy image assets */
+	/** Reference to the enemy texture */
 	private static final String ENEMY_TEXTURE = "enemy/enemy.png";
-	/** Reference to the Lantern asset image*/
+	/** Reference to the lantern texture */
 	private static final String LANTERN_TEXTURE = "tethers/notlit.png";
-	/** Reference to the Lightin Texture image */
+	/** Reference to the lighting texture */
 	private static final String LIGHTING_TEXTURE = "tethers/aura.png";
 	/** Reference to the 4-sided land texture */
 	private static final String LAND_4SIDE_TEXTURE = "terrain/repeat tile.png";
@@ -60,49 +60,40 @@ public class DownstreamController extends WorldController implements ContactList
 	private static final String BOTTOM_LAND_TEXTURE = "terrain/bottom-border.png";
 	/** Reference to the lotus texture */
 	private static final String LOTUS_TEXTURE= null;
-
-	/** Reference to the land texture */
-	private static String EARTH_FILE = "terrain/repeat tile.png";
-
+	/** Reference to the repeating land texture */
+	private static final String EARTH_FILE = "terrain/repeat tile.png";
 	/** Reference to the whirlpool texture */
 	private static final String WHIRLPOOL_TEXTURE = "terrain/whirlpool.png";
 	/** Reference to the flipped whirlpool texture */
 	private static final String WHIRLPOOL_FLIP_TEXTURE = "terrain/whirlpool_flip.png";
 
-
-	/** The assets sounds */
+	/** References to sounds */
 	private static final String CLICK_SOUND = "SOUNDS/menu_click.wav";
 	private static final String LIGHTING_SOUND = "SOUNDS/lighting_1.mp3";
 	private static final String DEATH_SOUND = "SOUNDS/fish_death.wav";
 	private static final String BACKGROUND_SOUND = "SOUNDS/background_sound.mp3";
 
-
 	/** Texture assets for the koi */
 	private TextureRegion koiTexture;
-	/** Texture assets for the lilypads */
+	/** Texture assets for lilypads */
 	private TextureRegion lilyTexture;
-	/** Texture assets for the enemy fish */
+	/** Texture assets for enemy fish */
 	private TextureRegion enemyTexture;
-	/** Texture assets for lantern */
+	/** Texture assets for lanterns */
 	private TextureRegion lanternTexture;
 	/** Texture assets for light */
 	private TextureRegion lightingTexture;
-	/** Texture assets for the land */
+	/** Texture assets for land */
 	private TextureRegion land4Texture;
 	private TextureRegion leftLandTexture;
 	private TextureRegion rightLandTexture;
 	private TextureRegion topLandTexture;
 	private TextureRegion bottomLandTexture;
-
-	/** The texture for walls and platforms */
+	/** Texture assets for walls and platforms */
 	private TextureRegion earthTile;
-
 	/** Texture assets for whirlpools */
 	private TextureRegion whirlpoolTexture;
 	private TextureRegion whirlpoolFlipTexture;
-
-
-
 
 	/** Track asset loading from all instances and subclasses */
 	private AssetState fishAssetState = AssetState.EMPTY;
@@ -115,7 +106,6 @@ public class DownstreamController extends WorldController implements ContactList
 	private boolean enableSlow = false;
 	private boolean enableLeadingLine = false;
 	private boolean enableTetherRadius = true;
-	
 	
 	//animations
 	
@@ -134,6 +124,24 @@ public class DownstreamController extends WorldController implements ContactList
     TextureRegion[]                 closedFlowerFrames;             // #5
     SpriteBatch                     closedFlowerspriteBatch;            // #6
     TextureRegion                   closedFlowercurrentFrame;           // #7
+    
+    Animation                      	openFlowerAnimation;          // #3
+    Texture                         openFlowerSheet;              // #4
+    TextureRegion[]                 openFlowerFrames;             // #5
+    SpriteBatch                     openFlowerspriteBatch;            // #6
+    TextureRegion                   openFlowercurrentFrame;           // #7
+    
+    Animation                      	openingFlowerAnimation;          // #3
+    Texture                         openingFlowerSheet;              // #4
+    TextureRegion[]                 openingFlowerFrames;             // #5
+    SpriteBatch                     openingFlowerspriteBatch;            // #6
+    TextureRegion                   openingFlowercurrentFrame;           // #7
+
+    Animation                      	closingFlowerAnimation;          // #3
+    Texture                         closingFlowerSheet;              // #4
+    TextureRegion[]                 closingFlowerFrames;             // #5
+    SpriteBatch                     closingFlowerspriteBatch;            // #6
+    TextureRegion                   closingFlowercurrentFrame;           // #7
 
 
 	/**
@@ -153,13 +161,11 @@ public class DownstreamController extends WorldController implements ContactList
 
 		fishAssetState = AssetState.LOADING;
 
-
-		manager.load(ENEMY_TEXTURE, Texture.class);
-		assets.add(ENEMY_TEXTURE);
-
-		// Ship textures
 		manager.load(KOI_TEXTURE, Texture.class);
 		assets.add(KOI_TEXTURE);
+		
+		manager.load(ENEMY_TEXTURE, Texture.class);
+		assets.add(ENEMY_TEXTURE);
 
 		manager.load(LILY_TEXTURE, Texture.class);
 		assets.add(LILY_TEXTURE);
@@ -169,31 +175,9 @@ public class DownstreamController extends WorldController implements ContactList
 
 		manager.load(LIGHTING_TEXTURE, Texture.class);
 		assets.add(LIGHTING_TEXTURE);
-
-
-//		manager.load(LAND_4SIDE_TEXTURE, Texture.class);
-//		assets.add(LAND_4SIDE_TEXTURE);
-
-//		manager.load(LEFT_LAND_TEXTURE, Texture.class);
-//		assets.add(LEFT_LAND_TEXTURE);
-//
-//		manager.load(RIGHT_LAND_TEXTURE, Texture.class);
-//		assets.add(RIGHT_LAND_TEXTURE);
-//
-//		manager.load(TOP_LAND_TEXTURE, Texture.class);
-//		assets.add(TOP_LAND_TEXTURE);
-//
-//		manager.load(BOTTOM_LAND_TEXTURE, Texture.class);
-//		assets.add(BOTTOM_LAND_TEXTURE);
 		
 		manager.load(EARTH_FILE,Texture.class);
 		assets.add(EARTH_FILE);
-
-
-		//sounds
-		//manager.load(MAIN_FIRE_SOUND, Sound.class);
-		//assets.add(MAIN_FIRE_SOUND);
-
 
 		manager.load(LAND_4SIDE_TEXTURE, Texture.class);
 		assets.add(LAND_4SIDE_TEXTURE);
@@ -266,16 +250,55 @@ public class DownstreamController extends WorldController implements ContactList
 	    closedFlowerSheet = new Texture(Gdx.files.internal("tethers/flowerclosed_spritesheet.png"));
 	    
 		//walkSheet = new Texture(Gdx.files.internal("koi/unnamed.png")); // #9
-        TextureRegion[][] tmp3 = TextureRegion.split(closedFlowerSheet, closedFlowerSheet.getWidth()/cols, closedFlowerSheet.getHeight()/rows);              // #10
+        TextureRegion[][] tmpclosed = TextureRegion.split(closedFlowerSheet, closedFlowerSheet.getWidth()/cols, closedFlowerSheet.getHeight()/rows);              // #10
         closedFlowerFrames = new TextureRegion[cols * rows];
         index = 0;
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                closedFlowerFrames[index++] = tmp3[i][j];
+                closedFlowerFrames[index++] = tmpclosed[i][j];
             }
         }
-        closedFlowerAnimation = new Animation(.2f, closedFlowerFrames);      // #11
-        closedFlowerspriteBatch = new SpriteBatch();                // #12
+        closedFlowerAnimation = new Animation(.2f, closedFlowerFrames);  
+        closedFlowerspriteBatch = new SpriteBatch(); 
+        
+        openFlowerSheet = new Texture(Gdx.files.internal("tethers/floweropen_spritesheet.png"));
+        TextureRegion[][] tmpOpen = TextureRegion.split(openFlowerSheet, openFlowerSheet.getWidth()/cols, openFlowerSheet.getHeight()/rows);              // #10
+        openFlowerFrames = new TextureRegion[cols * rows];
+        index = 0;
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                openFlowerFrames[index++] = tmpOpen[i][j];
+            }
+        }
+        openFlowerAnimation = new Animation(.2f, openFlowerFrames);  
+       	openFlowerspriteBatch = new SpriteBatch(); 
+       	
+       	cols = 8; 
+       	
+       	openingFlowerSheet = new Texture(Gdx.files.internal("tethers/flower_opening_spritesheet.png"));
+        TextureRegion[][] tmpOpening = TextureRegion.split(openingFlowerSheet, openingFlowerSheet.getWidth()/cols, openingFlowerSheet.getHeight()/rows);              // #10
+        openingFlowerFrames = new TextureRegion[cols * rows];
+        index = 0;
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                openingFlowerFrames[index++] = tmpOpening[i][j];
+            }
+        }
+        openingFlowerAnimation = new Animation(.5f, openingFlowerFrames); 
+       	openingFlowerspriteBatch = new SpriteBatch(); 
+       	
+
+       	closingFlowerSheet = new Texture(Gdx.files.internal("tethers/flower_closing_spritesheet.png"));
+        TextureRegion[][] tmpClosing = TextureRegion.split(closingFlowerSheet, closingFlowerSheet.getWidth()/cols, closingFlowerSheet.getHeight()/rows);              // #10
+        closingFlowerFrames = new TextureRegion[cols * rows];
+        index = 0;
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+            	closingFlowerFrames[index++] = tmpClosing[i][j];
+            }
+        }
+        closingFlowerAnimation = new Animation(.5f, closingFlowerFrames); 
+        closingFlowerspriteBatch = new SpriteBatch(); 
 		
 
 		enemyTexture = createTexture(manager,ENEMY_TEXTURE,false);
@@ -285,7 +308,6 @@ public class DownstreamController extends WorldController implements ContactList
 		lightingTexture = createTexture(manager, LIGHTING_TEXTURE, false);
 
 		earthTile = createTexture(manager,EARTH_FILE,true);
-
 
 		land4Texture = createTexture(manager,LAND_4SIDE_TEXTURE,false);
 		leftLandTexture = createTexture(manager,LEFT_LAND_TEXTURE,false);
@@ -380,6 +402,7 @@ public class DownstreamController extends WorldController implements ContactList
 		enemies.clear();
 		lanterns.clear();
 		tethers.clear();
+		wpools.clear();
 		objects.clear();
 		addQueue.clear();
 		world.dispose();
@@ -408,7 +431,6 @@ public class DownstreamController extends WorldController implements ContactList
 		float dwidth;
 		float dheight;
 		float rad = lilyTexture.getRegionWidth()/scale.x/2;
-		float wrad = whirlpoolTexture.getRegionWidth()/scale.x/2;
 
 		boolean sensorTethers = true;
 
@@ -623,15 +645,66 @@ public class DownstreamController extends WorldController implements ContactList
 		stateTime += Gdx.graphics.getDeltaTime();           // #15
 		lilycurrentFrame = lilyAnimation.getKeyFrame(stateTime, true);
 		closedFlowercurrentFrame = closedFlowerAnimation.getKeyFrame(stateTime, true);
+		openFlowercurrentFrame = openFlowerAnimation.getKeyFrame(stateTime, true);
 		
+		//FSM to handle Lotus
 		for (int i = 0; i < tethers.size(); i++){
 			if (tethers.get(i).getTetherType() == TetherType.Lilypad){
 				tethers.get(i).setTexture(lilycurrentFrame);
-			}
+				}
 			if (tethers.get(i).getTetherType() == TetherType.Lantern){
-				tethers.get(i).setTexture(closedFlowercurrentFrame);
+				if (tethers.get(i).getOpening() == 0){
+					tethers.get(i).setTexture(closedFlowercurrentFrame);
+					if (tethers.get(i).set){
+						tethers.get(i).setOpening(1);
+					}
+				}
+				if (tethers.get(i).getOpening() == 1){
+					//TODO
+					if (!openingFlowerAnimation.isAnimationFinished(relativeTime))
+						{openingFlowercurrentFrame = openingFlowerAnimation.getKeyFrame(relativeTime, true);
+						relativeTime += Gdx.graphics.getDeltaTime();  
+						tethers.get(i).setTexture(openingFlowercurrentFrame);
+						if(!tethers.get(i).set){
+							//go to closing
+							//relativeTime = 0;
+							tethers.get(i).setOpening(3);
+						}
+						}
+					if (openingFlowerAnimation.isAnimationFinished(relativeTime)){
+						tethers.get(i).setOpening(2);
+						relativeTime = 0;
+					}
+					
+				}
+				if (tethers.get(i).getOpening() == 2){
+					tethers.get(i).setTexture(openFlowercurrentFrame);
+					/*if (tethers.get(i).set){
+						tethers.get(i).setOpening(1);
+					}*/
+				}
+				if (tethers.get(i).getOpening() == 3){ 
+					if(!tethers.get(i).set){
+						if(!closingFlowerAnimation.isAnimationFinished(relativeTime)){
+						closingFlowercurrentFrame = closingFlowerAnimation.getKeyFrame(relativeTime, true);
+						relativeTime += Gdx.graphics.getDeltaTime();  
+						tethers.get(i).setTexture(closingFlowercurrentFrame);
+						}
+						if(closingFlowerAnimation.isAnimationFinished(relativeTime)){
+							tethers.get(i).setOpening(0);
+							relativeTime = 0;
+						}
+					}
+					if(tethers.get(i).set){
+						tethers.get(i).setOpening(1);
+					}
+				}
+				if(tethers.get(i).lit){
+					tethers.get(i).setTexture(openFlowercurrentFrame);
+				}
+				}
 			}
-		}
+		
 
 		SoundController.getInstance().update();
 	}

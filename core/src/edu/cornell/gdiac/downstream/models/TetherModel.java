@@ -48,6 +48,13 @@ public class TetherModel extends WheelObstacle {
 	private static TextureRegion lightingTexture;
 	
 	public boolean isTethered = false;
+	
+	public boolean lit = false;
+	
+	private int isOpening = 0;
+	//0 means its closed
+	//1 means its opening
+	//2 means its opened
 
 	/** Tethers can be lilipads, lanterns, or lotus flowers */
 	public enum TetherType {
@@ -133,6 +140,7 @@ public class TetherModel extends WheelObstacle {
 			}
 			if (sparkSize >= 2){
 				sparkSize = 2f;
+				lit = true;
 			}
 
 
@@ -146,6 +154,13 @@ public class TetherModel extends WheelObstacle {
 	public void setTethered(boolean b) {
 		set = b;
 		
+	}
+	
+	public void setOpening(int i){
+		isOpening = i;
+	}
+	public int getOpening(){
+		return isOpening;
 	}
 
 }
