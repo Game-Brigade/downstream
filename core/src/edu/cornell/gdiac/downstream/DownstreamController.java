@@ -394,6 +394,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private CameraController cameraController;
 	private CollisionController collisionController;
 	private TetherModel closestTether;
+	private int litLotusCount;
 
 	/**
 	 * Creates and initialize a new instance of Downstream
@@ -573,7 +574,16 @@ public class DownstreamController extends WorldController implements ContactList
 	 * @param delta Number of seconds since last animation frame
 	 */
 	public void update(float dt) {
-
+		litLotusCount = 0;
+		for(TetherModel t : lanterns){
+			if(t.lit){
+				litLotusCount++;
+			}
+		}
+		if(lanterns.size() == litLotusCount){
+			this.setComplete(true);
+		}
+		
 		if(dead){
 			objects.remove(koi);
 			setFailure(dead);
@@ -780,7 +790,7 @@ public class DownstreamController extends WorldController implements ContactList
 			Vector2 closestTether = getClosestTether().getPosition().cpy().scl(scale);
 			Vector2 initialTangent = koi.getInitialTangentPoint(getClosestTether().getPosition()).scl(scale);
 			float radius = closestTether.dst(initialTangent);
-			canvas.drawTetherCircle(closestTether, TetherModel.TETHER_DEFAULT_RANGE*scale.x);
+			canvas.drawTetherCircle(closestTether, TetherModel.TETHER_DEFAULT_RANGE*scale.x*.9f);
 		}
 		
 

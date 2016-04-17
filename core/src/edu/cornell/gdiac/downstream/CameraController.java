@@ -7,7 +7,7 @@ public class CameraController {
 
 	private OrthographicCamera camera;
 	
-	private static final float MAX_VELOCITY = 6.0f;
+	private static final float MAX_VELOCITY = 7.0f;
 	private static final float MIN_VELOCITY = 3.0f;
 	private static final float ACCELERATION = 0.05f;
 	private static float currentVelocity = MIN_VELOCITY;
