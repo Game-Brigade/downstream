@@ -274,6 +274,10 @@ public class InputController {
 		return null;
 	}
 	
+	public boolean leftClickHeldDown() {
+		return leftClick;
+	}
+	
 	public boolean getEnter() {
 		return enterPressed;
 	}
