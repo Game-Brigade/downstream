@@ -148,6 +148,12 @@ public class DownstreamController extends WorldController implements ContactList
     TextureRegion[]                 koiSFrames;             // #5
     SpriteBatch                     koiSspriteBatch;            // #6
     TextureRegion                   koiScurrentFrame;           // #7
+    
+    Animation                      	koiCAnimation;          // #3
+    Texture                         koiCSheet;              // #4
+    TextureRegion[]                 koiCFrames;             // #5
+    SpriteBatch                     koiCspriteBatch;            // #6
+    TextureRegion                   koiCcurrentFrame;           // #7
 
 
 	/**
@@ -235,7 +241,8 @@ public class DownstreamController extends WorldController implements ContactList
 		}
 		int cols = 11;
 		int rows = 1;
-		//animations
+		
+		//animationDef
 		lilySheet = new Texture(Gdx.files.internal("tethers/lotus_strip.png"));
 		    
 	      	//walkSheet = new Texture(Gdx.files.internal("koi/unnamed.png")); // #9
@@ -317,8 +324,22 @@ public class DownstreamController extends WorldController implements ContactList
             	koiSFrames[index++] = tmpkoiS[i][j];
             }
         }
-        koiSAnimation = new Animation(.1f, koiSFrames); 
+        koiSAnimation = new Animation(.05f, koiSFrames); 
         koiSspriteBatch = new SpriteBatch(); 
+        
+        cols = 11;
+        
+        koiCSheet = new Texture(Gdx.files.internal("koi/curved koi spritesheet.png"));
+        TextureRegion[][] tmpkoiC = TextureRegion.split(koiCSheet, koiCSheet.getWidth()/cols, koiCSheet.getHeight()/rows);              // #10
+        koiCFrames = new TextureRegion[cols * rows];
+        index = 0;
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+            	koiCFrames[index++] = tmpkoiC[i][j];
+            }
+        }
+        koiCAnimation = new Animation(.05f, koiCFrames); 
+        koiCspriteBatch = new SpriteBatch(); 
 		
 
 		enemyTexture = createTexture(manager,ENEMY_TEXTURE,false);
@@ -673,7 +694,7 @@ public class DownstreamController extends WorldController implements ContactList
 			cameraController.moveCameraTowards(koi.getPosition().cpy().scl(scale));
 			cameraController.zoomIn();
 		}
-
+		
 		//burst code
 		koi.updateRestore();
 		if (input.fast) {
@@ -687,7 +708,17 @@ public class DownstreamController extends WorldController implements ContactList
 		closedFlowercurrentFrame = closedFlowerAnimation.getKeyFrame(stateTime, true);
 		openFlowercurrentFrame = openFlowerAnimation.getKeyFrame(stateTime, true);
 		koiScurrentFrame = koiSAnimation.getKeyFrame(stateTime, true);
-		//koi.setTexture(koiScurrentFrame);
+		koiCcurrentFrame = koiCAnimation.getKeyFrame(stateTime, true);
+		//FSM to handle Koi
+		/*if (koi.isTethered()){
+			koi.setTexture(koiCcurrentFrame);
+			//if (getClosestTether().)
+		}
+		else{
+			koi.setTexture(koiScurrentFrame);
+		}*/
+		koi.setTexture(koiScurrentFrame);
+		
 		
 		//FSM to handle Lotus
 		for (int i = 0; i < tethers.size(); i++){
