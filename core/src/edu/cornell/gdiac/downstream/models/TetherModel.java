@@ -52,11 +52,12 @@ public class TetherModel extends WheelObstacle {
 	public boolean lit = false;
 	
 	private int isOpening = 0;
-	
-	private float alpha = 1f;
 	//0 means its closed
 	//1 means its opening
 	//2 means its opened
+	
+	private float alpha = 1f;
+	private double rand = .7;
 
 	/** Tethers can be lilipads, lanterns, or lotus flowers */
 	public enum TetherType {
@@ -146,17 +147,30 @@ public class TetherModel extends WheelObstacle {
 			if (sparkSize >= 2){
 				lit = true;
 				sparkSize = 2f;
+				//flicker();
 			}
 			if (lit && type == TetherType.Lotus && alpha > 0){
 				alpha = alpha - .001f;
 			}
 			if (alpha <= 0){
 				lit = false;
-				alpha = 0;
+				alpha = 1;
 				sparkSize = 0;
 			}
 			canvas.draw(lightingTexture,new Color(255, 255, 255, alpha), lightingTexture.getRegionWidth()/2, lightingTexture.getRegionHeight()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),sparkSize,sparkSize);
 
+		}
+	}
+	
+	private void flicker(){
+		if (alpha >= rand){
+			alpha = alpha - .02f;
+		}
+		if (alpha <= rand){
+			alpha = alpha + .02f;
+		}
+		if (alpha < rand + .02 && alpha > rand - .02){
+			rand = Math.random() + .5;
 		}
 	}
 
