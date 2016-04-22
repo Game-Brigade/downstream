@@ -436,7 +436,7 @@ public class LevelEditor extends WorldController {
 	}
 	
 	private void saveToJson() {
-		String filename = "level1.json";
+		String filename = "level3.json";
 		int n = 1;
 		Vector2 p = player;
 		Vector2 g = goal;
