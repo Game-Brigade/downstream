@@ -57,7 +57,9 @@ public class PlayerModel extends BoxObstacle {
 
 	private boolean attemptingTether;
 
-	private Vector2 temp;
+	private boolean bursting;
+	
+	private float energy;
 
 	/** Create a new player at x,y. */
 	public PlayerModel(float x, float y, float width, float height) {
@@ -359,6 +361,30 @@ public class PlayerModel extends BoxObstacle {
 
 	public void resolveDirection() {
 		setAngle((float) Math.atan2(getVY(),getVX()));
+		
+	}
+	
+	public void burst(){
+		if (energy >= 2){
+			bursting = true;
+		}
+		
+	}
+	
+	public void updateRestore(){
+		if (energy < 2 && !bursting){
+			energy = energy + .01f;
+		}
+		else if (bursting && energy >= 0){
+			this.setLinearVelocity(this.getLinearVelocity().setLength(4f*9));
+			energy = energy - .05f;
+		}
+		else if (energy <= 0){
+			bursting = false;
+		}
+		else if (energy >= 2){
+			energy = 2;
+		}
 		
 	}
 

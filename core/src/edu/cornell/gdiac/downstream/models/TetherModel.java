@@ -55,12 +55,15 @@ public class TetherModel extends WheelObstacle {
 	//0 means its closed
 	//1 means its opening
 	//2 means its opened
+	
+	private float alpha = 1f;
+	private double rand = .7;
 
 	/** Tethers can be lilipads, lanterns, or lotus flowers */
 	public enum TetherType {
 		Lilypad,
 		Lantern,
-		Lotus
+		Lotus,
 	};
 
 	public TetherModel(float x, float y, TetherType type) {
@@ -131,23 +134,43 @@ public class TetherModel extends WheelObstacle {
 			if (type == TetherType.Lilypad){
 				canvas.draw(texture,Color.WHITE,texture.getRegionHeight()/2,texture.getRegionWidth()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),.4f,.4f);
 			}
-			if (type == TetherType.Lantern){
+			if (type == TetherType.Lantern || type == TetherType.Lotus){
 				canvas.draw(texture,Color.WHITE,texture.getRegionHeight()/2,texture.getRegionWidth()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),.35f,.35f);
 				if (sparkSize < 2 && this.set){
 					sparkSize += .01f;
 				}
+				if (sparkSize < 2 && !this.set && !(sparkSize <= 0)){
+					sparkSize += -.01f;
+				}
 
 			}
 			if (sparkSize >= 2){
-				sparkSize = 2f;
 				lit = true;
+				sparkSize = 2f;
+				//flicker();
 			}
+			if (lit && type == TetherType.Lotus && alpha > 0){
+				alpha = alpha - .001f;
+			}
+			if (alpha <= 0){
+				lit = false;
+				alpha = 1;
+				sparkSize = 0;
+			}
+			canvas.draw(lightingTexture,new Color(255, 255, 255, alpha), lightingTexture.getRegionWidth()/2, lightingTexture.getRegionHeight()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),sparkSize,sparkSize);
 
-
-			//sparkSize = sparkSize / 5;
-//			System.out.println(lightingTexture);
-			canvas.draw(lightingTexture,Color.WHITE, lightingTexture.getRegionWidth()/2, lightingTexture.getRegionHeight()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),sparkSize,sparkSize);
-			//System.out.println(origin);
+		}
+	}
+	
+	private void flicker(){
+		if (alpha >= rand){
+			alpha = alpha - .02f;
+		}
+		if (alpha <= rand){
+			alpha = alpha + .02f;
+		}
+		if (alpha < rand + .02 && alpha > rand - .02){
+			rand = Math.random() + .5;
 		}
 	}
 

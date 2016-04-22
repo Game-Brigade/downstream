@@ -15,6 +15,8 @@ import com.badlogic.gdx.math.*;
 
 import java.util.ArrayList;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.physics.box2d.*;
 
@@ -49,6 +51,10 @@ public class EnemyModel extends SimpleObstacle {
 	public Vector2 rghtOrigin = new Vector2();
 	
 	private Vector2 lastGoal = new Vector2();
+	
+	private TetherModel tethered;
+	
+	
 	
 	/** 
 	 * Returns the dimensions of this box
@@ -166,6 +172,12 @@ public class EnemyModel extends SimpleObstacle {
 	public EnemyModel(float x, float y, float w, float h, ArrayList<Vector2> path) {
 		this(x,y,w,h);
 		patrolPath = path;
+	}
+	
+	public EnemyModel(float x, float y, float w, float h, ArrayList<Vector2> path, TetherModel attached) {
+		this(x,y,w,h);
+		patrolPath = path;
+		tethered = attached;
 	}
 	
 	/**
@@ -291,7 +303,7 @@ public class EnemyModel extends SimpleObstacle {
 	public void moveTowardsGoal(){
 	
 
-		float distance = Vector2.dst(lastGoal.x, lastGoal.y, goal.x, goal.y);
+		//float distance = Vector2.dst(lastGoal.x, lastGoal.y, goal.x, goal.y);
 
 		Vector2 direction = goal.cpy().sub(this.getPosition()).nor();
 
@@ -303,6 +315,15 @@ public class EnemyModel extends SimpleObstacle {
 		  	angle = angle - 180;
 		    return (float) Math.toRadians(angle);
 		}
+	 
+	 public void fleeFind(){
+		 if (tethered != null){
+			 if (tethered.lit){
+				 goal = new Vector2(999, 999);
+				 setAngle(findA(this.getPosition(), this.goal));
+			 }
+		 }
+	 }
 	 
 	/*public void applyForce() {
 			if (!isActive()) {
