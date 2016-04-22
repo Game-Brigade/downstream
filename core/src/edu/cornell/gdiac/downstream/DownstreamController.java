@@ -678,6 +678,7 @@ public class DownstreamController extends WorldController implements ContactList
 		koi.updateRestore();
 		if (input.fast) {
 			koi.burst();
+			cameraController.moveCameraTowards(koi.getPosition().cpy().scl(scale));
 		}
 		
 		//ANIMATION CODE

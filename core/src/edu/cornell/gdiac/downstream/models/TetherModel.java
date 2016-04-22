@@ -136,7 +136,7 @@ public class TetherModel extends WheelObstacle {
 				if (sparkSize < 2 && this.set){
 					sparkSize += .01f;
 				}
-				if (sparkSize < 2 && !this.set){
+				if (sparkSize < 2 && !this.set && !(sparkSize <= 0)){
 					sparkSize += -.01f;
 				}
 
