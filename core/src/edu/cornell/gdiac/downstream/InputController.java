@@ -85,6 +85,8 @@ public class InputController {
 	private boolean enterPressed;
 	private boolean enterPrevious;
 	
+	public boolean fast;
+	
 	/** How much did we move horizontally? */
 	private float horizontal;
 	/** How much did we move vertically? */
@@ -400,6 +402,8 @@ public class InputController {
 		if (Gdx.input.isKeyPressed(Input.Keys.NUM_4)) currentSelection = SelectionType.Player;
 		if (Gdx.input.isKeyPressed(Input.Keys.NUM_5)) currentSelection = SelectionType.Wall;
 		if (Gdx.input.isKeyPressed(Input.Keys.NUM_6)) currentSelection = SelectionType.Goal;
+		
+		fast = (Gdx.input.isKeyPressed(Input.Keys.F));
 		
 		enterPressed = (secondary && enterPressed) || (Gdx.input.isKeyPressed(Input.Keys.ENTER));
 		zoomIn = Gdx.input.isKeyPressed(Input.Keys.EQUALS);

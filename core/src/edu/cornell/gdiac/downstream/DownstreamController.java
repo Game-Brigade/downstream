@@ -674,6 +674,11 @@ public class DownstreamController extends WorldController implements ContactList
 		}
 
 		
+		koi.updateRestore();
+		if (input.fast) {
+			koi.burst();
+		}
+		
 		//ANIMATION CODE
 		stateTime += Gdx.graphics.getDeltaTime();           // #15
 		lilycurrentFrame = lilyAnimation.getKeyFrame(stateTime, true);

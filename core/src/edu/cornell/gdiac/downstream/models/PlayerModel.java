@@ -57,7 +57,7 @@ public class PlayerModel extends BoxObstacle {
 
 	private boolean attemptingTether;
 
-	private Vector2 temp;
+	private boolean bursting;
 	
 	private float energy;
 
@@ -365,19 +365,27 @@ public class PlayerModel extends BoxObstacle {
 	}
 	
 	public void burst(){
-		if (energy > 1.9){
-			energy = (float) (energy - .05);
-			this.setLinearVelocity(this.getLinearVelocity().setLength(4f*5));
+		if (energy >= 2){
+			bursting = true;
 		}
+		
 	}
 	
 	public void updateRestore(){
-		if (energy < 2){
-			energy = (float) (energy + .01);
+		if (energy < 2 && !bursting){
+			energy = energy + .01f;
 		}
-		if (energy > 2){
+		else if (bursting && energy >= 0){
+			this.setLinearVelocity(this.getLinearVelocity().setLength(4f*6));
+			energy = energy - .05f;
+		}
+		else if (energy <= 0){
+			bursting = false;
+		}
+		else if (energy >= 2){
 			energy = 2;
 		}
+		
 	}
 
 
