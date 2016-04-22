@@ -85,7 +85,6 @@ public class InputController {
 	private boolean enterPressed;
 	private boolean enterPrevious;
 	
-	public boolean fast;
 	
 	/** How much did we move horizontally? */
 	private float horizontal;
@@ -105,6 +104,7 @@ public class InputController {
 	public boolean deccel;
 	public boolean space;
 	public boolean slow;
+	public boolean fast;
 	
 	public enum SelectionType {
 		Lilypad, Lantern, Enemy, Player, Wall, Goal;

@@ -612,6 +612,7 @@ public class DownstreamController extends WorldController implements ContactList
 		for (EnemyModel enemy : enemies) {
 			enemy.patrol();
 			enemy.moveTowardsGoal();
+			enemy.fleeFind();
 		}
 
 		// KOI VEOLOCITY CODE
@@ -673,7 +674,7 @@ public class DownstreamController extends WorldController implements ContactList
 			cameraController.zoomIn();
 		}
 
-		
+		//burst code
 		koi.updateRestore();
 		if (input.fast) {
 			koi.burst();

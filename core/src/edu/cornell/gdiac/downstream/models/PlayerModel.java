@@ -376,7 +376,7 @@ public class PlayerModel extends BoxObstacle {
 			energy = energy + .01f;
 		}
 		else if (bursting && energy >= 0){
-			this.setLinearVelocity(this.getLinearVelocity().setLength(4f*6));
+			this.setLinearVelocity(this.getLinearVelocity().setLength(4f*9));
 			energy = energy - .05f;
 		}
 		else if (energy <= 0){
