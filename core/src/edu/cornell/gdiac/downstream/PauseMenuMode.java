@@ -1,34 +1,33 @@
 package edu.cornell.gdiac.downstream;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerListener;
-import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.controllers.PovDirection;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Texture.TextureFilter;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
 import edu.cornell.gdiac.util.ScreenListener;
 
-public class LevelSelectMode implements Screen, InputProcessor, ControllerListener {
+public class PauseMenuMode implements Screen, InputProcessor, ControllerListener{
 	
-	
-	/** Textures necessary to support the level select screen */
-	private static final String SELECT_SCREENSHOT = "level select.png";
+	/** Textures for buttons */
+	private static final String PAUSE_HEADER = "MENUS/paused-H.png";
+	private static final String RESUME_BUTTON = "MENUS/resume-b.png";
+	private static final String RESTART_BUTTON = "MENUS/restart-b.png";
+	private static final String OPTIONS_BUTTON = "MENUS/options-b.png";
 	private static final String BACK_BUTTON = "MENUS/back to main-b.png";
 	
-	
-	private Texture screenShot;
+	private Texture pauseHeader;
+	private Texture resume;
+	private Texture restart;
+	private Texture options;
 	private Texture back;
-
 	
 	/** AssetManager to be loading in the background */
 	private AssetManager manager;
@@ -39,8 +38,12 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 	
 	/** Whether or not this player mode is still active */
 	private boolean active;
-	/** The current state of the play button */
+	
+	/** The current states of the buttons */
 	private int backState;
+	private int resumeState;
+	private int restartState;
+	private int optionsState;
 	
 	/** Scaling factor for when the student changes the resolution. */
 	private float scale;
@@ -51,34 +54,44 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 	private static int STANDARD_HEIGHT = 700;
 	
 	/** Positions of buttons */
+	private static Vector2 headerPos = new Vector2();
+	private static Vector2 resumePos = new Vector2();
+	private static Vector2 restartPos = new Vector2();
+	private static Vector2 optionsPos = new Vector2();
 	private static Vector2 backPos = new Vector2();
-	
-	
 
 	/**
-	 * Creates a LevelSelectMode with the default budget, size and position.
+	 * Creates a PauseMenuMode with the default budget, size and position.
 	 *
 	 * @param manager
 	 *            The AssetManager to load in the background
 	 */
-	public LevelSelectMode(GameCanvas canvas, AssetManager manager) {
+	public PauseMenuMode(GameCanvas canvas, AssetManager manager) {
 		this.manager = manager;
 		this.canvas = canvas;
 		
 		// Compute the dimensions from the canvas
 		resize(canvas.getWidth(),canvas.getHeight());
 		
+		headerPos.set(new Vector2((float)canvas.getWidth()/2,(float)canvas.getHeight()/18));
 		backPos.set(new Vector2((float)canvas.getWidth()/2,(float)canvas.getHeight()/18));
+		resumePos.set(new Vector2((float)canvas.getWidth()/2,(float)canvas.getHeight()/18));
+		restartPos.set(new Vector2((float)canvas.getWidth()/2,(float)canvas.getHeight()/18));
+		optionsPos.set(new Vector2((float)canvas.getWidth()/2,(float)canvas.getHeight()/18));
 		
 
 		// Load images immediately.
-		screenShot = new Texture(SELECT_SCREENSHOT);
+		pauseHeader = new Texture(PAUSE_HEADER);
+		resume = new Texture(RESUME_BUTTON);
+		restart = new Texture(RESTART_BUTTON);
+		options = new Texture(OPTIONS_BUTTON);
 		back = new Texture(BACK_BUTTON);
 			
 		// No progress so far.
 		backState = 0;
-		
-		
+		resumeState = 0;
+		restartState = 0;
+		optionsState = 0;
 		
 
 		active = true;
@@ -89,7 +102,10 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 	 * Called when this screen should release all resources.
 	 */
 	public void dispose() {
-		screenShot.dispose();
+		pauseHeader.dispose();
+		resume.dispose();
+		restart.dispose();
+		options.dispose();
 		back.dispose();
 	}
 
@@ -104,11 +120,11 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 	private void draw() {
 		canvas.begin();
 		canvas.clear();
-		canvas.draw(screenShot, Color.WHITE, screenShot.getWidth()/2, screenShot.getHeight()/2, 
+		canvas.draw(pauseHeader, Color.WHITE, pauseHeader.getWidth()/2, pauseHeader.getHeight()/2, 
 				canvas.getWidth()/2, canvas.getHeight()/2, 0, scale, scale);
 		canvas.end();
 	}
-
+	
 	// ADDITIONAL SCREEN METHODS
 	/**
 	 * Called when the Screen should render itself.
@@ -128,6 +144,18 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 				listener.exitScreen(this, WorldController.EXIT_MAIN);
 			}
 			
+			if (resumePlay() && listener != null) {
+				listener.exitScreen(this, WorldController.EXIT_MAIN);
+			}
+			
+			if (restartLevel() && listener != null) {
+				listener.exitScreen(this, WorldController.EXIT_MAIN);
+			}
+			
+			if (goOptions() && listener != null) {
+				listener.exitScreen(this, WorldController.EXIT_MAIN);
+			}
+			
 		}
 	}
 	
@@ -138,6 +166,18 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 	 */
 	public boolean goBack() {
 		return backState == 2;
+	}
+	
+	public boolean resumePlay(){
+		return resumeState == 2;
+	}
+	
+	public boolean goOptions(){
+		return optionsState == 2;
+	}
+	
+	public boolean restartLevel(){
+		return restartState == 2;
 	}
 	
 
@@ -428,3 +468,4 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 
 
 }
+
