@@ -48,18 +48,6 @@ public class DownstreamController extends WorldController implements ContactList
 	private static final String LANTERN_TEXTURE = "tethers/notlit.png";
 	/** Reference to the lighting texture */
 	private static final String LIGHTING_TEXTURE = "tethers/aura.png";
-	/** Reference to the 4-sided land texture */
-	private static final String LAND_4SIDE_TEXTURE = "terrain/repeat tile.png";
-	/** Reference to the left land texture */
-	private static final String LEFT_LAND_TEXTURE = "terrain/left-border.png";
-	/** Reference to the right land texture */
-	private static final String RIGHT_LAND_TEXTURE = "terrain/right-border.png";
-	/** Reference to the top land texture */
-	private static final String TOP_LAND_TEXTURE = "terrain/top-border.png";
-	/** Reference to the bottom land texture */
-	private static final String BOTTOM_LAND_TEXTURE = "terrain/bottom-border.png";
-	/** Reference to the lotus texture */
-	private static final String LOTUS_TEXTURE= null;
 	/** Reference to the repeating land texture */
 	private static final String EARTH_FILE = "terrain/repeat tile.png";
 	/** Reference to the whirlpool texture */
@@ -83,12 +71,6 @@ public class DownstreamController extends WorldController implements ContactList
 	private TextureRegion lanternTexture;
 	/** Texture assets for light */
 	private TextureRegion lightingTexture;
-	/** Texture assets for land */
-	private TextureRegion land4Texture;
-	private TextureRegion leftLandTexture;
-	private TextureRegion rightLandTexture;
-	private TextureRegion topLandTexture;
-	private TextureRegion bottomLandTexture;
 	/** Texture assets for walls and platforms */
 	private TextureRegion earthTile;
 	/** Texture assets for whirlpools */
@@ -190,21 +172,6 @@ public class DownstreamController extends WorldController implements ContactList
 		
 		manager.load(EARTH_FILE,Texture.class);
 		assets.add(EARTH_FILE);
-
-		manager.load(LAND_4SIDE_TEXTURE, Texture.class);
-		assets.add(LAND_4SIDE_TEXTURE);
-
-		manager.load(LEFT_LAND_TEXTURE, Texture.class);
-		assets.add(LEFT_LAND_TEXTURE);
-
-		manager.load(RIGHT_LAND_TEXTURE, Texture.class);
-		assets.add(RIGHT_LAND_TEXTURE);
-
-		manager.load(TOP_LAND_TEXTURE, Texture.class);
-		assets.add(TOP_LAND_TEXTURE);
-
-		manager.load(BOTTOM_LAND_TEXTURE, Texture.class);
-		assets.add(BOTTOM_LAND_TEXTURE);
 		
 		manager.load(WHIRLPOOL_TEXTURE, Texture.class);
 		assets.add(WHIRLPOOL_TEXTURE);
@@ -351,11 +318,7 @@ public class DownstreamController extends WorldController implements ContactList
 
 		earthTile = createTexture(manager,EARTH_FILE,true);
 
-		land4Texture = createTexture(manager,LAND_4SIDE_TEXTURE,false);
-		leftLandTexture = createTexture(manager,LEFT_LAND_TEXTURE,false);
-		rightLandTexture = createTexture(manager,RIGHT_LAND_TEXTURE,false);
-		topLandTexture = createTexture(manager,TOP_LAND_TEXTURE,false);
-		bottomLandTexture = createTexture(manager,BOTTOM_LAND_TEXTURE,false);
+		
 		whirlpoolTexture = createTexture(manager,WHIRLPOOL_TEXTURE,false);
 		whirlpoolFlipTexture = createTexture(manager,WHIRLPOOL_FLIP_TEXTURE,false);
 /*
