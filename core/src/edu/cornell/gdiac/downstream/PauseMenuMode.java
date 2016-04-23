@@ -73,11 +73,11 @@ public class PauseMenuMode implements Screen, InputProcessor, ControllerListener
 		// Compute the dimensions from the canvas
 		resize(canvas.getWidth(),canvas.getHeight());
 		
-		headerPos.set(new Vector2((float)canvas.getWidth()/2,(float)canvas.getHeight()/18));
-		backPos.set(new Vector2((float)canvas.getWidth()/2,(float)canvas.getHeight()/18));
-		resumePos.set(new Vector2((float)canvas.getWidth()/2,(float)canvas.getHeight()/18));
-		restartPos.set(new Vector2((float)canvas.getWidth()/2,(float)canvas.getHeight()/18));
-		optionsPos.set(new Vector2((float)canvas.getWidth()/2,(float)canvas.getHeight()/18));
+		headerPos.set(new Vector2((float)canvas.getWidth()/2,(float)canvas.getHeight()/18*2));
+		backPos.set(new Vector2((float)canvas.getWidth()/2,(float)canvas.getHeight()/18*16));
+		resumePos.set(new Vector2((float)canvas.getWidth()/2,(float)canvas.getHeight()/18*4));
+		restartPos.set(new Vector2((float)canvas.getWidth()/2,(float)canvas.getHeight()/18*8));
+		optionsPos.set(new Vector2((float)canvas.getWidth()/2,(float)canvas.getHeight()/18*12));
 		
 
 		// Load images immediately.
@@ -121,7 +121,13 @@ public class PauseMenuMode implements Screen, InputProcessor, ControllerListener
 		canvas.begin();
 		canvas.clear();
 		canvas.draw(pauseHeader, Color.WHITE, pauseHeader.getWidth()/2, pauseHeader.getHeight()/2, 
-				canvas.getWidth()/2, canvas.getHeight()/2, 0, scale, scale);
+				headerPos.x, headerPos.y, 0, scale, scale);
+		canvas.draw(resume, Color.WHITE, resume.getWidth()/2, resume.getHeight()/2, 
+				resumePos.x, resumePos.y, 0, scale, scale);
+		canvas.draw(restart, Color.WHITE, restart.getWidth()/2, restart.getHeight()/2, 
+				restartPos.x, restartPos.y, 0, scale, scale);
+		canvas.draw(options, Color.WHITE, options.getWidth()/2, options.getHeight()/2, 
+				optionsPos.x, optionsPos.y, 0, scale, scale);
 		canvas.end();
 	}
 	
@@ -149,11 +155,11 @@ public class PauseMenuMode implements Screen, InputProcessor, ControllerListener
 			}
 			
 			if (restartLevel() && listener != null) {
-				listener.exitScreen(this, WorldController.EXIT_MAIN);
+				listener.exitScreen(this, WorldController.EXIT_PLAY);
 			}
 			
 			if (goOptions() && listener != null) {
-				listener.exitScreen(this, WorldController.EXIT_MAIN);
+				listener.exitScreen(this, WorldController.EXIT_OPTIONS);
 			}
 			
 		}
@@ -273,6 +279,26 @@ public class PauseMenuMode implements Screen, InputProcessor, ControllerListener
 			backState = 1;
 		}
 		
+		dx = Math.abs(screenX - resumePos.x);
+		dy = Math.abs(screenY - resumePos.y);
+		
+		if (dx < scale*resume.getWidth()/2 && dy < scale*resume.getHeight()/2) {
+			resumeState = 1;
+		}
+		
+		dx = Math.abs(screenX - restartPos.x);
+		dy = Math.abs(screenY - restartPos.y);
+		
+		if (dx < scale*restart.getWidth()/2 && dy < scale*restart.getHeight()/2) {
+			restartState = 1;
+		}
+		
+		dx = Math.abs(screenX - optionsPos.x);
+		dy = Math.abs(screenY - optionsPos.y);
+		
+		if (dx < scale*options.getWidth()/2 && dy < scale*options.getHeight()/2) {
+			optionsState = 1;
+		}
 		
 		
 		return false;
@@ -295,6 +321,18 @@ public class PauseMenuMode implements Screen, InputProcessor, ControllerListener
 	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
 		if (backState == 1) {
 			backState = 2;
+			return false;
+		}
+		if (resumeState == 1){
+			resumeState = 2;
+			return false;
+		}
+		if (restartState == 1){
+			restartState = 2;
+			return false;
+		}
+		if (optionsState == 1){
+			optionsState = 2;
 			return false;
 		}
 		return true;
