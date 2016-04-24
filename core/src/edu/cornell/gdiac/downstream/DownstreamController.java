@@ -597,6 +597,10 @@ public class DownstreamController extends WorldController implements ContactList
 			enemy.patrol();
 			enemy.moveTowardsGoal();
 			enemy.fleeFind();
+			enemy.fleeFind(lanterns);
+			if (enemy.dead){
+				enemy.deactivatePhysics(world);
+			}
 		}
 
 		// KOI VEOLOCITY CODE

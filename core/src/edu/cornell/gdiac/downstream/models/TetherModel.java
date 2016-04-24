@@ -58,6 +58,8 @@ public class TetherModel extends WheelObstacle {
 	
 	private float alpha = 1f;
 	private double rand = .7;
+	
+	public Circle lightCircle = new Circle(getX(),getY(), 0);
 
 	/** Tethers can be lilipads, lanterns, or lotus flowers */
 	public enum TetherType {
@@ -157,9 +159,15 @@ public class TetherModel extends WheelObstacle {
 				alpha = 1;
 				sparkSize = 0;
 			}
+			findCircle();
 			canvas.draw(lightingTexture,new Color(255, 255, 255, alpha), lightingTexture.getRegionWidth()/2, lightingTexture.getRegionHeight()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),sparkSize,sparkSize);
 
 		}
+	}
+	
+	
+	private void findCircle(){
+		lightCircle.setRadius((lightingTexture.getRegionWidth()/2 * sparkSize)/drawScale.x);
 	}
 	
 	private void flicker(){
