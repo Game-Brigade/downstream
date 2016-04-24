@@ -620,6 +620,7 @@ public class DownstreamController extends WorldController implements ContactList
 			koi.setAttemptingTether(false);
 		}
 		// HIT TANGENT
+		
 		if (koi.isAttemptingTether() && (koi.getPosition().sub(init).len2() < .01)) {
 			koi.setTethered(true);
 			koi.setAttemptingTether(false);
@@ -689,6 +690,12 @@ public class DownstreamController extends WorldController implements ContactList
 		
 		//FSM to handle Lotus
 		for (int i = 0; i < tethers.size(); i++){
+			if (tethers.get(i).equals(closestTether)){
+				tethers.get(i).inrange = true;
+			}
+			else{
+				tethers.get(i).inrange = false;
+			}
 			if (tethers.get(i).getTetherType() == TetherType.Lilypad){
 				tethers.get(i).setTexture(lilycurrentFrame);
 				}
@@ -794,8 +801,10 @@ public class DownstreamController extends WorldController implements ContactList
 		if (enableTetherRadius) {
 			Vector2 closestTether = getClosestTether().getPosition().cpy().scl(scale);
 			Vector2 initialTangent = koi.getInitialTangentPoint(getClosestTether().getPosition()).scl(scale);
-			float radius = closestTether.dst(initialTangent);
-			canvas.drawTetherCircle(closestTether, TetherModel.TETHER_DEFAULT_RANGE*scale.x*.9f);
+			//getClosestTether().inrange = true;
+			
+			//float radius = closestTether.dst(initialTangent);
+			//canvas.drawTetherCircle(closestTether, TetherModel.TETHER_DEFAULT_RANGE*scale.x*.9f);
 		}
 		
 

@@ -9,6 +9,7 @@
 package edu.cornell.gdiac.downstream.models;
 
 import com.badlogic.gdx.math.*;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.physics.box2d.*;
@@ -27,10 +28,11 @@ public class TetherModel extends WheelObstacle {
 
 	/** The range at which the player can enter orbit around this tether */
 	public static final int TETHER_DEFAULT_RANGE = 6;
-
-
-
-
+	
+	private static final String LIGHTTEXTURE = "tethers/lotusLight.png";
+	private TextureRegion lotusLightTexture = new TextureRegion(new Texture(Gdx.files.internal(LIGHTTEXTURE)));
+	
+	
 	private static final BodyDef.BodyType TETHER_BODY_TYPE = BodyDef.BodyType.StaticBody;
 
 	/** The type of this tether */
@@ -57,7 +59,10 @@ public class TetherModel extends WheelObstacle {
 	//2 means its opened
 	
 	private float alpha = 1f;
-	private double rand = .7;
+	
+	private float lightingScale = .4f;
+	private boolean lightingIncrease = false;
+	public boolean inrange = false;
 	
 	public Circle lightCircle = new Circle(getX(),getY(), 0);
 
@@ -130,11 +135,30 @@ public class TetherModel extends WheelObstacle {
 	public TetherType getTetherType(){
 		return type;
 	}
+	
+	private void setLightingScale(){
+		if (lightingIncrease){
+			lightingScale = lightingScale + .005f;
+		}
+		else{
+			lightingScale = lightingScale - .005f;
+		}
+		if (lightingScale < .4 || lightingScale > .6){
+			lightingIncrease = !lightingIncrease;
+		}
+	}
+	
+	public void drawLight(GameCanvas canvas){
+		setLightingScale();
+		canvas.draw(lotusLightTexture,new Color(255, 255, 255, .5f),texture.getRegionHeight()/2,texture.getRegionWidth()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),lightingScale,lightingScale);
+	}
+
 
 	public void draw(GameCanvas canvas) {
 		if (texture != null) {
 			if (type == TetherType.Lilypad){
 				canvas.draw(texture,Color.WHITE,texture.getRegionHeight()/2,texture.getRegionWidth()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),.4f,.4f);
+				
 			}
 			if (type == TetherType.Lantern || type == TetherType.Lotus){
 				canvas.draw(texture,Color.WHITE,texture.getRegionHeight()/2,texture.getRegionWidth()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),.35f,.35f);
@@ -149,7 +173,6 @@ public class TetherModel extends WheelObstacle {
 			if (sparkSize >= 2){
 				lit = true;
 				sparkSize = 2f;
-				//flicker();
 			}
 			if (lit && type == TetherType.Lotus && alpha > 0){
 				alpha = alpha - .001f;
@@ -161,7 +184,9 @@ public class TetherModel extends WheelObstacle {
 			}
 			findCircle();
 			canvas.draw(lightingTexture,new Color(255, 255, 255, alpha), lightingTexture.getRegionWidth()/2, lightingTexture.getRegionHeight()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),sparkSize,sparkSize);
-
+			if (inrange){
+				drawLight(canvas);
+			}
 		}
 	}
 	
@@ -170,21 +195,8 @@ public class TetherModel extends WheelObstacle {
 		lightCircle.setRadius((lightingTexture.getRegionWidth()/2 * sparkSize)/drawScale.x);
 	}
 	
-	private void flicker(){
-		if (alpha >= rand){
-			alpha = alpha - .02f;
-		}
-		if (alpha <= rand){
-			alpha = alpha + .02f;
-		}
-		if (alpha < rand + .02 && alpha > rand - .02){
-			rand = Math.random() + .5;
-		}
-	}
-
 	public void setTethered(boolean b) {
 		set = b;
-		
 	}
 	
 	public void setOpening(int i){
