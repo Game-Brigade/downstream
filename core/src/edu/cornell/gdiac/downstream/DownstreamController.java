@@ -447,7 +447,6 @@ public class DownstreamController extends WorldController implements ContactList
 		setComplete(false);
 		setFailure(false);
 		populateLevel();
-		canvas.setCameraPosition(koi.getPosition().cpy().scl(scale));
 	}
 
 	/**
@@ -531,7 +530,7 @@ public class DownstreamController extends WorldController implements ContactList
 			addObject(obj);
 		}
 		
-		for (Map.Entry<String,ArrayList<Vector2>> entry : level.enemies.entrySet()) {
+		for (Map.Entry<String,ArrayList<Vector2>> entry : level.enemiesLevel.entrySet()) {
 			Vector2 enemyPos = vectorOfString(entry.getKey());
 			ArrayList<Vector2> enemyPath = entry.getValue();
 //			for (Vector2 vector : enemyPath) {vector.x /= scale.x; vector.y /= scale.y;}
@@ -570,11 +569,14 @@ public class DownstreamController extends WorldController implements ContactList
 		addObject(koi);
 		
 		collisionController = new CollisionController(koi);
+
+		float width = Math.abs(level.map.get(0).x - level.map.get(1).x);
+		Vector2 center = new Vector2((level.map.get(0).x + level.map.get(1).x)/2,
+									 (level.map.get(0).y + level.map.get(1).y)/2);
+		cameraController.zoomStart(width, center, koi.getPosition().cpy().scl(scale));
 		
 		HUD = new HUDitems(lanterns.size(), lanternTexture, energyBarTexture, displayFont);
 		addHUD(HUD);
-		
-
 
 	}
 
@@ -588,7 +590,12 @@ public class DownstreamController extends WorldController implements ContactList
 	 *
 	 * @param delta Number of seconds since last animation frame
 	 */
-	public void update(float dt) {
+	public void update(float dt) {		
+		
+		if (!cameraController.isZoomedToPlayer()) {
+			cameraController.zoomToPlayer();
+			return;
+		}
 		InputController input = InputController.getInstance();
 		
 		litLotusCount = 0;
@@ -730,8 +737,8 @@ public class DownstreamController extends WorldController implements ContactList
 			}
 			if (tethers.get(i).getTetherType() == TetherType.Lilypad){
 				tethers.get(i).setTexture(lilycurrentFrame);
-				}
-			if (tethers.get(i).getTetherType() == TetherType.Lantern){
+			}
+			if (tethers.get(i).getTetherType() == TetherType.Lantern) {
 				if (tethers.get(i).getOpening() == 0){
 					tethers.get(i).setTexture(closedFlowercurrentFrame);
 					if (tethers.get(i).set){
@@ -781,12 +788,9 @@ public class DownstreamController extends WorldController implements ContactList
 				if(tethers.get(i).lit){
 					tethers.get(i).setTexture(openFlowercurrentFrame);
 				}
-				}
 			}
-		
-
+		}
 		SoundController.getInstance().update();
-		
 		HUD.updateHUD(litLotusCount, koi.getEnergy());
 	}
 	
@@ -826,6 +830,7 @@ public class DownstreamController extends WorldController implements ContactList
 	}
 
 	public void draw(float delta) {
+<<<<<<< HEAD
 
 		if (paused){
 			
@@ -848,6 +853,11 @@ public class DownstreamController extends WorldController implements ContactList
 		}
 		
 
+=======
+		if (paused) pauseMenu.draw();
+		else super.draw(delta);
+		
+>>>>>>> 8bfaf4387160963e99a7394ef45348e9d8d46c3e
 	}
 	
 	/**
