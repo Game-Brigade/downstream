@@ -28,7 +28,7 @@ import edu.cornell.gdiac.util.*;
  * This class is technically not the ROOT CLASS. Each platform has another class above
  * this (e.g. PC games use DesktopLauncher) which serves as the true root.  However, 
  * those classes are unique to each platform, while this class is the same across all 
- * plaforms. In addition, this functions as the root class all intents and purposes, 
+ * platforms. In addition, this functions as the root class all intents and purposes, 
  * and you would draw it as a root class in an architecture specification.  
  */
 public class GDXRoot extends Game implements ScreenListener {
@@ -40,13 +40,15 @@ public class GDXRoot extends Game implements ScreenListener {
 	private LoadingMode loading;
 	/** Player mode for the main menu */
 	private MainMenuMode mainMenu;
+	/** Player mode for the level select menu */
 	private LevelSelectMode levelSelect;
-	/** Player mode for the pause menu */
-	//private PauseMenuMode pauseMenu;
+	/** Player controller for playing the game */
+	private DownstreamController playGame;
+	/** Player mode for level editing */
+	private LevelEditor editor;
 	/** Player mode for the the game proper (CONTROLLER CLASS) */
 	private int current;
-	/** List of all WorldControllers */
-	private WorldController[] controllers;
+	
 	
 	/**
 	 * Creates a new game from the configuration settings.
@@ -75,14 +77,12 @@ public class GDXRoot extends Game implements ScreenListener {
 		loading = new LoadingMode(canvas,manager,1);
 		mainMenu = new MainMenuMode(canvas,manager);
 		levelSelect = new LevelSelectMode(canvas,manager);
+		playGame = new DownstreamController();
+		editor = new LevelEditor();
 		
-		controllers = new WorldController[2];
-		controllers[1] = new LevelEditor();
-		controllers[0] = new DownstreamController(); 
-		for(int ii = 0; ii < controllers.length; ii++) {
-			controllers[ii].preLoadContent(manager);
-		}
-		current = 0;
+		playGame.preLoadContent(manager);
+		editor.preLoadContent(manager);
+		
 		loading.setScreenListener(this);
 		setScreen(loading);
 	}
@@ -95,10 +95,11 @@ public class GDXRoot extends Game implements ScreenListener {
 	public void dispose() {
 		// Call dispose on our children
 		setScreen(null);
-		for(int ii = 0; ii < controllers.length; ii++) {
-			controllers[ii].unloadContent(manager);
-			controllers[ii].dispose();
-		}
+		
+		playGame.unloadContent(manager);
+		playGame.dispose();
+		editor.unloadContent(manager);
+		editor.dispose();
 
 		canvas.dispose();
 		canvas = null;
@@ -141,26 +142,27 @@ public class GDXRoot extends Game implements ScreenListener {
 		}
 		
 		else if (screen == mainMenu && exitCode == WorldController.EXIT_PLAY) {
-			for(int ii = 0; ii < controllers.length; ii++) {
-				controllers[ii].loadContent(manager);
-				controllers[ii].setScreenListener(this);
-				controllers[ii].setCanvas(canvas);
-			}
-			controllers[0].reset();
-			setScreen(controllers[0]);
+			
+			playGame.loadContent(manager);
+			playGame.setScreenListener(this);
+			playGame.setCanvas(canvas);
+			
+			playGame.reset();
+			
+			setScreen(playGame);
+			Gdx.input.setInputProcessor(playGame);
 			mainMenu.dispose();
 			mainMenu = null;
 		
 		} 
 		
 		else if (screen == mainMenu && exitCode == WorldController.EXIT_EDIT){
-			for(int ii = 0; ii < controllers.length; ii++) {
-				controllers[ii].loadContent(manager);
-				controllers[ii].setScreenListener(this);
-				controllers[ii].setCanvas(canvas);
-			}
-			controllers[1].reset();
-			setScreen(controllers[1]);
+			
+			editor.loadContent(manager);
+			editor.setScreenListener(this);
+			editor.setCanvas(canvas);
+			editor.reset();
+			setScreen(editor);
 			
 			mainMenu.dispose();
 			mainMenu = null;
@@ -186,15 +188,10 @@ public class GDXRoot extends Game implements ScreenListener {
 			Gdx.input.setInputProcessor(mainMenu);
 		}
 		
-		else if (exitCode == WorldController.EXIT_NEXT) {
-			current = (current+1) % controllers.length;
-			controllers[current].reset();
-			setScreen(controllers[current]);
-		} else if (exitCode == WorldController.EXIT_PREV) {
-			current = (current+controllers.length-1) % controllers.length;
-			controllers[current].reset();
-			setScreen(controllers[current]);
-		} else if (exitCode == WorldController.EXIT_QUIT) {
+		
+		
+		
+		else if (exitCode == WorldController.EXIT_QUIT) {
 			// We quit the main application
 			Gdx.app.exit();
 		}

@@ -214,6 +214,7 @@ public abstract class WorldController implements Screen {
 	public static final int EXIT_SELECT = 5;
 	public static final int EXIT_EDIT = 6;
 	public static final int EXIT_OPTIONS = 7;
+	public static final int EXIT_PAUSE = 8;
     /** How many frames after winning/losing do we continue? */
 	public static final int EXIT_COUNT = 120;
 
@@ -248,7 +249,7 @@ public abstract class WorldController implements Screen {
 	protected Vector2 scale;
 	
 	/** Whether or not this is an active controller */
-	private boolean active;
+	public boolean active;
 	/** Whether we have completed this level */
 	private boolean complete;
 	/** Whether we have failed at this world (and need a reset) */
@@ -257,6 +258,7 @@ public abstract class WorldController implements Screen {
 	private boolean debug;
 	/** Countdown active for winning or losing */
 	private int countdown;
+	
 
 	/**
 	 * Returns true if debug mode is active.
@@ -531,7 +533,7 @@ public abstract class WorldController implements Screen {
 				listener.exitScreen(this, EXIT_NEXT);
 				return false;
 			}
-		}
+		} 
 		return true;
 	}
 	
@@ -617,6 +619,8 @@ public abstract class WorldController implements Screen {
 			canvas.endDebug();
 		}
 		
+		
+		
 		// Final message
 		if (complete && !failed) {
 			displayFont.setColor(Color.YELLOW);
@@ -653,10 +657,12 @@ public abstract class WorldController implements Screen {
 	 * @param delta Number of seconds since last animation frame
 	 */
 	public void render(float delta) {
+		InputController input = InputController.getInstance();
 		if (active) {
 			if (preUpdate(delta)) {
-				update(delta); // This is the one that must be defined.
-				postUpdate(delta);
+					update(delta); // This is the one that must be defined.
+					postUpdate(delta);
+				
 			}
 			draw(delta);
 		}
