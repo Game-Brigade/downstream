@@ -690,7 +690,7 @@ public class DownstreamController extends WorldController implements ContactList
 		
 		//FSM to handle Lotus
 		for (int i = 0; i < tethers.size(); i++){
-			if (tethers.get(i).equals(closestTether)){
+			if (collisionController.inRangeOf(tethers.get(i))){
 				tethers.get(i).inrange = true;
 			}
 			else{
