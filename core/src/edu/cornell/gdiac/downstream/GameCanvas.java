@@ -957,7 +957,7 @@ public class GameCanvas {
     	float h = 100;
     	float w = 100;
     	GlyphLayout layout = new GlyphLayout(font,text);
-    	spriteBatch.draw(lilypad, (getWidth() - w/2)/1.1f - 14, (getHeight() - h/2)/1.1f + offset, w, h);
+    	spriteBatch.draw(lilypad, (getWidth() - w/2)/1.1f - 14, (getHeight() - h/2)/1.1f + offset + 10, w, h);
     	
 		float x = (getWidth()  - layout.width) / 1.1f;
 		float y = (getHeight() + layout.height) / 1.1f;

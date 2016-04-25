@@ -51,10 +51,11 @@ public class HUDitems extends Obstacle {
 	}
 	
 	private Color getBurstColor(){
-		Color c = Color.WHITE;
+		Color c = Color.CORAL.cpy();
 		if (Energy >= 1.9){
-			c = Color.GOLD;
+			c = Color.GOLD.cpy();
 		}
+		c.a = .6f;
 		return c;
 		
 	}
@@ -64,8 +65,8 @@ public class HUDitems extends Obstacle {
 	public void draw(GameCanvas canvas) {
 		// TODO Auto-generated method stub
 		if (TotalLotus != 0 && EnergyTexture != null && Lilypad != null) {
-			canvas.drawHUDText("" + LotusLit + "/" + TotalLotus, font, 0, Lilypad);
-			canvas.draw(EnergyTexture, getBurstColor(), canvas.getWidth()/1.1f - 400f , canvas.getHeight()/1.1f - 5, energyLen(), 30);
+			canvas.drawHUDText(TotalLotus - LotusLit  + "", font, -10, Lilypad);
+			canvas.draw(EnergyTexture, getBurstColor(), canvas.getWidth()/1.1f - 450f , canvas.getHeight()/1.1f - 5, energyLen(), 30);
 			}
 	}
 

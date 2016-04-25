@@ -63,7 +63,8 @@ public class DownstreamController extends WorldController implements ContactList
 	private static final String LIGHTING_SOUND = "SOUNDS/lighting_1.mp3";
 	private static final String DEATH_SOUND = "SOUNDS/fish_death.wav";
 	private static final String BACKGROUND_SOUND = "SOUNDS/background_sound.mp3";
-	private static final String ENERGYBAR_TEXTURE = "MENUS/energyBar.png";
+	private static final String ENERGYBAR_TEXTURE = "MENUS/UI_bar.png";
+	private static final String UI_FLOWER = "MENUS/UI_lotus.png";
 
 	/** Texture assets for the koi */
 	private TextureRegion koiTexture;
@@ -82,6 +83,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private TextureRegion whirlpoolFlipTexture;
 	
 	private TextureRegion energyBarTexture;
+	private TextureRegion UILotusTexture;
 
 	/** Track asset loading from all instances and subclasses */
 	private AssetState fishAssetState = AssetState.EMPTY;
@@ -200,6 +202,9 @@ public class DownstreamController extends WorldController implements ContactList
 		
 		manager.load(ENERGYBAR_TEXTURE, Texture.class);
 		assets.add(ENERGYBAR_TEXTURE);
+		
+		manager.load(UI_FLOWER, Texture.class);
+		assets.add(UI_FLOWER);
 /*
 		manager.load(CLICK_SOUND, Sound.class);
 		assets.add(CLICK_SOUND);
@@ -338,6 +343,7 @@ public class DownstreamController extends WorldController implements ContactList
 		lilyTexture = lilyFrames[0];
 		lanternTexture = closedFlowerFrames[0];
 		lightingTexture = createTexture(manager, LIGHTING_TEXTURE, false);
+		UILotusTexture = createTexture(manager, UI_FLOWER, false);
 
 		earthTile = createTexture(manager,EARTH_FILE,true);
 
@@ -558,6 +564,7 @@ public class DownstreamController extends WorldController implements ContactList
 
 		dwidth  = koiTexture.getRegionWidth()/scale.x;
 		dheight = koiTexture.getRegionHeight()/scale.y;
+		System.out.println(dwidth + " and " + dheight);
 		koi = new PlayerModel(level.player.x, level.player.y, dwidth, dheight);
 		koi.setDrawScale(scale);
 		koi.setName("koi");
@@ -575,7 +582,7 @@ public class DownstreamController extends WorldController implements ContactList
 									 (level.map.get(0).y + level.map.get(1).y)/2);
 		cameraController.zoomStart(width, center, koi.getPosition().cpy().scl(scale));
 		
-		HUD = new HUDitems(lanterns.size(), lanternTexture, energyBarTexture, displayFont);
+		HUD = new HUDitems(lanterns.size(), UILotusTexture, energyBarTexture, displayFont);
 		addHUD(HUD);
 
 	}
