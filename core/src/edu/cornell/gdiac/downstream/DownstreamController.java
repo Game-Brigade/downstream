@@ -89,6 +89,8 @@ public class DownstreamController extends WorldController implements ContactList
 	private boolean enableLeadingLine = false;
 	private boolean enableTetherRadius = true;
 	
+	private Music deathSound;
+	
 	//animations
 	
 	float stateTime;  
@@ -327,8 +329,8 @@ public class DownstreamController extends WorldController implements ContactList
 		sounds.allocate(manager, LIGHTING_SOUND);
 		sounds.allocate(manager, DEATH_SOUND);
 		*/
-
-
+		
+		deathSound = Gdx.audio.newMusic(Gdx.files.internal(LIGHTING_SOUND));
 		super.loadContent(manager);
 		fishAssetState = AssetState.COMPLETE;
 	}
@@ -569,6 +571,7 @@ public class DownstreamController extends WorldController implements ContactList
 		}
 		
 		if(dead){
+			deathSound.play();
 			objects.remove(koi);
 			setFailure(dead);
 			cameraController.resetCameraVelocity(); 
