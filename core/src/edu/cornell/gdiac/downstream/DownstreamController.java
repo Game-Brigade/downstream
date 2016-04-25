@@ -830,9 +830,34 @@ public class DownstreamController extends WorldController implements ContactList
 	}
 
 	public void draw(float delta) {
+<<<<<<< HEAD
+
+		if (paused){
+			
+			pauseMenu.draw();
+		}
+		else {
+			super.draw(delta);
+			if (enableLeadingLine) {
+				Vector2 farOff = koi.getPosition().cpy();
+				farOff.add(koi.getLinearVelocity().cpy().scl(1000));
+				canvas.drawLeadingLine(koi.getPosition().cpy(), farOff);
+			}
+			if (enableTetherRadius) {
+				Vector2 closestTether = getClosestTether().getPosition().cpy().scl(scale);
+				Vector2 initialTangent = koi.getInitialTangentPoint(getClosestTether().getPosition()).scl(scale);
+				float radius = closestTether.dst(initialTangent);
+				canvas.drawTetherCircle(closestTether, TetherModel.TETHER_DEFAULT_RANGE * scale.x * .9f);
+
+		}
+		}
+		
+
+=======
 		if (paused) pauseMenu.draw();
 		else super.draw(delta);
 		
+>>>>>>> 8bfaf4387160963e99a7394ef45348e9d8d46c3e
 	}
 	
 	/**
