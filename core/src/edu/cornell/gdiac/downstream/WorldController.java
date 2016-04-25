@@ -210,8 +210,10 @@ public abstract class WorldController implements Screen {
 	public static final int EXIT_MAIN = 3;
 	/** Exit code for first level */
 	public static final int EXIT_PLAY = 4;
+	
 	public static final int EXIT_SELECT = 5;
 	public static final int EXIT_EDIT = 6;
+	public static final int EXIT_OPTIONS = 7;
     /** How many frames after winning/losing do we continue? */
 	public static final int EXIT_COUNT = 120;
 
@@ -237,6 +239,8 @@ public abstract class WorldController implements Screen {
 	protected PooledList<Obstacle> addQueue = new PooledList<Obstacle>();
 	/** Listener that will update the player mode when we are done */
 	private ScreenListener listener;
+	
+	protected Vector2 HUDelements = new Vector2(0, 0);
 
 	/** The Box2D world */
 	protected World world;
@@ -605,6 +609,10 @@ public abstract class WorldController implements Screen {
 			obj.draw(canvas);
 		}
 		
+		canvas.end();
+		
+		canvas.beginHUD();
+		canvas.drawHUD("Lotus' left:" + (int) HUDelements.x, new BitmapFont(), 2);
 		canvas.end();
 		
 		if (debug) {

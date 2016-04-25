@@ -80,6 +80,7 @@ public class PlayerModel extends BoxObstacle {
 		cent = Vector2.Zero;
 		dest = Vector2.Zero;
 	}
+	
 
 	public boolean isAlive() {
 		return health > 0;
@@ -227,8 +228,12 @@ public class PlayerModel extends BoxObstacle {
 	 * @param canvas Drawing context
 	 */
 	public void draw(GameCanvas canvas) {
-		super.draw(canvas);  
+		//super.draw(canvas);  
 //		canvas.drawLeadingLine(body.getPosition(), new Vector2(0,0));
+		if (texture != null) {
+			canvas.draw(texture, Color.WHITE,origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x, (float) (getAngle() + 2.35619), .28f, .28f);
+			//canvas.draw(texture,Color.WHITE,origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x,getAngle(),1,1);
+		}
 
 	}
 	
@@ -387,10 +392,9 @@ public class PlayerModel extends BoxObstacle {
 		}
 		
 	}
-
-
-
 	
-	
+	public float getEnergy(){
+		return energy;
+	}
 	
 }
