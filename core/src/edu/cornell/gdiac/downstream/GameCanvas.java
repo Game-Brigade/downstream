@@ -1178,19 +1178,23 @@ public class GameCanvas {
 		local.translate(-ox,-oy);
 	}
 	
-	public void drawLeadingLine(Vector2 start, Vector2 end) {
+	public void drawLeadingLine(Vector2 start, Vector2 end, int width) {
 		start = start.cpy();
 		end = end.cpy();
-		Gdx.gl.glLineWidth(1);
+		Gdx.gl.glLineWidth(width);
         leadingLine.setProjectionMatrix(camera.combined);
         leadingLine.begin(ShapeRenderer.ShapeType.Line);
-        leadingLine.setColor(Color.WHITE);
+        leadingLine.setColor(Color.BLACK);
 //        local.applyTo(start);
 //        local.applyTo(end);
         leadingLine.line(start, end);
         leadingLine.end();
         Gdx.gl.glLineWidth(1);
     }
+	
+	public void drawLeadingLine(Vector2 start, Vector2 end) {
+		drawLeadingLine(start, end, 4);
+	}
 	
 	public void drawTetherCircle(Vector2 tetherPos, float radius) {
 		tetherRadiusLine.setProjectionMatrix(camera.combined);
