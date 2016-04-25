@@ -65,7 +65,7 @@ public class HUDitems extends Obstacle {
 		// TODO Auto-generated method stub
 		if (TotalLotus != 0 && EnergyTexture != null && Lilypad != null) {
 			canvas.drawHUDText("" + LotusLit + "/" + TotalLotus, font, 0, Lilypad);
-			canvas.draw(EnergyTexture, getBurstColor(), canvas.getWidth()/1.1f - 400f , canvas.getHeight()/1.1f, energyLen(), 30);
+			canvas.draw(EnergyTexture, getBurstColor(), canvas.getWidth()/1.1f - 400f , canvas.getHeight()/1.1f - 5, energyLen(), 30);
 			}
 	}
 
