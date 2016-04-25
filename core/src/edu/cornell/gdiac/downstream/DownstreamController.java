@@ -575,7 +575,7 @@ public class DownstreamController extends WorldController implements ContactList
 									 (level.map.get(0).y + level.map.get(1).y)/2);
 		cameraController.zoomStart(width, center, koi.getPosition().cpy().scl(scale));
 		
-		HUD = new HUDitems(lanterns.size(), lanternTexture, energyBarTexture);
+		HUD = new HUDitems(lanterns.size(), lanternTexture, energyBarTexture, displayFont);
 		addHUD(HUD);
 
 	}
