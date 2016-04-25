@@ -372,6 +372,7 @@ public class PlayerModel extends BoxObstacle {
 	public void burst(){
 		if (energy >= 2){
 			bursting = true;
+			setTethered(false);
 		}
 		
 	}

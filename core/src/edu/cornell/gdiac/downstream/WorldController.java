@@ -29,6 +29,7 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.graphics.g2d.freetype.*;
 
 import edu.cornell.gdiac.util.*;
+import edu.cornell.gdiac.downstream.models.TetherModel;
 import edu.cornell.gdiac.downstream.obstacle.*;
 
 /**
@@ -214,6 +215,7 @@ public abstract class WorldController implements Screen {
 	public static final int EXIT_SELECT = 5;
 	public static final int EXIT_EDIT = 6;
 	public static final int EXIT_OPTIONS = 7;
+	public static final int EXIT_PAUSE = 8;
     /** How many frames after winning/losing do we continue? */
 	public static final int EXIT_COUNT = 120;
 
@@ -240,7 +242,7 @@ public abstract class WorldController implements Screen {
 	/** Listener that will update the player mode when we are done */
 	private ScreenListener listener;
 	
-	protected Vector2 HUDelements = new Vector2(0, 0);
+	protected HUDitems HUD;
 
 	/** The Box2D world */
 	protected World world;
@@ -250,7 +252,7 @@ public abstract class WorldController implements Screen {
 	protected Vector2 scale;
 	
 	/** Whether or not this is an active controller */
-	private boolean active;
+	public boolean active;
 	/** Whether we have completed this level */
 	private boolean complete;
 	/** Whether we have failed at this world (and need a reset) */
@@ -259,6 +261,7 @@ public abstract class WorldController implements Screen {
 	private boolean debug;
 	/** Countdown active for winning or losing */
 	private int countdown;
+	
 
 	/**
 	 * Returns true if debug mode is active.
@@ -463,6 +466,10 @@ public abstract class WorldController implements Screen {
 		objects.remove(obj);
 		obj.deactivatePhysics(world);
 	}
+	
+	protected void addHUD(HUDitems h){
+		HUD = h;
+	}
 
 	/**
 	 * Returns true if the object is in bounds.
@@ -533,7 +540,7 @@ public abstract class WorldController implements Screen {
 				listener.exitScreen(this, EXIT_NEXT);
 				return false;
 			}
-		}
+		} 
 		return true;
 	}
 	
@@ -612,7 +619,7 @@ public abstract class WorldController implements Screen {
 		canvas.end();
 		
 		canvas.beginHUD();
-		canvas.drawHUD("Lotus' left:" + (int) HUDelements.x, new BitmapFont(), 2);
+		HUD.draw(canvas);
 		canvas.end();
 		
 		if (debug) {
@@ -622,6 +629,8 @@ public abstract class WorldController implements Screen {
 			}
 			canvas.endDebug();
 		}
+		
+		
 		
 		// Final message
 		if (complete && !failed) {
@@ -659,10 +668,12 @@ public abstract class WorldController implements Screen {
 	 * @param delta Number of seconds since last animation frame
 	 */
 	public void render(float delta) {
+		InputController input = InputController.getInstance();
 		if (active) {
 			if (preUpdate(delta)) {
-				update(delta); // This is the one that must be defined.
-				postUpdate(delta);
+					update(delta); // This is the one that must be defined.
+					postUpdate(delta);
+				
 			}
 			draw(delta);
 		}
