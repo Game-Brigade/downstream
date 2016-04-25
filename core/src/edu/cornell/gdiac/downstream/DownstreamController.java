@@ -423,7 +423,6 @@ public class DownstreamController extends WorldController implements ContactList
 		setComplete(false);
 		setFailure(false);
 		populateLevel();
-		canvas.setCameraPosition(koi.getPosition().cpy().scl(scale));
 	}
 
 	/**
@@ -507,7 +506,7 @@ public class DownstreamController extends WorldController implements ContactList
 			addObject(obj);
 		}
 		
-		for (Map.Entry<String,ArrayList<Vector2>> entry : level.enemies.entrySet()) {
+		for (Map.Entry<String,ArrayList<Vector2>> entry : level.enemiesLevel.entrySet()) {
 			Vector2 enemyPos = vectorOfString(entry.getKey());
 			ArrayList<Vector2> enemyPath = entry.getValue();
 //			for (Vector2 vector : enemyPath) {vector.x /= scale.x; vector.y /= scale.y;}
@@ -546,7 +545,10 @@ public class DownstreamController extends WorldController implements ContactList
 		addObject(koi);
 		
 		collisionController = new CollisionController(koi);
-
+		float width = Math.abs(level.map.get(0).x - level.map.get(1).x);
+		Vector2 center = new Vector2((level.map.get(0).x + level.map.get(1).x)/2,
+									 (level.map.get(0).y + level.map.get(1).y)/2);
+		cameraController.zoomStart(width, center, koi.getPosition().cpy().scl(scale));
 
 	}
 
@@ -561,6 +563,14 @@ public class DownstreamController extends WorldController implements ContactList
 	 * @param delta Number of seconds since last animation frame
 	 */
 	public void update(float dt) {
+		
+		System.out.println(cameraController.camera.zoom);
+		
+		if (!cameraController.isZoomedToPlayer()) {
+			cameraController.zoomToPlayer();
+			return;
+		}
+		
 		litLotusCount = 0;
 		for(TetherModel t : lanterns){
 			if(t.lit){
@@ -758,7 +768,7 @@ public class DownstreamController extends WorldController implements ContactList
 			}
 		
 
-		SoundController.getInstance().update();
+//		SoundController.getInstance().update();
 	}
 
 	private boolean isTethered() {
@@ -798,18 +808,20 @@ public class DownstreamController extends WorldController implements ContactList
 	public void draw(float delta) {
 		super.draw(delta);
 		
-		if (enableLeadingLine) {
-			Vector2 farOff = koi.getPosition().cpy();
-			farOff.add(koi.getLinearVelocity().cpy().scl(1000));
-			canvas.drawLeadingLine(koi.getPosition().cpy(), farOff);
-		}
-		if (enableTetherRadius) {
-			Vector2 closestTether = getClosestTether().getPosition().cpy().scl(scale);
-			Vector2 initialTangent = koi.getInitialTangentPoint(getClosestTether().getPosition()).scl(scale);
-			//getClosestTether().inrange = true;
-			//float radius = closestTether.dst(initialTangent);
-			//canvas.drawTetherCircle(closestTether, TetherModel.TETHER_DEFAULT_RANGE*scale.x*.9f);
-		}
+//		canvas.drawTetherCircle(cameraController.getCameraPosition(), TetherModel.TETHER_DEFAULT_RANGE*scale.x*.9f);
+		
+//		if (enableLeadingLine) {
+//			Vector2 farOff = koi.getPosition().cpy();
+//			farOff.add(koi.getLinearVelocity().cpy().scl(1000));
+//			
+//		}
+//		if (enableTetherRadius) {
+//			Vector2 closestTether = getClosestTether().getPosition().cpy().scl(scale);
+//			Vector2 initialTangent = koi.getInitialTangentPoint(getClosestTether().getPosition()).scl(scale);
+//			//getClosestTether().inrange = true;
+//			//float radius = closestTether.dst(initialTangent);
+//			//canvas.drawTetherCircle(closestTether, TetherModel.TETHER_DEFAULT_RANGE*scale.x*.9f);
+//		}
 		
 
 	}

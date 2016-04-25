@@ -107,7 +107,7 @@ public class InputController {
 	public boolean fast;
 	
 	public enum SelectionType {
-		Lilypad, Lantern, Enemy, Player, Wall, Goal;
+		Lilypad, Lantern, Enemy, Player, Wall, MapArea, Goal;
 	} 
 	
 	private SelectionType currentSelection;
@@ -405,7 +405,8 @@ public class InputController {
 		if (Gdx.input.isKeyPressed(Input.Keys.NUM_3)) currentSelection = SelectionType.Enemy;
 		if (Gdx.input.isKeyPressed(Input.Keys.NUM_4)) currentSelection = SelectionType.Player;
 		if (Gdx.input.isKeyPressed(Input.Keys.NUM_5)) currentSelection = SelectionType.Wall;
-		if (Gdx.input.isKeyPressed(Input.Keys.NUM_6)) currentSelection = SelectionType.Goal;
+		if (Gdx.input.isKeyPressed(Input.Keys.NUM_6)) currentSelection = SelectionType.MapArea;
+		if (Gdx.input.isKeyPressed(Input.Keys.NUM_7)) currentSelection = SelectionType.Goal;
 		
 		fast = (Gdx.input.isKeyPressed(Input.Keys.F));
 		

@@ -1237,9 +1237,17 @@ public class GameCanvas {
 		tetherRadiusLine.setProjectionMatrix(camera.combined);
 		tetherRadiusLine.begin(ShapeRenderer.ShapeType.Line);
 		tetherRadiusLine.setColor(Color.WHITE);
-//		System.out.println(tetherPos);
-//		System.out.println(radius);
 		tetherRadiusLine.circle(tetherPos.x, tetherPos.y, radius);
 		tetherRadiusLine.end();
+	}
+	
+	public void drawRectangle(Vector2 ll, Vector2 ur) {
+//		System.out.println("RECTANGLE BOYS");
+		ShapeRenderer rectangle = new ShapeRenderer();
+		rectangle.setProjectionMatrix(camera.combined);
+		rectangle.begin(ShapeRenderer.ShapeType.Line);
+		rectangle.setColor(Color.WHITE);
+		rectangle.rect(ll.x, ll.y, ur.x-ll.x, ur.y-ll.y);
+		rectangle.end();
 	}
 }
