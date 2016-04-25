@@ -25,11 +25,11 @@ public class HUDitems extends Obstacle {
 		font = new BitmapFont();
 	}
 	
-	public HUDitems(int lotuses, TextureRegion lily, TextureRegion energy){
+	public HUDitems(int lotuses, TextureRegion lily, TextureRegion energy, BitmapFont displayFont){
 		TotalLotus = lotuses;
 		LotusLit = 0;
 		Energy = 2f;
-		font = new BitmapFont();
+		font = displayFont;
 		Lilypad = lily;
 		EnergyTexture = energy;
 	}
