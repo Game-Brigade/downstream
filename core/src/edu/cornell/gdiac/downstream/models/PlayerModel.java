@@ -393,4 +393,8 @@ public class PlayerModel extends BoxObstacle {
 		
 	}
 	
+	public float getEnergy(){
+		return energy;
+	}
+	
 }

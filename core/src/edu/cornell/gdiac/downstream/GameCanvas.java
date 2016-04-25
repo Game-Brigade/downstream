@@ -82,6 +82,8 @@ public class GameCanvas {
 	/** Camera for the underlying SpriteBatch */
 	private OrthographicCamera camera;
 	
+	private OrthographicCamera hudCamera;
+	
 	/** Value to cache window width (if we are currently full screen) */
 	int width;
 	/** Value to cache window height (if we are currently full screen) */
@@ -119,6 +121,11 @@ public class GameCanvas {
 		debugRender.setProjectionMatrix(camera.combined);
 		leadingLine.setProjectionMatrix(camera.combined);
 		tetherRadiusLine.setProjectionMatrix(camera.combined);
+		
+		hudCamera = new OrthographicCamera(getWidth(),getWidth());
+		hudCamera.position.set(0,0,0);
+		hudCamera.update();
+		hudCamera.setToOrtho(false);
 		
 		// Initialize the cache objects
 		holder = new TextureRegion();
@@ -161,10 +168,13 @@ public class GameCanvas {
 	public void setViewportSize(float width, float height) {
 		camera.viewportWidth = width;
 		camera.viewportHeight = height;
+		hudCamera.viewportWidth = width;
+		hudCamera.viewportHeight = height;
 	}
 	
 	public void setCameraPosition(Vector2 newPosition) {
 		camera.position.set(newPosition, 0);
+		hudCamera.position.set(newPosition, 0);
 	}
 	
 	/**
@@ -390,6 +400,17 @@ public class GameCanvas {
 	 */
     public void begin() {
 		spriteBatch.setProjectionMatrix(camera.combined);
+    	spriteBatch.begin();
+    	active = DrawPass.STANDARD;
+    }
+    
+    /**
+	 * Start a standard drawing sequence.
+	 *
+	 * Nothing is flushed to the graphics card until the method end() is called.
+	 */
+    public void beginHUD() {
+		spriteBatch.setProjectionMatrix(hudCamera.combined);
     	spriteBatch.begin();
     	active = DrawPass.STANDARD;
     }
@@ -920,6 +941,22 @@ public class GameCanvas {
 		}
 		GlyphLayout layout = new GlyphLayout(font,text);
 		font.draw(spriteBatch, layout, x, y);
+    }
+    /***
+     * display hud in top left hand corner
+     * @param text
+     * @param font
+     * @param offset
+     */
+    public void drawHUD(String text, BitmapFont font, float offset){
+    	if (active != DrawPass.STANDARD) {
+			Gdx.app.error("GameCanvas", "Cannot draw without active begin()", new IllegalStateException());
+			return;
+		}
+    	GlyphLayout layout = new GlyphLayout(font,text);
+		float x = (getWidth()  - layout.width) / 1.1f;
+		float y = (getHeight() + layout.height) / 1.1f;
+		font.draw(spriteBatch, layout, x, y+offset);
     }
 
     /**

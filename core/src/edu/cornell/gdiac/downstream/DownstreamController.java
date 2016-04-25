@@ -8,6 +8,7 @@
 package edu.cornell.gdiac.downstream;
 
 import java.util.ArrayList;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -636,6 +637,7 @@ public class DownstreamController extends WorldController implements ContactList
 		else {}
 		koi.applyTetherForce(close, closestTether.getOrbitRadius());
 
+		HUDelements.set(lanterns.size() - litLotusCount, koi.getEnergy());
 
 		/*
 		WhirlpoolModel closestWhirlpool = getClosestWhirl();
@@ -795,7 +797,7 @@ public class DownstreamController extends WorldController implements ContactList
 
 	public void draw(float delta) {
 		super.draw(delta);
-
+		
 		if (enableLeadingLine) {
 			Vector2 farOff = koi.getPosition().cpy();
 			farOff.add(koi.getLinearVelocity().cpy().scl(1000));
@@ -805,7 +807,6 @@ public class DownstreamController extends WorldController implements ContactList
 			Vector2 closestTether = getClosestTether().getPosition().cpy().scl(scale);
 			Vector2 initialTangent = koi.getInitialTangentPoint(getClosestTether().getPosition()).scl(scale);
 			//getClosestTether().inrange = true;
-			
 			//float radius = closestTether.dst(initialTangent);
 			//canvas.drawTetherCircle(closestTether, TetherModel.TETHER_DEFAULT_RANGE*scale.x*.9f);
 		}

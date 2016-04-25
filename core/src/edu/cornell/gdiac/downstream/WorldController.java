@@ -239,6 +239,8 @@ public abstract class WorldController implements Screen {
 	protected PooledList<Obstacle> addQueue = new PooledList<Obstacle>();
 	/** Listener that will update the player mode when we are done */
 	private ScreenListener listener;
+	
+	protected Vector2 HUDelements = new Vector2(0, 0);
 
 	/** The Box2D world */
 	protected World world;
@@ -607,6 +609,10 @@ public abstract class WorldController implements Screen {
 			obj.draw(canvas);
 		}
 		
+		canvas.end();
+		
+		canvas.beginHUD();
+		canvas.drawHUD("Lotus' left:" + (int) HUDelements.x, new BitmapFont(), 2);
 		canvas.end();
 		
 		if (debug) {
