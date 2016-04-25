@@ -13,8 +13,6 @@ public class CollisionController {
 	PlayerModel koi;
 	public ArrayList<TetherModel> tethers = new ArrayList<TetherModel>();
 	
-	
-	
 	boolean death;
 	
 	public CollisionController(PlayerModel koi){
@@ -36,6 +34,7 @@ public class CollisionController {
 			}
 			else if(s2.startsWith("enemy")){
 				return true;
+				
 			}
 			else if(s2.startsWith("wall")){
 				koi.setTethered(false);
