@@ -8,6 +8,7 @@
 package edu.cornell.gdiac.downstream;
 
 import java.util.ArrayList;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -62,6 +63,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private static final String LIGHTING_SOUND = "SOUNDS/lighting_1.mp3";
 	private static final String DEATH_SOUND = "SOUNDS/fish_death.wav";
 	private static final String BACKGROUND_SOUND = "SOUNDS/background_sound.mp3";
+	private static final String ENERGYBAR_TEXTURE = "MENUS/energyBar.png";
 
 	/** Texture assets for the koi */
 	private TextureRegion koiTexture;
@@ -78,6 +80,8 @@ public class DownstreamController extends WorldController implements ContactList
 	/** Texture assets for whirlpools */
 	private TextureRegion whirlpoolTexture;
 	private TextureRegion whirlpoolFlipTexture;
+	
+	private TextureRegion energyBarTexture;
 
 	/** Track asset loading from all instances and subclasses */
 	private AssetState fishAssetState = AssetState.EMPTY;
@@ -99,6 +103,8 @@ public class DownstreamController extends WorldController implements ContactList
 	private boolean enableSlow = false;
 	private boolean enableLeadingLine = false;
 	private boolean enableTetherRadius = true;
+	
+	private Music deathSound;
 	
 	//animations
 	
@@ -147,6 +153,8 @@ public class DownstreamController extends WorldController implements ContactList
     TextureRegion[]                 koiCFrames;             // #5
     SpriteBatch                     koiCspriteBatch;            // #6
     TextureRegion                   koiCcurrentFrame;           // #7
+    
+    public HUDitems HUD;
 
 
 	/**
@@ -189,6 +197,9 @@ public class DownstreamController extends WorldController implements ContactList
 		
 		manager.load(WHIRLPOOL_FLIP_TEXTURE, Texture.class);
 		assets.add(WHIRLPOOL_FLIP_TEXTURE);
+		
+		manager.load(ENERGYBAR_TEXTURE, Texture.class);
+		assets.add(ENERGYBAR_TEXTURE);
 /*
 		manager.load(CLICK_SOUND, Sound.class);
 		assets.add(CLICK_SOUND);
@@ -319,7 +330,8 @@ public class DownstreamController extends WorldController implements ContactList
         koiCAnimation = new Animation(.05f, koiCFrames); 
         koiCspriteBatch = new SpriteBatch(); 
 		
-
+        
+        energyBarTexture = createTexture(manager, ENERGYBAR_TEXTURE, false);
 		enemyTexture = createTexture(manager,ENEMY_TEXTURE,false);
 		//koiTexture = koiSFrames[0];
 		koiTexture = createTexture(manager, KOI_TEXTURE, false);
@@ -338,8 +350,8 @@ public class DownstreamController extends WorldController implements ContactList
 		sounds.allocate(manager, LIGHTING_SOUND);
 		sounds.allocate(manager, DEATH_SOUND);
 		*/
-
-
+		
+		deathSound = Gdx.audio.newMusic(Gdx.files.internal(LIGHTING_SOUND));
 		super.loadContent(manager);
 		fishAssetState = AssetState.COMPLETE;
 	}
@@ -558,6 +570,10 @@ public class DownstreamController extends WorldController implements ContactList
 		addObject(koi);
 		
 		collisionController = new CollisionController(koi);
+		
+		HUD = new HUDitems(lanterns.size(), lanternTexture, energyBarTexture);
+		addHUD(HUD);
+		
 
 
 	}
@@ -586,6 +602,7 @@ public class DownstreamController extends WorldController implements ContactList
 		}
 		
 		if(dead){
+			deathSound.play();
 			objects.remove(koi);
 			setFailure(dead);
 			cameraController.resetCameraVelocity(); 
@@ -613,6 +630,10 @@ public class DownstreamController extends WorldController implements ContactList
 			enemy.patrol();
 			enemy.moveTowardsGoal();
 			enemy.fleeFind();
+			enemy.fleeFind(lanterns);
+			if (enemy.dead){
+				enemy.deactivatePhysics(world);
+			}
 		}
 
 		// KOI VEOLOCITY CODE
@@ -632,6 +653,7 @@ public class DownstreamController extends WorldController implements ContactList
 			koi.setAttemptingTether(false);
 		}
 		// HIT TANGENT
+		
 		if (koi.isAttemptingTether() && (koi.getPosition().sub(init).len2() < .01)) {
 			koi.setTethered(true);
 			koi.setAttemptingTether(false);
@@ -643,7 +665,6 @@ public class DownstreamController extends WorldController implements ContactList
 		}
 		else {}
 		koi.applyTetherForce(close, closestTether.getOrbitRadius());
-
 
 		/*
 		WhirlpoolModel closestWhirlpool = getClosestWhirl();
@@ -701,6 +722,12 @@ public class DownstreamController extends WorldController implements ContactList
 		
 		//FSM to handle Lotus
 		for (int i = 0; i < tethers.size(); i++){
+			if (collisionController.inRangeOf(tethers.get(i))){
+				tethers.get(i).inrange = true;
+			}
+			else{
+				tethers.get(i).inrange = false;
+			}
 			if (tethers.get(i).getTetherType() == TetherType.Lilypad){
 				tethers.get(i).setTexture(lilycurrentFrame);
 				}
@@ -759,6 +786,8 @@ public class DownstreamController extends WorldController implements ContactList
 		
 
 		SoundController.getInstance().update();
+		
+		HUD.updateHUD(litLotusCount, koi.getEnergy());
 	}
 	
 
@@ -797,6 +826,7 @@ public class DownstreamController extends WorldController implements ContactList
 	}
 
 	public void draw(float delta) {
+<<<<<<< HEAD
 		if (paused){
 			
 			pauseMenu.draw();
@@ -814,6 +844,21 @@ public class DownstreamController extends WorldController implements ContactList
 				float radius = closestTether.dst(initialTangent);
 				canvas.drawTetherCircle(closestTether, TetherModel.TETHER_DEFAULT_RANGE * scale.x * .9f);
 			}
+=======
+		super.draw(delta);
+		
+		if (enableLeadingLine) {
+			Vector2 farOff = koi.getPosition().cpy();
+			farOff.add(koi.getLinearVelocity().cpy().scl(1000));
+			canvas.drawLeadingLine(koi.getPosition().cpy(), farOff);
+		}
+		if (enableTetherRadius) {
+			Vector2 closestTether = getClosestTether().getPosition().cpy().scl(scale);
+			Vector2 initialTangent = koi.getInitialTangentPoint(getClosestTether().getPosition()).scl(scale);
+			//getClosestTether().inrange = true;
+			//float radius = closestTether.dst(initialTangent);
+			//canvas.drawTetherCircle(closestTether, TetherModel.TETHER_DEFAULT_RANGE*scale.x*.9f);
+>>>>>>> 63b9774cd4127691940dc6c98a4694e81d55add4
 		}
 		
 

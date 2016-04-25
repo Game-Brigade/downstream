@@ -54,6 +54,14 @@ public class EnemyModel extends SimpleObstacle {
 	
 	private TetherModel tethered;
 	
+	private boolean flee = false;
+	
+	private float alpha = 1;
+	
+	private Color c = new Color(255, 255, 255, alpha);
+	
+	public boolean dead = false;
+	
 	
 	
 	/** 
@@ -325,6 +333,28 @@ public class EnemyModel extends SimpleObstacle {
 		 }
 	 }
 	 
+	 public void fleeFind(ArrayList<TetherModel> tethers){
+		 for(TetherModel t: tethers){
+			 if (t.lightCircle.contains(this.getPosition())){
+				 flee = true;
+			 };
+		 }
+	 }
+	 
+	 private void fade(){
+		 if (flee){
+			 alpha = alpha - .03f;
+			 dead = true;
+		 }
+		 c.set(255, 255, 255, alpha);
+	 }
+	 
+	 public void draw(GameCanvas canvas){
+		 if (texture != null) {
+			 fade();
+			 canvas.draw(texture, c ,origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x,getAngle(),1,1);
+			}
+	 }
 	/*public void applyForce() {
 			if (!isActive()) {
 				return;
