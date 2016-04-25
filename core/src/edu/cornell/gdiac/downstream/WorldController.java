@@ -71,7 +71,7 @@ public abstract class WorldController implements Screen {
 	
 
 	/** Retro font for displaying messages */
-	private static String FONT_FILE = "loading/RetroGame.ttf";
+	private static String FONT_FILE = "loading/marathon.ttf";
 	private static int FONT_SIZE = 64;
 
 
