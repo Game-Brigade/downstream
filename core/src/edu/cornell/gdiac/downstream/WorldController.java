@@ -29,6 +29,7 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.graphics.g2d.freetype.*;
 
 import edu.cornell.gdiac.util.*;
+import edu.cornell.gdiac.downstream.models.TetherModel;
 import edu.cornell.gdiac.downstream.obstacle.*;
 
 /**
@@ -240,7 +241,7 @@ public abstract class WorldController implements Screen {
 	/** Listener that will update the player mode when we are done */
 	private ScreenListener listener;
 	
-	protected Vector2 HUDelements = new Vector2(0, 0);
+	protected HUDitems HUD;
 
 	/** The Box2D world */
 	protected World world;
@@ -463,6 +464,10 @@ public abstract class WorldController implements Screen {
 		objects.remove(obj);
 		obj.deactivatePhysics(world);
 	}
+	
+	protected void addHUD(HUDitems h){
+		HUD = h;
+	}
 
 	/**
 	 * Returns true if the object is in bounds.
@@ -612,7 +617,7 @@ public abstract class WorldController implements Screen {
 		canvas.end();
 		
 		canvas.beginHUD();
-		canvas.drawHUD("Lotus' left:" + (int) HUDelements.x, new BitmapFont(), 2);
+		HUD.draw(canvas);
 		canvas.end();
 		
 		if (debug) {

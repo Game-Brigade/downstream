@@ -948,16 +948,22 @@ public class GameCanvas {
      * @param font
      * @param offset
      */
-    public void drawHUD(String text, BitmapFont font, float offset){
+    public void drawHUDText(String text, BitmapFont font, float offset, TextureRegion lilypad){
     	if (active != DrawPass.STANDARD) {
 			Gdx.app.error("GameCanvas", "Cannot draw without active begin()", new IllegalStateException());
 			return;
 		}
+    	
+    	float h = 100;
+    	float w = 100;
     	GlyphLayout layout = new GlyphLayout(font,text);
+    	spriteBatch.draw(lilypad, (getWidth() - w/2)/1.1f - 14, (getHeight() - h/2)/1.1f + offset, w, h);
+    	
 		float x = (getWidth()  - layout.width) / 1.1f;
 		float y = (getHeight() + layout.height) / 1.1f;
 		font.draw(spriteBatch, layout, x, y+offset);
     }
+    
 
     /**
      * Draws text centered on the screen.

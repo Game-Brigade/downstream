@@ -61,6 +61,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private static final String LIGHTING_SOUND = "SOUNDS/lighting_1.mp3";
 	private static final String DEATH_SOUND = "SOUNDS/fish_death.wav";
 	private static final String BACKGROUND_SOUND = "SOUNDS/background_sound.mp3";
+	private static final String ENERGYBAR_TEXTURE = "MENUS/energyBar.png";
 
 	/** Texture assets for the koi */
 	private TextureRegion koiTexture;
@@ -77,6 +78,8 @@ public class DownstreamController extends WorldController implements ContactList
 	/** Texture assets for whirlpools */
 	private TextureRegion whirlpoolTexture;
 	private TextureRegion whirlpoolFlipTexture;
+	
+	private TextureRegion energyBarTexture;
 
 	/** Track asset loading from all instances and subclasses */
 	private AssetState fishAssetState = AssetState.EMPTY;
@@ -139,6 +142,8 @@ public class DownstreamController extends WorldController implements ContactList
     TextureRegion[]                 koiCFrames;             // #5
     SpriteBatch                     koiCspriteBatch;            // #6
     TextureRegion                   koiCcurrentFrame;           // #7
+    
+    public HUDitems HUD;
 
 
 	/**
@@ -181,6 +186,9 @@ public class DownstreamController extends WorldController implements ContactList
 		
 		manager.load(WHIRLPOOL_FLIP_TEXTURE, Texture.class);
 		assets.add(WHIRLPOOL_FLIP_TEXTURE);
+		
+		manager.load(ENERGYBAR_TEXTURE, Texture.class);
+		assets.add(ENERGYBAR_TEXTURE);
 /*
 		manager.load(CLICK_SOUND, Sound.class);
 		assets.add(CLICK_SOUND);
@@ -311,7 +319,8 @@ public class DownstreamController extends WorldController implements ContactList
         koiCAnimation = new Animation(.05f, koiCFrames); 
         koiCspriteBatch = new SpriteBatch(); 
 		
-
+        
+        energyBarTexture = createTexture(manager, ENERGYBAR_TEXTURE, false);
 		enemyTexture = createTexture(manager,ENEMY_TEXTURE,false);
 		//koiTexture = koiSFrames[0];
 		koiTexture = createTexture(manager, KOI_TEXTURE, false);
@@ -546,6 +555,10 @@ public class DownstreamController extends WorldController implements ContactList
 		addObject(koi);
 		
 		collisionController = new CollisionController(koi);
+		
+		HUD = new HUDitems(lanterns.size(), lanternTexture, energyBarTexture);
+		addHUD(HUD);
+		
 
 
 	}
@@ -636,8 +649,6 @@ public class DownstreamController extends WorldController implements ContactList
 		}
 		else {}
 		koi.applyTetherForce(close, closestTether.getOrbitRadius());
-
-		HUDelements.set(lanterns.size() - litLotusCount, koi.getEnergy());
 
 		/*
 		WhirlpoolModel closestWhirlpool = getClosestWhirl();
@@ -759,6 +770,8 @@ public class DownstreamController extends WorldController implements ContactList
 		
 
 		SoundController.getInstance().update();
+		
+		HUD.updateHUD(litLotusCount, koi.getEnergy());
 	}
 
 	private boolean isTethered() {
