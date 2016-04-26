@@ -12,30 +12,28 @@ import edu.cornell.gdiac.downstream.obstacle.*;
 
 public class ShadowModel extends BoxObstacle {
 
-	Vector2 goal;
+	Vector2 shadowDest;
 	Vector2 init;
 	Vector2 dir;
 	boolean cleared;
 	
 	public ShadowModel(float x, float y, float w, float h, Vector2 g) {
-		super(x,y);
+		super(x,y,w,h);
 		setBodyType(BodyDef.BodyType.StaticBody);
-		setSensor(true);
-		setName("shadow");
-		goal = g;
+		shadowDest = g;
 		init = getPosition();
 		dir = Vector2.Zero;
 	}
 	
 	public void clearShadow(boolean b){
-		dir = b ? goal.cpy().sub(getPosition()) : init.cpy().sub(getPosition());
+		dir = b ? shadowDest.cpy().sub(getPosition()) : init.cpy().sub(getPosition());
 		cleared = b;
 	}	
 
 	public void moveTowardsGoal(){
-		if(!goal.epsilonEquals(getPosition(), .2f)){
-			setY(getY() + dir.y *.2f);
-			setX(getX() + dir.x *.2f);
+		if(!shadowDest.epsilonEquals(getPosition(), .2f)){
+			setY(getY() - dir.y *.005f);
+			setX(getX() - dir.x *.005f);
 		}
 	}
 	

@@ -55,12 +55,18 @@ public class DownstreamController extends WorldController implements ContactList
 	private static final String LANTERN_TEXTURE = "tethers/notlit.png";
 	/** Reference to the lighting texture */
 	private static final String LIGHTING_TEXTURE = "tethers/aura.png";
+	private static final String SHADOW_TEXTURE = "terrain/shadow.png";
+	private static final String GOAL_TEXTURE = "terrain/goal.png";
+
 	/** Reference to the repeating land texture */
 
 	private static final String EARTH_FILE = "terrain/repeat tile.png";
-	private static final String EARTH_FILE_N = "terrain/swirl_grass.png";
-	private static final String EARTH_FILE_D = "terrain/Grass_day.jpg";
-	private static final String EARTH_FILE_S = "terrain/Grass_sunset.jpg";
+	private static final String EARTH_FILE_N = "terrain/Grass_Night.jpg";
+	private static final String EARTH_FILE_D = "terrain/Grass_Day.jpg";
+	private static final String EARTH_FILE_S = "terrain/Grass_Sunset.jpg";
+	private static final String ROCK_FILE_N = "terrain/Rock_Night.png";
+	private static final String ROCK_FILE_D = "terrain/Rock_Day.png";
+	private static final String ROCK_FILE_S = "terrain/Rock_Sunset.png";
 
 	/** Reference to the whirlpool texture */
 	private static final String WHIRLPOOL_TEXTURE = "terrain/whirlpool.png";
@@ -82,6 +88,8 @@ public class DownstreamController extends WorldController implements ContactList
 	private TextureRegion lanternTexture;
 	/** Texture assets for light */
 	private TextureRegion lightingTexture;
+	private TextureRegion shadowTexture;
+	private TextureRegion goalTexture;
 	/** Texture assets for walls and platforms */
 	private TextureRegion earthTile;
 
@@ -89,7 +97,10 @@ public class DownstreamController extends WorldController implements ContactList
 	private TextureRegion earthTileNight;
 	private TextureRegion earthTileSunset;
 
-
+	private TextureRegion rockDay;
+	private TextureRegion rockNight;
+	private TextureRegion rockSunset;
+	
 	/** Texture assets for whirlpools */
 	private TextureRegion whirlpoolTexture;
 	private TextureRegion whirlpoolFlipTexture;
@@ -198,10 +209,12 @@ public class DownstreamController extends WorldController implements ContactList
 	private ArrayList<TetherModel> tethers = new ArrayList<TetherModel>();
 	private ArrayList<TetherModel> lanterns = new ArrayList<TetherModel>();
 	private Stack<TetherModel> litlanterns = new Stack<TetherModel>();
+	private ArrayList<ShadowModel> shadows = new ArrayList<ShadowModel>();
 	private ArrayList<EnemyModel> enemies = new ArrayList<EnemyModel>();
 	private ArrayList<WhirlpoolModel> wpools = new ArrayList<WhirlpoolModel>();
 	private ArrayList<ArrayList<Float>> walls = new ArrayList<ArrayList<Float>>();
 	private PlayerModel koi;
+	private BoxObstacle goalDoor;
 	private EnemyModel eFish;
 	private CameraController cameraController;
 	private CollisionController collisionController;
@@ -214,13 +227,6 @@ public class DownstreamController extends WorldController implements ContactList
 	private TetherModel checkpoint0;
 
 	private double rot = 0;
-
-	/** The goal door position */
-	private static Vector2 GOAL_POS = new Vector2( 6, 12);
-	/** Reference to the goalDoor (for collision detection) */
-	private BoxObstacle goalDoor;
-
-	private boolean respawning;
 
 
 	/**
@@ -255,6 +261,12 @@ public class DownstreamController extends WorldController implements ContactList
 		manager.load(LIGHTING_TEXTURE, Texture.class);
 		assets.add(LIGHTING_TEXTURE);
 
+		manager.load(SHADOW_TEXTURE, Texture.class);
+		assets.add(SHADOW_TEXTURE);
+		
+		manager.load(GOAL_TEXTURE, Texture.class);
+		assets.add(GOAL_TEXTURE);
+		
 		manager.load(EARTH_FILE,Texture.class);
 		assets.add(EARTH_FILE);
 
@@ -265,6 +277,12 @@ public class DownstreamController extends WorldController implements ContactList
 		manager.load(EARTH_FILE_S,Texture.class);
 		assets.add(EARTH_FILE_S);
 
+		manager.load(ROCK_FILE_D,Texture.class);
+		assets.add(ROCK_FILE_D);
+		manager.load(ROCK_FILE_N,Texture.class);
+		assets.add(ROCK_FILE_N);
+		manager.load(ROCK_FILE_S,Texture.class);
+		assets.add(ROCK_FILE_S);
 
 		manager.load(WHIRLPOOL_TEXTURE, Texture.class);
 		assets.add(WHIRLPOOL_TEXTURE);
@@ -416,6 +434,8 @@ public class DownstreamController extends WorldController implements ContactList
 		lilyTexture = lilyFrames[0];
 		lanternTexture = closedFlowerFrames[0];
 		lightingTexture = createTexture(manager, LIGHTING_TEXTURE, false);
+		shadowTexture = createTexture(manager, SHADOW_TEXTURE, false);
+		goalTexture = createTexture(manager, GOAL_TEXTURE, false);
 		UILotusTexture = createTexture(manager, UI_FLOWER, false);
 
 		earthTile = createTexture(manager,EARTH_FILE_N,true);
@@ -445,6 +465,7 @@ public class DownstreamController extends WorldController implements ContactList
 		world.setContactListener(this);
 		dead = false;
 		whirled = false;
+		world.setGravity(Vector2.Zero);
 		paused = false;
 		wasPaused = false;
 	}
@@ -467,7 +488,9 @@ public class DownstreamController extends WorldController implements ContactList
 		}
 		enemies.clear();
 		lanterns.clear();
+		litlanterns.clear();
 		tethers.clear();
+		shadows.clear();
 		wpools.clear();
 		objects.clear();
 		addQueue.clear();
@@ -506,19 +529,6 @@ public class DownstreamController extends WorldController implements ContactList
 		boolean sensorTethers = true;
 		boolean sensorPools = true;
 
-		for (Vector2 lilypad : level.lilypads) {
-			TetherModel lily = new TetherModel(lilypad.x, lilypad.y, rad);
-			lily.setBodyType(BodyDef.BodyType.StaticBody);
-			lily.setName("lily"+ 1);
-			lily.setDensity(TETHER_DENSITY);
-			lily.setFriction(TETHER_FRICTION);
-			lily.setRestitution(TETHER_RESTITUTION);
-			lily.setSensor(sensorTethers);
-			lily.setDrawScale(scale);
-			lily.setTexture(lilyTexture);
-			addObject(lily);
-			tethers.add(lily);
-		}
 
 		if (!level.wpools.isEmpty()) {
 			for (Vector2 whirlpool : level.wpools) {
@@ -535,40 +545,7 @@ public class DownstreamController extends WorldController implements ContactList
 				wpools.add(pool);
 			}
 		}
-		for (Vector2 lotus : level.lotuses) {
-			TetherModel lantern = new TetherModel(lotus.x, lotus.y, rad, true);
-			lantern.setBodyType(BodyDef.BodyType.StaticBody);
-			lantern.setName("lotus"+ 1);
-			lantern.setDensity(TETHER_DENSITY);
-			lantern.setFriction(TETHER_FRICTION);
-			lantern.setRestitution(TETHER_RESTITUTION);
-			lantern.setSensor(sensorTethers);
-			lantern.setDrawScale(scale);
-			lantern.setTexture(lanternTexture);
-			lantern.setlightingTexture(lightingTexture);
-			lantern.setRotation(0);
-			addObject(lantern);
-			tethers.add(lantern);
-			lanterns.add(lantern);
-		}
 
-		for (ArrayList<Float> wall : level.walls) {
-			PolygonObstacle obj;
-			float[] wallFloat = new float[wall.size()];
-			for (int i = 0; i < wall.size(); i++) wallFloat[i] = wall.get(i);
-			obj = new PolygonObstacle(wallFloat, 0, 0);
-			obj.setBodyType(BodyDef.BodyType.StaticBody);
-			obj.setDensity(BASIC_DENSITY);
-			obj.setFriction(BASIC_FRICTION);
-			obj.setRestitution(BASIC_RESTITUTION);
-			obj.setDrawScale(scale);
-			obj.setTexture(earthTile);
-			obj.setName("wall1");
-			ArrayList<Float> scaledWall = new ArrayList<Float>();
-			for (Float f : wall) scaledWall.add(f*scale.x);
-			walls.add(scaledWall);
-			addObject(obj);
-		}
 
 		for (Map.Entry<String,ArrayList<Vector2>> entry : level.enemiesLevel.entrySet()) {
 			Vector2 enemyPos = vectorOfString(entry.getKey());
@@ -592,10 +569,40 @@ public class DownstreamController extends WorldController implements ContactList
 			enemies.add(eFish);
 		}
 
+		//Create goal tile
+		Vector2 goalPos = level.goal.get(0);
+		Vector2 shadowDest = level.goal.get(1);
 
-
+		cache = shadowDest.cpy().sub(goalPos).nor().scl(-3);
+		dwidth  = goalTexture.getRegionWidth()/scale.x;
+		dheight = goalTexture.getRegionHeight()/scale.y;
+		BoxObstacle goalTile = new BoxObstacle(goalPos.x+cache.x, goalPos.y+cache.y, dwidth, dheight);
+		goalTile.setName("goal");
+		goalTile.setDrawScale(scale);
+		goalTile.setTexture(goalTexture);
+		goalTile.setSensor(true);
+		goalTile.setAngle((float) Math.atan2(goalPos.y-shadowDest.y,goalPos.x-shadowDest.x));
+		addObject(goalTile);
+		
+		for (ArrayList<Float> wall : level.walls) {
+			PolygonObstacle obj;
+			float[] wallFloat = new float[wall.size()];
+			for (int i = 0; i < wall.size(); i++) wallFloat[i] = wall.get(i);
+			obj = new PolygonObstacle(wallFloat, 0, 0);
+			obj.setBodyType(BodyDef.BodyType.StaticBody);
+			obj.setDensity(BASIC_DENSITY);
+			obj.setFriction(BASIC_FRICTION);
+			obj.setRestitution(BASIC_RESTITUTION);
+			obj.setDrawScale(scale);
+			obj.setTexture(earthTile);
+			obj.setName("wall1");
+			ArrayList<Float> scaledWall = new ArrayList<Float>();
+			for (Float f : wall) scaledWall.add(f*scale.x);
+			walls.add(scaledWall);
+			addObject(obj);
+		}
+		
 		// Create the fish avatar
-
 		dwidth  = koiTexture.getRegionWidth()/scale.x;
 		dheight = koiTexture.getRegionHeight()/scale.y;
 		koi = new PlayerModel(level.player.x, level.player.y, dwidth, dheight);
@@ -603,15 +610,60 @@ public class DownstreamController extends WorldController implements ContactList
 		koi.setName("koi");
 		koi.setTexture(koiTexture);
 		koi.setTethered(false);
-
 		koi.setWhirled(false);
-
 		addObject(koi);
+		
+		
+		for (Vector2 lotus : level.lotuses) {
+			TetherModel lantern = new TetherModel(lotus.x, lotus.y, rad, true);
+			lantern.setBodyType(BodyDef.BodyType.StaticBody);
+			lantern.setName("lotus"+ 1);
+			lantern.setDensity(TETHER_DENSITY);
+			lantern.setFriction(TETHER_FRICTION);
+			lantern.setRestitution(TETHER_RESTITUTION);
+			lantern.setSensor(sensorTethers);
+			lantern.setDrawScale(scale);
+			lantern.setTexture(lanternTexture);
+			lantern.setlightingTexture(lightingTexture);
+			lantern.setRotation(0);
+			addObject(lantern);
+			tethers.add(lantern);
+			lanterns.add(lantern);
+		}
+		
+		for (Vector2 lilypad : level.lilypads) {
+			TetherModel lily = new TetherModel(lilypad.x, lilypad.y, rad);
+			lily.setBodyType(BodyDef.BodyType.StaticBody);
+			lily.setName("lily"+ 1);
+			lily.setDensity(TETHER_DENSITY);
+			lily.setFriction(TETHER_FRICTION);
+			lily.setRestitution(TETHER_RESTITUTION);
+			lily.setSensor(sensorTethers);
+			lily.setDrawScale(scale);
+			lily.setTexture(lilyTexture);
+			addObject(lily);
+			tethers.add(lily);
+		}
+		
+		//create shadow gate
+		dwidth = shadowTexture.getRegionWidth()/scale.x;
+		dheight = shadowTexture.getRegionHeight()/scale.y;
+		ShadowModel shadow = new ShadowModel(goalPos.x, goalPos.y, dwidth/4, dheight, shadowDest);
+		shadow.setName("shadow");
+		shadow.setDrawScale(scale);
+		shadow.setTexture(shadowTexture);
+		shadow.setSensor(true);
+		shadow.setAngle((float) Math.atan2(goalPos.y-shadowDest.y,goalPos.x-shadowDest.x));
+		shadows.add(shadow);
+		addObject(shadow);
+		
+
+		
+		
+		
+
 
 		collisionController = new CollisionController(koi);
-
-	
-
 
 		checkpoint0 = getClosestTetherTo(koi.initPos);
 		checkpoint = checkpoint0;
@@ -622,7 +674,7 @@ public class DownstreamController extends WorldController implements ContactList
 		Vector2 center = new Vector2((level.map.get(0).x + level.map.get(1).x)/2,
 				(level.map.get(0).y + level.map.get(1).y)/2);
 		cameraController.zoomStart(width, height, center, koi.getPosition().cpy().scl(scale));
-
+		
 		HUD = new HUDitems(lanterns.size(), UILotusTexture, energyBarTexture, displayFont);
 		addHUD(HUD);
 
@@ -696,6 +748,7 @@ public class DownstreamController extends WorldController implements ContactList
 			}
 
 			//CLEAR SHADOW CODE
+			System.out.println("WINNER: "+(lanterns.size() == litlanterns.size()));
 			clearShadows(lanterns.size() == litlanterns.size());
 			moveShadows();
 
@@ -905,18 +958,19 @@ public class DownstreamController extends WorldController implements ContactList
 			}
 		}
 		SoundController.getInstance().update();
-		HUD.updateHUD(lanterns.size()-litlanterns.size(), koi.getEnergy());
+		HUD.updateHUD(litlanterns.size(), koi.getEnergy());
 	}
 
 
 	private void clearShadows(boolean b) {
-		// TODO Auto-generated method stub
-
-	}
+		for (ShadowModel s : shadows){
+			s.clearShadow(b);;
+		}	}
 
 	private void moveShadows() {
-		// TODO Auto-generated method stub
-
+		for (ShadowModel s : shadows){
+			s.moveTowardsGoal();
+		}
 	}
 
 	private boolean isTethered() {
