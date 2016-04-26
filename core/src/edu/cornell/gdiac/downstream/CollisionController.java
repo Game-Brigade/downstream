@@ -10,14 +10,28 @@ import edu.cornell.gdiac.downstream.obstacle.Obstacle;
 
 public class CollisionController {
 
+<<<<<<< HEAD
+	private static final boolean LETHAL_WALLS  = false;
+	private static final boolean LETHAL_ROCKS  = true;
+	private static final boolean LETHAL_ENEMIES  = true;
+	private static final boolean LETHAL_WHIRLPOOLS  = false;
+	private static final boolean LETHAL_SHADOWS = true;
+	
+=======
 	PlayerModel koi;
 	public ArrayList<TetherModel> tethers = new ArrayList<TetherModel>();
 	public ArrayList<WhirlpoolModel> pools = new ArrayList<WhirlpoolModel>();
+>>>>>>> b0759998a9a98328febf9a791889916bcce8759d
 	
-	boolean death;
-	
+	PlayerModel koi;
+	public ArrayList<TetherModel> tethers = new ArrayList<TetherModel>();
+	private Body bCollide;
+	private String sCollide;
+		
 	public CollisionController(PlayerModel koi){
 		this.koi = koi;
+		bCollide = koi.getBody();
+		sCollide = "koi";
 	}
 	
 	//Called when a collision is made
@@ -26,8 +40,26 @@ public class CollisionController {
 		Body body2 = contact.getFixtureB().getBody();
 		String s1 = ((Obstacle)body1.getUserData()).getName();
 		String s2 = ((Obstacle)body2.getUserData()).getName();
-
 		if(s1.startsWith("koi")){
+<<<<<<< HEAD
+			sCollide = s2;
+			bCollide = body2;
+		}
+		else if(s2.startsWith("koi")){
+			sCollide = s1;
+			bCollide = body1;
+		}
+		else {
+			System.out.println("s1: "+ s1+ " s2: "+s2);
+			return false;
+		}
+		if(sCollide.startsWith("lily") || 
+				sCollide.startsWith("lotus") || 
+				sCollide.startsWith("fade") || 
+				sCollide.startsWith("lantern")){
+			if(!tethers.contains((TetherModel) bCollide.getUserData())){
+				tethers.add((TetherModel) bCollide.getUserData());
+=======
 			if(s2.startsWith("lily") || s2.startsWith("lotus") || s2.startsWith("fade")){
 				if(!tethers.contains((TetherModel) body2.getUserData())){
 					tethers.add((TetherModel) body2.getUserData());
@@ -71,39 +103,54 @@ public class CollisionController {
 			}
 			else{
 				System.out.println("COLLISION ERROR: "+s2);
+>>>>>>> b0759998a9a98328febf9a791889916bcce8759d
 			}
 		}
+		else if(sCollide.startsWith("whirl")){return LETHAL_WHIRLPOOLS;}
+		else if(sCollide.startsWith("rock")){return LETHAL_ROCKS;}
+		else if(sCollide.startsWith("shadow")){return LETHAL_SHADOWS;}
+		else if(sCollide.startsWith("enemy")){return LETHAL_ENEMIES;}
+		else if(sCollide.startsWith("wall")){return LETHAL_WALLS;}
+		else { System.out.println("COLLISION ERROR: "+sCollide);}
 		return false;
 	}
 	
 	public void end(Contact contact) {
-		Body body1 = contact.getFixtureA().getBody();
-		Body body2 = contact.getFixtureB().getBody();
-		String s1 = ((Obstacle)body1.getUserData()).getName();
-		String s2 = ((Obstacle)body2.getUserData()).getName();
-		
-		
-		if(body1.getUserData() == koi){
-			if(s2.startsWith("lily") || s2.startsWith("lotus") || s2.startsWith("fade")){
-				tethers.remove((TetherModel) body2.getUserData());
-			}
-			else if(s2.startsWith("enemy")){}
-			else if(s2.startsWith("land") || s2.startsWith("whirlpool")){}			
-			else{
-				System.out.println("COLLISION ERROR: "+s2);
-			}
-		}
-		
-		if(body2.getUserData() == koi){
-			if(s1.startsWith("lily") || s1.startsWith("lotus") || s1.startsWith("fade")){
-				tethers.remove((TetherModel) body1.getUserData());
-			}
-			else if(s1.startsWith("enemy")){}
-			else if(s2.startsWith("land") || s2.startsWith("whirlpool")){}			
-			else{
-				System.out.println("COLLISION ERROR: "+s2);
-			}
-		}
+
+
+				Body body1 = contact.getFixtureA().getBody();
+				Body body2 = contact.getFixtureB().getBody();
+				String s1 = ((Obstacle)body1.getUserData()).getName();
+				String s2 = ((Obstacle)body2.getUserData()).getName();
+				Body bCollide;
+				String sCollide;
+				if(s1.startsWith("koi")){
+					sCollide = s2;
+					bCollide = body2;
+				}
+				else if(s2.startsWith("koi")){
+					sCollide = s1;
+					bCollide = body1;
+				}
+				else {
+					return;
+				}
+				if(sCollide.startsWith("lily") || 
+						sCollide.startsWith("lotus") || 
+						sCollide.startsWith("fade") || 
+						sCollide.startsWith("lantern")){
+					tethers.remove((TetherModel) bCollide.getUserData());
+
+				}
+				else if(sCollide.startsWith("whirl")){}
+				else if(sCollide.startsWith("rock")){}
+				else if(sCollide.startsWith("shadow")){}
+				else if(sCollide.startsWith("enemy")){}
+				else if(sCollide.startsWith("wall")){}
+				else { System.out.println("COLLISION ERROR: "+sCollide);}
+				
+				
+				
 	}
 		
 	
@@ -144,6 +191,9 @@ public class CollisionController {
 	public boolean inRangeOf(TetherModel t) {
 		return tethers.contains(t);
 	}
+<<<<<<< HEAD
+
+=======
 	
 	public boolean inRangePool(){
 		return !pools.isEmpty();
@@ -154,9 +204,16 @@ public class CollisionController {
 	}
 	
 	
+>>>>>>> b0759998a9a98328febf9a791889916bcce8759d
 	public void initStart(TetherModel t){
+		clear();
 		tethers.add(t);
 	}
+	
+	public void clear(){
+		tethers.clear();
+	}
+	
 	
 	
 	
