@@ -72,6 +72,8 @@ public abstract class WorldController implements Screen {
 	private static final String BACKGROUND_FILE_S = "terrain/Water_Sunset.jpg";
 	private static final String OVERLAY_FILE = "terrain/texture.jpg";
 	
+	private static int dayTime = 0;
+	
 
 	/** Retro font for displaying messages */
 	private static String FONT_FILE = "loading/marathon.ttf";
@@ -81,7 +83,9 @@ public abstract class WorldController implements Screen {
 	/** The font for giving messages to the player */
 	protected BitmapFont displayFont;
 	/** The background image for the battle */
-	private static Texture background; 
+	private static Texture backgroundN; 
+	private static Texture backgroundD;
+	private static Texture backgroundS;
 	private static Texture overlay;
 	private Color referenceC = Color.WHITE.cpy();
 
@@ -141,8 +145,15 @@ public abstract class WorldController implements Screen {
 		
 		// Allocate the tiles
 
-		setBackground(manager.get(BACKGROUND_FILE_N, Texture.class));
-		getBackground().setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
+		
+		setBackground(manager.get(BACKGROUND_FILE_N, Texture.class), 1);
+		getBackground(1).setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
+		
+		setBackground(manager.get(BACKGROUND_FILE_D, Texture.class), 0);
+		getBackground(0).setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
+		
+		setBackground(manager.get(BACKGROUND_FILE_S, Texture.class), 2);
+		getBackground(2).setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
 		
 		overlay = manager.get(OVERLAY_FILE, Texture.class);
 		overlay.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
@@ -156,6 +167,22 @@ public abstract class WorldController implements Screen {
 
 		worldAssetState = AssetState.COMPLETE;
 	}
+	
+	/*private void backgroundCycle(AssetManager manager){
+		if (dayTime == 1){
+			setBackground(manager.get(BACKGROUND_FILE_N, Texture.class));
+			getBackground().setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
+		}
+		if (dayTime == 0){
+			setBackground(manager.get(BACKGROUND_FILE_D, Texture.class));
+			getBackground().setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
+		}
+		if(dayTime == 2){
+			setBackground(manager.get(BACKGROUND_FILE_S, Texture.class));
+			getBackground().setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
+			
+		}
+	}*/
 	
 	/**
 	 * Returns a newly loaded texture region for the given file.
@@ -179,6 +206,10 @@ public abstract class WorldController implements Screen {
 			return region;
 		}
 		return null;
+	}
+	
+	public void setDayTime(int i){
+		dayTime = i;
 	}
 	
 	/**
@@ -626,7 +657,7 @@ public abstract class WorldController implements Screen {
 		for (int i = -5; i < 5; i++) {
 			for (int j = -5; j < 5; j++) {
 
-				canvas.draw(getBackground(), Color.WHITE, canvas.getWidth()*i * 2, canvas.getHeight()*j * 2, 
+				canvas.draw(getBackground(dayTime), Color.WHITE, canvas.getWidth()*i * 2, canvas.getHeight()*j * 2, 
 													 canvas.getWidth() * 2,   canvas.getHeight() * 2);
 			}
 		}
@@ -746,12 +777,28 @@ public abstract class WorldController implements Screen {
 		this.listener = listener;
 	}
 
-	public static Texture getBackground() {
-		return background;
+	public static Texture getBackground(int n) {
+		if (n == 1){
+			return backgroundN;
+		}
+		else if (n == 0){
+			return backgroundD;
+		}
+		else{
+			return backgroundS;
+		}
 	}
 
-	public static void setBackground(Texture background) {
-		WorldController.background = background;
+	public static void setBackground(Texture background, int n) {
+		if (n == 1){
+			WorldController.backgroundN = background;
+		}
+		if (n == 0){
+			WorldController.backgroundD = background;
+		}
+		if (n == 2){
+			WorldController.backgroundS = background;
+		}
 	}
 	
 	protected static Vector2 vectorOfString(String s) {
