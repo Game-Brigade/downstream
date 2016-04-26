@@ -20,6 +20,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.*;
 import com.badlogic.gdx.audio.*;
 import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.physics.box2d.*;
@@ -62,8 +63,10 @@ public class DownstreamController extends WorldController implements ContactList
 	private static final String CLICK_SOUND = "SOUNDS/menu_click.wav";
 	private static final String LIGHTING_SOUND = "SOUNDS/lighting_1.mp3";
 	private static final String DEATH_SOUND = "SOUNDS/fish_death.wav";
-	private static final String BACKGROUND_SOUND = "SOUNDS/background_sound.mp3";
-	private static final String ENERGYBAR_TEXTURE = "MENUS/energyBar.png";
+	
+	private static final String ENERGYBAR_TEXTURE = "MENUS/UI_bar.png";
+	private static final String UI_FLOWER = "MENUS/UI_lotus.png";
+	private static final String OVERLAY = "terrain/texture.jpg";
 
 	/** Texture assets for the koi */
 	private TextureRegion koiTexture;
@@ -82,6 +85,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private TextureRegion whirlpoolFlipTexture;
 	
 	private TextureRegion energyBarTexture;
+	private TextureRegion UILotusTexture;
 
 	/** Track asset loading from all instances and subclasses */
 	private AssetState fishAssetState = AssetState.EMPTY;
@@ -94,6 +98,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private int optionsState;
 	private boolean wasPaused;
 	private boolean paused;
+	
 
 	private boolean dead;
 	private boolean whirled;
@@ -105,6 +110,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private boolean enableTetherRadius = true;
 	
 	private Music deathSound;
+	
 	
 	//animations
 	
@@ -200,6 +206,12 @@ public class DownstreamController extends WorldController implements ContactList
 		
 		manager.load(ENERGYBAR_TEXTURE, Texture.class);
 		assets.add(ENERGYBAR_TEXTURE);
+		
+		manager.load(UI_FLOWER, Texture.class);
+		assets.add(UI_FLOWER);
+		
+		manager.load(OVERLAY, Texture.class);
+		assets.add(OVERLAY);
 /*
 		manager.load(CLICK_SOUND, Sound.class);
 		assets.add(CLICK_SOUND);
@@ -338,9 +350,9 @@ public class DownstreamController extends WorldController implements ContactList
 		lilyTexture = lilyFrames[0];
 		lanternTexture = closedFlowerFrames[0];
 		lightingTexture = createTexture(manager, LIGHTING_TEXTURE, false);
+		UILotusTexture = createTexture(manager, UI_FLOWER, false);
 
 		earthTile = createTexture(manager,EARTH_FILE,true);
-
 		
 		whirlpoolTexture = createTexture(manager,WHIRLPOOL_TEXTURE,false);
 		whirlpoolFlipTexture = createTexture(manager,WHIRLPOOL_FLIP_TEXTURE,false);
@@ -352,6 +364,8 @@ public class DownstreamController extends WorldController implements ContactList
 		*/
 		
 		deathSound = Gdx.audio.newMusic(Gdx.files.internal(LIGHTING_SOUND));
+		deathSound.setLooping(false);
+		
 		super.loadContent(manager);
 		fishAssetState = AssetState.COMPLETE;
 	}
@@ -437,6 +451,7 @@ public class DownstreamController extends WorldController implements ContactList
 		objects.clear();
 		addQueue.clear();
 		world.dispose();
+		
 		dead = false;
 		whirled = false;
 		paused = false;
@@ -496,8 +511,21 @@ public class DownstreamController extends WorldController implements ContactList
 		wpools.add(pool);
 		
 		*/
-
-		
+		/*
+		for (Vector2 whirlpool: level.wpools) {
+			WhirlpoolModel pool = new WhirlpoolModel(whirlpool.x, whirlpool.y);
+			pool.setBodyType(BodyDef.BodyType.StaticBody);
+			pool.setName("whirlpool" + 1);
+			pool.setDensity(TETHER_DENSITY);
+			pool.setFriction(TETHER_FRICTION);
+			pool.setRestitution(TETHER_RESTITUTION);
+			pool.setSensor(sensorPools);
+			pool.setDrawScale(scale);
+			pool.setTexture(whirlpoolFlipTexture);
+			addObject(pool);
+			wpools.add(pool);
+		}
+		*/
 		for (Vector2 lotus : level.lotuses) {
 			TetherModel lantern = new TetherModel(lotus.x, lotus.y, rad, true);
 			lantern.setBodyType(BodyDef.BodyType.StaticBody);
@@ -558,6 +586,7 @@ public class DownstreamController extends WorldController implements ContactList
 
 		dwidth  = koiTexture.getRegionWidth()/scale.x;
 		dheight = koiTexture.getRegionHeight()/scale.y;
+		System.out.println(dwidth + " and " + dheight);
 		koi = new PlayerModel(level.player.x, level.player.y, dwidth, dheight);
 		koi.setDrawScale(scale);
 		koi.setName("koi");
@@ -575,7 +604,7 @@ public class DownstreamController extends WorldController implements ContactList
 									 (level.map.get(0).y + level.map.get(1).y)/2);
 		cameraController.zoomStart(width, center, koi.getPosition().cpy().scl(scale));
 		
-		HUD = new HUDitems(lanterns.size(), lanternTexture, energyBarTexture, displayFont);
+		HUD = new HUDitems(lanterns.size(), UILotusTexture, energyBarTexture, displayFont);
 		addHUD(HUD);
 
 	}
@@ -610,6 +639,7 @@ public class DownstreamController extends WorldController implements ContactList
 		
 		if(dead){
 			deathSound.play();
+
 			objects.remove(koi);
 			setFailure(dead);
 			cameraController.resetCameraVelocity(); 
@@ -831,9 +861,30 @@ public class DownstreamController extends WorldController implements ContactList
 
 	public void draw(float delta) {
 
-		if (paused) pauseMenu.draw();
-		else super.draw(delta);
+		if (paused){
+			pauseMenu.draw();
+		}
+		else {
+			super.draw(delta);
+			canvas.beginHUD();
+			HUD.draw(canvas);
+			canvas.end();
+			if (enableLeadingLine) {
+				Vector2 farOff = koi.getPosition().cpy();
+				farOff.add(koi.getLinearVelocity().cpy().scl(1000));
+				canvas.drawLeadingLine(koi.getPosition().cpy(), farOff);
+			}
+			if (enableTetherRadius) {
+				Vector2 closestTether = getClosestTether().getPosition().cpy().scl(scale);
+				Vector2 initialTangent = koi.getInitialTangentPoint(getClosestTether().getPosition()).scl(scale);
+				float radius = closestTether.dst(initialTangent);
+				canvas.drawTetherCircle(closestTether, TetherModel.TETHER_DEFAULT_RANGE * scale.x * .9f);
+			}
+		}
+
+
 		
+
 	}
 	
 	/**
@@ -860,8 +911,46 @@ public class DownstreamController extends WorldController implements ContactList
 					postUpdate(delta);
 			}
 			this.draw(delta);
+			if (goOptions() && listener != null) {
+				listener.exitScreen(this, WorldController.EXIT_OPTIONS);
+			}
+			if (goBack() && listener != null) {
+				listener.exitScreen(this, WorldController.EXIT_MAIN);
+			}
+			if (restartLevel() && listener != null) {
+				reset();
+			}
+			if (resumePlay() && listener != null) {
+				resumeState = 0;
+				restartState = 0;
+				optionsState = 0;
+				backState = 0;
+				wasPaused = false;
+				paused = false;
+			}
+			
 		}
 	}
+	
+	/**
+	 * Dispose of all (non-static) resources allocated to this mode.
+	 */
+	public void dispose() {
+		for(Obstacle obj : objects) {
+			obj.deactivatePhysics(world);
+		}
+		objects.clear();
+		addQueue.clear();
+		world.dispose();
+		pauseMenu.dispose();
+		objects = null;
+		addQueue = null;
+		bounds = null;
+		scale  = null;
+		world  = null;
+		canvas = null;
+	}
+	
 
 	/// CONTACT LISTENER METHODS
 	/**
@@ -875,17 +964,6 @@ public class DownstreamController extends WorldController implements ContactList
 	 */
 	public void beginContact(Contact contact) {
 		dead = collisionController.begin(contact);
-	}
-	
-	private static Vector2 vectorOfString(String s) {
-		int comma = s.indexOf(",");
-		int openParens = s.indexOf("(");
-		int closeParens = s.indexOf(")");
-		String xstr = s.substring(openParens+1,comma);
-		String ystr = s.substring(comma+1,closeParens);
-		float x = Float.parseFloat(xstr);
-		float y = Float.parseFloat(ystr);
-		return new Vector2(x,y);
 	}
 
 	/**
@@ -984,35 +1062,35 @@ public class DownstreamController extends WorldController implements ContactList
 	 */
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
 		if (paused) {
-			System.out.println(screenX + " " + screenY);
+			
 			// Flip to match graphics coordinates
 			screenY = canvas.getHeight() - screenY;
-			float dx = Math.abs(screenX - pauseMenu.backPos.x);
-			float dy = Math.abs(screenY - pauseMenu.backPos.y);
+			float dx = Math.abs(screenX - PauseMenuMode.backPos.x);
+			float dy = Math.abs(screenY - PauseMenuMode.backPos.y);
 
 			if (dx < pauseMenu.scale * pauseMenu.back.getWidth() / 2
 					&& dy < pauseMenu.scale * pauseMenu.back.getHeight() / 2) {
 				backState = 1;
 			}
 
-			dx = Math.abs(screenX - pauseMenu.resumePos.x);
-			dy = Math.abs(screenY - pauseMenu.resumePos.y);
+			dx = Math.abs(screenX - PauseMenuMode.resumePos.x);
+			dy = Math.abs(screenY - PauseMenuMode.resumePos.y);
 
 			if (dx < pauseMenu.scale * pauseMenu.resume.getWidth() / 2
 					&& dy < pauseMenu.scale * pauseMenu.resume.getHeight() / 2) {
 				resumeState = 1;
 			}
 
-			dx = Math.abs(screenX - pauseMenu.restartPos.x);
-			dy = Math.abs(screenY - pauseMenu.restartPos.y);
+			dx = Math.abs(screenX - PauseMenuMode.restartPos.x);
+			dy = Math.abs(screenY - PauseMenuMode.restartPos.y);
 
 			if (dx < pauseMenu.scale * pauseMenu.restart.getWidth() / 2
 					&& dy < pauseMenu.scale * pauseMenu.restart.getHeight() / 2) {
 				restartState = 1;
 			}
 
-			dx = Math.abs(screenX - pauseMenu.optionsPos.x);
-			dy = Math.abs(screenY - pauseMenu.optionsPos.y);
+			dx = Math.abs(screenX - PauseMenuMode.optionsPos.x);
+			dy = Math.abs(screenY - PauseMenuMode.optionsPos.y);
 
 			if (dx < pauseMenu.scale * pauseMenu.options.getWidth() / 2
 					&& dy < pauseMenu.scale * pauseMenu.options.getHeight() / 2) {

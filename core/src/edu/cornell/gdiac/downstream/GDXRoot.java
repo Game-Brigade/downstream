@@ -19,6 +19,7 @@ import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.g2d.freetype.*;
 import com.badlogic.gdx.assets.loaders.*;
 import com.badlogic.gdx.assets.loaders.resolvers.*;
+import com.badlogic.gdx.audio.Music;
 
 import edu.cornell.gdiac.util.*;
 
@@ -48,6 +49,9 @@ public class GDXRoot extends Game implements ScreenListener {
 	private LevelEditor editor;
 	/** Player mode for the the game proper (CONTROLLER CLASS) */
 	private int current;
+	
+	private Music backgroundMusic;
+	private static final String BACKGROUND_SOUND = "SOUNDS/background_sound.mp3";
 	
 	
 	/**
@@ -96,8 +100,7 @@ public class GDXRoot extends Game implements ScreenListener {
 		// Call dispose on our children
 		setScreen(null);
 		
-		playGame.unloadContent(manager);
-		playGame.dispose();
+		//System.out.println("Hello");
 		editor.unloadContent(manager);
 		editor.dispose();
 
@@ -139,9 +142,17 @@ public class GDXRoot extends Game implements ScreenListener {
 			mainMenu.setScreenListener(this);
 			setScreen(mainMenu);
 			Gdx.input.setInputProcessor(mainMenu);
+		
+			backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal(BACKGROUND_SOUND));
+			backgroundMusic.setLooping(true);
+			backgroundMusic.play();
 		}
 		
 		else if (screen == mainMenu && exitCode == WorldController.EXIT_PLAY) {
+			
+			playGame = new DownstreamController();
+			playGame.preLoadContent(manager);
+			editor.preLoadContent(manager);
 			
 			playGame.loadContent(manager);
 			playGame.setScreenListener(this);
@@ -188,6 +199,19 @@ public class GDXRoot extends Game implements ScreenListener {
 			Gdx.input.setInputProcessor(mainMenu);
 		}
 		
+		
+		
+		else if (screen == playGame && exitCode == WorldController.EXIT_MAIN){
+			System.out.println("Hello");
+			playGame.unloadContent(manager);
+			playGame.dispose();
+			playGame = null;
+			mainMenu = new MainMenuMode(canvas,manager);
+			
+			mainMenu.setScreenListener(this);
+			setScreen(mainMenu);
+			Gdx.input.setInputProcessor(mainMenu);
+		}
 		
 		
 		

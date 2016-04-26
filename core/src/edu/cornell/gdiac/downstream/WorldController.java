@@ -68,6 +68,7 @@ public abstract class WorldController implements Screen {
 	// Pathnames to shared assets
 	/** The background image for the battle */
 	private static final String BACKGROUND_FILE = "terrain/water.png";
+	private static final String OVERLAY_FILE = "terrain/texture.jpg";
 	
 
 	/** Retro font for displaying messages */
@@ -79,6 +80,8 @@ public abstract class WorldController implements Screen {
 	protected BitmapFont displayFont;
 	/** The background image for the battle */
 	private static Texture background; 
+	private static Texture overlay;
+	private Color referenceC = Color.WHITE.cpy();
 
 	/**
 	 * Preloads the assets for this controller.
@@ -99,6 +102,11 @@ public abstract class WorldController implements Screen {
 
 		manager.load(BACKGROUND_FILE, Texture.class);
 		assets.add(BACKGROUND_FILE);
+		
+		manager.load(OVERLAY_FILE, Texture.class);
+		assets.add(OVERLAY_FILE);
+		
+		referenceC.a = .3f;
 		
 		// Load the font
 		FreetypeFontLoader.FreeTypeFontLoaderParameter size2Params = new FreetypeFontLoader.FreeTypeFontLoaderParameter();
@@ -127,6 +135,9 @@ public abstract class WorldController implements Screen {
 
 		setBackground(manager.get(BACKGROUND_FILE, Texture.class));
 		getBackground().setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
+		
+		overlay = manager.get(OVERLAY_FILE, Texture.class);
+		overlay.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
 		
 		// Allocate the font
 		if (manager.isLoaded(FONT_FILE)) {
@@ -240,7 +251,7 @@ public abstract class WorldController implements Screen {
 	/** Queue for adding objects */
 	protected PooledList<Obstacle> addQueue = new PooledList<Obstacle>();
 	/** Listener that will update the player mode when we are done */
-	private ScreenListener listener;
+	protected ScreenListener listener;
 	
 	protected HUDitems HUD;
 
@@ -616,9 +627,14 @@ public abstract class WorldController implements Screen {
 			obj.draw(canvas);
 		}
 		
-		canvas.end();
+		for (int i = -5; i < 5; i++) {
+			for (int j = -5; j < 5; j++) {
+				canvas.draw(overlay, referenceC, canvas.getWidth()*i, canvas.getHeight()*j, 
+						 canvas.getWidth(),   canvas.getHeight());
+			}
+		}
 		
-
+		canvas.end();
 		
 		if (debug) {
 			canvas.beginDebug();
@@ -637,7 +653,7 @@ public abstract class WorldController implements Screen {
 			canvas.drawTextCentered("VICTORY!", displayFont, 0.0f);
 			canvas.end();
 		} else if (failed) {
-			displayFont.setColor(Color.RED);
+			//displayFont.setColor(Color.RED);
 			canvas.begin(); // DO NOT SCALE
 			canvas.drawTextCentered("FAILURE!", displayFont, 0.0f);
 			canvas.end();

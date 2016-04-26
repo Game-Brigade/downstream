@@ -84,6 +84,8 @@ public class GameCanvas {
 	
 	private OrthographicCamera hudCamera;
 	
+	private OrthographicCamera pauseCamera;
+	
 	/** Value to cache window width (if we are currently full screen) */
 	int width;
 	/** Value to cache window height (if we are currently full screen) */
@@ -126,6 +128,11 @@ public class GameCanvas {
 		hudCamera.position.set(0,0,0);
 		hudCamera.update();
 		hudCamera.setToOrtho(false);
+		
+		pauseCamera = new OrthographicCamera(getWidth(),getWidth());
+		pauseCamera.position.set(0,0,0);
+		pauseCamera.update();
+		pauseCamera.setToOrtho(false);
 		
 		// Initialize the cache objects
 		holder = new TextureRegion();
@@ -170,11 +177,14 @@ public class GameCanvas {
 		camera.viewportHeight = height;
 		hudCamera.viewportWidth = width;
 		hudCamera.viewportHeight = height;
+		pauseCamera.viewportWidth = width;
+		pauseCamera.viewportHeight = height;
 	}
 	
 	public void setCameraPosition(Vector2 newPosition) {
 		camera.position.set(newPosition, 0);
 		hudCamera.position.set(newPosition, 0);
+		pauseCamera.position.set(newPosition,0);
 	}
 	
 	/**
@@ -411,6 +421,12 @@ public class GameCanvas {
 	 */
     public void beginHUD() {
 		spriteBatch.setProjectionMatrix(hudCamera.combined);
+    	spriteBatch.begin();
+    	active = DrawPass.STANDARD;
+    }
+    
+    public void beginPAUSE() {
+    	spriteBatch.setProjectionMatrix(pauseCamera.combined);
     	spriteBatch.begin();
     	active = DrawPass.STANDARD;
     }
@@ -957,12 +973,13 @@ public class GameCanvas {
     	float h = 100;
     	float w = 100;
     	GlyphLayout layout = new GlyphLayout(font,text);
-    	spriteBatch.draw(lilypad, (getWidth() - w/2)/1.1f - 14, (getHeight() - h/2)/1.1f + offset, w, h);
+    	spriteBatch.draw(lilypad, (getWidth() - w/2)/1.1f - 14, (getHeight() - h/2)/1.1f + offset + 10, w, h);
     	
 		float x = (getWidth()  - layout.width) / 1.1f;
 		float y = (getHeight() + layout.height) / 1.1f;
 		font.draw(spriteBatch, layout, x, y+offset);
     }
+    
     
 
     /**
