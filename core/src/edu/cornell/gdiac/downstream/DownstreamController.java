@@ -168,9 +168,9 @@ public class DownstreamController extends WorldController implements ContactList
 	private SpriteBatch koiCspriteBatch; // #6
 	private TextureRegion koiCcurrentFrame; // #7
 	
-	private Animation						koiCAnimationFlipped;
-	private TextureRegion[]					koiCFramesFlipped;
-	private TextureRegion					KoiCcurrentFrameFlipped;
+	private Animation koiCAnimationFlipped;
+	private TextureRegion[]	koiCFramesFlipped;
+	private TextureRegion KoiCcurrentFrameFlipped;
 	
 	// Physics constants for initialization //
 	/** Density of non-enemy objects */
@@ -186,7 +186,6 @@ public class DownstreamController extends WorldController implements ContactList
 	private static final float TETHER_DENSITY = ENEMY_DENSITY;
 	private static final float TETHER_FRICTION = ENEMY_FRICTION;
 	private static final float TETHER_RESTITUTION = BASIC_RESTITUTION;
-
 
 	// Important game objects, lists, and controllers //
 	private ArrayList<TetherModel> tethers = new ArrayList<TetherModel>();
@@ -493,21 +492,21 @@ public class DownstreamController extends WorldController implements ContactList
 			tethers.add(lily);
 		}
 		
-		/*
-		for (Vector2 whirlpool: level.wpools) {
-			WhirlpoolModel pool = new WhirlpoolModel(whirlpool.x, whirlpool.y);
-			pool.setBodyType(BodyDef.BodyType.StaticBody);
-			pool.setName("whirlpool" + 1);
-			pool.setDensity(TETHER_DENSITY);
-			pool.setFriction(TETHER_FRICTION);
-			pool.setRestitution(TETHER_RESTITUTION);
-			pool.setSensor(sensorPools);
-			pool.setDrawScale(scale);
-			pool.setTexture(whirlpoolFlipTexture);
-			addObject(pool);
-			wpools.add(pool);
+		if (!level.wpools.isEmpty()) {
+			for (Vector2 whirlpool : level.wpools) {
+				WhirlpoolModel pool = new WhirlpoolModel(whirlpool.x, whirlpool.y,1);
+				pool.setBodyType(BodyDef.BodyType.StaticBody);
+				pool.setName("whirlpool" + 1);
+				pool.setDensity(TETHER_DENSITY);
+				pool.setFriction(TETHER_FRICTION);
+				pool.setRestitution(TETHER_RESTITUTION);
+				pool.setSensor(sensorPools);
+				pool.setDrawScale(scale);
+				pool.setTexture(whirlpoolFlipTexture);
+				addObject(pool);
+				wpools.add(pool);
+			}
 		}
-		*/
 		for (Vector2 lotus : level.lotuses) {
 			TetherModel lantern = new TetherModel(lotus.x, lotus.y, rad, true);
 			lantern.setBodyType(BodyDef.BodyType.StaticBody);
@@ -581,9 +580,10 @@ public class DownstreamController extends WorldController implements ContactList
 		collisionController = new CollisionController(koi);
 
 		float width = Math.abs(level.map.get(0).x - level.map.get(1).x);
+		float height = Math.abs(level.map.get(0).y - level.map.get(1).y);
 		Vector2 center = new Vector2((level.map.get(0).x + level.map.get(1).x)/2,
 									 (level.map.get(0).y + level.map.get(1).y)/2);
-		cameraController.zoomStart(width, center, koi.getPosition().cpy().scl(scale));
+		cameraController.zoomStart(width, height, center, koi.getPosition().cpy().scl(scale));
 		
 		HUD = new HUDitems(lanterns.size(), UILotusTexture, energyBarTexture, displayFont);
 		addHUD(HUD);
@@ -868,8 +868,10 @@ public class DownstreamController extends WorldController implements ContactList
 
 	public void draw(float delta) {
 
+//		System.out.println("paused: " + paused);
+//		System.out.println("waspaused: " + wasPaused);
+
 		if (paused){
-			
 			pauseMenu.draw();
 		}
 		else {
@@ -877,17 +879,6 @@ public class DownstreamController extends WorldController implements ContactList
 			canvas.beginHUD();
 			HUD.draw(canvas);
 			canvas.end();
-			if (enableLeadingLine) {
-				Vector2 farOff = koi.getPosition().cpy();
-				farOff.add(koi.getLinearVelocity().cpy().scl(1000));
-				canvas.drawLeadingLine(koi.getPosition().cpy(), farOff);
-			}
-			if (enableTetherRadius) {
-				Vector2 closestTether = getClosestTether().getPosition().cpy().scl(scale);
-				Vector2 initialTangent = koi.getInitialTangentPoint(getClosestTether().getPosition()).scl(scale);
-				float radius = closestTether.dst(initialTangent);
-				canvas.drawTetherCircle(closestTether, TetherModel.TETHER_DEFAULT_RANGE * scale.x * .9f);
-			}
 		}
 
 	}
@@ -905,10 +896,12 @@ public class DownstreamController extends WorldController implements ContactList
 		if(wasPaused){
 			
 			paused =true;
+			
 		}
 		else{
 			paused = input.didPause();
 			wasPaused = paused;
+//			if (paused) cameraController.pauseCamera();
 		}
 		
 		if (active) {
@@ -933,6 +926,7 @@ public class DownstreamController extends WorldController implements ContactList
 				backState = 0;
 				wasPaused = false;
 				paused = false;
+//				cameraController.unpauseCamera();
 			}
 			
 		}
