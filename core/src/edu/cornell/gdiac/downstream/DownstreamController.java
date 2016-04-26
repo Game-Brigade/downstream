@@ -20,6 +20,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.*;
 import com.badlogic.gdx.audio.*;
 import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.physics.box2d.*;
@@ -65,6 +66,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private static final String BACKGROUND_SOUND = "SOUNDS/background_sound.mp3";
 	private static final String ENERGYBAR_TEXTURE = "MENUS/UI_bar.png";
 	private static final String UI_FLOWER = "MENUS/UI_lotus.png";
+	private static final String OVERLAY = "terrain/texture.jpg";
 
 	/** Texture assets for the koi */
 	private TextureRegion koiTexture;
@@ -205,6 +207,9 @@ public class DownstreamController extends WorldController implements ContactList
 		
 		manager.load(UI_FLOWER, Texture.class);
 		assets.add(UI_FLOWER);
+		
+		manager.load(OVERLAY, Texture.class);
+		assets.add(OVERLAY);
 /*
 		manager.load(CLICK_SOUND, Sound.class);
 		assets.add(CLICK_SOUND);
@@ -346,7 +351,6 @@ public class DownstreamController extends WorldController implements ContactList
 		UILotusTexture = createTexture(manager, UI_FLOWER, false);
 
 		earthTile = createTexture(manager,EARTH_FILE,true);
-
 		
 		whirlpoolTexture = createTexture(manager,WHIRLPOOL_TEXTURE,false);
 		whirlpoolFlipTexture = createTexture(manager,WHIRLPOOL_FLIP_TEXTURE,false);
@@ -840,6 +844,11 @@ public class DownstreamController extends WorldController implements ContactList
 
 		if (paused) pauseMenu.draw();
 		else super.draw(delta);
+		
+		canvas.beginHUD();
+		HUD.draw(canvas);
+		canvas.end();
+
 		
 	}
 	
