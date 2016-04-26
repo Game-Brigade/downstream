@@ -243,6 +243,7 @@ public class LevelEditor extends WorldController {
 	
 	private void populateLevel() {
 		cameraController = new CameraController(canvas.getCamera());
+		goal = new ArrayList<Vector2>();
 		lilypads = new ArrayList<Vector2>();
 		lanterns = new ArrayList<Vector2>();
 		enemies = new HashMap<String,ArrayList<Vector2>>();
@@ -301,7 +302,7 @@ public class LevelEditor extends WorldController {
 					addPlayer(currentClick);
 					return;
 				case Wall:
-					System.out.println(newClick);
+//					System.out.println(newClick);
 					addWall(currentClick,didEnter);
 					return;
 				case MapArea:
@@ -346,23 +347,23 @@ public class LevelEditor extends WorldController {
 	
 
 	private void addWhirlpool(Vector2 click, int dir){
-		
-		wpools.add(click.cpy());
-		WhirlpoolModel pool = new WhirlpoolModel(currentClick.x, currentClick.y, dir);
-		pool.setBodyType(BodyDef.BodyType.StaticBody);
-		pool.setName("whirlpool" + 1);
-		pool.setDensity(TETHER_DENSITY);
-		pool.setFriction(TETHER_FRICTION);
-		pool.setRestitution(TETHER_RESTITUTION);
-		pool.setSensor(false);
-		pool.setDrawScale(scale);
-		if(dir == -1){
-			pool.setTexture(whirlpoolTexture);
-		}
-		else{
-			pool.setTexture(whirlpoolFlipTexture);
-		}
-		addObject(pool);
+		saveToJson();
+//		wpools.add(click.cpy());
+//		WhirlpoolModel pool = new WhirlpoolModel(currentClick.x, currentClick.y, dir);
+//		pool.setBodyType(BodyDef.BodyType.StaticBody);
+//		pool.setName("whirlpool" + 1);
+//		pool.setDensity(TETHER_DENSITY);
+//		pool.setFriction(TETHER_FRICTION);
+//		pool.setRestitution(TETHER_RESTITUTION);
+//		pool.setSensor(false);
+//		pool.setDrawScale(scale);
+//		if(dir == -1){
+//			pool.setTexture(whirlpoolTexture);
+//		}
+//		else{
+//			pool.setTexture(whirlpoolFlipTexture);
+//		}
+//		addObject(pool);
 	}
 	
 
@@ -441,7 +442,7 @@ public class LevelEditor extends WorldController {
 			float[] wallFloat = new float[wall.size()];
 			for (int i = 0; i < wall.size(); i++) wallFloat[i] = wall.get(i);
 			if (wallFloat.length == 0) return;
-			System.out.println(Arrays.toString(wallFloat));
+//			System.out.println(Arrays.toString(wallFloat));
 			obj = new PolygonObstacle(wallFloat, 0, 0);
 			obj.setBodyType(BodyDef.BodyType.StaticBody);
 			obj.setDensity(BASIC_DENSITY);
@@ -453,8 +454,8 @@ public class LevelEditor extends WorldController {
 			addObject(obj);
 			return;
 		}
-		System.out.println("Not building leveL: " + !buildingLevel);
-		System.out.println("Not new click: " + !newClick);
+//		System.out.println("Not building leveL: " + !buildingLevel);
+//		System.out.println("Not new click: " + !newClick);
 		if (!newClick && !buildingLevel) return;
 		if (settingWallPath) {
 			if (wallPath.get(wallPath.size()-1) != click) wallPath.add(click.cpy().scl(scale));
@@ -484,12 +485,13 @@ public class LevelEditor extends WorldController {
 		case 0:
 		case 1:
 			goal.add(click.cpy());
+			return;
 		case 2:
 		default:
 			goal.clear();
 			goal.add(click.cpy());
+			return;
 		}
-		saveToJson();
 	}
 	
 	private void drawPaths() {
@@ -502,7 +504,7 @@ public class LevelEditor extends WorldController {
 			drawPath(path);
 		}
 		if (mapArea.size() == 2) canvas.drawRectangle(mapArea.get(0), mapArea.get(1));
-		if (goal.size() == 2) canvas.drawLeadingLine(goal.get(0), goal.get(1));
+		if (goal.size() == 2) canvas.drawLeadingLine(goal.get(0).cpy().scl(scale), goal.get(1).cpy().scl(scale));
 	}
 	
 	private void drawPath(ArrayList<Vector2> path) {

@@ -61,7 +61,7 @@ public class CameraController {
 		mapHeight = height;
 		mapCenter = center;
 		playerPosition.x = player.x; playerPosition.y = player.y;
-		System.out.println("PLAYERPOSITION START: " + playerPosition);
+//		System.out.println("PLAYERPOSITION START: " + playerPosition);
 		numSteps = (center.cpy().sub(player).len()) / MAX_VELOCITY;
 		stepMove.x = (player.x - center.x) / numSteps;
 		stepMove.y = (player.y - center.y) / numSteps;
@@ -101,7 +101,7 @@ public class CameraController {
 	}
 	
 	public void pauseCamera() {
-		System.out.println("ASHKJSDFHSDKJFHDS");
+//		System.out.println("ASHKJSDFHSDKJFHDS");
 		saveState();
 		camera.zoom = mapWidth / Gdx.graphics.getWidth();
 		camera.position.x = mapCenter.x;
@@ -110,7 +110,7 @@ public class CameraController {
 	}
 	
 	public void unpauseCamera() {
-		System.out.println("unpaused");
+//		System.out.println("unpaused");
 		camera.zoom = saveCamera.zoom;
 		camera.position.x = saveCamera.position.x;
 		camera.position.y = saveCamera.position.y;
@@ -139,7 +139,7 @@ public class CameraController {
 		if (camRight > mapRight) newPosition.x = mapRight - Gdx.graphics.getWidth();
 		if (camTop > mapTop) newPosition.y = mapTop - Gdx.graphics.getHeight();
 		if (camBot < mapBot) newPosition.y = mapBot + Gdx.graphics.getHeight();
-		System.out.println("NEW POSIITON: " + newPosition);
+//		System.out.println("NEW POSIITON: " + newPosition);
 		playerPosition.x = newPosition.x; playerPosition.y = newPosition.y;
 		difference = newPosition.cpy().sub(new Vector2(camera.position.x, camera.position.y));
 		if (difference.len() < velocity) {
@@ -148,7 +148,7 @@ public class CameraController {
 			camera.translate(difference.setLength(velocity));
 		}
 		camera.update();
-		System.out.println(playerPosition);
+//		System.out.println(playerPosition);
 	}
 	
 	public void moveCameraTowards(Vector2 newPosition) {
