@@ -16,6 +16,8 @@ public class CameraController {
 	private static final float MIN_ZOOM_IN = 1.25f;
 	private static final int numSteps = 200;
 	private Vector2 playerPosition;
+	private float mapWidth;
+	private Vector2 mapCenter;
 	private Vector2 stepMove;
 	private float stepZoom;
 	private boolean isZooming;
@@ -26,6 +28,8 @@ public class CameraController {
 		stepMove = new Vector2();
 		stepZoom = 0;
 		isZooming = true;
+		mapWidth = 0;
+		mapCenter = new Vector2();
 	}
 	
 	public void zoomOut() {
@@ -51,24 +55,33 @@ public class CameraController {
 	}
 	
 	public void zoomStart(float width, Vector2 center, Vector2 player) {
+		mapWidth = width;
+		mapCenter = center;
 		playerPosition.x = player.x; playerPosition.y = player.y;
 		stepMove.x = (player.x - center.x) / numSteps;
 		stepMove.y = (player.y - center.y) / numSteps;
 		stepZoom = ((width / Gdx.graphics.getWidth()) - MIN_ZOOM_IN) / numSteps;
-//		System.out.println(stepZoom);
 		
 		camera.position.x = center.x; camera.position.y = center.y;
 		camera.zoom = width / Gdx.graphics.getWidth();
 		camera.update();
-//		System.out.println("Center: " + center);
-//		System.out.println("Player: " + player);
-//		System.out.println("Camera: " + camera.position);
-		
 	}
 	
 	public void zoomToPlayer() {
 //		System.out.println("Camera: " + camera.position);
 		camera.zoom -= stepZoom;
+		camera.translate(stepMove);
+		camera.update();
+	}
+	
+	public void zoomPause(Vector2 player) {
+		stepZoom = -((mapWidth / Gdx.graphics.getWidth()) - camera.zoom) / numSteps;
+		stepMove.x = (mapCenter.x - player.x) / numSteps;
+		stepMove.y = (mapCenter.y - player.y) / numSteps;
+	}
+	
+	public void zoomPause() {
+		camera.zoom += stepZoom;
 		camera.translate(stepMove);
 		camera.update();
 	}

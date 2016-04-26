@@ -20,6 +20,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.*;
 import com.badlogic.gdx.audio.*;
 import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.physics.box2d.*;
@@ -52,7 +53,7 @@ public class DownstreamController extends WorldController implements ContactList
 	/** Reference to the lighting texture */
 	private static final String LIGHTING_TEXTURE = "tethers/aura.png";
 	/** Reference to the repeating land texture */
-	private static final String EARTH_FILE = "terrain/repeat tile.png";
+	private static final String EARTH_FILE = "terrain/swirl_grass.png";
 	/** Reference to the whirlpool texture */
 	private static final String WHIRLPOOL_TEXTURE = "terrain/whirlpool.png";
 	/** Reference to the flipped whirlpool texture */
@@ -62,9 +63,10 @@ public class DownstreamController extends WorldController implements ContactList
 	private static final String CLICK_SOUND = "SOUNDS/menu_click.wav";
 	private static final String LIGHTING_SOUND = "SOUNDS/lighting_1.mp3";
 	private static final String DEATH_SOUND = "SOUNDS/fish_death.wav";
-	private static final String BACKGROUND_SOUND = "SOUNDS/background_sound.mp3";
+	
 	private static final String ENERGYBAR_TEXTURE = "MENUS/UI_bar.png";
 	private static final String UI_FLOWER = "MENUS/UI_lotus.png";
+	private static final String OVERLAY = "terrain/texture.jpg";
 
 	/** Texture assets for the koi */
 	private TextureRegion koiTexture;
@@ -108,6 +110,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private boolean enableTetherRadius = true;
 	
 	private Music deathSound;
+	
 	
 	//animations
 	
@@ -206,6 +209,9 @@ public class DownstreamController extends WorldController implements ContactList
 		
 		manager.load(UI_FLOWER, Texture.class);
 		assets.add(UI_FLOWER);
+		
+		manager.load(OVERLAY, Texture.class);
+		assets.add(OVERLAY);
 /*
 		manager.load(CLICK_SOUND, Sound.class);
 		assets.add(CLICK_SOUND);
@@ -347,7 +353,6 @@ public class DownstreamController extends WorldController implements ContactList
 		UILotusTexture = createTexture(manager, UI_FLOWER, false);
 
 		earthTile = createTexture(manager,EARTH_FILE,true);
-
 		
 		whirlpoolTexture = createTexture(manager,WHIRLPOOL_TEXTURE,false);
 		whirlpoolFlipTexture = createTexture(manager,WHIRLPOOL_FLIP_TEXTURE,false);
@@ -359,6 +364,8 @@ public class DownstreamController extends WorldController implements ContactList
 		*/
 		
 		deathSound = Gdx.audio.newMusic(Gdx.files.internal(LIGHTING_SOUND));
+		deathSound.setLooping(false);
+		
 		super.loadContent(manager);
 		fishAssetState = AssetState.COMPLETE;
 	}
@@ -624,6 +631,7 @@ public class DownstreamController extends WorldController implements ContactList
 		
 		if(dead){
 			deathSound.play();
+
 			objects.remove(koi);
 			setFailure(dead);
 			cameraController.resetCameraVelocity(); 
@@ -850,6 +858,9 @@ public class DownstreamController extends WorldController implements ContactList
 		}
 		else {
 			super.draw(delta);
+			canvas.beginHUD();
+			HUD.draw(canvas);
+			canvas.end();
 			if (enableLeadingLine) {
 				Vector2 farOff = koi.getPosition().cpy();
 				farOff.add(koi.getLinearVelocity().cpy().scl(1000));
@@ -862,6 +873,13 @@ public class DownstreamController extends WorldController implements ContactList
 				canvas.drawTetherCircle(closestTether, TetherModel.TETHER_DEFAULT_RANGE * scale.x * .9f);
 			}
 		}
+<<<<<<< HEAD
+=======
+
+
+		
+
+>>>>>>> 379fb3ab6bb38efde9249a9f121425ad6a6efc14
 	}
 	
 	/**
@@ -941,17 +959,6 @@ public class DownstreamController extends WorldController implements ContactList
 	 */
 	public void beginContact(Contact contact) {
 		dead = collisionController.begin(contact);
-	}
-	
-	private static Vector2 vectorOfString(String s) {
-		int comma = s.indexOf(",");
-		int openParens = s.indexOf("(");
-		int closeParens = s.indexOf(")");
-		String xstr = s.substring(openParens+1,comma);
-		String ystr = s.substring(comma+1,closeParens);
-		float x = Float.parseFloat(xstr);
-		float y = Float.parseFloat(ystr);
-		return new Vector2(x,y);
 	}
 
 	/**
