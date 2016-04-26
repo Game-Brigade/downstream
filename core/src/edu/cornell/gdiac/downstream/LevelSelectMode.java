@@ -188,7 +188,7 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 		
 		canvas.draw(background, Color.WHITE, background.getWidth()/2, background.getHeight()/2, 
 				canvas.getWidth()/2, canvas.getHeight()/2, 0, scale, scale);
-		canvas.drawTextCentered("Level Select", displayFont, 250);
+		canvas.drawText("Level Select", displayFont, canvas.getWidth()/3-15, canvas.getHeight()/8*7);
 		canvas.draw(level1button, Color.WHITE, level1button.getWidth()/2, level1button.getHeight()/2, 
 				button1.x, button1.y, 0, scale, scale);
 		canvas.draw(level2button, Color.WHITE, level2button.getWidth()/2, level2button.getHeight()/2, 
@@ -228,6 +228,32 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 			if (goBack() && listener != null) {
 				listener.exitScreen(this, WorldController.EXIT_MAIN);
 			}
+			if (Level1() && listener != null) {
+				listener.exitScreen(this, 1);
+			}
+			if (Level2() && listener != null) {
+				listener.exitScreen(this, 2);
+			}
+			if (Level3() && listener != null) {
+				listener.exitScreen(this, 3);
+			}
+			if (Level4() && listener != null) {
+				listener.exitScreen(this, 4);
+			}
+			/*
+			if (Level5() && listener != null) {
+				listener.exitScreen(this, 5);
+			}
+			if (Level6() && listener != null) {
+				listener.exitScreen(this, 6);
+			}
+			if (Level7() && listener != null) {
+				listener.exitScreen(this, 7);
+			}
+			if (Level8() && listener != null) {
+				listener.exitScreen(this, 8);
+			}
+			*/
 			
 			
 		}

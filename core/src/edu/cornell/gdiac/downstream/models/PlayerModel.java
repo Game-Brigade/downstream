@@ -126,6 +126,7 @@ public class PlayerModel extends BoxObstacle {
 		curved = b;
 	}
 
+
 	public void refreshTetherForce(Vector2 tetherPos, float rad){
 		pull = tetherPos.cpy().sub(getPosition());
 		pull.setLength(pull.len() + rad);
@@ -478,6 +479,7 @@ public class PlayerModel extends BoxObstacle {
 		
 	}
 
+
 	public void updateSpeed(float v) {
 		if(!this.isDead()){
 		if (isTethered()) {
@@ -516,6 +518,7 @@ public class PlayerModel extends BoxObstacle {
 		System.out.println("Pull: "+ pull);		
 	}
 	
+
 	
 	public float getEnergy(){
 		return energy;

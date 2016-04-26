@@ -114,7 +114,11 @@ public class DownstreamController extends WorldController implements ContactList
 	private boolean paused;
 	private boolean dead;
 	private boolean whirled;
+
+
 	private TetherModel checkpoint;
+	
+
 
 	private float PLAYER_LINEAR_VELOCITY = 6f;
 	private boolean enableSlow = false;
@@ -195,6 +199,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private Stack<TetherModel> litlanterns = new Stack<TetherModel>();
 	private ArrayList<EnemyModel> enemies = new ArrayList<EnemyModel>();
 	private ArrayList<WhirlpoolModel> wpools = new ArrayList<WhirlpoolModel>();
+	private ArrayList<ArrayList<Float>> walls = new ArrayList<ArrayList<Float>>();
 	private PlayerModel koi;
 	private EnemyModel eFish;
 	private CameraController cameraController;
@@ -202,9 +207,20 @@ public class DownstreamController extends WorldController implements ContactList
 	private TetherModel closestTether;
 	private WhirlpoolModel closestWhirlpool;
 	private int litLotusCount;
+	private int level = -1;
 	private static final int RESPAWN_TIME = 100;
 	private int respawnTimer = RESPAWN_TIME;
 	private TetherModel checkpoint0;
+
+
+	private double rot = 0;
+
+	/** The goal door position */
+	private static Vector2 GOAL_POS = new Vector2( 6, 12);
+	/** Reference to the goalDoor (for collision detection) */
+	private BoxObstacle goalDoor;
+
+	private boolean respawning;
 
 
 	/**
@@ -417,8 +433,7 @@ public class DownstreamController extends WorldController implements ContactList
 		fishAssetState = AssetState.COMPLETE;
 	}
 
-	
-	//Animations//
+
 		private float stateTime;  
 		private float relativeTime = 0;
 
@@ -436,6 +451,11 @@ public class DownstreamController extends WorldController implements ContactList
 		whirled = false;
 		paused = false;
 		wasPaused = false;
+	}
+	
+	public DownstreamController(int level) {
+		this();
+		this.level = level;
 	}
 
 	/**
@@ -473,13 +493,19 @@ public class DownstreamController extends WorldController implements ContactList
 	 * Lays out the game geography.
 	 */
 	private void populateLevel() {
-		
+	
 		int NDS = new Random().nextInt(3);
 		//follow convention chicos
 		// 0 is day 1 is night 2 is sunset
 		setDayTime(NDS);
 
-		LevelEditor.Level level = LevelEditor.loadFromJson();
+
+		LevelEditor.Level level;
+		if (this.level != -1) {
+			level = LevelEditor.loadFromJson(this.level);
+		} else {
+			level = LevelEditor.loadFromJson();
+		}
 
 		cameraController = new CameraController(canvas.getCamera());
 
@@ -557,6 +583,9 @@ public class DownstreamController extends WorldController implements ContactList
 			}
 			//obj.setTexture(earthTile);
 			obj.setName("wall1");
+			ArrayList<Float> scaledWall = new ArrayList<Float>();
+			for (Float f : wall) scaledWall.add(f*scale.x);
+			walls.add(scaledWall);
 			addObject(obj);
 		}
 
@@ -595,8 +624,13 @@ public class DownstreamController extends WorldController implements ContactList
 		addObject(koi);
 
 		collisionController = new CollisionController(koi);
+
+	
+
+
 		checkpoint0 = getClosestTetherTo(koi.initPos);
 		checkpoint = checkpoint0;
+
 
 		float width = Math.abs(level.map.get(0).x - level.map.get(1).x);
 		float height = Math.abs(level.map.get(0).y - level.map.get(1).y);
@@ -606,6 +640,7 @@ public class DownstreamController extends WorldController implements ContactList
 
 		HUD = new HUDitems(lanterns.size(), UILotusTexture, energyBarTexture, displayFont);
 		addHUD(HUD);
+
 
 	}
 
@@ -617,7 +652,6 @@ public class DownstreamController extends WorldController implements ContactList
 			collisionController.initStart(checkpoint);
 			koi.setPosition(checkpoint.getPosition().add(koi.NE.cpy().rotate90(1).nor().scl(TetherModel.TETHER_DEFAULT_ORBIT)));
 			koi.setTethered(true);
-			System.out.println("koi is set: "+koi.isTethered());
 			koi.setLinearVelocity(koi.NE);
 			koi.setDead(false);
 			respawnTimer = RESPAWN_TIME;
@@ -647,10 +681,12 @@ public class DownstreamController extends WorldController implements ContactList
 	 *
 	 * @param delta Number of seconds since last animation frame
 	 */
-	public void update(float dt) {
+	public void update(float dt) {	
+		if(collisionController.didWin()){
+			setComplete(true);
+		}
 		if(koi.isDead()){
 			deathSound.play();
-
 			respawn();
 		} else{
 			//ZOOM IN TO PLAYER AT START OF LEVEL
@@ -679,7 +715,7 @@ public class DownstreamController extends WorldController implements ContactList
 			moveShadows();
 
 
-			closestTether = getClosestTether();
+			closestTether = getClosestTetherTo(koi.getPosition());
 			// INPUT CODE
 			InputController input = InputController.getInstance();
 			if (input.didTether() && !isWhirled() && !koi.bursting) {
@@ -758,7 +794,8 @@ public class DownstreamController extends WorldController implements ContactList
 				koi.setTethered(false);
 			}
 			// HIT TANGENT
-			if (koi.isAttemptingTether() && (koi.getPosition().sub(init).len2() < .01)) {
+			if (koi.isAttemptingTether() && (koi.getPosition().sub(init).len2() < .01) ) {
+				System.out.println("tether");
 				koi.setTethered(true);
 				koi.setAttemptingTether(false);
 				koi.refreshTetherForce(close, closestTether.getOrbitRadius());
@@ -887,13 +924,15 @@ public class DownstreamController extends WorldController implements ContactList
 							tethers.get(i).setTexture(openFlowercurrentFrame);
 						}
 					}
-
 				}
-		}
-		
-		SoundController.getInstance().update();
+			}
+		System.out.println(koi.getEnergy());
 		HUD.updateHUD(litlanterns.size(), koi.getEnergy());
-	}
+		}
+		//SoundController.getInstance().update();
+
+		
+
 
 
 	private void clearShadows(boolean b) {
@@ -927,9 +966,6 @@ public class DownstreamController extends WorldController implements ContactList
 	}
 
 	private TetherModel getClosestTetherTo(Vector2 v) {
-		if(collisionController.inRange()){
-			return collisionController.getClosestTetherInRange();
-		}
 		TetherModel closestTether = tethers.get(0);
 		float closestDistance = tethers.get(0).getPosition().sub(v).len();
 		for (TetherModel tether : tethers) {
@@ -973,6 +1009,7 @@ public class DownstreamController extends WorldController implements ContactList
 			super.draw(delta);
 			canvas.beginHUD();
 			HUD.draw(canvas);
+			for (ArrayList<Float> wall : walls) canvas.drawPath(wall);
 			canvas.end();
 		}
 
@@ -1006,13 +1043,13 @@ public class DownstreamController extends WorldController implements ContactList
 			}
 			this.draw(delta);
 			if (goOptions() && listener != null) {
-				listener.exitScreen(this, WorldController.EXIT_OPTIONS);
+				//listener.exitScreen(this, WorldController.EXIT_OPTIONS);
 			}
 			if (goBack() && listener != null) {
 				listener.exitScreen(this, WorldController.EXIT_MAIN);
 			}
 			if (restartLevel() && listener != null) {
-				listener.exitScreen(this, WorldController.EXIT_PLAY);
+				listener.exitScreen(this, this.level);
 			}
 			if (resumePlay() && listener != null) {
 				resumeState = 0;

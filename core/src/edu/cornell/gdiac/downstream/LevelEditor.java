@@ -217,7 +217,7 @@ public class LevelEditor extends WorldController {
 	private Vector2 player;
 	private ArrayList<ArrayList<Vector2>> walls;
 	private ArrayList<Vector2> mapArea;
-	private Vector2 goal;
+	private ArrayList<Vector2> goal;
 	
 	private PlayerModel koi;
 	
@@ -480,7 +480,15 @@ public class LevelEditor extends WorldController {
 	}
 
 	private void addGoal(Vector2 click) {
-		goal = new Vector2(0,0);
+		switch (goal.size()) {
+		case 0:
+		case 1:
+			goal.add(click.cpy());
+		case 2:
+		default:
+			goal.clear();
+			goal.add(click.cpy());
+		}
 		saveToJson();
 	}
 	
@@ -494,6 +502,7 @@ public class LevelEditor extends WorldController {
 			drawPath(path);
 		}
 		if (mapArea.size() == 2) canvas.drawRectangle(mapArea.get(0), mapArea.get(1));
+		if (goal.size() == 2) canvas.drawLeadingLine(goal.get(0), goal.get(1));
 	}
 	
 	private void drawPath(ArrayList<Vector2> path) {
@@ -518,7 +527,7 @@ public class LevelEditor extends WorldController {
 	private void saveToJson() {
 		int n = 1;
 		Vector2 p = player;
-		Vector2 g = goal;
+		ArrayList<Vector2> g = goal;
 		HashMap<String,ArrayList<Vector2>> e = enemies;
 		ArrayList<Vector2> li = lilypads;
 		ArrayList<Vector2> lo = lanterns;
@@ -551,15 +560,22 @@ public class LevelEditor extends WorldController {
 			return null;
 		}
 	}
+	
+	public static Level loadFromJson(int lvl) {
+		Gson gson = new Gson();
+		try {
+			JsonReader reader = new JsonReader(new FileReader("" + lvl + ".json"));
+			Level level = gson.fromJson(reader, Level.class);
+			return level;
+		} catch (Exception e) {
+			System.out.println(e);
+			return null;
+		}
+	}
 
 	public void draw(float delta) {
 		super.draw(delta);
 		drawPaths();
-	}
-	
-	// return true if it's been period milliseconds since the last tick
-	private int tickTock(int period) {
-		return (int) (System.currentTimeMillis() % period);
 	}
 	
 	private void loadPartialLevel() {
@@ -621,7 +637,7 @@ public class LevelEditor extends WorldController {
 	public class Level {
 		int number;
 		Vector2 player;
-		Vector2 goal;
+		ArrayList<Vector2> goal;
 		HashMap<String,ArrayList<Vector2>> enemiesLevel;
 		ArrayList<Vector2> lilypads;
 		ArrayList<Vector2> lotuses;
@@ -632,7 +648,8 @@ public class LevelEditor extends WorldController {
 		ArrayList<Vector2> map;
 
 		
-		private Level(int n, Vector2 p, Vector2 g, 
+		private Level(int n, Vector2 p, 
+					  ArrayList<Vector2> g, 
 					  HashMap<String,ArrayList<Vector2>> e,
 					  ArrayList<Vector2> li,
 					  ArrayList<Vector2> lo,
