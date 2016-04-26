@@ -113,7 +113,11 @@ public class DownstreamController extends WorldController implements ContactList
 	private boolean paused;
 	private boolean dead;
 	private boolean whirled;
+
+
 	private TetherModel checkpoint;
+	
+
 
 	private float PLAYER_LINEAR_VELOCITY = 6f;
 	private boolean enableSlow = false;
@@ -216,6 +220,13 @@ public class DownstreamController extends WorldController implements ContactList
 	/** Reference to the goalDoor (for collision detection) */
 	private BoxObstacle goalDoor;
 
+	
+
+	/** Reference to the player avatar */
+
+	
+	
+	private boolean respawning;
 
 
 	/**
@@ -428,7 +439,6 @@ public class DownstreamController extends WorldController implements ContactList
 		fishAssetState = AssetState.COMPLETE;
 	}
 
-
 	/**
 	 * Creates and initialize a new instance of Downstream
 	 *
@@ -594,8 +604,13 @@ public class DownstreamController extends WorldController implements ContactList
 		addObject(koi);
 
 		collisionController = new CollisionController(koi);
+
+	
+
+
 		checkpoint0 = getClosestTetherTo(koi.initPos);
 		checkpoint = checkpoint0;
+
 
 		float width = Math.abs(level.map.get(0).x - level.map.get(1).x);
 		float height = Math.abs(level.map.get(0).y - level.map.get(1).y);
@@ -605,6 +620,7 @@ public class DownstreamController extends WorldController implements ContactList
 
 		HUD = new HUDitems(lanterns.size(), UILotusTexture, energyBarTexture, displayFont);
 		addHUD(HUD);
+
 
 	}
 
@@ -995,7 +1011,7 @@ public class DownstreamController extends WorldController implements ContactList
 			}
 			this.draw(delta);
 			if (goOptions() && listener != null) {
-				listener.exitScreen(this, WorldController.EXIT_OPTIONS);
+				//listener.exitScreen(this, WorldController.EXIT_OPTIONS);
 			}
 			if (goBack() && listener != null) {
 				listener.exitScreen(this, WorldController.EXIT_MAIN);
