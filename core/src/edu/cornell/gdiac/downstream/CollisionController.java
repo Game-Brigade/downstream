@@ -46,7 +46,7 @@ public class CollisionController {
 			bCollide = body1;
 		}
 		else {
-			System.out.println("s1: "+ s1+ " s2: "+s2);
+//			System.out.println("s1: "+ s1+ " s2: "+s2);
 			return false;
 		}
 		if(sCollide.startsWith("lily") || 
@@ -63,7 +63,7 @@ public class CollisionController {
 		else if(sCollide.startsWith("shadow")){return LETHAL_SHADOWS;}
 		else if(sCollide.startsWith("enemy")){return LETHAL_ENEMIES;}
 		else if(sCollide.startsWith("wall")){return LETHAL_WALLS;}
-		else { System.out.println("COLLISION ERROR: "+sCollide);}
+//		else { System.out.println("COLLISION ERROR: "+sCollide);}
 		return false;
 	}
 	
@@ -99,7 +99,7 @@ public class CollisionController {
 				else if(sCollide.startsWith("shadow")){}
 				else if(sCollide.startsWith("enemy")){}
 				else if(sCollide.startsWith("wall")){}
-				else { System.out.println("COLLISION ERROR: "+sCollide);}
+//				else { System.out.println("COLLISION ERROR: "+sCollide);}
 				
 	}
 		
