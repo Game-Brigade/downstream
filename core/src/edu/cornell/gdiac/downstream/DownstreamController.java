@@ -391,15 +391,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private ArrayList<WhirlpoolModel> wpools = new ArrayList<WhirlpoolModel>();
 	private double rot = 0;
 
-	// Other game objects
-	/** The initial koi position */
-	private static Vector2 KOI_POS = new Vector2(-2, 6);
-	/** The goal door position */
-	private static Vector2 GOAL_POS = new Vector2( 6, 12);
-
-	// Physics objects for the game
-	/** Reference to the goalDoor (for collision detection) */
-	private BoxObstacle goalDoor;
+	
 	/** Reference to the player avatar */
 	private PlayerModel koi;
 
@@ -852,7 +844,7 @@ public class DownstreamController extends WorldController implements ContactList
 	}
 
 	public void draw(float delta) {
-<<<<<<< HEAD
+
 		if (paused){
 			pauseMenu.draw();
 		}
@@ -870,12 +862,6 @@ public class DownstreamController extends WorldController implements ContactList
 				canvas.drawTetherCircle(closestTether, TetherModel.TETHER_DEFAULT_RANGE * scale.x * .9f);
 			}
 		}
-=======
-
-		if (paused) pauseMenu.draw();
-		else super.draw(delta);
-		
->>>>>>> 6cac08ad5a63a3b6a9401290bff80b953e3a796d
 	}
 	
 	/**
@@ -909,7 +895,7 @@ public class DownstreamController extends WorldController implements ContactList
 				listener.exitScreen(this, WorldController.EXIT_MAIN);
 			}
 			if (restartLevel() && listener != null) {
-				reset();
+				listener.exitScreen(this, WorldController.EXIT_PLAY);
 			}
 			if (resumePlay() && listener != null) {
 				resumeState = 0;

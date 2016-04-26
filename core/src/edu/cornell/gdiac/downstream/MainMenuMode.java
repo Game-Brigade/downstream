@@ -26,7 +26,7 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 	private static final String PLAY_FILE = "MENUS/Main/play-b.png";
 	private static final String SELECT_FILE = "MENUS/Main/level_select-b.png";
 	private static final String EDIT_FILE = "MENUS/Main/level_edit-b.png";
-	private static final String BACKGROUND_FILE = "MENUS/general_background.png";
+	private static final String BACKGROUND_FILE = "MENUS/general_background_new.png";
 	
 	/** Logo texture */
 	private Texture logo;
@@ -128,9 +128,8 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 	 * will talk about why we prefer this in lecture.
 	 */
 	private void draw() {
-		canvas.beginPAUSE();
+		canvas.beginMENU();
 		canvas.clear();
-		System.out.println("drawing main menu");
 		canvas.draw(background, Color.WHITE, background.getWidth()/2, background.getHeight()/2, backPos.x, backPos.y, 0, scale, scale);
 		canvas.draw(logo, Color.WHITE, logo.getWidth()/2, logo.getHeight()/2, logoPos.x, logoPos.y, 0, scale*0.6f, scale*0.6f);
 		canvas.draw(play, Color.WHITE, play.getWidth()/2, play.getHeight()/2, playPos.x, playPos.y, 0, scale*0.8f, scale*0.8f);

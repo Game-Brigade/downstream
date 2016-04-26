@@ -104,7 +104,7 @@ public class PauseMenuMode{
 	 * will talk about why we prefer this in lecture.
 	 */
 	public void draw() {
-		canvas.beginPAUSE();
+		canvas.beginMENU();
 		
 		Color c = Color.WHITE.cpy();
 		c.a = .03f;
