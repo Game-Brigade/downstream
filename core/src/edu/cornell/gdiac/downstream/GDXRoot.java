@@ -96,8 +96,7 @@ public class GDXRoot extends Game implements ScreenListener {
 		// Call dispose on our children
 		setScreen(null);
 		
-		playGame.unloadContent(manager);
-		playGame.dispose();
+		//System.out.println("Hello");
 		editor.unloadContent(manager);
 		editor.dispose();
 
@@ -142,6 +141,10 @@ public class GDXRoot extends Game implements ScreenListener {
 		}
 		
 		else if (screen == mainMenu && exitCode == WorldController.EXIT_PLAY) {
+			
+			playGame = new DownstreamController();
+			playGame.preLoadContent(manager);
+			editor.preLoadContent(manager);
 			
 			playGame.loadContent(manager);
 			playGame.setScreenListener(this);
@@ -188,6 +191,19 @@ public class GDXRoot extends Game implements ScreenListener {
 			Gdx.input.setInputProcessor(mainMenu);
 		}
 		
+		
+		
+		else if (screen == playGame && exitCode == WorldController.EXIT_MAIN){
+			System.out.println("Hello");
+			playGame.unloadContent(manager);
+			playGame.dispose();
+			playGame = null;
+			mainMenu = new MainMenuMode(canvas,manager);
+			
+			mainMenu.setScreenListener(this);
+			setScreen(mainMenu);
+			Gdx.input.setInputProcessor(mainMenu);
+		}
 		
 		
 		

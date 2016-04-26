@@ -22,7 +22,7 @@ public class PauseMenuMode{
 	private static final String RESTART_BUTTON = "MENUS/Paused/restart-b.png";
 	private static final String OPTIONS_BUTTON = "MENUS/Paused/options-b.png";
 	private static final String BACK_BUTTON = "MENUS/back to main-b.png";
-	private static final String BACKGROUND_FILE = "MENUS/general_background.png";
+	private static final String BACKGROUND_FILE = "MENUS/general_background_new.png";
 	
 	public Texture pauseHeader;
 	public Texture resume;
@@ -49,6 +49,7 @@ public class PauseMenuMode{
 	public static Vector2 restartPos = new Vector2();
 	public static Vector2 optionsPos = new Vector2();
 	public static Vector2 backPos = new Vector2();
+	public static Vector2 backgroundPos = new Vector2();
 
 	/**
 	 * Creates a PauseMenuMode with the default budget, size and position.
@@ -63,18 +64,12 @@ public class PauseMenuMode{
 		// Compute the dimensions from the canvas
 		resize(canvas.getWidth(),canvas.getHeight());
 		
-		float width = canvas.getCamera().viewportWidth;
-		float height = canvas.getCamera().viewportHeight;
-		
-		width =canvas.getWidth();
-		height = canvas.getHeight();
-		System.out.println(width);
-		System.out.println(canvas.getWidth());
-		headerPos.set(new Vector2(canvas.getWidth()/2,canvas.getHeight()));
-		backPos.set(new Vector2(width/2,height/18*16));
-		resumePos.set(new Vector2(width/2,height/18*4));
-		restartPos.set(new Vector2(width/2,height/18*8));
-		optionsPos.set(new Vector2(width/2,height/18*12));
+		headerPos.set(new Vector2(canvas.getWidth()/2, canvas.getHeight()/18*15));
+		resumePos.set(new Vector2(canvas.getWidth()/2, canvas.getHeight()/18*11));
+		restartPos.set(new Vector2(canvas.getWidth()/2, canvas.getHeight()/18*8));
+		optionsPos.set(new Vector2(canvas.getWidth()/2, canvas.getHeight()/18*5));
+		backPos.set(new Vector2(canvas.getWidth()/2, canvas.getHeight()/18*2));
+		backgroundPos.set(new Vector2(canvas.getWidth()/2, canvas.getHeight()/2));
 		
 
 		// Load images immediately.
@@ -109,19 +104,21 @@ public class PauseMenuMode{
 	 * will talk about why we prefer this in lecture.
 	 */
 	public void draw() {
-		canvas.begin();
-		//System.out.println("hello");
-		canvas.clear();
-		canvas.draw(background, Color.WHITE, pauseHeader.getWidth()/2, pauseHeader.getHeight()/2, 
-				canvas.getWidth()/2, canvas.getHeight()/2, 0, scale*10, scale*10);
-		/*
+		canvas.beginPAUSE();
+		
+		Color c = Color.WHITE.cpy();
+		c.a = .03f;
+		canvas.draw(background, c, background.getWidth()/2, background.getHeight()/2, 
+				backgroundPos.x, backgroundPos.y, 0, scale, scale);
+		canvas.draw(pauseHeader, Color.WHITE, pauseHeader.getWidth()/2, pauseHeader.getHeight()/2, 
+				headerPos.x, headerPos.y, 0, scale, scale);
 		canvas.draw(resume, Color.WHITE, resume.getWidth()/2, resume.getHeight()/2, 
 				resumePos.x, resumePos.y, 0, scale, scale);
 		canvas.draw(restart, Color.WHITE, restart.getWidth()/2, restart.getHeight()/2, 
 				restartPos.x, restartPos.y, 0, scale, scale);
 		canvas.draw(options, Color.WHITE, options.getWidth()/2, options.getHeight()/2, 
 				optionsPos.x, optionsPos.y, 0, scale, scale);
-				*/
+		canvas.draw(back, Color.WHITE, back.getWidth()/2, back.getHeight()/2, backPos.x, backPos.y, 0, scale, scale);	
 		canvas.end();
 	}
 	

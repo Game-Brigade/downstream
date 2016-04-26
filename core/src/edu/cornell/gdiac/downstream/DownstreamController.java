@@ -98,6 +98,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private int optionsState;
 	private boolean wasPaused;
 	private boolean paused;
+	
 
 	private boolean dead;
 	private boolean whirled;
@@ -447,6 +448,7 @@ public class DownstreamController extends WorldController implements ContactList
 		objects.clear();
 		addQueue.clear();
 		world.dispose();
+		
 		dead = false;
 		whirled = false;
 		paused = false;
@@ -506,8 +508,21 @@ public class DownstreamController extends WorldController implements ContactList
 		wpools.add(pool);
 		
 		*/
-
-		
+		/*
+		for (Vector2 whirlpool: level.wpools) {
+			WhirlpoolModel pool = new WhirlpoolModel(whirlpool.x, whirlpool.y);
+			pool.setBodyType(BodyDef.BodyType.StaticBody);
+			pool.setName("whirlpool" + 1);
+			pool.setDensity(TETHER_DENSITY);
+			pool.setFriction(TETHER_FRICTION);
+			pool.setRestitution(TETHER_RESTITUTION);
+			pool.setSensor(sensorPools);
+			pool.setDrawScale(scale);
+			pool.setTexture(whirlpoolFlipTexture);
+			addObject(pool);
+			wpools.add(pool);
+		}
+		*/
 		for (Vector2 lotus : level.lotuses) {
 			TetherModel lantern = new TetherModel(lotus.x, lotus.y, rad, true);
 			lantern.setBodyType(BodyDef.BodyType.StaticBody);
@@ -842,14 +857,29 @@ public class DownstreamController extends WorldController implements ContactList
 
 	public void draw(float delta) {
 
-		if (paused) pauseMenu.draw();
-		else super.draw(delta);
-		
+		if (paused){
+			pauseMenu.draw();
+		}
+		else {
+			super.draw(delta);
+			if (enableLeadingLine) {
+				Vector2 farOff = koi.getPosition().cpy();
+				farOff.add(koi.getLinearVelocity().cpy().scl(1000));
+				canvas.drawLeadingLine(koi.getPosition().cpy(), farOff);
+			}
+			if (enableTetherRadius) {
+				Vector2 closestTether = getClosestTether().getPosition().cpy().scl(scale);
+				Vector2 initialTangent = koi.getInitialTangentPoint(getClosestTether().getPosition()).scl(scale);
+				float radius = closestTether.dst(initialTangent);
+				canvas.drawTetherCircle(closestTether, TetherModel.TETHER_DEFAULT_RANGE * scale.x * .9f);
+			}
+		}
+
+
 		canvas.beginHUD();
 		HUD.draw(canvas);
 		canvas.end();
 
-		
 	}
 	
 	/**
@@ -876,8 +906,46 @@ public class DownstreamController extends WorldController implements ContactList
 					postUpdate(delta);
 			}
 			this.draw(delta);
+			if (goOptions() && listener != null) {
+				listener.exitScreen(this, WorldController.EXIT_OPTIONS);
+			}
+			if (goBack() && listener != null) {
+				listener.exitScreen(this, WorldController.EXIT_MAIN);
+			}
+			if (restartLevel() && listener != null) {
+				reset();
+			}
+			if (resumePlay() && listener != null) {
+				resumeState = 0;
+				restartState = 0;
+				optionsState = 0;
+				backState = 0;
+				wasPaused = false;
+				paused = false;
+			}
+			
 		}
 	}
+	
+	/**
+	 * Dispose of all (non-static) resources allocated to this mode.
+	 */
+	public void dispose() {
+		for(Obstacle obj : objects) {
+			obj.deactivatePhysics(world);
+		}
+		objects.clear();
+		addQueue.clear();
+		world.dispose();
+		pauseMenu.dispose();
+		objects = null;
+		addQueue = null;
+		bounds = null;
+		scale  = null;
+		world  = null;
+		canvas = null;
+	}
+	
 
 	/// CONTACT LISTENER METHODS
 	/**
@@ -1000,35 +1068,35 @@ public class DownstreamController extends WorldController implements ContactList
 	 */
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
 		if (paused) {
-			System.out.println(screenX + " " + screenY);
+			
 			// Flip to match graphics coordinates
 			screenY = canvas.getHeight() - screenY;
-			float dx = Math.abs(screenX - pauseMenu.backPos.x);
-			float dy = Math.abs(screenY - pauseMenu.backPos.y);
+			float dx = Math.abs(screenX - PauseMenuMode.backPos.x);
+			float dy = Math.abs(screenY - PauseMenuMode.backPos.y);
 
 			if (dx < pauseMenu.scale * pauseMenu.back.getWidth() / 2
 					&& dy < pauseMenu.scale * pauseMenu.back.getHeight() / 2) {
 				backState = 1;
 			}
 
-			dx = Math.abs(screenX - pauseMenu.resumePos.x);
-			dy = Math.abs(screenY - pauseMenu.resumePos.y);
+			dx = Math.abs(screenX - PauseMenuMode.resumePos.x);
+			dy = Math.abs(screenY - PauseMenuMode.resumePos.y);
 
 			if (dx < pauseMenu.scale * pauseMenu.resume.getWidth() / 2
 					&& dy < pauseMenu.scale * pauseMenu.resume.getHeight() / 2) {
 				resumeState = 1;
 			}
 
-			dx = Math.abs(screenX - pauseMenu.restartPos.x);
-			dy = Math.abs(screenY - pauseMenu.restartPos.y);
+			dx = Math.abs(screenX - PauseMenuMode.restartPos.x);
+			dy = Math.abs(screenY - PauseMenuMode.restartPos.y);
 
 			if (dx < pauseMenu.scale * pauseMenu.restart.getWidth() / 2
 					&& dy < pauseMenu.scale * pauseMenu.restart.getHeight() / 2) {
 				restartState = 1;
 			}
 
-			dx = Math.abs(screenX - pauseMenu.optionsPos.x);
-			dy = Math.abs(screenY - pauseMenu.optionsPos.y);
+			dx = Math.abs(screenX - PauseMenuMode.optionsPos.x);
+			dy = Math.abs(screenY - PauseMenuMode.optionsPos.y);
 
 			if (dx < pauseMenu.scale * pauseMenu.options.getWidth() / 2
 					&& dy < pauseMenu.scale * pauseMenu.options.getHeight() / 2) {

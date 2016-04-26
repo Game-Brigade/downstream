@@ -28,6 +28,7 @@ import edu.cornell.gdiac.downstream.WorldController.AssetState;
 import edu.cornell.gdiac.downstream.models.EnemyModel;
 import edu.cornell.gdiac.downstream.models.PlayerModel;
 import edu.cornell.gdiac.downstream.models.TetherModel;
+import edu.cornell.gdiac.downstream.models.WhirlpoolModel;
 import edu.cornell.gdiac.downstream.obstacle.PolygonObstacle;
 import edu.cornell.gdiac.util.SoundController;
 
@@ -56,7 +57,9 @@ public class LevelEditor extends WorldController {
 	/** Reference to the lotus texture */
 	private static final String LOTUS_TEXTURE= null;
 	/** Reference to the land texture */
+
 	private static String EARTH_FILE = "terrain/swirl_grass.png";
+
 	
 	/** Reference to the whirlpool texture */
 	private static final String WHIRLPOOL_TEXTURE = "terrain/whirlpool.png";
@@ -75,6 +78,9 @@ public class LevelEditor extends WorldController {
 	private TextureRegion lightingTexture;
 	/** Texture assets for the land */
 	private TextureRegion earthTile;
+	/** Texture assets for the whirlpools */
+	private TextureRegion whirlpoolTexture;
+	private TextureRegion whirlpoolFlipTexture;
 	
 
 
@@ -167,6 +173,9 @@ public class LevelEditor extends WorldController {
 		lanternTexture = createTexture(manager, LANTERN_TEXTURE, false);
 		lightingTexture = createTexture(manager, LIGHTING_TEXTURE, false);
 		earthTile = createTexture(manager,EARTH_FILE,true);
+		whirlpoolTexture = createTexture(manager, WHIRLPOOL_TEXTURE, false);
+		whirlpoolFlipTexture = createTexture(manager, WHIRLPOOL_FLIP_TEXTURE, false);
+		
 
 		SoundController sounds = SoundController.getInstance();
 		//sounds.allocate(manager,MAIN_FIRE_SOUND);
@@ -309,6 +318,22 @@ public class LevelEditor extends WorldController {
 		lily.setDrawScale(scale);
 		lily.setTexture(lilyTexture);
 		addObject(lily);
+	}
+	
+	private void addWhirlPool(){
+		updateClicks();
+		wpools.add(currentClick);
+		//rad?
+		WhirlpoolModel pool = new WhirlpoolModel(currentClick.x, currentClick.y);
+		pool.setBodyType(BodyDef.BodyType.StaticBody);
+		pool.setName("whirlpool" + 1);
+		pool.setDensity(TETHER_DENSITY);
+		pool.setFriction(TETHER_FRICTION);
+		pool.setRestitution(TETHER_RESTITUTION);
+		pool.setSensor(false);
+		pool.setDrawScale(scale);
+		pool.setTexture(whirlpoolFlipTexture);
+		addObject(pool);
 	}
 	
 	private void addLantern() {
@@ -462,9 +487,11 @@ public class LevelEditor extends WorldController {
 		ArrayList<Vector2> li = lilypads;
 		ArrayList<Vector2> lo = lanterns;
 		ArrayList<ArrayList<Vector2>> w = walls;
+		ArrayList<Vector2> wp = wpools;
 		ArrayList<Vector2> m = mapArea;
 		
-		Level level = new Level(n,p,g,e,li,lo,w,m);
+		Level level = new Level(n,p,g,e,li,lo,w,wp, m);
+
 		
 		try {
 			Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -519,15 +546,20 @@ public class LevelEditor extends WorldController {
 		ArrayList<Vector2> lilypads;
 		ArrayList<Vector2> lotuses;
 		ArrayList<ArrayList<Float>> walls;
+		ArrayList<Vector2> wpools;
+
 		ArrayList<Vector2> map;
+
 		
 		private Level(int n, Vector2 p, Vector2 g, 
 					  HashMap<String,ArrayList<Vector2>> e,
 					  ArrayList<Vector2> li,
 					  ArrayList<Vector2> lo,
+
 					  ArrayList<ArrayList<Vector2>> w,
+					  ArrayList<Vector2> wp,
 					  ArrayList<Vector2> m) {
-//			System.out.println(e.values());
+
 			number = n;
 			player = p;
 			goal = g;
@@ -540,6 +572,7 @@ public class LevelEditor extends WorldController {
 			}
 			lilypads = li;
 			lotuses = lo;
+			wpools = wp;
 			walls = new ArrayList<ArrayList<Float>>();
 			for (ArrayList<Vector2> vectorList : w) {
 				ArrayList<Float> floatList = new ArrayList<Float>();
