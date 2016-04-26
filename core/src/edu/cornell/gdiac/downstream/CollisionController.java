@@ -23,7 +23,7 @@ public class CollisionController {
 
 	private Body bCollide;
 	private String sCollide;
-	private boolean win;
+	private boolean win = false;
 		
 	public CollisionController(PlayerModel koi){
 		this.koi = koi;

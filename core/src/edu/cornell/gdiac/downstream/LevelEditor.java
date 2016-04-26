@@ -213,6 +213,7 @@ public class LevelEditor extends WorldController {
 	private ArrayList<Vector2> lilypads;
 	private ArrayList<Vector2> lanterns;
 	private ArrayList<Vector2> wpools;
+	private ArrayList<Vector2> rocks;
 	private HashMap<String,ArrayList<Vector2>> enemies;
 	private Vector2 player;
 	private ArrayList<ArrayList<Vector2>> walls;
@@ -648,6 +649,7 @@ public class LevelEditor extends WorldController {
 		ArrayList<Vector2> wpools;
 
 		ArrayList<Vector2> map;
+		ArrayList<Vector2> rocks;
 
 		
 		private Level(int n, Vector2 p, 
