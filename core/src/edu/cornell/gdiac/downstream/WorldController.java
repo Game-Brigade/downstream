@@ -67,7 +67,7 @@ public abstract class WorldController implements Screen {
 	
 	// Pathnames to shared assets
 	/** The background image for the battle */
-	private static final String BACKGROUND_FILE_N = "terrain/Water_Night.jpg";
+	private static final String BACKGROUND_FILE_N = "terrain/Water_Day.jpg";
 	private static final String BACKGROUND_FILE_D = "terrain/Water_Day.jpg";
 	private static final String BACKGROUND_FILE_S = "terrain/Water_Sunset.jpg";
 	private static final String OVERLAY_FILE = "terrain/texture.jpg";
@@ -625,8 +625,9 @@ public abstract class WorldController implements Screen {
 		canvas.begin();
 		for (int i = -5; i < 5; i++) {
 			for (int j = -5; j < 5; j++) {
-				canvas.draw(getBackground(), Color.WHITE, canvas.getWidth()*i, canvas.getHeight()*j, 
-													 canvas.getWidth(),   canvas.getHeight());
+
+				canvas.draw(getBackground(), Color.WHITE, canvas.getWidth()*i * 2, canvas.getHeight()*j * 2, 
+													 canvas.getWidth() * 2,   canvas.getHeight() * 2);
 			}
 		}
 //		canvas.draw(background, Color.WHITE, 0, 0, canvas.getWidth(), canvas.getHeight());

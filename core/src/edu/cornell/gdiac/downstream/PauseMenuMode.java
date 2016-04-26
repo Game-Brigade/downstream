@@ -31,6 +31,9 @@ public class PauseMenuMode{
 	public Texture back;
 	public Texture background;
 	
+	private Color alphaSet = new Color(255, 255, 255, .1f);
+
+	
 	
 	/** Reference to GameCanvas created by the root */
 	private GameCanvas canvas;
@@ -106,9 +109,7 @@ public class PauseMenuMode{
 	public void draw() {
 		canvas.beginMENU();
 		
-		Color c = Color.WHITE.cpy();
-		c.a = .03f;
-		canvas.draw(background, c, background.getWidth()/2, background.getHeight()/2, 
+		canvas.draw(background, alphaSet, background.getWidth()/2, background.getHeight()/2, 
 				backgroundPos.x, backgroundPos.y, 0, scale, scale);
 		canvas.draw(pauseHeader, Color.WHITE, pauseHeader.getWidth()/2, pauseHeader.getHeight()/2, 
 				headerPos.x, headerPos.y, 0, scale, scale);
