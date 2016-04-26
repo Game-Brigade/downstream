@@ -57,7 +57,7 @@ public class DownstreamController extends WorldController implements ContactList
 	/** Reference to the repeating land texture */
 
 	private static final String EARTH_FILE = "terrain/repeat tile.png";
-	private static final String EARTH_FILE_N = "terrain/Grass_night.jpg";
+	private static final String EARTH_FILE_N = "terrain/swirl_grass.png";
 	private static final String EARTH_FILE_D = "terrain/Grass_day.jpg";
 	private static final String EARTH_FILE_S = "terrain/Grass_sunset.jpg";
 
