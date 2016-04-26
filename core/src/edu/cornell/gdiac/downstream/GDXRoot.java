@@ -47,12 +47,9 @@ public class GDXRoot extends Game implements ScreenListener {
 	private DownstreamController playGame;
 	/** Player mode for level editing */
 	private LevelEditor editor;
-	/** Player mode for the the game proper (CONTROLLER CLASS) */
-	private int current;
-	
-	private Music backgroundMusic;
+	/** Background music */
 	private static final String BACKGROUND_SOUND = "SOUNDS/background_sound.mp3";
-	
+	private Music backgroundMusic;
 	
 	/**
 	 * Creates a new game from the configuration settings.
@@ -99,10 +96,6 @@ public class GDXRoot extends Game implements ScreenListener {
 	public void dispose() {
 		// Call dispose on our children
 		setScreen(null);
-		
-		//System.out.println("Hello");
-		editor.unloadContent(manager);
-		editor.dispose();
 
 		canvas.dispose();
 		canvas = null;
@@ -145,78 +138,69 @@ public class GDXRoot extends Game implements ScreenListener {
 		
 			backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal(BACKGROUND_SOUND));
 			backgroundMusic.setLooping(true);
-			backgroundMusic.play();
+			//backgroundMusic.play();
 		}
-		
 		else if (screen == mainMenu && exitCode == WorldController.EXIT_PLAY) {
-			
 			playGame = new DownstreamController();
 			playGame.preLoadContent(manager);
-			editor.preLoadContent(manager);
-			
 			playGame.loadContent(manager);
 			playGame.setScreenListener(this);
 			playGame.setCanvas(canvas);
-			
 			playGame.reset();
-			
 			setScreen(playGame);
 			Gdx.input.setInputProcessor(playGame);
 			mainMenu.dispose();
 			mainMenu = null;
-		
 		} 
-		
 		else if (screen == mainMenu && exitCode == WorldController.EXIT_EDIT){
-			
+			editor = new LevelEditor();
+			editor.preLoadContent(manager);
 			editor.loadContent(manager);
 			editor.setScreenListener(this);
 			editor.setCanvas(canvas);
 			editor.reset();
 			setScreen(editor);
-			
 			mainMenu.dispose();
 			mainMenu = null;
 		}
-		
 		else if (screen == mainMenu && exitCode == WorldController.EXIT_SELECT){
-			
-			mainMenu.dispose();
-			mainMenu = null;
 			levelSelect = new LevelSelectMode(canvas,manager);
 			levelSelect.setScreenListener(this);
 			setScreen(levelSelect);
 			Gdx.input.setInputProcessor(levelSelect);
+			mainMenu.dispose();
+			mainMenu = null;
 		}
-		
 		else if (screen == levelSelect && exitCode == WorldController.EXIT_MAIN){
-			levelSelect.dispose();
-			levelSelect = null;
 			mainMenu = new MainMenuMode(canvas,manager);
-			
 			mainMenu.setScreenListener(this);
 			setScreen(mainMenu);
 			Gdx.input.setInputProcessor(mainMenu);
+			levelSelect.dispose();
+			levelSelect = null;
 		}
-		
-		
-		
 		else if (screen == playGame && exitCode == WorldController.EXIT_MAIN){
-			System.out.println("Hello");
 			playGame.unloadContent(manager);
 			playGame.dispose();
 			playGame = null;
 			mainMenu = new MainMenuMode(canvas,manager);
-			
 			mainMenu.setScreenListener(this);
 			setScreen(mainMenu);
 			Gdx.input.setInputProcessor(mainMenu);
 		}
-		
-		
-		
-		else if (exitCode == WorldController.EXIT_QUIT) {
-			// We quit the main application
+		else if (screen == playGame && exitCode == WorldController.EXIT_PLAY){
+			playGame.unloadContent(manager);
+			playGame.dispose();
+			playGame = new DownstreamController();
+			playGame.preLoadContent(manager);
+			playGame.loadContent(manager);
+			playGame.setScreenListener(this);
+			playGame.setCanvas(canvas);
+			playGame.reset();
+			setScreen(playGame);
+			Gdx.input.setInputProcessor(playGame);
+		}
+		else if (exitCode == WorldController.EXIT_QUIT){
 			Gdx.app.exit();
 		}
 	}

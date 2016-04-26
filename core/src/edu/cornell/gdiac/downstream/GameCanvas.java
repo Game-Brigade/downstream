@@ -84,7 +84,7 @@ public class GameCanvas {
 	
 	private OrthographicCamera hudCamera;
 	
-	private OrthographicCamera pauseCamera;
+	private OrthographicCamera menuCamera;
 	
 	/** Value to cache window width (if we are currently full screen) */
 	int width;
@@ -129,10 +129,10 @@ public class GameCanvas {
 		hudCamera.update();
 		hudCamera.setToOrtho(false);
 		
-		pauseCamera = new OrthographicCamera(getWidth(),getWidth());
-		pauseCamera.position.set(0,0,0);
-		pauseCamera.update();
-		pauseCamera.setToOrtho(false);
+		menuCamera = new OrthographicCamera(getWidth(),getWidth());
+		menuCamera.position.set(0,0,0);
+		menuCamera.update();
+		menuCamera.setToOrtho(false);
 		
 		// Initialize the cache objects
 		holder = new TextureRegion();
@@ -172,19 +172,21 @@ public class GameCanvas {
 		return camera;
 	}
 	
+	
+	
 	public void setViewportSize(float width, float height) {
 		camera.viewportWidth = width;
 		camera.viewportHeight = height;
 		hudCamera.viewportWidth = width;
 		hudCamera.viewportHeight = height;
-		pauseCamera.viewportWidth = width;
-		pauseCamera.viewportHeight = height;
+		menuCamera.viewportWidth = width;
+		menuCamera.viewportHeight = height;
 	}
 	
 	public void setCameraPosition(Vector2 newPosition) {
 		camera.position.set(newPosition, 0);
 		hudCamera.position.set(newPosition, 0);
-		pauseCamera.position.set(newPosition,0);
+		menuCamera.position.set(newPosition,0);
 	}
 	
 	/**
@@ -425,8 +427,8 @@ public class GameCanvas {
     	active = DrawPass.STANDARD;
     }
     
-    public void beginPAUSE() {
-    	spriteBatch.setProjectionMatrix(pauseCamera.combined);
+    public void beginMENU() {
+    	spriteBatch.setProjectionMatrix(menuCamera.combined);
     	spriteBatch.begin();
     	active = DrawPass.STANDARD;
     }

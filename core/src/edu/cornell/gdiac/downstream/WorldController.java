@@ -644,10 +644,6 @@ public abstract class WorldController implements Screen {
 		
 		canvas.end();
 		
-		/*canvas.beginHUD();
-		HUD.draw(canvas);
-		canvas.end();*/
-		
 		if (debug) {
 			canvas.beginDebug();
 			for(Obstacle obj : objects) {
@@ -755,6 +751,17 @@ public abstract class WorldController implements Screen {
 
 	public static void setBackground(Texture background) {
 		WorldController.background = background;
+	}
+	
+	protected static Vector2 vectorOfString(String s) {
+		int comma = s.indexOf(",");
+		int openParens = s.indexOf("(");
+		int closeParens = s.indexOf(")");
+		String xstr = s.substring(openParens+1,comma);
+		String ystr = s.substring(comma+1,closeParens);
+		float x = Float.parseFloat(xstr);
+		float y = Float.parseFloat(ystr);
+		return new Vector2(x,y);
 	}
 
 }

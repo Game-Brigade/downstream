@@ -102,7 +102,7 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 	 * will talk about why we prefer this in lecture.
 	 */
 	private void draw() {
-		canvas.begin();
+		canvas.beginMENU();
 		canvas.clear();
 		canvas.draw(screenShot, Color.WHITE, screenShot.getWidth()/2, screenShot.getHeight()/2, 
 				canvas.getWidth()/2, canvas.getHeight()/2, 0, scale, scale);
