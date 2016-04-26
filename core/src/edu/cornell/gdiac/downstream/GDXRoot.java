@@ -136,9 +136,6 @@ public class GDXRoot extends Game implements ScreenListener {
 			setScreen(mainMenu);
 			Gdx.input.setInputProcessor(mainMenu);
 		
-			backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal(BACKGROUND_SOUND));
-			backgroundMusic.setLooping(true);
-			//backgroundMusic.play();
 		}
 		else if (screen == mainMenu && exitCode == WorldController.EXIT_PLAY) {
 			playGame = new DownstreamController();
@@ -151,6 +148,9 @@ public class GDXRoot extends Game implements ScreenListener {
 			Gdx.input.setInputProcessor(playGame);
 			mainMenu.dispose();
 			mainMenu = null;
+			backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal(BACKGROUND_SOUND));
+			backgroundMusic.setLooping(true);
+			backgroundMusic.play();
 		} 
 		else if (screen == mainMenu && exitCode == WorldController.EXIT_EDIT){
 			editor = new LevelEditor();

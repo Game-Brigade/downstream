@@ -12,7 +12,9 @@ import com.badlogic.gdx.controllers.PovDirection;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
@@ -22,14 +24,35 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 	
 	
 	/** Textures necessary to support the level select screen */
-	private static final String SELECT_SCREENSHOT = "level select.png";
+	private static final String BACKGROUND = "MENUS/general_background_new.png";
 	private static final String BACK_BUTTON = "MENUS/back to main-b.png";
+	private static final String LEVEL1_BUTTON = "MENUS/Level Select/lvl 1.png";
+	private static final String LEVEL2_BUTTON = "MENUS/Level Select/lvl 2.png";
+	private static final String LEVEL3_BUTTON = "MENUS/Level Select/lvl 3.png";
+	private static final String LEVEL4_BUTTON = "MENUS/Level Select/lvl 4.png";
+	private static final String LEVEL5_BUTTON = "MENUS/Level Select/lvl 5.png";
+	private static final String LEVEL6_BUTTON = "MENUS/Level Select/lvl 6.png";
+	private static final String LEVEL7_BUTTON = "MENUS/Level Select/lvl 7.png";
+	private static final String LEVEL8_BUTTON = "MENUS/Level Select/lvl 8.png";
 	
 	
-	private Texture screenShot;
+	/** Retro font for displaying messages */
+	private static String FONT_FILE = "loading/marathon.ttf";
+	private static int FONT_SIZE = 150;
+	/** The font for giving messages to the player */
+	protected BitmapFont displayFont;
+	
 	private Texture back;
+	private Texture level1button;
+	private Texture level2button;
+	private Texture level3button;
+	private Texture level4button;
+	private Texture level5button;
+	private Texture level6button;
+	private Texture level7button;
+	private Texture level8button;
+	private Texture background;
 
-	
 	/** AssetManager to be loading in the background */
 	private AssetManager manager;
 	/** Reference to GameCanvas created by the root */
@@ -39,8 +62,17 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 	
 	/** Whether or not this player mode is still active */
 	private boolean active;
-	/** The current state of the play button */
+	/** The current states of the buttons */
 	private int backState;
+	private int button1State;
+	private int button2State;
+	private int button3State;
+	private int button4State;
+	private int button5State;
+	private int button6State;
+	private int button7State;
+	private int button8State;
+	
 	
 	/** Scaling factor for when the student changes the resolution. */
 	private float scale;
@@ -52,6 +84,14 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 	
 	/** Positions of buttons */
 	private static Vector2 backPos = new Vector2();
+	private static Vector2 button1 = new Vector2();
+	private static Vector2 button2 = new Vector2();
+	private static Vector2 button3 = new Vector2();
+	private static Vector2 button4 = new Vector2();
+	private static Vector2 button5 = new Vector2();
+	private static Vector2 button6 = new Vector2();
+	private static Vector2 button7 = new Vector2();
+	private static Vector2 button8 = new Vector2();
 	
 	
 
@@ -68,19 +108,52 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 		// Compute the dimensions from the canvas
 		resize(canvas.getWidth(),canvas.getHeight());
 		
-		backPos.set(new Vector2((float)canvas.getWidth()/2,(float)canvas.getHeight()/18));
+		backPos.set(new Vector2((float)canvas.getWidth()/2,(float)canvas.getHeight()/18*2));
+		button1.set(new Vector2((float)canvas.getWidth()/12*3,(float)canvas.getHeight()/12*8));
+		button2.set(new Vector2((float)canvas.getWidth()/12*5,(float)canvas.getHeight()/12*8));
+		button3.set(new Vector2((float)canvas.getWidth()/12*7,(float)canvas.getHeight()/12*8));
+		button4.set(new Vector2((float)canvas.getWidth()/12*9,(float)canvas.getHeight()/12*8));
+		button5.set(new Vector2((float)canvas.getWidth()/12*3,(float)canvas.getHeight()/12*5));
+		button6.set(new Vector2((float)canvas.getWidth()/12*5,(float)canvas.getHeight()/12*5));
+		button7.set(new Vector2((float)canvas.getWidth()/12*7,(float)canvas.getHeight()/12*5));
+		button8.set(new Vector2((float)canvas.getWidth()/12*9,(float)canvas.getHeight()/12*5));
+		
+		// Load the font
+		FreetypeFontLoader.FreeTypeFontLoaderParameter size2Params = new FreetypeFontLoader.FreeTypeFontLoaderParameter();
+		size2Params.fontFileName = FONT_FILE;
+		size2Params.fontParameters.size = FONT_SIZE;
+		manager.load(FONT_FILE, BitmapFont.class, size2Params);
+		if (manager.isLoaded(FONT_FILE)) {
+			displayFont = manager.get(FONT_FILE,BitmapFont.class);
+			displayFont.setColor(new Color(0,0,0,1));
+		} else {
+			displayFont = null;
+		}
 		
 
 		// Load images immediately.
-		screenShot = new Texture(SELECT_SCREENSHOT);
 		back = new Texture(BACK_BUTTON);
+		level1button = new Texture(LEVEL1_BUTTON);
+		level2button = new Texture(LEVEL2_BUTTON);
+		level3button = new Texture(LEVEL3_BUTTON);
+		level4button = new Texture(LEVEL4_BUTTON);
+		level5button = new Texture(LEVEL5_BUTTON);
+		level6button = new Texture(LEVEL6_BUTTON);
+		level7button = new Texture(LEVEL7_BUTTON);
+		level8button = new Texture(LEVEL8_BUTTON);
+		background = new Texture(BACKGROUND);
 			
 		// No progress so far.
 		backState = 0;
+		button1State = 0;
+		button2State = 0;
+		button3State = 0;
+		button4State = 0;
+		button5State = 0;
+		button6State = 0;
+		button7State = 0;
+		button8State = 0;
 		
-		
-		
-
 		active = true;
 	}
 	
@@ -89,8 +162,16 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 	 * Called when this screen should release all resources.
 	 */
 	public void dispose() {
-		screenShot.dispose();
+		level1button.dispose();
+		level2button.dispose();
+		level3button.dispose();
+		level4button.dispose();
+		level5button.dispose();
+		level6button.dispose();
+		level7button.dispose();
+		level8button.dispose();
 		back.dispose();
+		background.dispose();
 	}
 
 
@@ -104,8 +185,28 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 	private void draw() {
 		canvas.beginMENU();
 		canvas.clear();
-		canvas.draw(screenShot, Color.WHITE, screenShot.getWidth()/2, screenShot.getHeight()/2, 
+		
+		canvas.draw(background, Color.WHITE, background.getWidth()/2, background.getHeight()/2, 
 				canvas.getWidth()/2, canvas.getHeight()/2, 0, scale, scale);
+		canvas.drawTextCentered("Level Select", displayFont, 250);
+		canvas.draw(level1button, Color.WHITE, level1button.getWidth()/2, level1button.getHeight()/2, 
+				button1.x, button1.y, 0, scale, scale);
+		canvas.draw(level2button, Color.WHITE, level2button.getWidth()/2, level2button.getHeight()/2, 
+				button2.x, button2.y, 0, scale, scale);
+		canvas.draw(level3button, Color.WHITE, level3button.getWidth()/2, level3button.getHeight()/2, 
+				button3.x, button3.y, 0, scale, scale);
+		canvas.draw(level4button, Color.WHITE, level4button.getWidth()/2, level4button.getHeight()/2, 
+				button4.x, button4.y, 0, scale, scale);
+		canvas.draw(level5button, Color.WHITE, level5button.getWidth()/2, level5button.getHeight()/2, 
+				button5.x, button5.y, 0, scale, scale);
+		canvas.draw(level6button, Color.WHITE, level6button.getWidth()/2, level6button.getHeight()/2, 
+				button6.x, button6.y, 0, scale, scale);
+		canvas.draw(level7button, Color.WHITE, level7button.getWidth()/2, level7button.getHeight()/2, 
+				button7.x, button7.y, 0, scale, scale);
+		canvas.draw(level8button, Color.WHITE, level8button.getWidth()/2, level8button.getHeight()/2, 
+				button8.x, button8.y, 0, scale, scale);
+		
+		canvas.draw(back, Color.WHITE, back.getWidth()/2, back.getHeight()/2, backPos.x, backPos.y, 0, scale, scale);
 		canvas.end();
 	}
 
@@ -128,6 +229,7 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 				listener.exitScreen(this, WorldController.EXIT_MAIN);
 			}
 			
+			
 		}
 	}
 	
@@ -140,6 +242,37 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 		return backState == 2;
 	}
 	
+	public boolean Level1() {
+		return button1State == 2;
+	}
+	
+	public boolean Level2() {
+		return button2State == 2;
+	}
+	
+	public boolean Level3() {
+		return button3State == 2;
+	}
+	
+	public boolean Level4() {
+		return button4State == 2;
+	}
+	
+	public boolean Level5() {
+		return button5State == 2;
+	}
+	
+	public boolean Level6() {
+		return button6State == 2;
+	}
+	
+	public boolean Level7() {
+		return button7State == 2;
+	}
+	
+	public boolean Level8() {
+		return button8State == 2;
+	}
 
 	/**
 	 * Called when the Screen is resized.
@@ -226,13 +359,60 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 		
 		// Flip to match graphics coordinates
 		screenY = canvas.getHeight()-screenY;
+		
 		float dx = Math.abs(screenX - backPos.x);
 		float dy = Math.abs(screenY - backPos.y);
-		
 		if (dx < scale*back.getWidth()/2 && dy < scale*back.getHeight()/2) {
 			backState = 1;
 		}
 		
+		dx = Math.abs(screenX - button1.x);
+		dy = Math.abs(screenY - button1.y);
+		if (dx < scale*level1button.getWidth()/2 && dy < scale*level1button.getHeight()/2) {
+			button1State = 1;
+		}
+		
+		dx = Math.abs(screenX - button2.x);
+		dy = Math.abs(screenY - button2.y);
+		if (dx < scale*level2button.getWidth()/2 && dy < scale*level2button.getHeight()/2) {
+			button2State = 1;
+		}
+		
+		dx = Math.abs(screenX - button3.x);
+		dy = Math.abs(screenY - button3.y);
+		if (dx < scale*level3button.getWidth()/2 && dy < scale*level3button.getHeight()/2) {
+			button3State = 1;
+		}
+		
+		dx = Math.abs(screenX - button4.x);
+		dy = Math.abs(screenY - button4.y);
+		if (dx < scale*level4button.getWidth()/2 && dy < scale*level4button.getHeight()/2) {
+			button4State = 1;
+		}
+		
+		dx = Math.abs(screenX - button5.x);
+		dy = Math.abs(screenY - button5.y);
+		if (dx < scale*level5button.getWidth()/2 && dy < scale*level5button.getHeight()/2) {
+			button5State = 1;
+		}
+		
+		dx = Math.abs(screenX - button6.x);
+		dy = Math.abs(screenY - button6.y);
+		if (dx < scale*level6button.getWidth()/2 && dy < scale*level6button.getHeight()/2) {
+			button6State = 1;
+		}
+		
+		dx = Math.abs(screenX - button7.x);
+		dy = Math.abs(screenY - button7.y);
+		if (dx < scale*level7button.getWidth()/2 && dy < scale*level7button.getHeight()/2) {
+			button7State = 1;
+		}
+		
+		dx = Math.abs(screenX - button8.x);
+		dy = Math.abs(screenY - button8.y);
+		if (dx < scale*level8button.getWidth()/2 && dy < scale*level8button.getHeight()/2) {
+			button8State = 1;
+		}
 		
 		
 		return false;
@@ -253,9 +433,45 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 	 * @return whether to hand the event to other listeners.
 	 */
 	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-		if (backState == 1) {
-			backState = 2;
-			return false;
+		if (backState == 1 || button1State == 1 || button2State == 1 || button3State == 1 || button4State == 1
+				|| button5State == 1 || button6State == 1 || button7State == 1 || button8State == 1) {
+			if(backState == 1){
+				backState = 2;
+				return false;
+			}
+			if(button1State == 1){
+				button1State = 2;
+				return false;
+			}
+			if(button2State == 1){
+				button2State = 2;
+				return false;
+			}
+			if(button3State == 1){
+				button3State = 2;
+				return false;
+			}
+			if(button4State == 1){
+				button4State = 2;
+				return false;
+			}
+			if(button5State == 1){
+				button5State = 2;
+				return false;
+			}
+			if(button6State == 1){
+				button6State = 2;
+				return false;
+			}
+			if(button7State == 1){
+				button7State = 2;
+				return false;
+			}
+			if(button8State == 1){
+				button8State = 2;
+				return false;
+			}
+			
 		}
 		return true;
 	}

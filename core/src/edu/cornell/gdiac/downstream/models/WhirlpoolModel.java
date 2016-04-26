@@ -1,6 +1,7 @@
 package edu.cornell.gdiac.downstream.models;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 
 import edu.cornell.gdiac.downstream.GameCanvas;
@@ -21,11 +22,14 @@ public class WhirlpoolModel extends WheelObstacle {
 	private int direction;
 	
 	private float rot = 0;
+	
+	private float numOfRotations; 
+	private Vector2 entry;
 
 	public WhirlpoolModel(float x, float y, int dir) {
 		super(x, y, WHIRL_DEFAULT_RANGE);
 		direction = dir;
-		
+		numOfRotations = 0;
 	}
 	
 	public float getRadius() {
@@ -45,6 +49,19 @@ public class WhirlpoolModel extends WheelObstacle {
 				texture.getRegionHeight()/2, this.getX()*drawScale.x, this.getY()*drawScale.x, (float)(Math.PI*rot*direction),0.4f, 0.4f);
 		rot+=0.02;
 		
+	}
+	
+	public void setEntry(Vector2 e){
+		entry = e;
+	}
+	
+	public void rotationPass(PlayerModel koi){
+		assert entry != null;
+		if(true){
+			//rotations = 
+		}
+		
+		//numOfRotations = numOfRotations + .5f;
 	}
 	
 

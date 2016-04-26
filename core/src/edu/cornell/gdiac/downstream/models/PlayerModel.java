@@ -40,11 +40,15 @@ public class PlayerModel extends BoxObstacle {
 	/** Cache object for right afterburner origin */
 	public Vector2 rghtOrigin = new Vector2();
 	
+	public Vector2 initPos;
+
 	private Vector2 cachedPos = new Vector2(0, 0);
 	
 	private int health;
 
 	private Vector2 force;
+	
+	public static final Vector2 NE = (new Vector2(1,1)).nor();
 	
 	private boolean isTethered;
 	
@@ -52,13 +56,14 @@ public class PlayerModel extends BoxObstacle {
 
 	public Vector2 pull;
 
+
 	public Vector2 cent;
 
 	private Vector2 dest;
 
 	private boolean attemptingTether;
 
-	private boolean bursting;
+	public boolean bursting;
 	
 	private float energy;
 	
@@ -68,9 +73,14 @@ public class PlayerModel extends BoxObstacle {
 	
 	private boolean cachedLeft = false;
 
+	private boolean pastTanTether;
+	
+	private boolean dead;
+
 	/** Create a new player at x,y. */
 	public PlayerModel(float x, float y, float width, float height) {
 		super(x, y, width, height);
+		initPos = getPosition();
 		setBodyType(PLAYER_FISH_BODY_TYPE);
 		setDensity(DEFAULT_DENSITY);
 		setDensity(DEFAULT_DENSITY);
@@ -83,6 +93,7 @@ public class PlayerModel extends BoxObstacle {
 		isTethered = false;
 		attemptingTether = true;
 		isWhirled = false;
+		setLinearVelocity(NE);
 		pull = Vector2.Zero;
 		cent = Vector2.Zero;
 		dest = Vector2.Zero;
@@ -93,6 +104,14 @@ public class PlayerModel extends BoxObstacle {
 		return health > 0;
 	}
 
+	public boolean isAttemptingTether() {
+		return attemptingTether;
+	}
+	
+	public void setAttemptingTether(boolean b) {
+		attemptingTether = b;
+	}
+	
 	public void applyTetherForce(Vector2 tetherPos, float rad) {
 		force = calculateTetherForce(tetherPos,rad);
 		body.applyForceToCenter(force, true);
@@ -102,9 +121,11 @@ public class PlayerModel extends BoxObstacle {
 		body.applyForceToCenter(calculateWhirlForce(whirlPos,rad), true);
 	}
 	
+
 	public void setCurved(boolean b){
 		curved = b;
 	}
+
 
 	public void refreshTetherForce(Vector2 tetherPos, float rad){
 		pull = tetherPos.cpy().sub(getPosition());
@@ -120,12 +141,15 @@ public class PlayerModel extends BoxObstacle {
 		cent = getPosition().cpy().add(pull.cpy().scl(0.5f));
 	}
 	
-	
-	
 	public Vector2 calculateTetherForce(Vector2 tetherPos, float rad){
+		if(cent.isZero() || dest.isZero() || pull.isZero()){
+			return cent;
+		}
 		if(isTethered()){
 			// TRUE CIRCLE
 			if(getPosition().sub(dest).len2() < .01){
+				pastTanTether = false;
+				attemptingTether = false;
 				dest = getPosition();
 				
 				// set force direction
@@ -144,19 +168,14 @@ public class PlayerModel extends BoxObstacle {
 		}
 		else{
 			if(isAttemptingTether()){
-				passAdjust(tetherPos);
+			    float forceMagnitude = (float) (getMass() * getLinearVelocity().len2() / (pull.len()/2));
+			    return cent.cpy().sub(getPosition()).setLength(forceMagnitude);			
 			}
 			return Vector2.Zero;
 		}
 	}
 	
-	public boolean isAttemptingTether() {
-		return attemptingTether;
-	}
-	
-	public void setAttemptingTether(boolean b) {
-		attemptingTether = b;
-	}
+
 	
 	public Vector2 calculateWhirlForce(Vector2 whirlPos, float rad){
 		if(isWhirled()){
@@ -183,14 +202,16 @@ public class PlayerModel extends BoxObstacle {
 	}
 	
 	public void passAdjust(Vector2 tetherPos){
-		/*
-		Vector2 temp = getPosition().sub(tetherPos);
-		if (getLinearVelocity().dot(temp) > 0) {
-			float angle = getLinearVelocity().angle(temp);
-			setForce(getLinearVelocity().rotate90((int) angle*-1).scl(temp.len()*3));
-			applyForce();
-		}
-		*/
+		Vector2 perp = tetherPos.cpy().sub(getInitialTangentPoint(tetherPos)).scl(.5f);
+		float rad = perp.len();
+		cent = getPosition().add(getLinearVelocity().setLength(rad/2)).add(perp);
+		
+		dest = getPosition().add(perp.cpy().scl(2)).add(getLinearVelocity().setLength(rad));
+		pull = dest.cpy().sub(getPosition());
+		cent = getPosition().cpy().add(pull.cpy().scl(0.5f));
+		
+		pastTanTether = true;
+		
 	}
 	
 	private void setForce(Vector2 scl) {
@@ -222,6 +243,12 @@ public class PlayerModel extends BoxObstacle {
 	public boolean willIntersect(Vector2 target) {
 		Vector2 time = timeToIntersect(target);
 		return time.x > -0.009 && time.y > -0.009;
+		//return getLinearVelocity().isCollinear(target.sub(getPosition()), .009f);
+	}
+	
+	public boolean pastTangent(Vector2 target){
+		return !getLinearVelocity().isZero() &&
+				getLinearVelocity().hasOppositeDirection(target.cpy().sub(getPosition()));
 	}
 	
 	public boolean isTethered() {
@@ -277,29 +304,27 @@ public class PlayerModel extends BoxObstacle {
 	 * @param canvas Drawing context
 	 */
 	public void draw(GameCanvas canvas) {
-		//super.draw(canvas);  
-//		canvas.drawLeadingLine(body.getPosition(), new Vector2(0,0));
-		if (texture != null) {
-			if (!curved){canvas.draw(texture, Color.WHITE,origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x,getAngle() + 2.2f, .28f, .28f);}
-			else{
-				if(left){
-					if (curved)canvas.draw(texture, Color.WHITE,origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x, getAngle() + 2.6f, .3f, .3f);
-				}
+		//		canvas.drawLeadingLine(body.getPosition(), new Vector2(0,0));
+		if(!dead){
+			//super.draw(canvas);  
+			//		canvas.drawLeadingLine(body.getPosition(), new Vector2(0,0));
+			if (texture != null) {
+				if (!curved){canvas.draw(texture, Color.WHITE,origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x,getAngle() + 2.2f, .28f, .28f);}
 				else{
-					if (curved)canvas.draw(texture, Color.WHITE,origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x, getAngle() + 3.7f, .3f, .3f);
+					if(left){
+						if (curved)canvas.draw(texture, Color.WHITE,origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x, getAngle() + 2.6f, .3f, .3f);
+					}
+					else{
+						if (curved)canvas.draw(texture, Color.WHITE,origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x, getAngle() + 3.7f, .3f, .3f);
+					}
 				}
+
+
+				//canvas.draw(texture,Color.WHITE,origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x,getAngle(),1,1);
 			}
-			
-			
-			//canvas.draw(texture,Color.WHITE,origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x,getAngle(),1,1);
 		}
 
 	}
-	
-	
-	
-
-
 
 	
 	/**
@@ -436,6 +461,7 @@ public class PlayerModel extends BoxObstacle {
 		
 	}
 	
+	
 	public void updateRestore(){
 		if (energy < 2 && !bursting){
 			energy = energy + .01f;
@@ -452,6 +478,47 @@ public class PlayerModel extends BoxObstacle {
 		}
 		
 	}
+
+
+	public void updateSpeed(float v) {
+		if(!this.isDead()){
+		if (isTethered()) {
+			setLinearVelocity(getLinearVelocity().setLength(v*1.5f));
+		} else{
+			setLinearVelocity(getLinearVelocity().setLength(v*2));
+		}
+		}
+	}
+
+	public void setPastTangentTethering(boolean b){
+		pastTanTether = b;
+	}
+	
+	
+	public boolean isPastTangentTethering() {
+		return pastTanTether;
+	}
+
+	public void free(){
+		setAttemptingTether(false);
+		setTethered(false);
+	}
+
+	public void setDead(boolean b){
+		dead = b;
+	}
+	
+	public boolean isDead(){
+		return dead;
+	}
+
+	public void getVectors() {
+		System.out.println("Cent: "+ cent);		
+		System.out.println("Dest: "+ dest);		
+		System.out.println("Pull: "+ pull);		
+	}
+	
+
 	
 	public float getEnergy(){
 		return energy;
