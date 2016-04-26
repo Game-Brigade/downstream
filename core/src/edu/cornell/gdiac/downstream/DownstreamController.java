@@ -616,7 +616,6 @@ public class DownstreamController extends WorldController implements ContactList
 			collisionController.initStart(checkpoint);
 			koi.setPosition(checkpoint.getPosition().add(koi.NE.cpy().rotate90(1).nor().scl(TetherModel.TETHER_DEFAULT_ORBIT)));
 			koi.setTethered(true);
-			System.out.println("koi is set: "+koi.isTethered());
 			koi.setLinearVelocity(koi.NE);
 			koi.setDead(false);
 			respawnTimer = RESPAWN_TIME;
@@ -879,7 +878,6 @@ public class DownstreamController extends WorldController implements ContactList
 						}
 					}
 				}
-
 			}
 		}
 		SoundController.getInstance().update();
