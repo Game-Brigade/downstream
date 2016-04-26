@@ -322,6 +322,7 @@ public abstract class WorldController implements Screen {
 			countdown = EXIT_COUNT;
 		}
 		complete = value;
+//		if (value) waitSeconds(3);
 	}
 
 	/**
@@ -747,6 +748,13 @@ public abstract class WorldController implements Screen {
 
 	public static void setBackground(Texture background) {
 		WorldController.background = background;
+	}
+	
+	public static void waitSeconds(int seconds) {
+		long start = System.currentTimeMillis();
+		while (System.currentTimeMillis() < start + seconds * 1000) {
+			continue;
+		}
 	}
 	
 	protected static Vector2 vectorOfString(String s) {
