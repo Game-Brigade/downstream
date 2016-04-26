@@ -65,9 +65,15 @@ public class DownstreamController extends WorldController implements ContactList
 	private static final String EARTH_FILE_N = "terrain/Grass_Night.jpg";
 	private static final String EARTH_FILE_D = "terrain/Grass_Day.jpg";
 	private static final String EARTH_FILE_S = "terrain/Grass_Sunset.jpg";
+	
 	private static final String ROCK_FILE_N = "terrain/Rock_Night.png";
 	private static final String ROCK_FILE_D = "terrain/Rock_Day.png";
 	private static final String ROCK_FILE_S = "terrain/Rock_Sunset.png";
+
+	
+	private static final String LILY_TEXTURE_S = "tethers/Lily_Sunset.png";
+	private static final String LILY_TEXTURE_N = "tethers/Lily_Night.png";
+	private static final String LILY_TEXTURE_D = "tethers/Lily_Day.png";
 
 	/** Reference to the whirlpool texture */
 	private static final String WHIRLPOOL_TEXTURE = "terrain/whirlpool.png";
@@ -83,6 +89,9 @@ public class DownstreamController extends WorldController implements ContactList
 	private TextureRegion koiTexture;
 	/** Texture assets for lilypads */
 	private TextureRegion lilyTexture;
+	private TextureRegion lilyTextureDay;
+	private TextureRegion lilyTextureNight;
+	private TextureRegion lilyTextureSunset;
 	/** Texture assets for enemy fish */
 	private TextureRegion enemyTexture;
 	/** Texture assets for lanterns */
@@ -143,11 +152,15 @@ public class DownstreamController extends WorldController implements ContactList
 
 
 
-	private Animation lilyAnimation; // #3
-	private Texture lilySheet; // #4
-	private TextureRegion[] lilyFrames; // #5
-	private SpriteBatch lilyspriteBatch; // #6
-	private TextureRegion lilycurrentFrame; // #7
+	
+	private Animation lilyAnimation; // This is the only one
+	 
+
+	private TextureRegion[] lilyFrames;
+	private TextureRegion[] lilyFramesDay;
+	private TextureRegion[] lilyFramesNight;
+	private TextureRegion[] lilyFramesSunset;
+	private TextureRegion lilycurrentFrame; // also the only one! 
 
 	private Animation closedFlowerAnimation; // #3
 	private Texture closedFlowerSheet; // #4
@@ -302,6 +315,21 @@ public class DownstreamController extends WorldController implements ContactList
 
 		super.preLoadContent(manager);
 	}
+	
+	private TextureRegion[] splice(int images, String filePath){
+		
+		Texture sheet = new Texture(Gdx.files.internal(filePath));
+
+		TextureRegion[][] tmp = TextureRegion.split(sheet, sheet.getWidth()/images, sheet.getHeight());
+		TextureRegion[] Frames = new TextureRegion[images];
+		int index = 0;
+		for (int i = 0; i < 1; i++) {
+			for (int j = 0; j < images; j++) {
+				Frames[index++] = tmp[i][j];
+			}
+		}
+		return Frames;
+	}
 
 	/**
 	 * Loads the assets for this controller.
@@ -321,19 +349,15 @@ public class DownstreamController extends WorldController implements ContactList
 		int rows = 1;
 
 		//animationDef
-		lilySheet = new Texture(Gdx.files.internal("tethers/lotus_strip.png"));
+		//load the animation content here
+		
+		lilyFrames = splice(11, "tethers/lotus_strip.png");
+		//lilyFramesDay = splice(47, "tethers/Lily_Day.png");
+		lilyFramesNight = splice(47, LILY_TEXTURE_N);
+		//lilyFramesSunset = splice(47, LILY_TEXTURE_S);
 
-		//walkSheet = new Texture(Gdx.files.internal("koi/unnamed.png")); // #9
-		TextureRegion[][] tmplily = TextureRegion.split(lilySheet, lilySheet.getWidth()/cols, lilySheet.getHeight()/rows);              // #10
-		lilyFrames = new TextureRegion[11 * 1];
-		int index = 0;
-		for (int i = 0; i < 1; i++) {
-			for (int j = 0; j < 11; j++) {
-				lilyFrames[index++] = tmplily[i][j];
-			}
-		}
-		lilyAnimation = new Animation(.2f, lilyFrames);      // #11
-		lilyspriteBatch = new SpriteBatch();                // #12
+		//lilyAnimation = new Animation(.2f, lilyFrames);
+
 
 		cols = 11;
 		rows = 1;
@@ -343,7 +367,7 @@ public class DownstreamController extends WorldController implements ContactList
 		//walkSheet = new Texture(Gdx.files.internal("koi/unnamed.png")); // #9
 		TextureRegion[][] tmpclosed = TextureRegion.split(closedFlowerSheet, closedFlowerSheet.getWidth()/cols, closedFlowerSheet.getHeight()/rows);              // #10
 		closedFlowerFrames = new TextureRegion[cols * rows];
-		index = 0;
+		int index = 0;
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < cols; j++) {
 				closedFlowerFrames[index++] = tmpclosed[i][j];
@@ -432,6 +456,7 @@ public class DownstreamController extends WorldController implements ContactList
 		enemyTexture = createTexture(manager,ENEMY_TEXTURE,false);
 		//koiTexture = koiSFrames[0];
 		koiTexture = createTexture(manager, KOI_TEXTURE, false);
+		//lilyTexture = lilyFramesNight[0];
 		lilyTexture = lilyFrames[0];
 		lanternTexture = closedFlowerFrames[0];
 		lightingTexture = createTexture(manager, LIGHTING_TEXTURE, false);
@@ -519,10 +544,24 @@ public class DownstreamController extends WorldController implements ContactList
 	private void populateLevel() {
 
 		int NDS = new Random().nextInt(3);
-		//follow convention chicos
+
 		// 0 is day 1 is night 2 is sunset
 		setDayTime(NDS);
 
+		
+		//animation is a bitch
+		if (NDS == 0){
+			//day
+			lilyAnimation = new Animation(.1f, lilyFrames);
+		}
+		else if (NDS == 1){
+			//night
+			lilyAnimation = new Animation(.1f, lilyFrames);
+		}
+		else{
+			//sunset
+			lilyAnimation = new Animation(.1f, lilyFrames);
+		}
 
 		LevelEditor.Level level;
 		if (this.level != -1) {
