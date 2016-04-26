@@ -1,7 +1,7 @@
 /*
  * FishController.java
  *
- * Author: Walker M. White && Dashiell Brown
+ * Author: Walker M. White && Dashiell Brown && Omar Abdelaziz
  * Based on original PhysicsDemo Lab by Don Holden, 2007
  * LibGDX version, 2/6/2015
  */
