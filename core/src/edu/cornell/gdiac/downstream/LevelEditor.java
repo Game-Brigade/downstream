@@ -47,7 +47,7 @@ public class LevelEditor extends WorldController {
 	private static final String ENEMY_TEXTURE = "enemy/enemy.png";
 	/** Reference to the Lantern asset image*/
 	private static final String LANTERN_TEXTURE = "tethers/notlit.png";
-	/** Reference to the Lightin Texture image */
+	/** Reference to the Lighting Texture image */
 	private static final String LIGHTING_TEXTURE = "tethers/aura.png";
 	/** Reference to the 4-sided land texture */
 	private static final String LAND_4SIDE_TEXTURE = "terrain/land.png";
@@ -63,7 +63,9 @@ public class LevelEditor extends WorldController {
 	private static final String LOTUS_TEXTURE= null;
 	/** Reference to the land texture */
 
-	private static String EARTH_FILE = "terrain/swirl_grass.png";
+
+	private static final String EARTH_FILE = "terrain/swirl_grass.png";
+
 
 	
 	/** Reference to the whirlpool texture */
@@ -336,6 +338,24 @@ public class LevelEditor extends WorldController {
 		addObject(lily);
 	}
 	
+
+	private void addWhirlPool(Vector2 click){
+		
+		wpools.add(click.cpy());
+		//rad?
+		WhirlpoolModel pool = new WhirlpoolModel(currentClick.x, currentClick.y, 1);
+		pool.setBodyType(BodyDef.BodyType.StaticBody);
+		pool.setName("whirlpool" + 1);
+		pool.setDensity(TETHER_DENSITY);
+		pool.setFriction(TETHER_FRICTION);
+		pool.setRestitution(TETHER_RESTITUTION);
+		pool.setSensor(false);
+		pool.setDrawScale(scale);
+		pool.setTexture(whirlpoolFlipTexture);
+		addObject(pool);
+	}
+	
+
 	private void addLantern(Vector2 click) {
 		lanterns.add(click.cpy());
 		float rad = lilyTexture.getRegionWidth()/scale.x/2;
@@ -496,7 +516,9 @@ public class LevelEditor extends WorldController {
 		ArrayList<Vector2> wp = wpools;
 		ArrayList<Vector2> m = mapArea;
 		
-		Level level = new Level(n,p,g,e,li,lo,w,wp, m);
+
+		Level level = new Level(n,p,g,e,li,lo,w,wp,m);
+
 
 		
 		try {
@@ -598,6 +620,7 @@ public class LevelEditor extends WorldController {
 		ArrayList<Vector2> lilypads;
 		ArrayList<Vector2> lotuses;
 		ArrayList<ArrayList<Float>> walls;
+
 		ArrayList<Vector2> wpools;
 
 		ArrayList<Vector2> map;
@@ -607,10 +630,9 @@ public class LevelEditor extends WorldController {
 					  HashMap<String,ArrayList<Vector2>> e,
 					  ArrayList<Vector2> li,
 					  ArrayList<Vector2> lo,
+					  ArrayList<ArrayList<Vector2>> w, ArrayList<Vector2> wp, ArrayList<Vector2> m) {
+//			System.out.println(e.values());
 
-					  ArrayList<ArrayList<Vector2>> w,
-					  ArrayList<Vector2> wp,
-					  ArrayList<Vector2> m) {
 
 			number = n;
 			player = p;

@@ -151,15 +151,26 @@ public class PlayerModel extends BoxObstacle {
 	
 	public Vector2 calculateWhirlForce(Vector2 whirlPos, float rad){
 		if(isWhirled()){
+			// TRUE CIRCLE
 			if(getPosition().sub(dest).len2() < .01){
 				dest = getPosition();
+				
+				// set force direction
 				pull = whirlPos.sub(getPosition());
-				float forceMagnitude = (float)(getMass() * getLinearVelocity().len2() / rad);
-				return pull.setLength(forceMagnitude);
+				
+				// set force magnitude
+			    float forceMagnitude = (float) (getMass() * getLinearVelocity().len2() / rad);
+			    return pull.setLength(forceMagnitude);
+			} 
+			
+			// CORRECTIVE CIRCLE
+			else{
+			    float forceMagnitude = (float) (getMass() * getLinearVelocity().len2() / (pull.len()/2));
+			    return cent.cpy().sub(getPosition()).setLength(forceMagnitude);			
 			}
 		}
-		
 		return Vector2.Zero;
+		
 	}
 	
 	public void passAdjust(Vector2 tetherPos){

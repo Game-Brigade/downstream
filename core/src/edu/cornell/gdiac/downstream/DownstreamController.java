@@ -398,15 +398,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private ArrayList<WhirlpoolModel> wpools = new ArrayList<WhirlpoolModel>();
 	private double rot = 0;
 
-	// Other game objects
-	/** The initial koi position */
-	private static Vector2 KOI_POS = new Vector2(-2, 6);
-	/** The goal door position */
-	private static Vector2 GOAL_POS = new Vector2( 6, 12);
-
-	// Physics objects for the game
-	/** Reference to the goalDoor (for collision detection) */
-	private BoxObstacle goalDoor;
+	
 	/** Reference to the player avatar */
 	private PlayerModel koi;
 
@@ -871,9 +863,6 @@ public class DownstreamController extends WorldController implements ContactList
 			canvas.end();
 		}
 
-
-		
-
 	}
 	
 	/**
@@ -907,7 +896,7 @@ public class DownstreamController extends WorldController implements ContactList
 				listener.exitScreen(this, WorldController.EXIT_MAIN);
 			}
 			if (restartLevel() && listener != null) {
-				reset();
+				listener.exitScreen(this, WorldController.EXIT_PLAY);
 			}
 			if (resumePlay() && listener != null) {
 				resumeState = 0;

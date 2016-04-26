@@ -17,11 +17,14 @@ public class WhirlpoolModel extends WheelObstacle {
 	/** The range at which the player gets pulled into a whirlpool */
 	private static final int WHIRL_DEFAULT_RANGE = 3;
 	
+	/** The direction the pool spins; 1 is ccw, -1 is cw */
+	private int direction;
+	
 	private float rot = 0;
 
-	public WhirlpoolModel(float x, float y) {
+	public WhirlpoolModel(float x, float y, int dir) {
 		super(x, y, WHIRL_DEFAULT_RANGE);
-		setBodyType(BodyDef.BodyType.StaticBody);
+		direction = dir;
 		
 	}
 	
@@ -39,7 +42,7 @@ public class WhirlpoolModel extends WheelObstacle {
 	
 	public void draw(GameCanvas canvas){
 		canvas.draw(texture, Color.WHITE, texture.getRegionWidth()/2, 
-				texture.getRegionHeight()/2, this.getX()*drawScale.x, this.getY()*drawScale.x, (float)(Math.PI*rot),0.5f, 0.5f);
+				texture.getRegionHeight()/2, this.getX()*drawScale.x, this.getY()*drawScale.x, (float)(Math.PI*rot*direction),0.5f, 0.5f);
 		
 		rot+=0.01;
 	}

@@ -250,9 +250,7 @@ public class InputController {
 	}
 	
 	public boolean didPause() {
-		if(pausePressed && !pausePrevious){
-			System.out.println(pausePressed && !pausePrevious);
-		}
+		
 		return pausePressed && !pausePrevious;
 	}
 	
