@@ -667,25 +667,9 @@ public class DownstreamController extends WorldController implements ContactList
 	 * @param delta Number of seconds since last animation frame
 	 */
 	public void update(float dt) {	
-		
-		System.out.println("KOI POSIITON: " + koi.getPosition().cpy().scl(scale));
-		
-		if (!cameraController.isZoomedToPlayer()) {
-			cameraController.zoomToPlayer();
-			return;
+		if(collisionController.didWin()){
+			setComplete(true);
 		}
-		InputController input = InputController.getInstance();
-		
-		litLotusCount = 0;
-		for(TetherModel t : lanterns){
-			if(t.lit){
-				litLotusCount++;
-			}
-		}
-		if(lanterns.size() == litLotusCount){
-			this.setComplete(true);
-		}
-		
 		if(koi.isDead()){
 			deathSound.play();
 			respawn();
@@ -718,6 +702,7 @@ public class DownstreamController extends WorldController implements ContactList
 
 			closestTether = getClosestTetherTo(koi.getPosition());
 			// INPUT CODE
+			InputController input = InputController.getInstance();
 			if (input.didTether() && !isWhirled() && !koi.bursting) {
 				if((koi.isTethered() || koi.isAttemptingTether())){
 					koi.setTethered(false);					
@@ -920,7 +905,7 @@ public class DownstreamController extends WorldController implements ContactList
 			}
 		}
 		SoundController.getInstance().update();
-		HUD.updateHUD(litLotusCount, koi.getEnergy());
+		HUD.updateHUD(lanterns.size()-litlanterns.size(), koi.getEnergy());
 	}
 
 

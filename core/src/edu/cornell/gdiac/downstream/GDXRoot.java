@@ -157,7 +157,7 @@ public class GDXRoot extends Game implements ScreenListener {
 			mainMenu = null;
 		}
 		else if (screen == mainMenu) {
-			playGame = new DownstreamController(0);
+			playGame = new DownstreamController(1);
 			playGame.preLoadContent(manager);
 			playGame.loadContent(manager);
 			playGame.setScreenListener(this);

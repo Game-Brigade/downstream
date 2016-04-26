@@ -23,6 +23,7 @@ public class CollisionController {
 
 	private Body bCollide;
 	private String sCollide;
+	private boolean win;
 		
 	public CollisionController(PlayerModel koi){
 		this.koi = koi;
@@ -56,6 +57,7 @@ public class CollisionController {
 				tethers.add((TetherModel) bCollide.getUserData());
 			}
 		}
+		else if(sCollide.startsWith("goal")){win = true; return false;}
 		else if(sCollide.startsWith("whirl")){return LETHAL_WHIRLPOOLS;}
 		else if(sCollide.startsWith("rock")){return LETHAL_ROCKS;}
 		else if(sCollide.startsWith("shadow")){return LETHAL_SHADOWS;}
@@ -159,6 +161,9 @@ public class CollisionController {
 		tethers.clear();
 	}
 	
+	public boolean didWin(){
+		return win;
+	}
 	
 	
 	
