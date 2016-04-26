@@ -230,7 +230,7 @@ public class LevelEditor extends WorldController {
 	private boolean newClick;
 	private Vector2 currentClick;
 	
-	private static String filename = "0.json";
+	private static String filename = null;
 	private boolean buildingLevel = false;
 	
 	private CameraController cameraController;
@@ -516,11 +516,7 @@ public class LevelEditor extends WorldController {
 		ArrayList<Vector2> wp = wpools;
 		ArrayList<Vector2> m = mapArea;
 		
-
 		Level level = new Level(n,p,g,e,li,lo,w,wp,m);
-
-
-		
 		try {
 			Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		    System.setOut(new PrintStream(new FileOutputStream(filename)));
@@ -534,7 +530,7 @@ public class LevelEditor extends WorldController {
 	protected static Level loadFromJson() {
 		Gson gson = new Gson();
 		try {
-			filename = getFileName();
+			if (filename == null) filename = getFileName();
 			JsonReader reader = new JsonReader(new FileReader(filename));
 			Level level = gson.fromJson(reader, Level.class);
 //			System.out.println(level);

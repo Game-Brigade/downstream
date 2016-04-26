@@ -161,6 +161,9 @@ public class DownstreamController extends WorldController implements ContactList
     TextureRegion                   koiCcurrentFrame;           // #7
     
     public HUDitems HUD;
+    
+    private Vector2 ll;
+    private Vector2 ur;
 
 
 	/**
@@ -592,12 +595,16 @@ public class DownstreamController extends WorldController implements ContactList
 		collisionController = new CollisionController(koi);
 
 		float width = Math.abs(level.map.get(0).x - level.map.get(1).x);
+		float height = Math.abs(level.map.get(0).y - level.map.get(1).y);
 		Vector2 center = new Vector2((level.map.get(0).x + level.map.get(1).x)/2,
 									 (level.map.get(0).y + level.map.get(1).y)/2);
-		cameraController.zoomStart(width, center, koi.getPosition().cpy().scl(scale));
+		cameraController.zoomStart(width, height, center, koi.getPosition().cpy().scl(scale));
 		
 		HUD = new HUDitems(lanterns.size(), UILotusTexture, energyBarTexture, displayFont);
 		addHUD(HUD);
+		
+		ll = level.map.get(0);
+		ur = level.map.get(1);
 
 	}
 
@@ -853,8 +860,14 @@ public class DownstreamController extends WorldController implements ContactList
 
 	public void draw(float delta) {
 
+//		System.out.println("paused: " + paused);
+//		System.out.println("waspaused: " + wasPaused);
+
 		if (paused){
+//			if (paused)
+//				super.draw(delta);
 			pauseMenu.draw();
+			
 		}
 		else {
 			super.draw(delta);
@@ -862,6 +875,8 @@ public class DownstreamController extends WorldController implements ContactList
 			HUD.draw(canvas);
 			canvas.end();
 		}
+		
+		canvas.drawRectangle(ll, ur);
 
 	}
 	
@@ -877,10 +892,12 @@ public class DownstreamController extends WorldController implements ContactList
 		InputController input = InputController.getInstance();
 		if(wasPaused){
 			paused =true;
+			
 		}
 		else{
 			paused = input.didPause();
 			wasPaused = paused;
+//			if (paused) cameraController.pauseCamera();
 		}
 		
 		if (active) {
@@ -905,6 +922,7 @@ public class DownstreamController extends WorldController implements ContactList
 				backState = 0;
 				wasPaused = false;
 				paused = false;
+//				cameraController.unpauseCamera();
 			}
 			
 		}

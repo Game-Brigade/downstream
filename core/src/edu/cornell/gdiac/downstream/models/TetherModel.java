@@ -27,7 +27,7 @@ public class TetherModel extends WheelObstacle {
 	public static final float TETHER_DEFAULT_ORBIT = 2f;  
 
 	/** The range at which the player can enter orbit around this tether */
-	public static final int TETHER_DEFAULT_RANGE = 6;
+	public static final int TETHER_DEFAULT_RANGE = 9;
 	
 	private static final String LIGHTTEXTURE = "tethers/lotusLight.png";
 	private TextureRegion lotusLightTexture = new TextureRegion(new Texture(Gdx.files.internal(LIGHTTEXTURE)));
