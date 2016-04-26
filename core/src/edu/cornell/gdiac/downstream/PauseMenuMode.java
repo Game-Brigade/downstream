@@ -107,7 +107,7 @@ public class PauseMenuMode{
 		canvas.beginMENU();
 		
 		Color c = Color.WHITE.cpy();
-		c.a = .03f;
+		c.a = .005f;
 		canvas.draw(background, c, background.getWidth()/2, background.getHeight()/2, 
 				backgroundPos.x, backgroundPos.y, 0, scale, scale);
 		canvas.draw(pauseHeader, Color.WHITE, pauseHeader.getWidth()/2, pauseHeader.getHeight()/2, 

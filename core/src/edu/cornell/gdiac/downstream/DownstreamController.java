@@ -193,6 +193,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private ArrayList<TetherModel> litlanterns = new ArrayList<TetherModel>();
 	private ArrayList<EnemyModel> enemies = new ArrayList<EnemyModel>();
 	private ArrayList<WhirlpoolModel> wpools = new ArrayList<WhirlpoolModel>();
+	private ArrayList<ArrayList<Float>> walls = new ArrayList<ArrayList<Float>>();
 	private PlayerModel koi;
 	private EnemyModel eFish;
 	private CameraController cameraController;
@@ -200,6 +201,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private TetherModel closestTether;
 	private WhirlpoolModel closestWhirlpool;
 	private int litLotusCount;
+	private int level = -1;
 
     
 
@@ -428,6 +430,11 @@ public class DownstreamController extends WorldController implements ContactList
 		paused = false;
 		wasPaused = false;
 	}
+	
+	public DownstreamController(int level) {
+		this();
+		this.level = level;
+	}
 
 	/**
 	 * Resets the status of the game so that we can play again.
@@ -465,7 +472,13 @@ public class DownstreamController extends WorldController implements ContactList
 	 */
 	private void populateLevel() {
 		
-		LevelEditor.Level level = LevelEditor.loadFromJson();
+		LevelEditor.Level level;
+		if (this.level != -1) {
+			level = LevelEditor.loadFromJson(this.level);
+		} else {
+			level = LevelEditor.loadFromJson();
+		}
+		 
 		
 		// Add level goal
 //		System.out.println(Arrays.toString(Thread.currentThread().getStackTrace()));
@@ -536,6 +549,9 @@ public class DownstreamController extends WorldController implements ContactList
 			obj.setDrawScale(scale);
 			obj.setTexture(earthTile);
 			obj.setName("wall1");
+			ArrayList<Float> scaledWall = new ArrayList<Float>();
+			for (Float f : wall) scaledWall.add(f*scale.x);
+			walls.add(scaledWall);
 			addObject(obj);
 		}
 		
@@ -600,7 +616,9 @@ public class DownstreamController extends WorldController implements ContactList
 	 *
 	 * @param delta Number of seconds since last animation frame
 	 */
-	public void update(float dt) {		
+	public void update(float dt) {	
+		
+		System.out.println("KOI POSIITON: " + koi.getPosition().cpy().scl(scale));
 		
 		if (!cameraController.isZoomedToPlayer()) {
 			cameraController.zoomToPlayer();
@@ -878,6 +896,7 @@ public class DownstreamController extends WorldController implements ContactList
 			super.draw(delta);
 			canvas.beginHUD();
 			HUD.draw(canvas);
+			for (ArrayList<Float> wall : walls) canvas.drawPath(wall);
 			canvas.end();
 		}
 
