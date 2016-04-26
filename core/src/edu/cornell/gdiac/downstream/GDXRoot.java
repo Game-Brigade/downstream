@@ -96,11 +96,6 @@ public class GDXRoot extends Game implements ScreenListener {
 	public void dispose() {
 		// Call dispose on our children
 		setScreen(null);
-		
-		playGame.unloadContent(manager);
-		playGame.dispose();
-		editor.unloadContent(manager);
-		editor.dispose();
 
 		canvas.dispose();
 		canvas = null;
@@ -143,7 +138,7 @@ public class GDXRoot extends Game implements ScreenListener {
 		
 			backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal(BACKGROUND_SOUND));
 			backgroundMusic.setLooping(true);
-			backgroundMusic.play();
+			//backgroundMusic.play();
 		}
 		else if (screen == mainMenu && exitCode == WorldController.EXIT_PLAY) {
 			playGame = new DownstreamController();

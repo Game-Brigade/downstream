@@ -591,9 +591,24 @@ public class DownstreamController extends WorldController implements ContactList
 			return;
 		}
 		closestTether = getClosestTether();
+		closestWhirlpool = getClosestWhirl();
+		
+		// CHECK IF KOI WILL BE SUCKED INTO WHIRLPOOL //
+		Vector2 close = closestWhirlpool.getPosition();
+		Vector2 init = koi.getInitialTangentPoint(close);
+		if (close.dst(koi.getPosition()) < WhirlpoolModel.WHIRL_DEFAULT_RANGE){
+			koi.setWhirled(true);
+		}
+		if (koi.getPosition().sub(init).len2() < .01) {
+			koi.setWhirled(true);
+			koi.refreshWhirlForce(close, closestWhirlpool.getOrbitRadius());
+		}
+		else{
+			koi.applyWhirlForce(close, closestWhirlpool.getOrbitRadius());
+		}
 		
 		// TETHER TOGGLE CODE
-		if (input.didTether()) {
+		if (input.didTether() && !isWhirled()) {
 			if(koi.isTethered() || koi.isAttemptingTether()){
 				koi.setTethered(false);					
 				koi.setAttemptingTether(false); 
@@ -617,9 +632,9 @@ public class DownstreamController extends WorldController implements ContactList
 				enemy.deactivatePhysics(world);
 			}
 		}
-
+		
 		// KOI VEOLOCITY CODE
-		if (isTethered()) {
+		if (isTethered() && !isWhirled()) {
 			koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*1.5f));
 		} else{
 			koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*2));
@@ -629,8 +644,8 @@ public class DownstreamController extends WorldController implements ContactList
 		closestTether.setTethered(isTethered() && closestTether.isLotus() && collisionController.inRangeOf(closestTether));
 
 		// TETHER FORCE CODE
-		Vector2 close = closestTether.getPosition();
-		Vector2 init = koi.getInitialTangentPoint(close);
+		close = closestTether.getPosition();
+		init = koi.getInitialTangentPoint(close);
 		if (close.dst(koi.getPosition()) > TetherModel.TETHER_DEFAULT_RANGE){
 			koi.setAttemptingTether(false);
 		}

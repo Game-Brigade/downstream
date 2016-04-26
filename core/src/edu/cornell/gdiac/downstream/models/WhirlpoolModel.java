@@ -12,10 +12,10 @@ public class WhirlpoolModel extends WheelObstacle {
 	private static final int WHIRL_DEFAULT_RADIUS = 1;
 
 	/** The radius at which the player spins around a whirlpool */
-	public static final float WHIRL_DEFAULT_ORBIT = 1.5f;  
+	public static final float WHIRL_DEFAULT_ORBIT = 2f;  
 
 	/** The range at which the player gets pulled into a whirlpool */
-	private static final int WHIRL_DEFAULT_RANGE = 3;
+	public static final float WHIRL_DEFAULT_RANGE = 2.5f;
 	
 	/** The direction the pool spins; 1 is ccw, -1 is cw */
 	private int direction;
@@ -43,8 +43,8 @@ public class WhirlpoolModel extends WheelObstacle {
 	public void draw(GameCanvas canvas){
 		canvas.draw(texture, Color.WHITE, texture.getRegionWidth()/2, 
 				texture.getRegionHeight()/2, this.getX()*drawScale.x, this.getY()*drawScale.x, (float)(Math.PI*rot*direction),0.4f, 0.4f);
-		
 		rot+=0.02;
+		
 	}
 	
 
