@@ -105,6 +105,7 @@ public class InputController {
 	public boolean space;
 	public boolean slow;
 	public boolean fast;
+	public boolean kill;
 	
 	public enum SelectionType {
 		Lilypad, Lantern, Enemy, Player, Wall, Goal;
@@ -118,6 +119,7 @@ public class InputController {
 	
 	/** An X-Box controller (if it is connected) */
 	XBox360Controller xbox;
+	private boolean killPressed;
 	
 	/**
 	 * Returns the amount of sideways movement. 
@@ -262,6 +264,10 @@ public class InputController {
 		return rightPressed;
 	}
 	
+	public boolean didKill() {
+		return killPressed;
+	}
+	
 	public boolean didEnter() {
 		return enterPressed && !enterPrevious;
 	}
@@ -386,6 +392,7 @@ public class InputController {
 	private void readKeyboard(Rectangle bounds, Vector2 scale, boolean secondary) {
 		// Give priority to gamepad results
 		resetPressed = (secondary && resetPressed) || (Gdx.input.isKeyPressed(Input.Keys.R));
+		killPressed = (secondary && killPressed) || (Gdx.input.isKeyPressed(Input.Keys.K));
 		debugPressed = (secondary && debugPressed) || (Gdx.input.isKeyPressed(Input.Keys.D));
 		primePressed = (secondary && primePressed) || (Gdx.input.isKeyPressed(Input.Keys.UP));
 		secondPressed = (secondary && secondPressed) || (Gdx.input.isKeyPressed(Input.Keys.SPACE));
