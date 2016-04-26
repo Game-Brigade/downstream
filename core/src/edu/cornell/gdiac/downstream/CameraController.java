@@ -101,7 +101,7 @@ public class CameraController {
 	}
 	
 	public void pauseCamera() {
-		System.out.println("ASHKJSDFHSDKJFHDS");
+//		System.out.println("ASHKJSDFHSDKJFHDS");
 		saveState();
 		camera.zoom = mapWidth / Gdx.graphics.getWidth();
 		camera.position.x = mapCenter.x;
@@ -110,7 +110,7 @@ public class CameraController {
 	}
 	
 	public void unpauseCamera() {
-		System.out.println("unpaused");
+//		System.out.println("unpaused");
 		camera.zoom = saveCamera.zoom;
 		camera.position.x = saveCamera.position.x;
 		camera.position.y = saveCamera.position.y;

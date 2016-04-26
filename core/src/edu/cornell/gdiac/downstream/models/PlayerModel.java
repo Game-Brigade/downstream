@@ -513,9 +513,9 @@ public class PlayerModel extends BoxObstacle {
 	}
 
 	public void getVectors() {
-		System.out.println("Cent: "+ cent);		
-		System.out.println("Dest: "+ dest);		
-		System.out.println("Pull: "+ pull);		
+//		System.out.println("Cent: "+ cent);		
+//		System.out.println("Dest: "+ dest);		
+//		System.out.println("Pull: "+ pull);		
 	}
 	
 

@@ -1173,7 +1173,7 @@ public class GameCanvas {
 		local.applyTo(vertex);
 		x1 = vertex.x; y1 = vertex.y;
 		debugRender.line(x0, y0, x1, y1);
-		System.out.println("" + x0 + " " + y0 + " " + x1 + " " + y1);
+//		System.out.println("" + x0 + " " + y0 + " " + x1 + " " + y1);
     }
     
     /** 

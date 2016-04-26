@@ -347,23 +347,23 @@ public class LevelEditor extends WorldController {
 	
 
 	private void addWhirlpool(Vector2 click, int dir){
-		
-		wpools.add(click.cpy());
-		WhirlpoolModel pool = new WhirlpoolModel(currentClick.x, currentClick.y, dir);
-		pool.setBodyType(BodyDef.BodyType.StaticBody);
-		pool.setName("whirlpool" + 1);
-		pool.setDensity(TETHER_DENSITY);
-		pool.setFriction(TETHER_FRICTION);
-		pool.setRestitution(TETHER_RESTITUTION);
-		pool.setSensor(false);
-		pool.setDrawScale(scale);
-		if(dir == -1){
-			pool.setTexture(whirlpoolTexture);
-		}
-		else{
-			pool.setTexture(whirlpoolFlipTexture);
-		}
-		addObject(pool);
+		saveToJson();
+//		wpools.add(click.cpy());
+//		WhirlpoolModel pool = new WhirlpoolModel(currentClick.x, currentClick.y, dir);
+//		pool.setBodyType(BodyDef.BodyType.StaticBody);
+//		pool.setName("whirlpool" + 1);
+//		pool.setDensity(TETHER_DENSITY);
+//		pool.setFriction(TETHER_FRICTION);
+//		pool.setRestitution(TETHER_RESTITUTION);
+//		pool.setSensor(false);
+//		pool.setDrawScale(scale);
+//		if(dir == -1){
+//			pool.setTexture(whirlpoolTexture);
+//		}
+//		else{
+//			pool.setTexture(whirlpoolFlipTexture);
+//		}
+//		addObject(pool);
 	}
 	
 
@@ -490,7 +490,7 @@ public class LevelEditor extends WorldController {
 			goal.clear();
 			goal.add(click.cpy());
 		}
-		saveToJson();
+		System.out.println(goal);
 	}
 	
 	private void drawPaths() {
@@ -503,7 +503,7 @@ public class LevelEditor extends WorldController {
 			drawPath(path);
 		}
 		if (mapArea.size() == 2) canvas.drawRectangle(mapArea.get(0), mapArea.get(1));
-		if (goal.size() == 2) canvas.drawLeadingLine(goal.get(0), goal.get(1));
+		if (goal.size() == 2) canvas.drawLeadingLine(goal.get(0).cpy().scl(scale), goal.get(1).cpy().scl(scale));
 	}
 	
 	private void drawPath(ArrayList<Vector2> path) {

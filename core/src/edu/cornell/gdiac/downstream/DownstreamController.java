@@ -795,7 +795,7 @@ public class DownstreamController extends WorldController implements ContactList
 			}
 			// HIT TANGENT
 			if (koi.isAttemptingTether() && (koi.getPosition().sub(init).len2() < .01) ) {
-				System.out.println("tether");
+//				System.out.println("tether");
 				koi.setTethered(true);
 				koi.setAttemptingTether(false);
 				koi.refreshTetherForce(close, closestTether.getOrbitRadius());
@@ -892,7 +892,7 @@ public class DownstreamController extends WorldController implements ContactList
 							}
 							}
 							if (openingFlowerAnimation.isAnimationFinished(relativeTime)){
-								System.out.println("finished");
+//								System.out.println("finished");
 								tethers.get(i).setOpening(2);
 								relativeTime = 0;
 							}
