@@ -24,6 +24,7 @@ import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 import com.badlogic.gdx.utils.Array;
 
 import edu.cornell.gdiac.util.*;
@@ -54,6 +55,9 @@ public class DownstreamController extends WorldController implements ContactList
 	private static final String LIGHTING_TEXTURE = "tethers/aura.png";
 	/** Reference to the repeating land texture */
 	private static final String EARTH_FILE = "terrain/repeat tile.png";
+	private static final String EARTH_FILE_N = "terrain/Grass_night.jpg";
+	private static final String EARTH_FILE_D = "terrain/Grass_day.jpg";
+	private static final String EARTH_FILE_S = "terrain/Grass_sunset.jpg";
 	/** Reference to the whirlpool texture */
 	private static final String WHIRLPOOL_TEXTURE = "terrain/whirlpool.png";
 	/** Reference to the flipped whirlpool texture */
@@ -80,6 +84,12 @@ public class DownstreamController extends WorldController implements ContactList
 	private TextureRegion lightingTexture;
 	/** Texture assets for walls and platforms */
 	private TextureRegion earthTile;
+	
+	private TextureRegion earthTileDay;
+	private TextureRegion earthTileNight;
+	private TextureRegion earthTileSunset;
+	
+	
 	/** Texture assets for whirlpools */
 	private TextureRegion whirlpoolTexture;
 	private TextureRegion whirlpoolFlipTexture;
@@ -155,10 +165,13 @@ public class DownstreamController extends WorldController implements ContactList
     TextureRegion                   koiScurrentFrame;           // #7
     
     Animation                      	koiCAnimation;          // #3
+    Animation						koiCAnimationFlipped;
     Texture                         koiCSheet;              // #4
     TextureRegion[]                 koiCFrames;             // #5
+    TextureRegion[]					koiCFramesFlipped;
     SpriteBatch                     koiCspriteBatch;            // #6
     TextureRegion                   koiCcurrentFrame;           // #7
+    TextureRegion					KoiCcurrentFrameFlipped;
     
     public HUDitems HUD;
 
@@ -197,6 +210,14 @@ public class DownstreamController extends WorldController implements ContactList
 		
 		manager.load(EARTH_FILE,Texture.class);
 		assets.add(EARTH_FILE);
+		
+		manager.load(EARTH_FILE_D,Texture.class);
+		assets.add(EARTH_FILE_D);
+		manager.load(EARTH_FILE_N,Texture.class);
+		assets.add(EARTH_FILE_N);
+		manager.load(EARTH_FILE_S,Texture.class);
+		assets.add(EARTH_FILE_S);
+		
 		
 		manager.load(WHIRLPOOL_TEXTURE, Texture.class);
 		assets.add(WHIRLPOOL_TEXTURE);
@@ -315,8 +336,8 @@ public class DownstreamController extends WorldController implements ContactList
         closingFlowerspriteBatch = new SpriteBatch(); 
         
         
-        cols = 9;
-        koiSSheet = new Texture(Gdx.files.internal("koi/straight koi spritesheet.png"));
+        cols = 12;
+        koiSSheet = new Texture(Gdx.files.internal("koi/Straight_Koi.png"));
         TextureRegion[][] tmpkoiS = TextureRegion.split(koiSSheet, koiSSheet.getWidth()/cols, koiSSheet.getHeight()/rows);              // #10
         koiSFrames = new TextureRegion[cols * rows];
         index = 0;
@@ -328,19 +349,27 @@ public class DownstreamController extends WorldController implements ContactList
         koiSAnimation = new Animation(.05f, koiSFrames); 
         koiSspriteBatch = new SpriteBatch(); 
         
-        cols = 11;
-        
-        koiCSheet = new Texture(Gdx.files.internal("koi/curved koi spritesheet.png"));
+        cols = 31;
+        //remeber kiddies, animate both directions
+        koiCSheet = new Texture(Gdx.files.internal("koi/curved_koi.png"));
         TextureRegion[][] tmpkoiC = TextureRegion.split(koiCSheet, koiCSheet.getWidth()/cols, koiCSheet.getHeight()/rows);              // #10
+        TextureRegion[][] tmpkoiCFlipped = TextureRegion.split(koiCSheet, koiCSheet.getWidth()/cols, koiCSheet.getHeight()/rows);              // #10
+        
         koiCFrames = new TextureRegion[cols * rows];
+        koiCFramesFlipped = new TextureRegion[cols * rows];
         index = 0;
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-            	koiCFrames[index++] = tmpkoiC[i][j];
+            	//tmpkoiC[i][j].flip(false, true);
+            	koiCFrames[index] = tmpkoiC[i][j];
+            	tmpkoiCFlipped[i][j].flip(false, true);
+            	koiCFramesFlipped[index++] = tmpkoiCFlipped[i][j];
             }
         }
         koiCAnimation = new Animation(.05f, koiCFrames); 
+        koiCAnimationFlipped = new Animation(.05f, koiCFramesFlipped);
         koiCspriteBatch = new SpriteBatch(); 
+        
 		
         
         energyBarTexture = createTexture(manager, ENERGYBAR_TEXTURE, false);
@@ -352,7 +381,10 @@ public class DownstreamController extends WorldController implements ContactList
 		lightingTexture = createTexture(manager, LIGHTING_TEXTURE, false);
 		UILotusTexture = createTexture(manager, UI_FLOWER, false);
 
-		earthTile = createTexture(manager,EARTH_FILE,true);
+		earthTile = createTexture(manager,EARTH_FILE_N,true);
+		earthTileDay = createTexture(manager,EARTH_FILE_D, true);
+		earthTileNight = createTexture(manager,EARTH_FILE_N, true);
+		earthTileSunset = createTexture(manager,EARTH_FILE_S, true);
 		
 		whirlpoolTexture = createTexture(manager,WHIRLPOOL_TEXTURE,false);
 		whirlpoolFlipTexture = createTexture(manager,WHIRLPOOL_FLIP_TEXTURE,false);
@@ -586,7 +618,6 @@ public class DownstreamController extends WorldController implements ContactList
 
 		dwidth  = koiTexture.getRegionWidth()/scale.x;
 		dheight = koiTexture.getRegionHeight()/scale.y;
-		System.out.println(dwidth + " and " + dheight);
 		koi = new PlayerModel(level.player.x, level.player.y, dwidth, dheight);
 		koi.setDrawScale(scale);
 		koi.setName("koi");
@@ -746,15 +777,25 @@ public class DownstreamController extends WorldController implements ContactList
 		openFlowercurrentFrame = openFlowerAnimation.getKeyFrame(stateTime, true);
 		koiScurrentFrame = koiSAnimation.getKeyFrame(stateTime, true);
 		koiCcurrentFrame = koiCAnimation.getKeyFrame(stateTime, true);
+		KoiCcurrentFrameFlipped = koiCAnimationFlipped.getKeyFrame(stateTime, true);
+		
 		//FSM to handle Koi
-		/*if (koi.isTethered()){
-			koi.setTexture(koiCcurrentFrame);
-			//if (getClosestTether().)
+ 
+		//koiCcurrentFrame.flip(koi.left(closestTether), false);
+		if (koi.isTethered()){
+			koi.setCurved(true);
+			if (koi.left(closestTether)){
+				koi.setTexture(koiCcurrentFrame);
+			}
+			else{
+				koi.setTexture(KoiCcurrentFrameFlipped);
+			}
 		}
 		else{
+			koi.setCurved(false);
 			koi.setTexture(koiScurrentFrame);
-		}*/
-		koi.setTexture(koiScurrentFrame);
+		}
+		//koi.setTexture(koiCcurrentFrame);
 		
 		
 		//FSM to handle Lotus

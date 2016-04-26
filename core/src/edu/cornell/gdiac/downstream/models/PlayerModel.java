@@ -40,7 +40,8 @@ public class PlayerModel extends BoxObstacle {
 	/** Cache object for right afterburner origin */
 	public Vector2 rghtOrigin = new Vector2();
 	
-
+	private Vector2 cachedPos = new Vector2(0, 0);
+	
 	private int health;
 
 	private Vector2 force;
@@ -60,6 +61,12 @@ public class PlayerModel extends BoxObstacle {
 	private boolean bursting;
 	
 	private float energy;
+	
+	private boolean curved;
+	
+	private boolean left;
+	
+	private boolean cachedLeft = false;
 
 	/** Create a new player at x,y. */
 	public PlayerModel(float x, float y, float width, float height) {
@@ -95,7 +102,9 @@ public class PlayerModel extends BoxObstacle {
 		body.applyForceToCenter(calculateWhirlForce(whirlPos,rad), true);
 	}
 	
-	
+	public void setCurved(boolean b){
+		curved = b;
+	}
 
 	public void refreshTetherForce(Vector2 tetherPos, float rad){
 		pull = tetherPos.cpy().sub(getPosition());
@@ -220,7 +229,36 @@ public class PlayerModel extends BoxObstacle {
 		isWhirled = newState;
 	}
 	
+	public boolean left(TetherModel t){
+		boolean b;
+		
+		if (cachedPos.x - .5 > t.getX()){
+			if (this.getPosition().x > t.getX() && this.getPosition().y > cachedPos.y){
+				b = true;
+			}
+			else{ b = false;}
+			cachedLeft = b;
+		}
+		else{
+			b = cachedLeft;
+		}
+		
+		if (cachedPos.x + .5 < t.getX()){
+			if (this.getPosition().x < t.getX() && this.getPosition().y < cachedPos.y){
+				b = true;
+			}
+			else{b = false;}
+			cachedLeft = b;
+		}
+		else{
+			b = cachedLeft;
+		}
+		
+		cachedPos = getPosition().cpy();
+		left = b;
+		return b;
 
+	}
 	
 	/**
 	 * Draws the physics object.
@@ -231,7 +269,17 @@ public class PlayerModel extends BoxObstacle {
 		//super.draw(canvas);  
 //		canvas.drawLeadingLine(body.getPosition(), new Vector2(0,0));
 		if (texture != null) {
-			canvas.draw(texture, Color.WHITE,origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x, (float) (getAngle() + 2.35619), .28f, .28f);
+			if (!curved){canvas.draw(texture, Color.WHITE,origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x,getAngle() + 2.2f, .28f, .28f);}
+			else{
+				if(left){
+					if (curved)canvas.draw(texture, Color.WHITE,origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x, getAngle() + 2.6f, .3f, .3f);
+				}
+				else{
+					if (curved)canvas.draw(texture, Color.WHITE,origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x, getAngle() + 3.7f, .3f, .3f);
+				}
+			}
+			
+			
 			//canvas.draw(texture,Color.WHITE,origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x,getAngle(),1,1);
 		}
 

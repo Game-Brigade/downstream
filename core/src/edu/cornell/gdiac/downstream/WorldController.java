@@ -67,7 +67,9 @@ public abstract class WorldController implements Screen {
 	
 	// Pathnames to shared assets
 	/** The background image for the battle */
-	private static final String BACKGROUND_FILE = "terrain/water.png";
+	private static final String BACKGROUND_FILE_N = "terrain/Water_Night.jpg";
+	private static final String BACKGROUND_FILE_D = "terrain/Water_Day.jpg";
+	private static final String BACKGROUND_FILE_S = "terrain/Water_Sunset.jpg";
 	private static final String OVERLAY_FILE = "terrain/texture.jpg";
 	
 
@@ -100,8 +102,14 @@ public abstract class WorldController implements Screen {
 		
 		worldAssetState = AssetState.LOADING;
 
-		manager.load(BACKGROUND_FILE, Texture.class);
-		assets.add(BACKGROUND_FILE);
+		manager.load(BACKGROUND_FILE_N, Texture.class);
+		assets.add(BACKGROUND_FILE_N);
+		
+		manager.load(BACKGROUND_FILE_D, Texture.class);
+		assets.add(BACKGROUND_FILE_D);
+		
+		manager.load(BACKGROUND_FILE_S, Texture.class);
+		assets.add(BACKGROUND_FILE_S);
 		
 		manager.load(OVERLAY_FILE, Texture.class);
 		assets.add(OVERLAY_FILE);
@@ -133,7 +141,7 @@ public abstract class WorldController implements Screen {
 		
 		// Allocate the tiles
 
-		setBackground(manager.get(BACKGROUND_FILE, Texture.class));
+		setBackground(manager.get(BACKGROUND_FILE_N, Texture.class));
 		getBackground().setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
 		
 		overlay = manager.get(OVERLAY_FILE, Texture.class);
