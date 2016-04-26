@@ -798,8 +798,7 @@ public class DownstreamController extends WorldController implements ContactList
 			}
 			// PAST TANGENT
 			else if (koi.isAttemptingTether() && !koi.willIntersect(init) && koi.pastTangent(init)) {
-				//koi.passAdjust(close);
-				System.out.println("TURN AWAY??");
+				koi.passAdjust(close);
 			}
 			else {}
 			koi.applyTetherForce(close, closestTether.getOrbitRadius());
