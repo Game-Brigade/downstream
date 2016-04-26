@@ -485,12 +485,13 @@ public class LevelEditor extends WorldController {
 		case 0:
 		case 1:
 			goal.add(click.cpy());
+			return;
 		case 2:
 		default:
 			goal.clear();
 			goal.add(click.cpy());
+			return;
 		}
-		System.out.println(goal);
 	}
 	
 	private void drawPaths() {
