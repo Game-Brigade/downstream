@@ -627,20 +627,28 @@ public class DownstreamController extends WorldController implements ContactList
 			return;
 		}
 		closestTether = getClosestTether();
-		closestWhirlpool = getClosestWhirl();
-		
-		// CHECK IF KOI WILL BE SUCKED INTO WHIRLPOOL //
-		Vector2 close = closestWhirlpool.getPosition();
-		Vector2 init = koi.getInitialTangentPoint(close);
-		if (close.dst(koi.getPosition()) < WhirlpoolModel.WHIRL_DEFAULT_RANGE){
-			koi.setWhirled(true);
-		}
-		if (koi.getPosition().sub(init).len2() < .01) {
-			koi.setWhirled(true);
-			koi.refreshWhirlForce(close, closestWhirlpool.getOrbitRadius());
+		if (wpools.isEmpty()){
+			closestWhirlpool = null;
 		}
 		else{
-			koi.applyWhirlForce(close, closestWhirlpool.getOrbitRadius());
+			closestWhirlpool = getClosestWhirl();
+		}
+		
+		// CHECK IF KOI WILL BE SUCKED INTO WHIRLPOOL //
+		Vector2 close;
+		Vector2 init;
+		if (closestWhirlpool != null) {
+			close = closestWhirlpool.getPosition();
+			init = koi.getInitialTangentPoint(close);
+			if (close.dst(koi.getPosition()) < WhirlpoolModel.WHIRL_DEFAULT_RANGE) {
+				koi.setWhirled(true);
+			}
+			if (koi.getPosition().sub(init).len2() < .01) {
+				koi.setWhirled(true);
+				koi.refreshWhirlForce(close, closestWhirlpool.getOrbitRadius());
+			} else {
+				koi.applyWhirlForce(close, closestWhirlpool.getOrbitRadius());
+			}
 		}
 		
 		// TETHER TOGGLE CODE
