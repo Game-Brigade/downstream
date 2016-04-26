@@ -229,6 +229,7 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 				listener.exitScreen(this, WorldController.EXIT_MAIN);
 			}
 			
+			
 		}
 	}
 	
@@ -241,6 +242,37 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 		return backState == 2;
 	}
 	
+	public boolean Level1() {
+		return button1State == 2;
+	}
+	
+	public boolean Level2() {
+		return button2State == 2;
+	}
+	
+	public boolean Level3() {
+		return button3State == 2;
+	}
+	
+	public boolean Level4() {
+		return button4State == 2;
+	}
+	
+	public boolean Level5() {
+		return button5State == 2;
+	}
+	
+	public boolean Level6() {
+		return button6State == 2;
+	}
+	
+	public boolean Level7() {
+		return button7State == 2;
+	}
+	
+	public boolean Level8() {
+		return button8State == 2;
+	}
 
 	/**
 	 * Called when the Screen is resized.
@@ -327,13 +359,60 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 		
 		// Flip to match graphics coordinates
 		screenY = canvas.getHeight()-screenY;
+		
 		float dx = Math.abs(screenX - backPos.x);
 		float dy = Math.abs(screenY - backPos.y);
-		
 		if (dx < scale*back.getWidth()/2 && dy < scale*back.getHeight()/2) {
 			backState = 1;
 		}
 		
+		dx = Math.abs(screenX - button1.x);
+		dy = Math.abs(screenY - button1.y);
+		if (dx < scale*level1button.getWidth()/2 && dy < scale*level1button.getHeight()/2) {
+			button1State = 1;
+		}
+		
+		dx = Math.abs(screenX - button2.x);
+		dy = Math.abs(screenY - button2.y);
+		if (dx < scale*level2button.getWidth()/2 && dy < scale*level2button.getHeight()/2) {
+			button2State = 1;
+		}
+		
+		dx = Math.abs(screenX - button3.x);
+		dy = Math.abs(screenY - button3.y);
+		if (dx < scale*level3button.getWidth()/2 && dy < scale*level3button.getHeight()/2) {
+			button3State = 1;
+		}
+		
+		dx = Math.abs(screenX - button4.x);
+		dy = Math.abs(screenY - button4.y);
+		if (dx < scale*level4button.getWidth()/2 && dy < scale*level4button.getHeight()/2) {
+			button4State = 1;
+		}
+		
+		dx = Math.abs(screenX - button5.x);
+		dy = Math.abs(screenY - button5.y);
+		if (dx < scale*level5button.getWidth()/2 && dy < scale*level5button.getHeight()/2) {
+			button5State = 1;
+		}
+		
+		dx = Math.abs(screenX - button6.x);
+		dy = Math.abs(screenY - button6.y);
+		if (dx < scale*level6button.getWidth()/2 && dy < scale*level6button.getHeight()/2) {
+			button6State = 1;
+		}
+		
+		dx = Math.abs(screenX - button7.x);
+		dy = Math.abs(screenY - button7.y);
+		if (dx < scale*level7button.getWidth()/2 && dy < scale*level7button.getHeight()/2) {
+			button7State = 1;
+		}
+		
+		dx = Math.abs(screenX - button8.x);
+		dy = Math.abs(screenY - button8.y);
+		if (dx < scale*level8button.getWidth()/2 && dy < scale*level8button.getHeight()/2) {
+			button8State = 1;
+		}
 		
 		
 		return false;
@@ -354,9 +433,45 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 	 * @return whether to hand the event to other listeners.
 	 */
 	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-		if (backState == 1) {
-			backState = 2;
-			return false;
+		if (backState == 1 || button1State == 1 || button2State == 1 || button3State == 1 || button4State == 1
+				|| button5State == 1 || button6State == 1 || button7State == 1 || button8State == 1) {
+			if(backState == 1){
+				backState = 2;
+				return false;
+			}
+			if(button1State == 1){
+				button1State = 2;
+				return false;
+			}
+			if(button2State == 1){
+				button2State = 2;
+				return false;
+			}
+			if(button3State == 1){
+				button3State = 2;
+				return false;
+			}
+			if(button4State == 1){
+				button4State = 2;
+				return false;
+			}
+			if(button5State == 1){
+				button5State = 2;
+				return false;
+			}
+			if(button6State == 1){
+				button6State = 2;
+				return false;
+			}
+			if(button7State == 1){
+				button7State = 2;
+				return false;
+			}
+			if(button8State == 1){
+				button8State = 2;
+				return false;
+			}
+			
 		}
 		return true;
 	}
