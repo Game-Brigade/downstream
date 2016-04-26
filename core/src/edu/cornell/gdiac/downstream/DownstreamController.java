@@ -113,11 +113,10 @@ public class DownstreamController extends WorldController implements ContactList
 	private boolean paused;
 	private boolean dead;
 	private boolean whirled;
-<<<<<<< HEAD
+
 	private TetherModel checkpoint;
 	
-=======
->>>>>>> b0759998a9a98328febf9a791889916bcce8759d
+
 	private float PLAYER_LINEAR_VELOCITY = 6f;
 	private boolean enableSlow = false;
 	private boolean enableLeadingLine = false;
@@ -419,34 +418,10 @@ public class DownstreamController extends WorldController implements ContactList
 		fishAssetState = AssetState.COMPLETE;
 	}
 
-<<<<<<< HEAD
-	// Physics constants for initialization
-	/** Density of non-enemy objects */
-	private static final float BASIC_DENSITY   = 0.0f;
-	/** Density of the enemy objects */
-	private static final float ENEMY_DENSITY   = 1.0f;
-	/** Friction of non-enemy objects */
-	private static final float BASIC_FRICTION  = 0.1f;
-	/** Friction of the enemy objects */
-	private static final float ENEMY_FRICTION  = 0.3f;
-	/** Collision restitution for all objects */
-	private static final float BASIC_RESTITUTION = 0.1f;
-	/** Threshold for generating sound on collision */
-	private static final float SOUND_THRESHOLD = 1.0f;
 
-	private static final float TETHER_DENSITY = ENEMY_DENSITY;
-	private static final float TETHER_FRICTION = ENEMY_FRICTION;
-	private static final float TETHER_RESTITUTION = BASIC_RESTITUTION;
 	private static final int RESPAWN_TIME = 100;
 
 
-
-
-	private ArrayList<TetherModel> tethers = new ArrayList<TetherModel>();
-	private ArrayList<TetherModel> lanterns = new ArrayList<TetherModel>();
-	private Stack<TetherModel> litlanterns = new Stack<TetherModel>();
-	private ArrayList<EnemyModel> enemies = new ArrayList<EnemyModel>();
-	private ArrayList<WhirlpoolModel> wpools = new ArrayList<WhirlpoolModel>();
 	private double rot = 0;
 
 	// Other game objects
@@ -459,20 +434,12 @@ public class DownstreamController extends WorldController implements ContactList
 	/** Reference to the goalDoor (for collision detection) */
 	private BoxObstacle goalDoor;
 	/** Reference to the player avatar */
-	private PlayerModel koi;
 
-	private EnemyModel eFish;
-	
-	private CameraController cameraController;
-	private CollisionController collisionController;
-	private TetherModel closestTether;
-	private int litLotusCount;
 	private int respawnTimer = RESPAWN_TIME;
 	private TetherModel checkpoint0;
 	private boolean respawning;
 
-=======
->>>>>>> b0759998a9a98328febf9a791889916bcce8759d
+
 	/**
 	 * Creates and initialize a new instance of Downstream
 	 *
@@ -638,10 +605,10 @@ public class DownstreamController extends WorldController implements ContactList
 		addObject(koi);
 		
 		collisionController = new CollisionController(koi);
-<<<<<<< HEAD
+
 		checkpoint = getClosestTetherTo(koi.initPos);
 		checkpoint0 = getClosestTetherTo(koi.initPos);
-=======
+
 
 		float width = Math.abs(level.map.get(0).x - level.map.get(1).x);
 		float height = Math.abs(level.map.get(0).y - level.map.get(1).y);
@@ -651,7 +618,7 @@ public class DownstreamController extends WorldController implements ContactList
 		
 		HUD = new HUDitems(lanterns.size(), UILotusTexture, energyBarTexture, displayFont);
 		addHUD(HUD);
->>>>>>> b0759998a9a98328febf9a791889916bcce8759d
+
 
 	}
 
@@ -1147,10 +1114,7 @@ public class DownstreamController extends WorldController implements ContactList
 			HUD.draw(canvas);
 			canvas.end();
 		}
-<<<<<<< HEAD
-=======
 
->>>>>>> b0759998a9a98328febf9a791889916bcce8759d
 	}
 	
 	/**
@@ -1181,7 +1145,7 @@ public class DownstreamController extends WorldController implements ContactList
 			}
 			this.draw(delta);
 			if (goOptions() && listener != null) {
-				listener.exitScreen(this, WorldController.EXIT_OPTIONS);
+				//listener.exitScreen(this, WorldController.EXIT_OPTIONS);
 			}
 			if (goBack() && listener != null) {
 				listener.exitScreen(this, WorldController.EXIT_MAIN);

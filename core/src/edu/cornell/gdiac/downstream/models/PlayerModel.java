@@ -124,13 +124,12 @@ public class PlayerModel extends BoxObstacle {
 		body.applyForceToCenter(calculateWhirlForce(whirlPos,rad), true);
 	}
 	
-<<<<<<< HEAD
-=======
+
 	public void setCurved(boolean b){
 		curved = b;
 	}
 
->>>>>>> b0759998a9a98328febf9a791889916bcce8759d
+
 	public void refreshTetherForce(Vector2 tetherPos, float rad){
 		pull = tetherPos.cpy().sub(getPosition());
 		pull.setLength(pull.len() + rad);
@@ -491,7 +490,7 @@ public class PlayerModel extends BoxObstacle {
 		}
 		
 	}
-<<<<<<< HEAD
+
 
 	public void updateSpeed(float v) {
 		if(!this.isDead()){
@@ -531,8 +530,7 @@ public class PlayerModel extends BoxObstacle {
 		System.out.println("Pull: "+ pull);		
 	}
 	
-=======
->>>>>>> b0759998a9a98328febf9a791889916bcce8759d
+
 	
 	public float getEnergy(){
 		return energy;
