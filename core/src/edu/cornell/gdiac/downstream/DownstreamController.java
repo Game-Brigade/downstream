@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Random;
 import java.util.Stack;
 
 import com.badlogic.gdx.math.*;
@@ -100,7 +101,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private TextureRegion rockDay;
 	private TextureRegion rockNight;
 	private TextureRegion rockSunset;
-	
+
 	/** Texture assets for whirlpools */
 	private TextureRegion whirlpoolTexture;
 	private TextureRegion whirlpoolFlipTexture;
@@ -127,7 +128,7 @@ public class DownstreamController extends WorldController implements ContactList
 
 
 	private TetherModel checkpoint;
-	
+
 
 
 	private float PLAYER_LINEAR_VELOCITY = 6f;
@@ -140,9 +141,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private static final String LIGHTING_SOUND = "SOUNDS/lighting_1.mp3";
 	private Music deathSound;
 
-	//Animations//
-	private float stateTime;  
-	private float relativeTime = 0;
+
 
 	private Animation lilyAnimation; // #3
 	private Texture lilySheet; // #4
@@ -226,6 +225,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private int respawnTimer = RESPAWN_TIME;
 	private TetherModel checkpoint0;
 
+
 	private double rot = 0;
 
 
@@ -263,10 +263,10 @@ public class DownstreamController extends WorldController implements ContactList
 
 		manager.load(SHADOW_TEXTURE, Texture.class);
 		assets.add(SHADOW_TEXTURE);
-		
+
 		manager.load(GOAL_TEXTURE, Texture.class);
 		assets.add(GOAL_TEXTURE);
-		
+
 		manager.load(EARTH_FILE,Texture.class);
 		assets.add(EARTH_FILE);
 
@@ -453,6 +453,10 @@ public class DownstreamController extends WorldController implements ContactList
 		fishAssetState = AssetState.COMPLETE;
 	}
 
+
+	private float stateTime;  
+	private float relativeTime = 0;
+
 	/**
 	 * Creates and initialize a new instance of Downstream
 	 *
@@ -469,7 +473,7 @@ public class DownstreamController extends WorldController implements ContactList
 		paused = false;
 		wasPaused = false;
 	}
-	
+
 	public DownstreamController(int level) {
 		this();
 		this.level = level;
@@ -512,14 +516,20 @@ public class DownstreamController extends WorldController implements ContactList
 	 * Lays out the game geography.
 	 */
 	private void populateLevel() {
+
+		int NDS = new Random().nextInt(3);
+		//follow convention chicos
+		// 0 is day 1 is night 2 is sunset
+		setDayTime(NDS);
+
+
 		LevelEditor.Level level;
 		if (this.level != -1) {
 			level = LevelEditor.loadFromJson(this.level);
 		} else {
 			level = LevelEditor.loadFromJson();
 		}
-		// Add level goal
-		//		System.out.println(Arrays.toString(Thread.currentThread().getStackTrace()));
+
 		cameraController = new CameraController(canvas.getCamera());
 
 		float dwidth;
@@ -545,6 +555,7 @@ public class DownstreamController extends WorldController implements ContactList
 				wpools.add(pool);
 			}
 		}
+
 
 
 		for (Map.Entry<String,ArrayList<Vector2>> entry : level.enemiesLevel.entrySet()) {
@@ -583,7 +594,7 @@ public class DownstreamController extends WorldController implements ContactList
 		goalTile.setSensor(true);
 		goalTile.setAngle((float) Math.atan2(goalPos.y-shadowDest.y,goalPos.x-shadowDest.x));
 		addObject(goalTile);
-		
+
 		for (ArrayList<Float> wall : level.walls) {
 			PolygonObstacle obj;
 			float[] wallFloat = new float[wall.size()];
@@ -594,14 +605,23 @@ public class DownstreamController extends WorldController implements ContactList
 			obj.setFriction(BASIC_FRICTION);
 			obj.setRestitution(BASIC_RESTITUTION);
 			obj.setDrawScale(scale);
-			obj.setTexture(earthTile);
+			if (NDS == 0){
+				obj.setTexture(earthTileDay);
+			}
+			if (NDS == 1){
+				obj.setTexture(earthTileNight);
+			}
+			if (NDS == 2){
+				obj.setTexture(earthTileSunset);
+			}
+			//obj.setTexture(earthTile);
 			obj.setName("wall1");
 			ArrayList<Float> scaledWall = new ArrayList<Float>();
 			for (Float f : wall) scaledWall.add(f*scale.x);
 			walls.add(scaledWall);
 			addObject(obj);
 		}
-		
+
 		// Create the fish avatar
 		dwidth  = koiTexture.getRegionWidth()/scale.x;
 		dheight = koiTexture.getRegionHeight()/scale.y;
@@ -612,8 +632,8 @@ public class DownstreamController extends WorldController implements ContactList
 		koi.setTethered(false);
 		koi.setWhirled(false);
 		addObject(koi);
-		
-		
+
+
 		for (Vector2 lotus : level.lotuses) {
 			TetherModel lantern = new TetherModel(lotus.x, lotus.y, rad, true);
 			lantern.setBodyType(BodyDef.BodyType.StaticBody);
@@ -630,7 +650,7 @@ public class DownstreamController extends WorldController implements ContactList
 			tethers.add(lantern);
 			lanterns.add(lantern);
 		}
-		
+
 		for (Vector2 lilypad : level.lilypads) {
 			TetherModel lily = new TetherModel(lilypad.x, lilypad.y, rad);
 			lily.setBodyType(BodyDef.BodyType.StaticBody);
@@ -644,7 +664,7 @@ public class DownstreamController extends WorldController implements ContactList
 			addObject(lily);
 			tethers.add(lily);
 		}
-		
+
 		//create shadow gate
 		dwidth = shadowTexture.getRegionWidth()/scale.x;
 		dheight = shadowTexture.getRegionHeight()/scale.y;
@@ -656,15 +676,9 @@ public class DownstreamController extends WorldController implements ContactList
 		shadow.setAngle((float) Math.atan2(goalPos.y-shadowDest.y,goalPos.x-shadowDest.x));
 		shadows.add(shadow);
 		addObject(shadow);
-		
 
-		
-		
-		
-
-
+		//Setup checkpoint and collisioncontroller
 		collisionController = new CollisionController(koi);
-
 		checkpoint0 = getClosestTetherTo(koi.initPos);
 		checkpoint = checkpoint0;
 
@@ -674,7 +688,7 @@ public class DownstreamController extends WorldController implements ContactList
 		Vector2 center = new Vector2((level.map.get(0).x + level.map.get(1).x)/2,
 				(level.map.get(0).y + level.map.get(1).y)/2);
 		cameraController.zoomStart(width, height, center, koi.getPosition().cpy().scl(scale));
-		
+
 		HUD = new HUDitems(lanterns.size(), UILotusTexture, energyBarTexture, displayFont);
 		addHUD(HUD);
 
@@ -772,7 +786,7 @@ public class DownstreamController extends WorldController implements ContactList
 				koi.setDead(true);
 				return;
 			}
-
+			/*
 			//WHIRLPOOL CODE
 			if (wpools.isEmpty()){
 				closestWhirlpool = null;
@@ -796,7 +810,7 @@ public class DownstreamController extends WorldController implements ContactList
 					koi.applyWhirlForce(close, closestWhirlpool.getOrbitRadius());
 				}
 			}
-
+			 */
 
 			// ENEMY PATROL CODE
 			for (EnemyModel enemy : enemies) {
@@ -818,10 +832,14 @@ public class DownstreamController extends WorldController implements ContactList
 
 			// LOTUS LIGHTING CODE
 			closestTether.setTethered(isTethered() && closestTether.isLotus() && collisionController.inRangeOf(closestTether));
+			//System.out.println(isTethered());
+			//System.out.println(closestTether.isLotus());
+			//System.out.println(collisionController.inRangeOf(closestTether));
+			//System.out.println(closestTether.set);
 
 			// TETHER FORCE CODE
-			close = getClosestTether().getPosition();
-			init = koi.getInitialTangentPoint(close);
+			Vector2 close = getClosestTether().getPosition();
+			Vector2 init = koi.getInitialTangentPoint(close);
 
 			if (close.dst(koi.getPosition()) > TetherModel.TETHER_DEFAULT_RANGE*1.3){
 				koi.setAttemptingTether(false);
@@ -874,8 +892,7 @@ public class DownstreamController extends WorldController implements ContactList
 			koiCcurrentFrame = koiCAnimation.getKeyFrame(stateTime, true);
 			KoiCcurrentFrameFlipped = koiCAnimationFlipped.getKeyFrame(stateTime, true);
 
-			//FSM to handle Koi
-
+			//System.out.println(relativeTime);
 			//koiCcurrentFrame.flip(koi.left(closestTether), false);
 			if (koi.isTethered()){
 				koi.setCurved(true);
@@ -901,58 +918,62 @@ public class DownstreamController extends WorldController implements ContactList
 				else{
 					tethers.get(i).inrange = false;
 				}
+
 				if (tethers.get(i).getTetherType() == TetherType.Lilypad){
 					tethers.get(i).setTexture(lilycurrentFrame);
 				}
 				if (tethers.get(i).getTetherType() == TetherType.Lantern) {
+					//System.out.println("here");
 					if (tethers.get(i).getOpening() == 0){
 						tethers.get(i).setTexture(closedFlowercurrentFrame);
 						if (tethers.get(i).set){
+
 							tethers.get(i).setOpening(1);
 						}
-						if (tethers.get(i).getOpening() == 1){
-							//TODO
-							if (!openingFlowerAnimation.isAnimationFinished(relativeTime))
-							{openingFlowercurrentFrame = openingFlowerAnimation.getKeyFrame(relativeTime, true);
-							relativeTime += Gdx.graphics.getDeltaTime();  
-							tethers.get(i).setTexture(openingFlowercurrentFrame);
-							if(!tethers.get(i).set){
-								//go to closing
-								//relativeTime = 0;
-								tethers.get(i).setOpening(3);
+					}
+					if (tethers.get(i).getOpening() == 1){
+
+						if (!openingFlowerAnimation.isAnimationFinished(relativeTime))
+						{openingFlowercurrentFrame = openingFlowerAnimation.getKeyFrame(relativeTime, true);
+						relativeTime += Gdx.graphics.getDeltaTime();  
+						tethers.get(i).setTexture(openingFlowercurrentFrame);
+						if(!tethers.get(i).set){
+							//go to closing
+							//relativeTime = 0;
+							tethers.get(i).setOpening(3);
+						}
+						}
+						if (openingFlowerAnimation.isAnimationFinished(relativeTime)){
+							System.out.println("finished");
+							tethers.get(i).setOpening(2);
+							relativeTime = 0;
+						}
+
+					}
+					if (tethers.get(i).getOpening() == 2){
+						tethers.get(i).setTexture(openFlowercurrentFrame);
+						/*if (tethers.get(i).set){
+							tethers.get(i).setOpening(1);
+						}*/
+					}
+					if (tethers.get(i).getOpening() == 3){ 
+						if(!tethers.get(i).set){
+							if(!closingFlowerAnimation.isAnimationFinished(relativeTime)){
+								closingFlowercurrentFrame = closingFlowerAnimation.getKeyFrame(relativeTime, true);
+								relativeTime += Gdx.graphics.getDeltaTime();  
+								tethers.get(i).setTexture(closingFlowercurrentFrame);
 							}
-							}
-							if (openingFlowerAnimation.isAnimationFinished(relativeTime)){
-								tethers.get(i).setOpening(2);
+							if(closingFlowerAnimation.isAnimationFinished(relativeTime)){
+								tethers.get(i).setOpening(0);
 								relativeTime = 0;
 							}
-
 						}
-						if (tethers.get(i).getOpening() == 2){
-							tethers.get(i).setTexture(openFlowercurrentFrame);
-							/*if (tethers.get(i).set){
-						tethers.get(i).setOpening(1);
-					}*/
+						if(tethers.get(i).set){
+							tethers.get(i).setOpening(1);
 						}
-						if (tethers.get(i).getOpening() == 3){ 
-							if(!tethers.get(i).set){
-								if(!closingFlowerAnimation.isAnimationFinished(relativeTime)){
-									closingFlowercurrentFrame = closingFlowerAnimation.getKeyFrame(relativeTime, true);
-									relativeTime += Gdx.graphics.getDeltaTime();  
-									tethers.get(i).setTexture(closingFlowercurrentFrame);
-								}
-								if(closingFlowerAnimation.isAnimationFinished(relativeTime)){
-									tethers.get(i).setOpening(0);
-									relativeTime = 0;
-								}
-							}
-							if(tethers.get(i).set){
-								tethers.get(i).setOpening(1);
-							}
-						}
-						if(tethers.get(i).lit){
-							tethers.get(i).setTexture(openFlowercurrentFrame);
-						}
+					}
+					if(tethers.get(i).lit){
+						tethers.get(i).setTexture(openFlowercurrentFrame);
 					}
 				}
 			}
@@ -962,361 +983,365 @@ public class DownstreamController extends WorldController implements ContactList
 	}
 
 
-	private void clearShadows(boolean b) {
-		for (ShadowModel s : shadows){
-			s.clearShadow(b);;
-		}	}
 
-	private void moveShadows() {
-		for (ShadowModel s : shadows){
-			s.moveTowardsGoal();
+
+
+
+private void clearShadows(boolean b) {
+	for (ShadowModel s : shadows){
+		s.clearShadow(b);;
+	}	}
+
+private void moveShadows() {
+	for (ShadowModel s : shadows){
+		s.moveTowardsGoal();
+	}
+}
+
+private boolean isTethered() {
+	return koi.isTethered();
+}
+
+private TetherModel getClosestTether() {
+	if(collisionController.inRange()){
+		return collisionController.getClosestTetherInRange();
+	}
+	TetherModel closestTether = tethers.get(0);
+	float closestDistance = tethers.get(0).getPosition().sub(koi.getPosition()).len2();
+	for (TetherModel tether : tethers) {
+		float newDistance = tether.getPosition().sub(koi.getPosition()).len2();
+		if (newDistance < closestDistance) {
+			closestDistance = newDistance;
+			closestTether = tether;
 		}
 	}
+	return closestTether;
+}
 
-	private boolean isTethered() {
-		return koi.isTethered();
-	}
-
-	private TetherModel getClosestTether() {
-		if(collisionController.inRange()){
-			return collisionController.getClosestTetherInRange();
-		}
-		TetherModel closestTether = tethers.get(0);
-		float closestDistance = tethers.get(0).getPosition().sub(koi.getPosition()).len2();
-		for (TetherModel tether : tethers) {
-			float newDistance = tether.getPosition().sub(koi.getPosition()).len2();
-			if (newDistance < closestDistance) {
-				closestDistance = newDistance;
-				closestTether = tether;
-			}
-		}
-		return closestTether;
-	}
-
-	private TetherModel getClosestTetherTo(Vector2 v) {
-		TetherModel closestTether = tethers.get(0);
-		float closestDistance = tethers.get(0).getPosition().sub(v).len();
-		for (TetherModel tether : tethers) {
-			float newDistance = tether.getPosition().sub(v).len();
-			if (newDistance < closestDistance) {
-				closestDistance = newDistance;
-				closestTether = tether;
-			}
-		}
-		return closestTether;
-	}
-	private boolean isWhirled(){
-		return koi.isWhirled();
-	}
-
-	private WhirlpoolModel getClosestWhirl() {
-		if(collisionController.inRangePool()){
-			return collisionController.getClosestWhirlpoolInRange();
-		}
-		WhirlpoolModel closestPool = wpools.get(0);
-		float closestDistance = wpools.get(0).getPosition().sub(koi.getPosition()).len2();
-		for (WhirlpoolModel wp : wpools) {
-			float newDistance = wp.getPosition().sub(koi.getPosition()).len2();
-			if (newDistance < closestDistance) {
-				closestDistance = newDistance;
-				closestWhirlpool = wp;
-			}
-		}
-		return closestWhirlpool;
-	}
-
-	public void draw(float delta) {
-
-		//		System.out.println("paused: " + paused);
-		//		System.out.println("waspaused: " + wasPaused);
-
-		if (paused){
-			pauseMenu.draw();
-		}
-		else {
-			super.draw(delta);
-			canvas.beginHUD();
-			HUD.draw(canvas);
-			for (ArrayList<Float> wall : walls) canvas.drawPath(wall);
-			canvas.end();
-		}
-
-	}
-
-	/**
-	 * Called when the Screen should render itself.
-	 *
-	 * We defer to the other methods update() and draw().  However, it is VERY important
-	 * that we only quit AFTER a draw.
-	 *
-	 * @param delta Number of seconds since last animation frame
-	 */
-	public void render(float delta) {
-		InputController input = InputController.getInstance();
-		if(wasPaused){
-
-			paused =true;
-
-		}
-		else{
-			paused = input.didPause();
-			wasPaused = paused;
-			//			if (paused) cameraController.pauseCamera();
-		}
-
-		if (active) {
-			if (preUpdate(delta) && !paused) {
-				update(delta); // This is the one that must be defined.
-				postUpdate(delta);
-			}
-			this.draw(delta);
-			if (goOptions() && listener != null) {
-				//listener.exitScreen(this, WorldController.EXIT_OPTIONS);
-			}
-			if (goBack() && listener != null) {
-				listener.exitScreen(this, WorldController.EXIT_MAIN);
-			}
-			if (restartLevel() && listener != null) {
-				listener.exitScreen(this, this.level);
-			}
-			if (resumePlay() && listener != null) {
-				resumeState = 0;
-				restartState = 0;
-				optionsState = 0;
-				backState = 0;
-				wasPaused = false;
-				paused = false;
-				//				cameraController.unpauseCamera();
-			}
-
+private TetherModel getClosestTetherTo(Vector2 v) {
+	TetherModel closestTether = tethers.get(0);
+	float closestDistance = tethers.get(0).getPosition().sub(v).len();
+	for (TetherModel tether : tethers) {
+		float newDistance = tether.getPosition().sub(v).len();
+		if (newDistance < closestDistance) {
+			closestDistance = newDistance;
+			closestTether = tether;
 		}
 	}
+	return closestTether;
+}
+private boolean isWhirled(){
+	return koi.isWhirled();
+}
 
-	/**
-	 * Dispose of all (non-static) resources allocated to this mode.
-	 */
-	public void dispose() {
-		for(Obstacle obj : objects) {
-			obj.deactivatePhysics(world);
+private WhirlpoolModel getClosestWhirl() {
+	if(collisionController.inRangePool()){
+		return collisionController.getClosestWhirlpoolInRange();
+	}
+	WhirlpoolModel closestPool = wpools.get(0);
+	float closestDistance = wpools.get(0).getPosition().sub(koi.getPosition()).len2();
+	for (WhirlpoolModel wp : wpools) {
+		float newDistance = wp.getPosition().sub(koi.getPosition()).len2();
+		if (newDistance < closestDistance) {
+			closestDistance = newDistance;
+			closestWhirlpool = wp;
 		}
-		objects.clear();
-		addQueue.clear();
-		world.dispose();
-		pauseMenu.dispose();
-		objects = null;
-		addQueue = null;
-		bounds = null;
-		scale  = null;
-		world  = null;
-		canvas = null;
+	}
+	return closestWhirlpool;
+}
+
+public void draw(float delta) {
+
+	//		System.out.println("paused: " + paused);
+	//		System.out.println("waspaused: " + wasPaused);
+
+	if (paused){
+		pauseMenu.draw();
+	}
+	else {
+		super.draw(delta);
+		canvas.beginHUD();
+		HUD.draw(canvas);
+		for (ArrayList<Float> wall : walls) canvas.drawPath(wall);
+		canvas.end();
 	}
 
+}
 
-	/// CONTACT LISTENER METHODS
-	/**
-	 * Callback method for the start of a collision
-	 *
-	 * This method is called when we first get a collision between two objects.  We use 
-	 * this method to test if it is the "right" kind of collision.  In particular, we
-	 * use it to test if we made it to the win door.
-	 *
-	 * @param contact The two bodies that collided
-	 */
-	public void beginContact(Contact contact) {
-		koi.setDead(collisionController.begin(contact));
+/**
+ * Called when the Screen should render itself.
+ *
+ * We defer to the other methods update() and draw().  However, it is VERY important
+ * that we only quit AFTER a draw.
+ *
+ * @param delta Number of seconds since last animation frame
+ */
+public void render(float delta) {
+	InputController input = InputController.getInstance();
+	if(wasPaused){
+
+		paused =true;
+
+	}
+	else{
+		paused = input.didPause();
+		wasPaused = paused;
+		//			if (paused) cameraController.pauseCamera();
 	}
 
-	/**
-	 * Callback method for the start of a collision
-	 *
-	 * This method is called when two objects cease to touch.  We do not use it.
-	 */ 
-	public void endContact(Contact contact) {
-		collisionController.end(contact);
-	}
-
-	private Vector2 cache = new Vector2();
-
-	/** Unused ContactListener method */
-	public void postSolve(Contact contact, ContactImpulse impulse) {}
-
-	/**
-	 * Handles any modifications necessary before collision resolution
-	 *
-	 * This method is called just before Box2D resolves a collision.  We use this method
-	 * to implement sound on contact, using the algorithms outlined similar to those in
-	 * Ian Parberry's "Introduction to Game Physics with Box2D".  
-	 * 
-	 * However, we cannot use the proper algorithms, because LibGDX does not implement 
-	 * b2GetPointStates from Box2D.  The danger with our approximation is that we may
-	 * get a collision over multiple frames (instead of detecting the first frame), and
-	 * so play a sound repeatedly.  Fortunately, the cooldown hack in SoundController
-	 * prevents this from happening.
-	 *
-	 * @param  contact  	The two bodies that collided
-	 * @param  oldManfold  	The collision manifold before contact
-	 */
-
-	public void preSolve(Contact contact, Manifold oldManifold) {
-		float speed = 0;
-
-		// Use Ian Parberry's method to compute a speed threshold
-		Body body1 = contact.getFixtureA().getBody();
-		Body body2 = contact.getFixtureB().getBody();
-		WorldManifold worldManifold = contact.getWorldManifold();
-		Vector2 wp = worldManifold.getPoints()[0];
-		cache.set(body1.getLinearVelocityFromWorldPoint(wp));
-		cache.sub(body2.getLinearVelocityFromWorldPoint(wp));
-		speed = cache.dot(worldManifold.getNormal());
-	}
-
-	//PAUSE MENU METHODS
-
-
-	public boolean goBack() {
-		return backState == 2;
-	}
-
-	public boolean resumePlay(){
-		return resumeState == 2;
-	}
-
-	public boolean goOptions(){
-		return optionsState == 2;
-	}
-
-	public boolean restartLevel(){
-		return restartState == 2;
-	}
-
-	// PROCESSING PLAYER INPUT
-	/**
-	 * Called when the screen was touched or a mouse button was pressed.
-	 *
-	 * This method checks to see if the play button is available and if the
-	 * click is in the bounds of the play button. If so, it signals the that the
-	 * button has been pressed and is currently down. Any mouse button is
-	 * accepted.
-	 *
-	 * @param screenX
-	 *            the x-coordinate of the mouse on the screen
-	 * @param screenY
-	 *            the y-coordinate of the mouse on the screen
-	 * @param pointer
-	 *            the button or touch finger number
-	 * @return whether to hand the event to other listeners.
-	 */
-	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-		if (paused) {
-
-			// Flip to match graphics coordinates
-			screenY = canvas.getHeight() - screenY;
-			float dx = Math.abs(screenX - PauseMenuMode.backPos.x);
-			float dy = Math.abs(screenY - PauseMenuMode.backPos.y);
-
-			if (dx < pauseMenu.scale * pauseMenu.back.getWidth() / 2
-					&& dy < pauseMenu.scale * pauseMenu.back.getHeight() / 2) {
-				backState = 1;
-			}
-
-			dx = Math.abs(screenX - PauseMenuMode.resumePos.x);
-			dy = Math.abs(screenY - PauseMenuMode.resumePos.y);
-
-			if (dx < pauseMenu.scale * pauseMenu.resume.getWidth() / 2
-					&& dy < pauseMenu.scale * pauseMenu.resume.getHeight() / 2) {
-				resumeState = 1;
-			}
-
-			dx = Math.abs(screenX - PauseMenuMode.restartPos.x);
-			dy = Math.abs(screenY - PauseMenuMode.restartPos.y);
-
-			if (dx < pauseMenu.scale * pauseMenu.restart.getWidth() / 2
-					&& dy < pauseMenu.scale * pauseMenu.restart.getHeight() / 2) {
-				restartState = 1;
-			}
-
-			dx = Math.abs(screenX - PauseMenuMode.optionsPos.x);
-			dy = Math.abs(screenY - PauseMenuMode.optionsPos.y);
-
-			if (dx < pauseMenu.scale * pauseMenu.options.getWidth() / 2
-					&& dy < pauseMenu.scale * pauseMenu.options.getHeight() / 2) {
-				optionsState = 1;
-			}
+	if (active) {
+		if (preUpdate(delta) && !paused) {
+			update(delta); // This is the one that must be defined.
+			postUpdate(delta);
 		}
-		return false;
-	}
-
-	/**
-	 * Called when a finger was lifted or a mouse button was released.
-	 *
-	 * This method checks to see if the play button is currently pressed down.
-	 * If so, it signals the that the player is ready to go.
-	 *
-	 * @param screenX
-	 *            the x-coordinate of the mouse on the screen
-	 * @param screenY
-	 *            the y-coordinate of the mouse on the screen
-	 * @param pointer
-	 *            the button or touch finger number
-	 * @return whether to hand the event to other listeners.
-	 */
-	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-		if (paused) {
-			if (backState == 1) {
-				backState = 2;
-				return false;
-			}
-			if (resumeState == 1) {
-				resumeState = 2;
-				return false;
-			}
-			if (restartState == 1) {
-				restartState = 2;
-				return false;
-			}
-			if (optionsState == 1) {
-				optionsState = 2;
-				return false;
-			}
+		this.draw(delta);
+		if (goOptions() && listener != null) {
+			//listener.exitScreen(this, WorldController.EXIT_OPTIONS);
 		}
-		return true;
-	}
+		if (goBack() && listener != null) {
+			listener.exitScreen(this, WorldController.EXIT_MAIN);
+		}
+		if (restartLevel() && listener != null) {
+			listener.exitScreen(this, this.level);
+		}
+		if (resumePlay() && listener != null) {
+			resumeState = 0;
+			restartState = 0;
+			optionsState = 0;
+			backState = 0;
+			wasPaused = false;
+			paused = false;
+			//				cameraController.unpauseCamera();
+		}
 
-	@Override
-	public boolean keyDown(int keycode) {
-		// TODO Auto-generated method stub
-		return false;
 	}
+}
 
-	@Override
-	public boolean keyUp(int keycode) {
-		// TODO Auto-generated method stub
-		return false;
+/**
+ * Dispose of all (non-static) resources allocated to this mode.
+ */
+public void dispose() {
+	for(Obstacle obj : objects) {
+		obj.deactivatePhysics(world);
 	}
+	objects.clear();
+	addQueue.clear();
+	world.dispose();
+	pauseMenu.dispose();
+	objects = null;
+	addQueue = null;
+	bounds = null;
+	scale  = null;
+	world  = null;
+	canvas = null;
+}
 
-	@Override
-	public boolean keyTyped(char character) {
-		// TODO Auto-generated method stub
-		return false;
-	}
 
-	@Override
-	public boolean touchDragged(int screenX, int screenY, int pointer) {
-		// TODO Auto-generated method stub
-		return false;
-	}
+/// CONTACT LISTENER METHODS
+/**
+ * Callback method for the start of a collision
+ *
+ * This method is called when we first get a collision between two objects.  We use 
+ * this method to test if it is the "right" kind of collision.  In particular, we
+ * use it to test if we made it to the win door.
+ *
+ * @param contact The two bodies that collided
+ */
+public void beginContact(Contact contact) {
+	koi.setDead(collisionController.begin(contact));
+}
 
-	@Override
-	public boolean mouseMoved(int screenX, int screenY) {
-		// TODO Auto-generated method stub
-		return false;
-	}
+/**
+ * Callback method for the start of a collision
+ *
+ * This method is called when two objects cease to touch.  We do not use it.
+ */ 
+public void endContact(Contact contact) {
+	collisionController.end(contact);
+}
 
-	@Override
-	public boolean scrolled(int amount) {
-		// TODO Auto-generated method stub
-		return false;
+private Vector2 cache = new Vector2();
+
+/** Unused ContactListener method */
+public void postSolve(Contact contact, ContactImpulse impulse) {}
+
+/**
+ * Handles any modifications necessary before collision resolution
+ *
+ * This method is called just before Box2D resolves a collision.  We use this method
+ * to implement sound on contact, using the algorithms outlined similar to those in
+ * Ian Parberry's "Introduction to Game Physics with Box2D".  
+ * 
+ * However, we cannot use the proper algorithms, because LibGDX does not implement 
+ * b2GetPointStates from Box2D.  The danger with our approximation is that we may
+ * get a collision over multiple frames (instead of detecting the first frame), and
+ * so play a sound repeatedly.  Fortunately, the cooldown hack in SoundController
+ * prevents this from happening.
+ *
+ * @param  contact  	The two bodies that collided
+ * @param  oldManfold  	The collision manifold before contact
+ */
+
+public void preSolve(Contact contact, Manifold oldManifold) {
+	float speed = 0;
+
+	// Use Ian Parberry's method to compute a speed threshold
+	Body body1 = contact.getFixtureA().getBody();
+	Body body2 = contact.getFixtureB().getBody();
+	WorldManifold worldManifold = contact.getWorldManifold();
+	Vector2 wp = worldManifold.getPoints()[0];
+	cache.set(body1.getLinearVelocityFromWorldPoint(wp));
+	cache.sub(body2.getLinearVelocityFromWorldPoint(wp));
+	speed = cache.dot(worldManifold.getNormal());
+}
+
+//PAUSE MENU METHODS
+
+
+public boolean goBack() {
+	return backState == 2;
+}
+
+public boolean resumePlay(){
+	return resumeState == 2;
+}
+
+public boolean goOptions(){
+	return optionsState == 2;
+}
+
+public boolean restartLevel(){
+	return restartState == 2;
+}
+
+// PROCESSING PLAYER INPUT
+/**
+ * Called when the screen was touched or a mouse button was pressed.
+ *
+ * This method checks to see if the play button is available and if the
+ * click is in the bounds of the play button. If so, it signals the that the
+ * button has been pressed and is currently down. Any mouse button is
+ * accepted.
+ *
+ * @param screenX
+ *            the x-coordinate of the mouse on the screen
+ * @param screenY
+ *            the y-coordinate of the mouse on the screen
+ * @param pointer
+ *            the button or touch finger number
+ * @return whether to hand the event to other listeners.
+ */
+public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+	if (paused) {
+
+		// Flip to match graphics coordinates
+		screenY = canvas.getHeight() - screenY;
+		float dx = Math.abs(screenX - PauseMenuMode.backPos.x);
+		float dy = Math.abs(screenY - PauseMenuMode.backPos.y);
+
+		if (dx < pauseMenu.scale * pauseMenu.back.getWidth() / 2
+				&& dy < pauseMenu.scale * pauseMenu.back.getHeight() / 2) {
+			backState = 1;
+		}
+
+		dx = Math.abs(screenX - PauseMenuMode.resumePos.x);
+		dy = Math.abs(screenY - PauseMenuMode.resumePos.y);
+
+		if (dx < pauseMenu.scale * pauseMenu.resume.getWidth() / 2
+				&& dy < pauseMenu.scale * pauseMenu.resume.getHeight() / 2) {
+			resumeState = 1;
+		}
+
+		dx = Math.abs(screenX - PauseMenuMode.restartPos.x);
+		dy = Math.abs(screenY - PauseMenuMode.restartPos.y);
+
+		if (dx < pauseMenu.scale * pauseMenu.restart.getWidth() / 2
+				&& dy < pauseMenu.scale * pauseMenu.restart.getHeight() / 2) {
+			restartState = 1;
+		}
+
+		dx = Math.abs(screenX - PauseMenuMode.optionsPos.x);
+		dy = Math.abs(screenY - PauseMenuMode.optionsPos.y);
+
+		if (dx < pauseMenu.scale * pauseMenu.options.getWidth() / 2
+				&& dy < pauseMenu.scale * pauseMenu.options.getHeight() / 2) {
+			optionsState = 1;
+		}
 	}
+	return false;
+}
+
+/**
+ * Called when a finger was lifted or a mouse button was released.
+ *
+ * This method checks to see if the play button is currently pressed down.
+ * If so, it signals the that the player is ready to go.
+ *
+ * @param screenX
+ *            the x-coordinate of the mouse on the screen
+ * @param screenY
+ *            the y-coordinate of the mouse on the screen
+ * @param pointer
+ *            the button or touch finger number
+ * @return whether to hand the event to other listeners.
+ */
+public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+	if (paused) {
+		if (backState == 1) {
+			backState = 2;
+			return false;
+		}
+		if (resumeState == 1) {
+			resumeState = 2;
+			return false;
+		}
+		if (restartState == 1) {
+			restartState = 2;
+			return false;
+		}
+		if (optionsState == 1) {
+			optionsState = 2;
+			return false;
+		}
+	}
+	return true;
+}
+
+@Override
+public boolean keyDown(int keycode) {
+	// TODO Auto-generated method stub
+	return false;
+}
+
+@Override
+public boolean keyUp(int keycode) {
+	// TODO Auto-generated method stub
+	return false;
+}
+
+@Override
+public boolean keyTyped(char character) {
+	// TODO Auto-generated method stub
+	return false;
+}
+
+@Override
+public boolean touchDragged(int screenX, int screenY, int pointer) {
+	// TODO Auto-generated method stub
+	return false;
+}
+
+@Override
+public boolean mouseMoved(int screenX, int screenY) {
+	// TODO Auto-generated method stub
+	return false;
+}
+
+@Override
+public boolean scrolled(int amount) {
+	// TODO Auto-generated method stub
+	return false;
+}
 
 
 }
