@@ -926,7 +926,7 @@ public class DownstreamController extends WorldController implements ContactList
 					}
 				}
 			}
-		System.out.println(koi.getEnergy());
+
 		HUD.updateHUD(litlanterns.size(), koi.getEnergy());
 		}
 		//SoundController.getInstance().update();
