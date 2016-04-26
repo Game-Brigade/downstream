@@ -624,15 +624,17 @@ public class DownstreamController extends WorldController implements ContactList
 		Vector2 goalPos = level.goal.get(0);
 		Vector2 shadowDest = level.goal.get(1);
 
-		cache = shadowDest.cpy().sub(goalPos).nor().scl(-3);
+		cache = shadowDest.cpy().sub(goalPos).nor().scl(2);
 		dwidth  = goalTexture.getRegionWidth()/scale.x;
 		dheight = goalTexture.getRegionHeight()/scale.y;
-		BoxObstacle goalTile = new BoxObstacle(goalPos.x+cache.x, goalPos.y+cache.y, dwidth, dheight);
+		goalTexture.setRegionHeight(goalTexture.getRegionHeight());
+		goalTexture.setRegionWidth(goalTexture.getRegionWidth());
+		BoxObstacle goalTile = new BoxObstacle(goalPos.x+cache.x, goalPos.y+cache.y, dwidth/2, dheight/2);
 		goalTile.setName("goal");
 		goalTile.setDrawScale(scale);
 		goalTile.setTexture(goalTexture);
 		goalTile.setSensor(true);
-		goalTile.setAngle((float) Math.atan2(goalPos.y-shadowDest.y,goalPos.x-shadowDest.x));
+		goalTile.setAngle((float) Math.atan2(shadowDest.y-goalPos.y,shadowDest.x-goalPos.x));
 		addObject(goalTile);
 
 		for (ArrayList<Float> wall : level.walls) {
@@ -662,25 +664,25 @@ public class DownstreamController extends WorldController implements ContactList
 			addObject(obj);
 		}
 		
-		for (Vector2 rock : level.rocks) {
-			WheelObstacle obj;
-			obj = new WheelObstacle(rock.x,rock.y,rockDay.getRegionWidth()/2);
-			obj.setBodyType(BodyDef.BodyType.StaticBody);
-			obj.setSensor(true);
-			obj.setDrawScale(scale);
-			if (NDS == 0){
-				obj.setTexture(rockDay);
-			}
-			if (NDS == 1){
-				obj.setTexture(rockNight);
-			}
-			if (NDS == 2){
-				obj.setTexture(rockSunset);
-			}
-			obj.setName("rock");
-			rocks.add(obj);
-			addObject(obj);
-		}
+//		for (Vector2 rock : level.rocks) {
+//			WheelObstacle obj;
+//			obj = new WheelObstacle(rock.x,rock.y,rockDay.getRegionWidth()/2);
+//			obj.setBodyType(BodyDef.BodyType.StaticBody);
+//			obj.setSensor(true);
+//			obj.setDrawScale(scale);
+//			if (NDS == 0){
+//				obj.setTexture(rockDay);
+//			}
+//			if (NDS == 1){
+//				obj.setTexture(rockNight);
+//			}
+//			if (NDS == 2){
+//				obj.setTexture(rockSunset);
+//			}
+//			obj.setName("rock");
+//			rocks.add(obj);
+//			addObject(obj);
+//		}
 
 		// Create the fish avatar
 		dwidth  = koiTexture.getRegionWidth()/scale.x;
@@ -727,14 +729,14 @@ public class DownstreamController extends WorldController implements ContactList
 
 		//create shadow(s)
 		if(lanterns.size() > 0){
-			dwidth = shadowTexture.getRegionWidth()/scale.x;
-			dheight = shadowTexture.getRegionHeight()/scale.y;
-			ShadowModel shadow = new ShadowModel(goalPos.x, goalPos.y, dwidth/4, dheight, shadowDest);
+			dwidth = shadowTexture.getRegionWidth()/scale.x/2;
+			dheight = shadowTexture.getRegionHeight()/scale.y/2;
+			ShadowModel shadow = new ShadowModel(goalPos.x, goalPos.y, dwidth*1.5f, dheight, shadowDest);
 			shadow.setName("shadow");
 			shadow.setDrawScale(scale);
 			shadow.setTexture(shadowTexture);
 			shadow.setSensor(true);
-			shadow.setAngle((float) Math.atan2(goalPos.y-shadowDest.y,goalPos.x-shadowDest.x));
+			shadow.setAngle((float) Math.atan2(shadowDest.y-goalPos.y,shadowDest.x-goalPos.x));
 			shadows.add(shadow);
 			addObject(shadow);
 		}

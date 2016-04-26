@@ -27,6 +27,7 @@ public class ShadowModel extends BoxObstacle {
 	
 	public void clearShadow(boolean b){
 		dir = b ? shadowDest.cpy().sub(getPosition()) : init.cpy().sub(getPosition());
+		dir.scl(-1);
 		cleared = b;
 	}	
 
