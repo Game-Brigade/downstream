@@ -126,10 +126,7 @@ public class PlayerModel extends BoxObstacle {
 		curved = b;
 	}
 
-<<<<<<< HEAD
 
-=======
->>>>>>> e5070e8728a107664ade67b6a10a1b57d00d6495
 	public void refreshTetherForce(Vector2 tetherPos, float rad){
 		pull = tetherPos.cpy().sub(getPosition());
 		pull.setLength(pull.len() + rad);
@@ -481,10 +478,7 @@ public class PlayerModel extends BoxObstacle {
 		}
 		
 	}
-<<<<<<< HEAD
 
-=======
->>>>>>> e5070e8728a107664ade67b6a10a1b57d00d6495
 
 	public void updateSpeed(float v) {
 		if(!this.isDead()){
@@ -524,10 +518,7 @@ public class PlayerModel extends BoxObstacle {
 		System.out.println("Pull: "+ pull);		
 	}
 	
-<<<<<<< HEAD
 
-=======
->>>>>>> e5070e8728a107664ade67b6a10a1b57d00d6495
 	
 	public float getEnergy(){
 		return energy;

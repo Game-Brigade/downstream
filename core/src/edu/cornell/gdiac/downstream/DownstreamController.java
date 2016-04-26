@@ -113,13 +113,11 @@ public class DownstreamController extends WorldController implements ContactList
 	private boolean paused;
 	private boolean dead;
 	private boolean whirled;
-<<<<<<< HEAD
+
 
 	private TetherModel checkpoint;
 	
-=======
-	private TetherModel checkpoint;
->>>>>>> e5070e8728a107664ade67b6a10a1b57d00d6495
+
 
 	private float PLAYER_LINEAR_VELOCITY = 6f;
 	private boolean enableSlow = false;
@@ -222,6 +220,13 @@ public class DownstreamController extends WorldController implements ContactList
 	/** Reference to the goalDoor (for collision detection) */
 	private BoxObstacle goalDoor;
 
+	
+
+	/** Reference to the player avatar */
+
+	
+	
+	private boolean respawning;
 
 
 	/**
@@ -434,32 +439,6 @@ public class DownstreamController extends WorldController implements ContactList
 		fishAssetState = AssetState.COMPLETE;
 	}
 
-<<<<<<< HEAD
-
-	private static final int RESPAWN_TIME = 100;
-
-
-	private double rot = 0;
-
-	// Other game objects
-	/** The initial koi position */
-	private static Vector2 KOI_POS = new Vector2(-2, 6);
-	/** The goal door position */
-	private static Vector2 GOAL_POS = new Vector2( 6, 12);
-
-	// Physics objects for the game
-	/** Reference to the goalDoor (for collision detection) */
-	private BoxObstacle goalDoor;
-	/** Reference to the player avatar */
-
-	private int respawnTimer = RESPAWN_TIME;
-	private TetherModel checkpoint0;
-	private boolean respawning;
-
-
-=======
-
->>>>>>> e5070e8728a107664ade67b6a10a1b57d00d6495
 	/**
 	 * Creates and initialize a new instance of Downstream
 	 *
@@ -625,15 +604,13 @@ public class DownstreamController extends WorldController implements ContactList
 		addObject(koi);
 
 		collisionController = new CollisionController(koi);
-<<<<<<< HEAD
 
-		checkpoint = getClosestTetherTo(koi.initPos);
-		checkpoint0 = getClosestTetherTo(koi.initPos);
+	
 
-=======
+
 		checkpoint0 = getClosestTetherTo(koi.initPos);
 		checkpoint = checkpoint0;
->>>>>>> e5070e8728a107664ade67b6a10a1b57d00d6495
+
 
 		float width = Math.abs(level.map.get(0).x - level.map.get(1).x);
 		float height = Math.abs(level.map.get(0).y - level.map.get(1).y);
@@ -643,10 +620,7 @@ public class DownstreamController extends WorldController implements ContactList
 
 		HUD = new HUDitems(lanterns.size(), UILotusTexture, energyBarTexture, displayFont);
 		addHUD(HUD);
-<<<<<<< HEAD
 
-=======
->>>>>>> e5070e8728a107664ade67b6a10a1b57d00d6495
 
 	}
 
