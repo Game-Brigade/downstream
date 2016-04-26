@@ -10,21 +10,17 @@ import edu.cornell.gdiac.downstream.obstacle.Obstacle;
 
 public class CollisionController {
 
-<<<<<<< HEAD
 	private static final boolean LETHAL_WALLS  = false;
 	private static final boolean LETHAL_ROCKS  = true;
 	private static final boolean LETHAL_ENEMIES  = true;
 	private static final boolean LETHAL_WHIRLPOOLS  = false;
 	private static final boolean LETHAL_SHADOWS = true;
 	
-=======
 	PlayerModel koi;
 	public ArrayList<TetherModel> tethers = new ArrayList<TetherModel>();
 	public ArrayList<WhirlpoolModel> pools = new ArrayList<WhirlpoolModel>();
->>>>>>> b0759998a9a98328febf9a791889916bcce8759d
 	
-	PlayerModel koi;
-	public ArrayList<TetherModel> tethers = new ArrayList<TetherModel>();
+
 	private Body bCollide;
 	private String sCollide;
 		
@@ -41,7 +37,6 @@ public class CollisionController {
 		String s1 = ((Obstacle)body1.getUserData()).getName();
 		String s2 = ((Obstacle)body2.getUserData()).getName();
 		if(s1.startsWith("koi")){
-<<<<<<< HEAD
 			sCollide = s2;
 			bCollide = body2;
 		}
@@ -59,51 +54,6 @@ public class CollisionController {
 				sCollide.startsWith("lantern")){
 			if(!tethers.contains((TetherModel) bCollide.getUserData())){
 				tethers.add((TetherModel) bCollide.getUserData());
-=======
-			if(s2.startsWith("lily") || s2.startsWith("lotus") || s2.startsWith("fade")){
-				if(!tethers.contains((TetherModel) body2.getUserData())){
-					tethers.add((TetherModel) body2.getUserData());
-				}
-			}
-			else if(s2.startsWith("enemy")){
-				return true;
-				
-			}
-			else if(s2.startsWith("wall")){
-				koi.setTethered(false);
-				koi.setAttemptingTether(false);				
-			}			
-			else if(s2.startsWith("whirlpool")){
-				if(koi.getPosition().dst(body2.getPosition()) < .5){
-					return false;
-				}
-			}
-			else{
-				System.out.println("COLLISION ERROR: "+s2);
-			}
-		}
-		
-		if(s2.startsWith("koi")){
-			if(s1.startsWith("lily") || s1.startsWith("lotus") || s1.startsWith("fade")){
-				if(!tethers.contains((TetherModel) body1.getUserData())){
-					tethers.add((TetherModel) body1.getUserData());
-				}			
-			}
-			else if(s1.startsWith("enemy")){
-				return true;
-			}
-			else if(s1.startsWith("wall")){
-				koi.setTethered(false);
-				koi.setAttemptingTether(false);		
-			}			
-			else if(s1.startsWith("whirlpool")){
-				if(koi.getPosition().dst(body2.getPosition()) < .5){
-					return false;
-				}				
-			}
-			else{
-				System.out.println("COLLISION ERROR: "+s2);
->>>>>>> b0759998a9a98328febf9a791889916bcce8759d
 			}
 		}
 		else if(sCollide.startsWith("whirl")){return LETHAL_WHIRLPOOLS;}
@@ -191,9 +141,7 @@ public class CollisionController {
 	public boolean inRangeOf(TetherModel t) {
 		return tethers.contains(t);
 	}
-<<<<<<< HEAD
 
-=======
 	
 	public boolean inRangePool(){
 		return !pools.isEmpty();
@@ -204,7 +152,6 @@ public class CollisionController {
 	}
 	
 	
->>>>>>> b0759998a9a98328febf9a791889916bcce8759d
 	public void initStart(TetherModel t){
 		clear();
 		tethers.add(t);

@@ -40,13 +40,10 @@ public class PlayerModel extends BoxObstacle {
 	/** Cache object for right afterburner origin */
 	public Vector2 rghtOrigin = new Vector2();
 	
-<<<<<<< HEAD
 	public Vector2 initPos;
 
-=======
 	private Vector2 cachedPos = new Vector2(0, 0);
 	
->>>>>>> b0759998a9a98328febf9a791889916bcce8759d
 	private int health;
 
 	private Vector2 force;
@@ -66,7 +63,7 @@ public class PlayerModel extends BoxObstacle {
 
 	private boolean attemptingTether;
 
-	private boolean bursting;
+	public boolean bursting;
 	
 	private float energy;
 	
@@ -129,7 +126,10 @@ public class PlayerModel extends BoxObstacle {
 		curved = b;
 	}
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> e5070e8728a107664ade67b6a10a1b57d00d6495
 	public void refreshTetherForce(Vector2 tetherPos, float rad){
 		pull = tetherPos.cpy().sub(getPosition());
 		pull.setLength(pull.len() + rad);
@@ -307,36 +307,27 @@ public class PlayerModel extends BoxObstacle {
 	 * @param canvas Drawing context
 	 */
 	public void draw(GameCanvas canvas) {
-<<<<<<< HEAD
-//		canvas.drawLeadingLine(body.getPosition(), new Vector2(0,0));
+		//		canvas.drawLeadingLine(body.getPosition(), new Vector2(0,0));
 		if(!dead){
-			super.draw(canvas);  
-		}
-=======
-		//super.draw(canvas);  
-//		canvas.drawLeadingLine(body.getPosition(), new Vector2(0,0));
-		if (texture != null) {
-			if (!curved){canvas.draw(texture, Color.WHITE,origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x,getAngle() + 2.2f, .28f, .28f);}
-			else{
-				if(left){
-					if (curved)canvas.draw(texture, Color.WHITE,origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x, getAngle() + 2.6f, .3f, .3f);
-				}
+			//super.draw(canvas);  
+			//		canvas.drawLeadingLine(body.getPosition(), new Vector2(0,0));
+			if (texture != null) {
+				if (!curved){canvas.draw(texture, Color.WHITE,origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x,getAngle() + 2.2f, .28f, .28f);}
 				else{
-					if (curved)canvas.draw(texture, Color.WHITE,origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x, getAngle() + 3.7f, .3f, .3f);
+					if(left){
+						if (curved)canvas.draw(texture, Color.WHITE,origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x, getAngle() + 2.6f, .3f, .3f);
+					}
+					else{
+						if (curved)canvas.draw(texture, Color.WHITE,origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x, getAngle() + 3.7f, .3f, .3f);
+					}
 				}
+
+
+				//canvas.draw(texture,Color.WHITE,origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x,getAngle(),1,1);
 			}
-			
-			
-			//canvas.draw(texture,Color.WHITE,origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x,getAngle(),1,1);
 		}
 
->>>>>>> b0759998a9a98328febf9a791889916bcce8759d
 	}
-	
-	
-	
-
-
 
 	
 	/**
@@ -490,7 +481,10 @@ public class PlayerModel extends BoxObstacle {
 		}
 		
 	}
+<<<<<<< HEAD
 
+=======
+>>>>>>> e5070e8728a107664ade67b6a10a1b57d00d6495
 
 	public void updateSpeed(float v) {
 		if(!this.isDead()){
@@ -530,7 +524,10 @@ public class PlayerModel extends BoxObstacle {
 		System.out.println("Pull: "+ pull);		
 	}
 	
+<<<<<<< HEAD
 
+=======
+>>>>>>> e5070e8728a107664ade67b6a10a1b57d00d6495
 	
 	public float getEnergy(){
 		return energy;
