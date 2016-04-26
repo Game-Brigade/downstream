@@ -53,7 +53,7 @@ public class DownstreamController extends WorldController implements ContactList
 	/** Reference to the lighting texture */
 	private static final String LIGHTING_TEXTURE = "tethers/aura.png";
 	/** Reference to the repeating land texture */
-	private static final String EARTH_FILE = "terrain/repeat tile.png";
+	private static final String EARTH_FILE = "terrain/swirl_grass.png";
 	/** Reference to the whirlpool texture */
 	private static final String WHIRLPOOL_TEXTURE = "terrain/whirlpool.png";
 	/** Reference to the flipped whirlpool texture */

@@ -556,7 +556,7 @@ public class LevelEditor extends WorldController {
 			tempWalls.add(wall);
 		}
 		if (level.player != null) {
-			addPlayer(player);
+			addPlayer(level.player);
 		}
 		if (level.map != null) {
 			mapArea = level.map;
@@ -590,8 +590,10 @@ public class LevelEditor extends WorldController {
 	    int result = fileChooser.showOpenDialog(new JFrame());
 	    if (result == JFileChooser.APPROVE_OPTION) {
 	      File selectedFile = fileChooser.getSelectedFile();
-	      System.out.println(selectedFile.getAbsolutePath());
-	      return selectedFile.getAbsolutePath();
+	      
+	      String abs = selectedFile.getAbsolutePath();
+	      int lfs = abs.lastIndexOf("/") + 1;
+	      return abs.substring(lfs);
 	    }
 	    return null;
 	}
