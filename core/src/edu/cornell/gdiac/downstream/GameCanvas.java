@@ -172,6 +172,8 @@ public class GameCanvas {
 		return camera;
 	}
 	
+	
+	
 	public void setViewportSize(float width, float height) {
 		camera.viewportWidth = width;
 		camera.viewportHeight = height;

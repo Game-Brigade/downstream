@@ -12,6 +12,7 @@ public class CollisionController {
 
 	PlayerModel koi;
 	public ArrayList<TetherModel> tethers = new ArrayList<TetherModel>();
+	public ArrayList<WhirlpoolModel> pools = new ArrayList<WhirlpoolModel>();
 	
 	boolean death;
 	
@@ -42,7 +43,7 @@ public class CollisionController {
 			}			
 			else if(s2.startsWith("whirlpool")){
 				if(koi.getPosition().dst(body2.getPosition()) < .5){
-					return true;
+					return false;
 				}
 			}
 			else{
@@ -65,7 +66,7 @@ public class CollisionController {
 			}			
 			else if(s1.startsWith("whirlpool")){
 				if(koi.getPosition().dst(body2.getPosition()) < .5){
-					return true;
+					return false;
 				}				
 			}
 			else{
@@ -121,12 +122,35 @@ public class CollisionController {
 		}
 		return closestTether;
 	}
-
+	
+	public WhirlpoolModel getClosestWhirlpoolInRange() {
+		if(!inRangePool()){
+			return null;
+		}
+		WhirlpoolModel closestPool = pools.get(0);
+		float closestDistance = closestPool.getPosition().sub(koi.getPosition()).len2();
+		for (WhirlpoolModel wpool : pools) {
+			float newDistance = wpool.getPosition().sub(koi.getPosition()).len2();
+			if (newDistance < closestDistance) {
+				closestDistance = newDistance;
+				closestPool = wpool;
+			}
+		}
+		return closestPool;
+	}
 	public boolean inRange() {
 		return !tethers.isEmpty();
 	}	
 	public boolean inRangeOf(TetherModel t) {
 		return tethers.contains(t);
+	}
+	
+	public boolean inRangePool(){
+		return !pools.isEmpty();
+	}
+	
+	public boolean inRangeOfPool(WhirlpoolModel w){
+		return pools.contains(w);
 	}
 	
 	

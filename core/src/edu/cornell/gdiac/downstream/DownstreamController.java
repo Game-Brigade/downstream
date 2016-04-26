@@ -1,7 +1,7 @@
 /*
  * FishController.java
  *
- * Author: Walker M. White && Dashiell Brown
+ * Author: Walker M. White && Dashiell Brown && Omar Abdelaziz
  * Based on original PhysicsDemo Lab by Don Holden, 2007
  * LibGDX version, 2/6/2015
  */
@@ -24,6 +24,7 @@ import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 import com.badlogic.gdx.utils.Array;
 
 import edu.cornell.gdiac.util.*;
@@ -42,6 +43,7 @@ import edu.cornell.gdiac.downstream.models.TetherModel.TetherType;
  * place nicely with the static assets.
  */
 public class DownstreamController extends WorldController implements ContactListener, Screen, InputProcessor{
+	//Texture References//
 	/** Reference to the fish texture */
 	private static final String KOI_TEXTURE = "koi/koi.png";
 	/** Reference to the lilypad texture  */
@@ -53,21 +55,22 @@ public class DownstreamController extends WorldController implements ContactList
 	/** Reference to the lighting texture */
 	private static final String LIGHTING_TEXTURE = "tethers/aura.png";
 	/** Reference to the repeating land texture */
-	private static final String EARTH_FILE = "terrain/swirl_grass.png";
+
+	private static final String EARTH_FILE = "terrain/repeat tile.png";
+	private static final String EARTH_FILE_N = "terrain/Grass_night.jpg";
+	private static final String EARTH_FILE_D = "terrain/Grass_day.jpg";
+	private static final String EARTH_FILE_S = "terrain/Grass_sunset.jpg";
+
 	/** Reference to the whirlpool texture */
 	private static final String WHIRLPOOL_TEXTURE = "terrain/whirlpool.png";
 	/** Reference to the flipped whirlpool texture */
 	private static final String WHIRLPOOL_FLIP_TEXTURE = "terrain/whirlpool_flip.png";
-
-	/** References to sounds */
-	private static final String CLICK_SOUND = "SOUNDS/menu_click.wav";
-	private static final String LIGHTING_SOUND = "SOUNDS/lighting_1.mp3";
-	private static final String DEATH_SOUND = "SOUNDS/fish_death.wav";
-	
+	/** HUD textures */
 	private static final String ENERGYBAR_TEXTURE = "MENUS/UI_bar.png";
 	private static final String UI_FLOWER = "MENUS/UI_lotus.png";
 	private static final String OVERLAY = "terrain/texture.jpg";
-
+	
+	//TextureRegions//
 	/** Texture assets for the koi */
 	private TextureRegion koiTexture;
 	/** Texture assets for lilypads */
@@ -80,16 +83,25 @@ public class DownstreamController extends WorldController implements ContactList
 	private TextureRegion lightingTexture;
 	/** Texture assets for walls and platforms */
 	private TextureRegion earthTile;
+	
+	private TextureRegion earthTileDay;
+	private TextureRegion earthTileNight;
+	private TextureRegion earthTileSunset;
+	
+	
 	/** Texture assets for whirlpools */
 	private TextureRegion whirlpoolTexture;
 	private TextureRegion whirlpoolFlipTexture;
-	
+	/** Texture assets for HUD */
 	private TextureRegion energyBarTexture;
 	private TextureRegion UILotusTexture;
-
+	
+	/** The HUD */
+	public HUDitems HUD;
+	
+	//Game States//
 	/** Track asset loading from all instances and subclasses */
 	private AssetState fishAssetState = AssetState.EMPTY;
-	
 	/** Pause menu and button states */
 	public PauseMenuMode pauseMenu;
 	private int backState;
@@ -98,73 +110,98 @@ public class DownstreamController extends WorldController implements ContactList
 	private int optionsState;
 	private boolean wasPaused;
 	private boolean paused;
-	
-
 	private boolean dead;
 	private boolean whirled;
-
 	private float PLAYER_LINEAR_VELOCITY = 6f;
-
 	private boolean enableSlow = false;
 	private boolean enableLeadingLine = false;
 	private boolean enableTetherRadius = true;
 	
+	//Sounds//
+	/** References to sounds */
+	private static final String LIGHTING_SOUND = "SOUNDS/lighting_1.mp3";
 	private Music deathSound;
 	
+	//Animations//
+	private float stateTime;  
+	private float relativeTime = 0;
+
+	private Animation lilyAnimation; // #3
+	private Texture lilySheet; // #4
+	private TextureRegion[] lilyFrames; // #5
+	private SpriteBatch lilyspriteBatch; // #6
+	private TextureRegion lilycurrentFrame; // #7
+
+	private Animation closedFlowerAnimation; // #3
+	private Texture closedFlowerSheet; // #4
+	private TextureRegion[] closedFlowerFrames; // #5
+	private SpriteBatch closedFlowerspriteBatch; // #6
+	private TextureRegion closedFlowercurrentFrame; // #7
+
+	private Animation openFlowerAnimation; // #3
+	private Texture openFlowerSheet; // #4
+	private TextureRegion[] openFlowerFrames; // #5
+	private SpriteBatch openFlowerspriteBatch; // #6
+	private TextureRegion openFlowercurrentFrame; // #7
+
+	private Animation openingFlowerAnimation; // #3
+	private Texture openingFlowerSheet; // #4
+	private TextureRegion[] openingFlowerFrames; // #5
+	private SpriteBatch openingFlowerspriteBatch; // #6
+	private TextureRegion openingFlowercurrentFrame; // #7
+
+	private Animation closingFlowerAnimation; // #3
+	private Texture closingFlowerSheet; // #4
+	private TextureRegion[] closingFlowerFrames; // #5
+	private SpriteBatch closingFlowerspriteBatch; // #6
+	private TextureRegion closingFlowercurrentFrame; // #7
+
+	private Animation koiSAnimation; // #3
+	private Texture koiSSheet; // #4
+	private TextureRegion[] koiSFrames; // #5
+	private SpriteBatch koiSspriteBatch; // #6
+	private TextureRegion koiScurrentFrame; // #7
+
+	private Animation koiCAnimation; // #3
+	private Texture koiCSheet; // #4
+	private TextureRegion[] koiCFrames; // #5
+	private SpriteBatch koiCspriteBatch; // #6
+	private TextureRegion koiCcurrentFrame; // #7
 	
-	//animations
+	private Animation koiCAnimationFlipped;
+	private TextureRegion[]	koiCFramesFlipped;
+	private TextureRegion KoiCcurrentFrameFlipped;
 	
-	float stateTime;  
-    float relativeTime = 0;
-    
+	// Physics constants for initialization //
+	/** Density of non-enemy objects */
+	private static final float BASIC_DENSITY   = 0.0f;
+	/** Density of the enemy objects */
+	private static final float ENEMY_DENSITY   = 1.0f;
+	/** Friction of non-enemy objects */
+	private static final float BASIC_FRICTION  = 0.1f;
+	/** Friction of the enemy objects */
+	private static final float ENEMY_FRICTION  = 0.3f;
+	/** Collision restitution for all objects */
+	private static final float BASIC_RESTITUTION = 0.1f;
+	private static final float TETHER_DENSITY = ENEMY_DENSITY;
+	private static final float TETHER_FRICTION = ENEMY_FRICTION;
+	private static final float TETHER_RESTITUTION = BASIC_RESTITUTION;
 
-	Animation                      	lilyAnimation;          // #3
-    Texture                         lilySheet;              // #4
-    TextureRegion[]                 lilyFrames;             // #5
-    SpriteBatch                     lilyspriteBatch;            // #6
-    TextureRegion                   lilycurrentFrame;           // #7
-    
-    Animation                      	closedFlowerAnimation;          // #3
-    Texture                         closedFlowerSheet;              // #4
-    TextureRegion[]                 closedFlowerFrames;             // #5
-    SpriteBatch                     closedFlowerspriteBatch;            // #6
-    TextureRegion                   closedFlowercurrentFrame;           // #7
-    
-    Animation                      	openFlowerAnimation;          // #3
-    Texture                         openFlowerSheet;              // #4
-    TextureRegion[]                 openFlowerFrames;             // #5
-    SpriteBatch                     openFlowerspriteBatch;            // #6
-    TextureRegion                   openFlowercurrentFrame;           // #7
-    
-    Animation                      	openingFlowerAnimation;          // #3
-    Texture                         openingFlowerSheet;              // #4
-    TextureRegion[]                 openingFlowerFrames;             // #5
-    SpriteBatch                     openingFlowerspriteBatch;            // #6
-    TextureRegion                   openingFlowercurrentFrame;           // #7
+	// Important game objects, lists, and controllers //
+	private ArrayList<TetherModel> tethers = new ArrayList<TetherModel>();
+	private ArrayList<TetherModel> lanterns = new ArrayList<TetherModel>();
+	private ArrayList<TetherModel> litlanterns = new ArrayList<TetherModel>();
+	private ArrayList<EnemyModel> enemies = new ArrayList<EnemyModel>();
+	private ArrayList<WhirlpoolModel> wpools = new ArrayList<WhirlpoolModel>();
+	private PlayerModel koi;
+	private EnemyModel eFish;
+	private CameraController cameraController;
+	private CollisionController collisionController;
+	private TetherModel closestTether;
+	private WhirlpoolModel closestWhirlpool;
+	private int litLotusCount;
 
-    Animation                      	closingFlowerAnimation;          // #3
-    Texture                         closingFlowerSheet;              // #4
-    TextureRegion[]                 closingFlowerFrames;             // #5
-    SpriteBatch                     closingFlowerspriteBatch;            // #6
-    TextureRegion                   closingFlowercurrentFrame;           // #7
     
-    Animation                      	koiSAnimation;          // #3
-    Texture                         koiSSheet;              // #4
-    TextureRegion[]                 koiSFrames;             // #5
-    SpriteBatch                     koiSspriteBatch;            // #6
-    TextureRegion                   koiScurrentFrame;           // #7
-    
-    Animation                      	koiCAnimation;          // #3
-    Texture                         koiCSheet;              // #4
-    TextureRegion[]                 koiCFrames;             // #5
-    SpriteBatch                     koiCspriteBatch;            // #6
-    TextureRegion                   koiCcurrentFrame;           // #7
-    
-    public HUDitems HUD;
-    
-    private Vector2 ll;
-    private Vector2 ur;
-
 
 	/**
 	 * Preloads the assets for this controller.
@@ -201,6 +238,14 @@ public class DownstreamController extends WorldController implements ContactList
 		manager.load(EARTH_FILE,Texture.class);
 		assets.add(EARTH_FILE);
 		
+		manager.load(EARTH_FILE_D,Texture.class);
+		assets.add(EARTH_FILE_D);
+		manager.load(EARTH_FILE_N,Texture.class);
+		assets.add(EARTH_FILE_N);
+		manager.load(EARTH_FILE_S,Texture.class);
+		assets.add(EARTH_FILE_S);
+		
+		
 		manager.load(WHIRLPOOL_TEXTURE, Texture.class);
 		assets.add(WHIRLPOOL_TEXTURE);
 		
@@ -215,16 +260,6 @@ public class DownstreamController extends WorldController implements ContactList
 		
 		manager.load(OVERLAY, Texture.class);
 		assets.add(OVERLAY);
-/*
-		manager.load(CLICK_SOUND, Sound.class);
-		assets.add(CLICK_SOUND);
-		
-		manager.load(LIGHTING_SOUND, Sound.class);
-		assets.add(LIGHTING_SOUND);
-		
-		manager.load(DEATH_SOUND, Sound.class);
-		assets.add(DEATH_SOUND);
-		*/
 	
 		super.preLoadContent(manager);
 	}
@@ -318,8 +353,8 @@ public class DownstreamController extends WorldController implements ContactList
         closingFlowerspriteBatch = new SpriteBatch(); 
         
         
-        cols = 9;
-        koiSSheet = new Texture(Gdx.files.internal("koi/straight koi spritesheet.png"));
+        cols = 12;
+        koiSSheet = new Texture(Gdx.files.internal("koi/Straight_Koi.png"));
         TextureRegion[][] tmpkoiS = TextureRegion.split(koiSSheet, koiSSheet.getWidth()/cols, koiSSheet.getHeight()/rows);              // #10
         koiSFrames = new TextureRegion[cols * rows];
         index = 0;
@@ -331,19 +366,27 @@ public class DownstreamController extends WorldController implements ContactList
         koiSAnimation = new Animation(.05f, koiSFrames); 
         koiSspriteBatch = new SpriteBatch(); 
         
-        cols = 11;
-        
-        koiCSheet = new Texture(Gdx.files.internal("koi/curved koi spritesheet.png"));
+        cols = 31;
+        //remeber kiddies, animate both directions
+        koiCSheet = new Texture(Gdx.files.internal("koi/curved_koi.png"));
         TextureRegion[][] tmpkoiC = TextureRegion.split(koiCSheet, koiCSheet.getWidth()/cols, koiCSheet.getHeight()/rows);              // #10
+        TextureRegion[][] tmpkoiCFlipped = TextureRegion.split(koiCSheet, koiCSheet.getWidth()/cols, koiCSheet.getHeight()/rows);              // #10
+        
         koiCFrames = new TextureRegion[cols * rows];
+        koiCFramesFlipped = new TextureRegion[cols * rows];
         index = 0;
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-            	koiCFrames[index++] = tmpkoiC[i][j];
+            	//tmpkoiC[i][j].flip(false, true);
+            	koiCFrames[index] = tmpkoiC[i][j];
+            	tmpkoiCFlipped[i][j].flip(false, true);
+            	koiCFramesFlipped[index++] = tmpkoiCFlipped[i][j];
             }
         }
         koiCAnimation = new Animation(.05f, koiCFrames); 
+        koiCAnimationFlipped = new Animation(.05f, koiCFramesFlipped);
         koiCspriteBatch = new SpriteBatch(); 
+        
 		
         
         energyBarTexture = createTexture(manager, ENERGYBAR_TEXTURE, false);
@@ -355,16 +398,13 @@ public class DownstreamController extends WorldController implements ContactList
 		lightingTexture = createTexture(manager, LIGHTING_TEXTURE, false);
 		UILotusTexture = createTexture(manager, UI_FLOWER, false);
 
-		earthTile = createTexture(manager,EARTH_FILE,true);
+		earthTile = createTexture(manager,EARTH_FILE_N,true);
+		earthTileDay = createTexture(manager,EARTH_FILE_D, true);
+		earthTileNight = createTexture(manager,EARTH_FILE_N, true);
+		earthTileSunset = createTexture(manager,EARTH_FILE_S, true);
 		
 		whirlpoolTexture = createTexture(manager,WHIRLPOOL_TEXTURE,false);
 		whirlpoolFlipTexture = createTexture(manager,WHIRLPOOL_FLIP_TEXTURE,false);
-/*
-		SoundController sounds = SoundController.getInstance();
-		sounds.allocate(manager,CLICK_SOUND);
-		sounds.allocate(manager, LIGHTING_SOUND);
-		sounds.allocate(manager, DEATH_SOUND);
-		*/
 		
 		deathSound = Gdx.audio.newMusic(Gdx.files.internal(LIGHTING_SOUND));
 		deathSound.setLooping(false);
@@ -372,45 +412,6 @@ public class DownstreamController extends WorldController implements ContactList
 		super.loadContent(manager);
 		fishAssetState = AssetState.COMPLETE;
 	}
-
-	// Physics constants for initialization
-	/** Density of non-enemy objects */
-	private static final float BASIC_DENSITY   = 0.0f;
-	/** Density of the enemy objects */
-	private static final float ENEMY_DENSITY   = 1.0f;
-	/** Friction of non-enemy objects */
-	private static final float BASIC_FRICTION  = 0.1f;
-	/** Friction of the enemy objects */
-	private static final float ENEMY_FRICTION  = 0.3f;
-	/** Collision restitution for all objects */
-	private static final float BASIC_RESTITUTION = 0.1f;
-	/** Threshold for generating sound on collision */
-	private static final float SOUND_THRESHOLD = 1.0f;
-
-	private static final float TETHER_DENSITY = ENEMY_DENSITY;
-	private static final float TETHER_FRICTION = ENEMY_FRICTION;
-	private static final float TETHER_RESTITUTION = BASIC_RESTITUTION;
-
-
-
-
-	private ArrayList<TetherModel> tethers = new ArrayList<TetherModel>();
-	private ArrayList<TetherModel> lanterns = new ArrayList<TetherModel>();
-	private ArrayList<TetherModel> litlanterns = new ArrayList<TetherModel>();
-	private ArrayList<EnemyModel> enemies = new ArrayList<EnemyModel>();
-	private ArrayList<WhirlpoolModel> wpools = new ArrayList<WhirlpoolModel>();
-	private double rot = 0;
-
-	
-	/** Reference to the player avatar */
-	private PlayerModel koi;
-
-	private EnemyModel eFish;
-	
-	private CameraController cameraController;
-	private CollisionController collisionController;
-	private TetherModel closestTether;
-	private int litLotusCount;
 
 	/**
 	 * Creates and initialize a new instance of Downstream
@@ -475,7 +476,7 @@ public class DownstreamController extends WorldController implements ContactList
 		float rad = lilyTexture.getRegionWidth()/scale.x/2;
 
 		boolean sensorTethers = true;
-
+		boolean sensorPools = true;
 
 		for (Vector2 lilypad : level.lilypads) {
 			TetherModel lily = new TetherModel(lilypad.x, lilypad.y, rad);
@@ -490,37 +491,22 @@ public class DownstreamController extends WorldController implements ContactList
 			addObject(lily);
 			tethers.add(lily);
 		}
-
-		boolean sensorPools = true;
 		
-		/*
-		WhirlpoolModel pool = new WhirlpoolModel(-2, -5);
-		pool.setBodyType(BodyDef.BodyType.StaticBody);
-		pool.setName("whirlpool" + 1);
-		pool.setDensity(TETHER_DENSITY);
-		pool.setRestitution(TETHER_RESTITUTION);
-		pool.setSensor(sensorPools);
-		pool.setDrawScale(scale);
-		pool.setTexture(whirlpoolFlipTexture);
-		addObject(pool);
-		wpools.add(pool);
-		
-		*/
-		/*
-		for (Vector2 whirlpool: level.wpools) {
-			WhirlpoolModel pool = new WhirlpoolModel(whirlpool.x, whirlpool.y);
-			pool.setBodyType(BodyDef.BodyType.StaticBody);
-			pool.setName("whirlpool" + 1);
-			pool.setDensity(TETHER_DENSITY);
-			pool.setFriction(TETHER_FRICTION);
-			pool.setRestitution(TETHER_RESTITUTION);
-			pool.setSensor(sensorPools);
-			pool.setDrawScale(scale);
-			pool.setTexture(whirlpoolFlipTexture);
-			addObject(pool);
-			wpools.add(pool);
+		if (!level.wpools.isEmpty()) {
+			for (Vector2 whirlpool : level.wpools) {
+				WhirlpoolModel pool = new WhirlpoolModel(whirlpool.x, whirlpool.y,1);
+				pool.setBodyType(BodyDef.BodyType.StaticBody);
+				pool.setName("whirlpool" + 1);
+				pool.setDensity(TETHER_DENSITY);
+				pool.setFriction(TETHER_FRICTION);
+				pool.setRestitution(TETHER_RESTITUTION);
+				pool.setSensor(sensorPools);
+				pool.setDrawScale(scale);
+				pool.setTexture(whirlpoolFlipTexture);
+				addObject(pool);
+				wpools.add(pool);
+			}
 		}
-		*/
 		for (Vector2 lotus : level.lotuses) {
 			TetherModel lantern = new TetherModel(lotus.x, lotus.y, rad, true);
 			lantern.setBodyType(BodyDef.BodyType.StaticBody);
@@ -581,7 +567,6 @@ public class DownstreamController extends WorldController implements ContactList
 
 		dwidth  = koiTexture.getRegionWidth()/scale.x;
 		dheight = koiTexture.getRegionHeight()/scale.y;
-		System.out.println(dwidth + " and " + dheight);
 		koi = new PlayerModel(level.player.x, level.player.y, dwidth, dheight);
 		koi.setDrawScale(scale);
 		koi.setName("koi");
@@ -602,9 +587,6 @@ public class DownstreamController extends WorldController implements ContactList
 		
 		HUD = new HUDitems(lanterns.size(), UILotusTexture, energyBarTexture, displayFont);
 		addHUD(HUD);
-		
-		ll = level.map.get(0);
-		ur = level.map.get(1);
 
 	}
 
@@ -645,9 +627,32 @@ public class DownstreamController extends WorldController implements ContactList
 			return;
 		}
 		closestTether = getClosestTether();
+		if (wpools.isEmpty()){
+			closestWhirlpool = null;
+		}
+		else{
+			closestWhirlpool = getClosestWhirl();
+		}
+		
+		// CHECK IF KOI WILL BE SUCKED INTO WHIRLPOOL //
+		Vector2 close;
+		Vector2 init;
+		if (closestWhirlpool != null) {
+			close = closestWhirlpool.getPosition();
+			init = koi.getInitialTangentPoint(close);
+			if (close.dst(koi.getPosition()) < WhirlpoolModel.WHIRL_DEFAULT_RANGE) {
+				koi.setWhirled(true);
+			}
+			if (koi.getPosition().sub(init).len2() < .01) {
+				koi.setWhirled(true);
+				koi.refreshWhirlForce(close, closestWhirlpool.getOrbitRadius());
+			} else {
+				koi.applyWhirlForce(close, closestWhirlpool.getOrbitRadius());
+			}
+		}
 		
 		// TETHER TOGGLE CODE
-		if (input.didTether()) {
+		if (input.didTether() && !isWhirled()) {
 			if(koi.isTethered() || koi.isAttemptingTether()){
 				koi.setTethered(false);					
 				koi.setAttemptingTether(false); 
@@ -671,9 +676,9 @@ public class DownstreamController extends WorldController implements ContactList
 				enemy.deactivatePhysics(world);
 			}
 		}
-
+		
 		// KOI VEOLOCITY CODE
-		if (isTethered()) {
+		if (isTethered() && !isWhirled()) {
 			koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*1.5f));
 		} else{
 			koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*2));
@@ -683,8 +688,8 @@ public class DownstreamController extends WorldController implements ContactList
 		closestTether.setTethered(isTethered() && closestTether.isLotus() && collisionController.inRangeOf(closestTether));
 
 		// TETHER FORCE CODE
-		Vector2 close = closestTether.getPosition();
-		Vector2 init = koi.getInitialTangentPoint(close);
+		close = closestTether.getPosition();
+		init = koi.getInitialTangentPoint(close);
 		if (close.dst(koi.getPosition()) > TetherModel.TETHER_DEFAULT_RANGE){
 			koi.setAttemptingTether(false);
 		}
@@ -702,20 +707,7 @@ public class DownstreamController extends WorldController implements ContactList
 		else {}
 		koi.applyTetherForce(close, closestTether.getOrbitRadius());
 
-		/*
-		WhirlpoolModel closestWhirlpool = getClosestWhirl();
-		
-		if (koi.getPosition().sub(koi.getInitialTangentPoint(closestWhirlpool.getPosition())).len2() < .01){
-			if (!koi.isWhirled()) {
-				koi.refreshWhirlForce(closestWhirlpool.getPosition(), closestWhirlpool.getOrbitRadius());
-			}
-			koi.applyWhirlForce(closestWhirlpool.getPosition(), closestWhirlpool.getOrbitRadius());
-			cameraController.moveCameraTowards(closestWhirlpool.getPosition().cpy().scl(scale));
-			if (camera_zoom) cameraController.zoomOut();
-			koi.setWhirled(true);
-		}
-		
-*/
+
 		// RESOLVE FISH IMG
 		koi.resolveDirection();
 		
@@ -745,15 +737,25 @@ public class DownstreamController extends WorldController implements ContactList
 		openFlowercurrentFrame = openFlowerAnimation.getKeyFrame(stateTime, true);
 		koiScurrentFrame = koiSAnimation.getKeyFrame(stateTime, true);
 		koiCcurrentFrame = koiCAnimation.getKeyFrame(stateTime, true);
+		KoiCcurrentFrameFlipped = koiCAnimationFlipped.getKeyFrame(stateTime, true);
+		
 		//FSM to handle Koi
-		/*if (koi.isTethered()){
-			koi.setTexture(koiCcurrentFrame);
-			//if (getClosestTether().)
+ 
+		//koiCcurrentFrame.flip(koi.left(closestTether), false);
+		if (koi.isTethered()){
+			koi.setCurved(true);
+			if (koi.left(closestTether)){
+				koi.setTexture(koiCcurrentFrame);
+			}
+			else{
+				koi.setTexture(KoiCcurrentFrameFlipped);
+			}
 		}
 		else{
+			koi.setCurved(false);
 			koi.setTexture(koiScurrentFrame);
-		}*/
-		koi.setTexture(koiScurrentFrame);
+		}
+		//koi.setTexture(koiCcurrentFrame);
 		
 		
 		//FSM to handle Lotus
@@ -844,18 +846,24 @@ public class DownstreamController extends WorldController implements ContactList
 		return closestTether;
 	}
 	
+	private boolean isWhirled(){
+		return koi.isWhirled();
+	}
 	
 	private WhirlpoolModel getClosestWhirl() {
-		WhirlpoolModel closestWhirl = wpools.get(0);
+		if(collisionController.inRangePool()){
+			return collisionController.getClosestWhirlpoolInRange();
+		}
+		WhirlpoolModel closestPool = wpools.get(0);
 		float closestDistance = wpools.get(0).getPosition().sub(koi.getPosition()).len2();
-		for(WhirlpoolModel w: wpools){
-			float newDistance = w.getPosition().sub(koi.getPosition()).len2();
-			if(newDistance < closestDistance){
+		for (WhirlpoolModel wp : wpools) {
+			float newDistance = wp.getPosition().sub(koi.getPosition()).len2();
+			if (newDistance < closestDistance) {
 				closestDistance = newDistance;
-				closestWhirl = w;
+				closestWhirlpool = wp;
 			}
 		}
-		return closestWhirl;
+		return closestWhirlpool;
 	}
 
 	public void draw(float delta) {
@@ -864,10 +872,7 @@ public class DownstreamController extends WorldController implements ContactList
 //		System.out.println("waspaused: " + wasPaused);
 
 		if (paused){
-//			if (paused)
-//				super.draw(delta);
 			pauseMenu.draw();
-			
 		}
 		else {
 			super.draw(delta);
@@ -875,8 +880,6 @@ public class DownstreamController extends WorldController implements ContactList
 			HUD.draw(canvas);
 			canvas.end();
 		}
-		
-		canvas.drawRectangle(ll, ur);
 
 	}
 	
@@ -891,6 +894,7 @@ public class DownstreamController extends WorldController implements ContactList
 	public void render(float delta) {
 		InputController input = InputController.getInstance();
 		if(wasPaused){
+			
 			paused =true;
 			
 		}
@@ -1004,20 +1008,6 @@ public class DownstreamController extends WorldController implements ContactList
 		cache.set(body1.getLinearVelocityFromWorldPoint(wp));
 		cache.sub(body2.getLinearVelocityFromWorldPoint(wp));
 		speed = cache.dot(worldManifold.getNormal());
-
-		/*
-		// Play a sound if above threshold
-		if (speed > SOUND_THRESHOLD) {
-			String s1 = ((Obstacle)body1.getUserData()).getName();
-			String s2 = ((Obstacle)body2.getUserData()).getName();
-			if (s1.equals("koi") || s1.startsWith("enemy") || s1.startsWith("tether")) {
-				SoundController.getInstance().play(s1, COLLISION_SOUND, false, 0.5f);
-			}
-			if (s2.equals("koi") || s2.startsWith("enemy") || s2.startsWith("tether")) {
-				SoundController.getInstance().play(s2, COLLISION_SOUND, false, 0.5f);
-			}
-		}
-		 */
 	}
 
 	//PAUSE MENU METHODS
