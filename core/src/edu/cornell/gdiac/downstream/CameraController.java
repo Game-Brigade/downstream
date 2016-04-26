@@ -92,6 +92,8 @@ public class CameraController {
 	
 	private void moveCameraTowards(Vector2 newPosition, float velocity) {
 		Vector2 difference = newPosition.cpy().sub(new Vector2(camera.position.x, camera.position.y));
+//		if (camera.position.x-Gdx.graphics.getWidth() < mapCenter.x - mapWidth/2) difference.x = 0;
+//		if (camera.position.x+Gdx.graphics.getWidth() > mapCenter.x + mapWidth/2) difference.x = 0;
 		if (difference.len() < velocity) {
 			camera.position.set(newPosition,0);
 		} else {

@@ -228,7 +228,7 @@ public class LevelEditor extends WorldController {
 	private boolean newClick;
 	private Vector2 currentClick;
 	
-	private static String filename = "test.json";
+	private static String filename = "0.json";
 	private boolean buildingLevel = false;
 	
 	private CameraController cameraController;
@@ -486,13 +486,6 @@ public class LevelEditor extends WorldController {
 	}
 	
 	private void saveToJson() {
-		String filename = "0.json";
-		try {
-			filename = getFileName();
-		} catch (IOException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		}
 		int n = 1;
 		Vector2 p = player;
 		Vector2 g = goal;
@@ -519,7 +512,6 @@ public class LevelEditor extends WorldController {
 	protected static Level loadFromJson() {
 		Gson gson = new Gson();
 		try {
-//			String filename = "testplease.json";
 			filename = getFileName();
 			JsonReader reader = new JsonReader(new FileReader(filename));
 			Level level = gson.fromJson(reader, Level.class);

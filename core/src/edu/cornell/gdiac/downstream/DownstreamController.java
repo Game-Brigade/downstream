@@ -869,17 +869,6 @@ public class DownstreamController extends WorldController implements ContactList
 			canvas.beginHUD();
 			HUD.draw(canvas);
 			canvas.end();
-			if (enableLeadingLine) {
-				Vector2 farOff = koi.getPosition().cpy();
-				farOff.add(koi.getLinearVelocity().cpy().scl(1000));
-				canvas.drawLeadingLine(koi.getPosition().cpy(), farOff);
-			}
-			if (enableTetherRadius) {
-				Vector2 closestTether = getClosestTether().getPosition().cpy().scl(scale);
-				Vector2 initialTangent = koi.getInitialTangentPoint(getClosestTether().getPosition()).scl(scale);
-				float radius = closestTether.dst(initialTangent);
-				canvas.drawTetherCircle(closestTether, TetherModel.TETHER_DEFAULT_RANGE * scale.x * .9f);
-			}
 		}
 
 
