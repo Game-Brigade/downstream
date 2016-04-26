@@ -222,14 +222,6 @@ public abstract class WorldController implements Screen {
 	
 	/** Exit code for quitting the game */
 	public static final int EXIT_QUIT = 0;
-	public static final int EXIT_LEVEL1 = 1;
-	public static final int EXIT_LEVEL2 = 2;
-	public static final int EXIT_LEVEL3 = 3;
-	public static final int EXIT_LEVEL4 = 4;
-	public static final int EXIT_LEVEL5 = 5;
-	public static final int EXIT_LEVEL6 = 6;
-	public static final int EXIT_LEVEL7 = 7;
-	public static final int EXIT_LEVEL8 = 8;
 	public static final int EXIT_MAIN = 9;
 	public static final int EXIT_SELECT = 10;
 	public static final int EXIT_PAUSE = 11;
