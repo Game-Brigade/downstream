@@ -82,6 +82,10 @@ public class GameCanvas {
 	/** Camera for the underlying SpriteBatch */
 	private OrthographicCamera camera;
 	
+	private OrthographicCamera hudCamera;
+	
+	private OrthographicCamera menuCamera;
+	
 	/** Value to cache window width (if we are currently full screen) */
 	int width;
 	/** Value to cache window height (if we are currently full screen) */
@@ -119,6 +123,16 @@ public class GameCanvas {
 		debugRender.setProjectionMatrix(camera.combined);
 		leadingLine.setProjectionMatrix(camera.combined);
 		tetherRadiusLine.setProjectionMatrix(camera.combined);
+		
+		hudCamera = new OrthographicCamera(getWidth(),getWidth());
+		hudCamera.position.set(0,0,0);
+		hudCamera.update();
+		hudCamera.setToOrtho(false);
+		
+		menuCamera = new OrthographicCamera(getWidth(),getWidth());
+		menuCamera.position.set(0,0,0);
+		menuCamera.update();
+		menuCamera.setToOrtho(false);
 		
 		// Initialize the cache objects
 		holder = new TextureRegion();
@@ -158,13 +172,21 @@ public class GameCanvas {
 		return camera;
 	}
 	
+	
+	
 	public void setViewportSize(float width, float height) {
 		camera.viewportWidth = width;
 		camera.viewportHeight = height;
+		hudCamera.viewportWidth = width;
+		hudCamera.viewportHeight = height;
+		menuCamera.viewportWidth = width;
+		menuCamera.viewportHeight = height;
 	}
 	
 	public void setCameraPosition(Vector2 newPosition) {
 		camera.position.set(newPosition, 0);
+		hudCamera.position.set(newPosition, 0);
+		menuCamera.position.set(newPosition,0);
 	}
 	
 	/**
@@ -390,6 +412,23 @@ public class GameCanvas {
 	 */
     public void begin() {
 		spriteBatch.setProjectionMatrix(camera.combined);
+    	spriteBatch.begin();
+    	active = DrawPass.STANDARD;
+    }
+    
+    /**
+	 * Start a standard drawing sequence.
+	 *
+	 * Nothing is flushed to the graphics card until the method end() is called.
+	 */
+    public void beginHUD() {
+		spriteBatch.setProjectionMatrix(hudCamera.combined);
+    	spriteBatch.begin();
+    	active = DrawPass.STANDARD;
+    }
+    
+    public void beginMENU() {
+    	spriteBatch.setProjectionMatrix(menuCamera.combined);
     	spriteBatch.begin();
     	active = DrawPass.STANDARD;
     }
@@ -921,6 +960,29 @@ public class GameCanvas {
 		GlyphLayout layout = new GlyphLayout(font,text);
 		font.draw(spriteBatch, layout, x, y);
     }
+    /***
+     * display hud in top left hand corner
+     * @param text
+     * @param font
+     * @param offset
+     */
+    public void drawHUDText(String text, BitmapFont font, float offset, TextureRegion lilypad){
+    	if (active != DrawPass.STANDARD) {
+			Gdx.app.error("GameCanvas", "Cannot draw without active begin()", new IllegalStateException());
+			return;
+		}
+    	
+    	float h = 100;
+    	float w = 100;
+    	GlyphLayout layout = new GlyphLayout(font,text);
+    	spriteBatch.draw(lilypad, (getWidth() - w/2)/1.1f - 14, (getHeight() - h/2)/1.1f + offset + 10, w, h);
+    	
+		float x = (getWidth()  - layout.width) / 1.1f;
+		float y = (getHeight() + layout.height) / 1.1f;
+		font.draw(spriteBatch, layout, x, y+offset);
+    }
+    
+    
 
     /**
      * Draws text centered on the screen.
@@ -1178,13 +1240,13 @@ public class GameCanvas {
 		local.translate(-ox,-oy);
 	}
 	
-	public void drawLeadingLine(Vector2 start, Vector2 end) {
+	public void drawLeadingLine(Vector2 start, Vector2 end, int width) {
 		start = start.cpy();
 		end = end.cpy();
-		Gdx.gl.glLineWidth(1);
+		Gdx.gl.glLineWidth(width);
         leadingLine.setProjectionMatrix(camera.combined);
         leadingLine.begin(ShapeRenderer.ShapeType.Line);
-        leadingLine.setColor(Color.WHITE);
+        leadingLine.setColor(Color.BLACK);
 //        local.applyTo(start);
 //        local.applyTo(end);
         leadingLine.line(start, end);
@@ -1192,13 +1254,25 @@ public class GameCanvas {
         Gdx.gl.glLineWidth(1);
     }
 	
+	public void drawLeadingLine(Vector2 start, Vector2 end) {
+		drawLeadingLine(start, end, 4);
+	}
+	
 	public void drawTetherCircle(Vector2 tetherPos, float radius) {
 		tetherRadiusLine.setProjectionMatrix(camera.combined);
 		tetherRadiusLine.begin(ShapeRenderer.ShapeType.Line);
 		tetherRadiusLine.setColor(Color.WHITE);
-//		System.out.println(tetherPos);
-//		System.out.println(radius);
 		tetherRadiusLine.circle(tetherPos.x, tetherPos.y, radius);
 		tetherRadiusLine.end();
+	}
+	
+	public void drawRectangle(Vector2 ll, Vector2 ur) {
+//		System.out.println("RECTANGLE BOYS");
+		ShapeRenderer rectangle = new ShapeRenderer();
+		rectangle.setProjectionMatrix(camera.combined);
+		rectangle.begin(ShapeRenderer.ShapeType.Line);
+		rectangle.setColor(Color.WHITE);
+		rectangle.rect(ll.x, ll.y, ur.x-ll.x, ur.y-ll.y);
+		rectangle.end();
 	}
 }

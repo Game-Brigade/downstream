@@ -1,5 +1,6 @@
 package edu.cornell.gdiac.downstream;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -9,6 +10,11 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -27,6 +33,7 @@ import edu.cornell.gdiac.downstream.WorldController.AssetState;
 import edu.cornell.gdiac.downstream.models.EnemyModel;
 import edu.cornell.gdiac.downstream.models.PlayerModel;
 import edu.cornell.gdiac.downstream.models.TetherModel;
+import edu.cornell.gdiac.downstream.models.WhirlpoolModel;
 import edu.cornell.gdiac.downstream.obstacle.PolygonObstacle;
 import edu.cornell.gdiac.util.SoundController;
 
@@ -40,7 +47,7 @@ public class LevelEditor extends WorldController {
 	private static final String ENEMY_TEXTURE = "enemy/enemy.png";
 	/** Reference to the Lantern asset image*/
 	private static final String LANTERN_TEXTURE = "tethers/notlit.png";
-	/** Reference to the Lightin Texture image */
+	/** Reference to the Lighting Texture image */
 	private static final String LIGHTING_TEXTURE = "tethers/aura.png";
 	/** Reference to the 4-sided land texture */
 	private static final String LAND_4SIDE_TEXTURE = "terrain/land.png";
@@ -55,7 +62,11 @@ public class LevelEditor extends WorldController {
 	/** Reference to the lotus texture */
 	private static final String LOTUS_TEXTURE= null;
 	/** Reference to the land texture */
-	private static String EARTH_FILE = "terrain/repeat tile.png";
+
+
+	private static final String EARTH_FILE = "terrain/swirl_grass.png";
+
+
 	
 	/** Reference to the whirlpool texture */
 	private static final String WHIRLPOOL_TEXTURE = "terrain/whirlpool.png";
@@ -74,6 +85,9 @@ public class LevelEditor extends WorldController {
 	private TextureRegion lightingTexture;
 	/** Texture assets for the land */
 	private TextureRegion earthTile;
+	/** Texture assets for the whirlpools */
+	private TextureRegion whirlpoolTexture;
+	private TextureRegion whirlpoolFlipTexture;
 	
 
 
@@ -166,6 +180,9 @@ public class LevelEditor extends WorldController {
 		lanternTexture = createTexture(manager, LANTERN_TEXTURE, false);
 		lightingTexture = createTexture(manager, LIGHTING_TEXTURE, false);
 		earthTile = createTexture(manager,EARTH_FILE,true);
+		whirlpoolTexture = createTexture(manager, WHIRLPOOL_TEXTURE, false);
+		whirlpoolFlipTexture = createTexture(manager, WHIRLPOOL_FLIP_TEXTURE, false);
+		
 
 		SoundController sounds = SoundController.getInstance();
 		//sounds.allocate(manager,MAIN_FIRE_SOUND);
@@ -196,9 +213,10 @@ public class LevelEditor extends WorldController {
 	private ArrayList<Vector2> lilypads;
 	private ArrayList<Vector2> lanterns;
 	private ArrayList<Vector2> wpools;
-	private HashMap<Vector2,ArrayList<Vector2>> enemies;
+	private HashMap<String,ArrayList<Vector2>> enemies;
 	private Vector2 player;
 	private ArrayList<ArrayList<Vector2>> walls;
+	private ArrayList<Vector2> mapArea;
 	private Vector2 goal;
 	
 	private PlayerModel koi;
@@ -209,8 +227,11 @@ public class LevelEditor extends WorldController {
 	private Vector2 currentEnemy;
 	private ArrayList<Vector2> enemyPath;
 	private ArrayList<Vector2> wallPath;
-	private Vector2 lastClick;
+	private boolean newClick;
 	private Vector2 currentClick;
+	
+	private static String filename = null;
+	private boolean buildingLevel = false;
 	
 	private CameraController cameraController;
 	
@@ -224,12 +245,21 @@ public class LevelEditor extends WorldController {
 		cameraController = new CameraController(canvas.getCamera());
 		lilypads = new ArrayList<Vector2>();
 		lanterns = new ArrayList<Vector2>();
-		enemies = new HashMap<Vector2,ArrayList<Vector2>>();
+		enemies = new HashMap<String,ArrayList<Vector2>>();
 		enemyPath = new ArrayList<Vector2>();
 		walls = new ArrayList<ArrayList<Vector2>>();
 		wpools = new ArrayList<Vector2>();
-		lastClick = new Vector2();
-		currentClick = new Vector2();
+		newClick = false;
+		currentClick = new Vector2(0,0);
+		mapArea = new ArrayList<Vector2>();
+		
+		boolean loadFile = true;
+		buildingLevel = loadFile;
+		if (loadFile) {
+			loadPartialLevel();
+		}
+		buildingLevel = false;
+		
 	}
 	
 	@Override
@@ -247,55 +277,61 @@ public class LevelEditor extends WorldController {
 		
 		didEnter = input.didEnter() || didEnter;
 		
-		if (input.didEnter() && settingEnemyPath) addEnemy(true);
-		if (input.didEnter() && settingWallPath) addWall(true);
+		if (input.didEnter() && settingEnemyPath) addEnemy(null,true);
+		if (input.didEnter() && settingWallPath) addWall(null,true);
 		
 		if (input.isZoomIn()) 		cameraController.zoomInBoundless();
 		else if (input.isZoomOut()) cameraController.zoomOutBoundless();
 		cameraController.handleArrowKeys(input.getUp(), input.getDown(), input.getLeft(), input.getRight());
 		
 		handleClick: if (input.getClick() != null) {
-			System.out.println("AYY BITCH");
-			if (input.getSelection() == null) break handleClick;
+			if (input.getSelection() == null) break handleClick;	
+			updateClicks();
 			switch (input.getSelection()) {
 				case Lilypad: 
-					addLilypad();
+					addLilypad(currentClick);
 					return;
 				case Lantern:
-					addLantern();
+					addLantern(currentClick);
 					return;
 				case Enemy:
-					addEnemy(didEnter);
+					addEnemy(currentClick,didEnter);
 					return;
 				case Player:
-					addPlayer();
+					addPlayer(currentClick);
 					return;
 				case Wall:
-					addWall(didEnter);
+					System.out.println(newClick);
+					addWall(currentClick,didEnter);
+					return;
+				case MapArea:
+					addMapArea(currentClick);
 					return;
 				case Goal:
-					addGoal();
+					addGoal(currentClick);
 					return;
+				case WhirlpoolCCW:
+					addWhirlpool(currentClick, 1);
+					return;
+				case WhirlpoolCW:
+					addWhirlpool(currentClick, -1);
+					
 			}
 		}
-		
+//		System.out.println("please");
 		// we can create walls by holding and dragging
 		if (input.leftClickHeldDown() && 
 			input.getSelection() != null && 
 			input.getSelection() == SelectionType.Wall) {
-			System.out.println("wtf");
-			//timer
-			addWall(didEnter);
+			updateClicks();
+			addWall(currentClick,didEnter);
 		}
-		
-		
 	}
 	
-	private void addLilypad() {
-		updateClicks();
-		lilypads.add(currentClick);
+	private void addLilypad(Vector2 click) {
+		lilypads.add(click.cpy());
 		float rad = lilyTexture.getRegionWidth()/scale.x/2;
-		TetherModel lily = new TetherModel(currentClick.x, currentClick.y, rad);
+		TetherModel lily = new TetherModel(click.x, click.y, rad);
 		lily.setBodyType(BodyDef.BodyType.StaticBody);
 		lily.setName("lily"+ 1);
 		lily.setDensity(TETHER_DENSITY);
@@ -308,11 +344,32 @@ public class LevelEditor extends WorldController {
 		addObject(lily);
 	}
 	
-	private void addLantern() {
-		updateClicks();
-		lanterns.add(currentClick);
+
+	private void addWhirlpool(Vector2 click, int dir){
+		
+		wpools.add(click.cpy());
+		WhirlpoolModel pool = new WhirlpoolModel(currentClick.x, currentClick.y, dir);
+		pool.setBodyType(BodyDef.BodyType.StaticBody);
+		pool.setName("whirlpool" + 1);
+		pool.setDensity(TETHER_DENSITY);
+		pool.setFriction(TETHER_FRICTION);
+		pool.setRestitution(TETHER_RESTITUTION);
+		pool.setSensor(false);
+		pool.setDrawScale(scale);
+		if(dir == -1){
+			pool.setTexture(whirlpoolTexture);
+		}
+		else{
+			pool.setTexture(whirlpoolFlipTexture);
+		}
+		addObject(pool);
+	}
+	
+
+	private void addLantern(Vector2 click) {
+		lanterns.add(click.cpy());
 		float rad = lilyTexture.getRegionWidth()/scale.x/2;
-		TetherModel lantern = new TetherModel(currentClick.x, currentClick.y, rad, true);
+		TetherModel lantern = new TetherModel(click.x, click.y, rad, true);
 		lantern.setBodyType(BodyDef.BodyType.StaticBody);
 		lantern.setName("lantern"+ 1);
 		lantern.setDensity(TETHER_DENSITY);
@@ -326,26 +383,25 @@ public class LevelEditor extends WorldController {
 		addObject(lantern);
 	}
 	
-	private void addEnemy(boolean enter) {
+	private void addEnemy(Vector2 click, boolean enter) {
 		if (enter) {
 			settingEnemyPath = false;
 			didEnter = false;
-			enemies.put(currentEnemy, enemyPath);
+			enemies.put(currentEnemy.toString(), enemyPath);
 			return;
 		}
-		updateClicks();
 		if (settingEnemyPath) {
-			enemyPath.add(currentClick.cpy().scl(scale));
+			enemyPath.add(click.cpy().scl(scale));
 			return;
 		}
 		settingEnemyPath = true;
-		currentEnemy = currentClick;
+		currentEnemy = click.cpy();
 		enemyPath = new ArrayList<Vector2>();
-		enemyPath.add(currentClick.cpy().scl(scale));
+		enemyPath.add(click.cpy().scl(scale));
 		TextureRegion etexture = enemyTexture;
 		float dwidth  = etexture.getRegionWidth()/scale.x;
 		float dheight = etexture.getRegionHeight()/scale.y;
-		EnemyModel eFish = new EnemyModel(currentClick.x, currentClick.y, dwidth, dheight);
+		EnemyModel eFish = new EnemyModel(click.x, click.y, dwidth, dheight);
 		eFish.setDensity(ENEMY_DENSITY);
 		eFish.setFriction(ENEMY_FRICTION);
 		eFish.setRestitution(BASIC_RESTITUTION);
@@ -358,13 +414,12 @@ public class LevelEditor extends WorldController {
 		addObject(eFish);
 	}
 	
-	private void addPlayer() {
-		updateClicks();
-		player = currentClick;
+	private void addPlayer(Vector2 click) {
+		player = click.cpy();
 		if (koi != null) removeObject(koi);
 		float dwidth  = koiTexture.getRegionWidth()/scale.x;
 		float dheight = koiTexture.getRegionHeight()/scale.y;
-		koi = new PlayerModel(currentClick.x, currentClick.y, dwidth, dheight);
+		koi = new PlayerModel(click.x, click.y, dwidth, dheight);
 		koi.setDrawScale(scale);
 		koi.setName("koi");
 		koi.setTexture(koiTexture);
@@ -372,10 +427,8 @@ public class LevelEditor extends WorldController {
 		addObject(koi);
 	}
 	
-	private void addWall(boolean enter) {
-		System.out.println("fucking tilted");
+	private void addWall(Vector2 click, boolean enter) {
 		if (enter) {
-			System.out.println("ENTER BOYS");
 			settingWallPath = false;
 			didEnter = false;
 			walls.add(wallPath);
@@ -387,7 +440,6 @@ public class LevelEditor extends WorldController {
 			}
 			float[] wallFloat = new float[wall.size()];
 			for (int i = 0; i < wall.size(); i++) wallFloat[i] = wall.get(i);
-//			System.out.println(Arrays.toString(wallFloat));
 			if (wallFloat.length == 0) return;
 			System.out.println(Arrays.toString(wallFloat));
 			obj = new PolygonObstacle(wallFloat, 0, 0);
@@ -401,21 +453,35 @@ public class LevelEditor extends WorldController {
 			addObject(obj);
 			return;
 		}
-		if (!updateClicks()) return;
+		System.out.println("Not building leveL: " + !buildingLevel);
+		System.out.println("Not new click: " + !newClick);
+		if (!newClick && !buildingLevel) return;
 		if (settingWallPath) {
-			wallPath.add(currentClick.cpy().scl(scale));
+			if (wallPath.get(wallPath.size()-1) != click) wallPath.add(click.cpy().scl(scale));
 			return;
 		}
 		settingWallPath = true;
 		wallPath = new ArrayList<Vector2>();
-		wallPath.add(currentClick.cpy().scl(scale));
+		wallPath.add(click.cpy().scl(scale));
+	}
+	
+	private void addMapArea(Vector2 click) {
+		switch (mapArea.size()) {
+			case 0:
+			case 1:
+				mapArea.add(click.cpy().scl(scale));
+				return;
+			case 2:
+			default:
+				mapArea.clear();
+				mapArea.add(click.cpy().scl(scale));
+				return;
+		}
 	}
 
-	private void addGoal() {
-//		System.out.println("IN GOAL");
+	private void addGoal(Vector2 click) {
 		goal = new Vector2(0,0);
 		saveToJson();
-//		loadFromJson();
 	}
 	
 	private void drawPaths() {
@@ -424,30 +490,43 @@ public class LevelEditor extends WorldController {
 		for (ArrayList<Vector2> path : enemies.values()) {
 			drawPath(path);
 		}
-		/*
 		for (ArrayList<Vector2> path : walls) {
 			drawPath(path);
 		}
-		*/
+		if (mapArea.size() == 2) canvas.drawRectangle(mapArea.get(0), mapArea.get(1));
 	}
 	
 	private void drawPath(ArrayList<Vector2> path) {
 		for (int i = 0; i < path.size() - 1; i++) {
 			canvas.drawLeadingLine(path.get(i), path.get(i+1));
 		}
+		canvas.drawLeadingLine(path.get(0), path.get(path.size()-1));
+	}
+	
+	private boolean updateClicks() {
+		Vector3 click3 = canvas.getCamera().unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
+		Vector2 temp = new Vector2(click3.x/scale.x, click3.y/scale.y);
+		if (temp.dst2(currentClick) > 0.5) {
+			newClick = true;
+			currentClick.x = temp.x; currentClick.y = temp.y;
+			return true;
+		}
+		newClick = false;
+		return false;
 	}
 	
 	private void saveToJson() {
-		String filename = "level3.json";
 		int n = 1;
 		Vector2 p = player;
 		Vector2 g = goal;
-		HashMap<Vector2,ArrayList<Vector2>> e = enemies;
+		HashMap<String,ArrayList<Vector2>> e = enemies;
 		ArrayList<Vector2> li = lilypads;
 		ArrayList<Vector2> lo = lanterns;
 		ArrayList<ArrayList<Vector2>> w = walls;
-		Level level = new Level(n,p,g,e,li,lo,w);
+		ArrayList<Vector2> wp = wpools;
+		ArrayList<Vector2> m = mapArea;
 		
+		Level level = new Level(n,p,g,e,li,lo,w,wp,m);
 		try {
 			Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		    System.setOut(new PrintStream(new FileOutputStream(filename)));
@@ -458,21 +537,11 @@ public class LevelEditor extends WorldController {
 		}
 	}
 	
-	private boolean updateClicks() {
-		Vector3 click3 = canvas.getCamera().unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
-		Vector2 temp = new Vector2(click3.x/scale.x, click3.y/scale.y);
-		if (temp.dst2(currentClick) > 0.1) {
-			lastClick = currentClick.cpy();
-			currentClick.x = temp.x; currentClick.y = temp.y;
-			return true;
-		}	
-		return false;
-	}
-	
 	protected static Level loadFromJson() {
 		Gson gson = new Gson();
 		try {
-			JsonReader reader = new JsonReader(new FileReader("level1.json"));
+			if (filename == null) filename = getFileName();
+			JsonReader reader = new JsonReader(new FileReader(filename));
 			Level level = gson.fromJson(reader, Level.class);
 //			System.out.println(level);
 			return level;
@@ -493,31 +562,97 @@ public class LevelEditor extends WorldController {
 		return (int) (System.currentTimeMillis() % period);
 	}
 	
+	private void loadPartialLevel() {
+		buildingLevel = true;
+		Level level = loadFromJson();
+		if (level == null) return;
+		ArrayList<ArrayList<Vector2>> tempWalls = new ArrayList<ArrayList<Vector2>>();
+		for (int i = 0; i < level.walls.size(); i++) {
+			ArrayList<Vector2> wall = new ArrayList<Vector2>();
+			for (int j = 0; j < level.walls.get(i).size(); j+=2) {
+				wall.add(new Vector2(level.walls.get(i).get(j),
+									 level.walls.get(i).get(j+1)));
+			}
+			tempWalls.add(wall);
+		}
+		if (level.player != null) {
+			addPlayer(level.player);
+		}
+		if (level.map != null) {
+			mapArea = level.map;
+		}
+		for (Vector2 lilypad : level.lilypads) {
+			addLilypad(lilypad);
+		}
+		for (Vector2 lotus : level.lotuses) {
+			addLantern(lotus);
+		}
+		for (ArrayList<Vector2> wall : tempWalls) {
+			settingWallPath = false;
+			for (Vector2 vertex : wall) {
+				addWall(vertex, false);
+			}
+			addWall(null,true);
+		}
+		for (String enemy : level.enemiesLevel.keySet()) {
+			addEnemy(vectorOfString(enemy), false);
+			for (Vector2 waypoint : level.enemiesLevel.get(enemy)) {
+				addEnemy(waypoint,false);
+			}
+			addEnemy(null,true);
+		}
+		buildingLevel = false;
+	}
+	
+	private static String getFileName() throws IOException {
+	    JFileChooser fileChooser = new JFileChooser();
+	    fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
+	    int result = fileChooser.showOpenDialog(new JFrame());
+	    if (result == JFileChooser.APPROVE_OPTION) {
+	      File selectedFile = fileChooser.getSelectedFile();
+	      
+	      String abs = selectedFile.getAbsolutePath();
+	      int lfs = abs.lastIndexOf("/") + 1;
+	      return abs.substring(lfs);
+	    }
+	    return null;
+	}
+	
 	public class Level {
 		int number;
 		Vector2 player;
 		Vector2 goal;
-		HashMap<String,ArrayList<Vector2>> enemies;
+		HashMap<String,ArrayList<Vector2>> enemiesLevel;
 		ArrayList<Vector2> lilypads;
 		ArrayList<Vector2> lotuses;
 		ArrayList<ArrayList<Float>> walls;
+
+		ArrayList<Vector2> wpools;
+
+		ArrayList<Vector2> map;
+
 		
 		private Level(int n, Vector2 p, Vector2 g, 
-					  HashMap<Vector2,ArrayList<Vector2>> e,
+					  HashMap<String,ArrayList<Vector2>> e,
 					  ArrayList<Vector2> li,
 					  ArrayList<Vector2> lo,
-					  ArrayList<ArrayList<Vector2>> w) {
+					  ArrayList<ArrayList<Vector2>> w, ArrayList<Vector2> wp, ArrayList<Vector2> m) {
+//			System.out.println(e.values());
+
+
 			number = n;
 			player = p;
 			goal = g;
-			enemies = new HashMap<String,ArrayList<Vector2>>();
-			for (Vector2 enemy : e.keySet()) {
-				for (Vector2 v : e.get(enemy)) v.scl(1/scale.x,1/scale.y);
-				enemies.put(enemy.toString(), e.get(enemy));
+			enemiesLevel = new HashMap<String,ArrayList<Vector2>>();
+			for (String enemy : e.keySet()) {
+				ArrayList<Vector2> enemyPath = new ArrayList<Vector2>();
+				for (Vector2 v : e.get(enemy)) enemyPath.add(v.cpy().scl(1/scale.x,1/scale.y));
+				enemiesLevel.put(enemy, enemyPath);
 				
 			}
 			lilypads = li;
 			lotuses = lo;
+			wpools = wp;
 			walls = new ArrayList<ArrayList<Float>>();
 			for (ArrayList<Vector2> vectorList : w) {
 				ArrayList<Float> floatList = new ArrayList<Float>();
@@ -527,16 +662,8 @@ public class LevelEditor extends WorldController {
 				}
 				walls.add(floatList);
 			}
+			map = m;
 		}
-		
-//		public String toString() {
-//			return "Number: " + number + "\n" +
-//				   "Player: " + player + "\n" +
-//				   "Goal: " + goal + "\n" +
-//				   "Enemies: " + enemies + "\n" +
-//				   "Lilypads: " + lilypads + "\n" +
-//				   "Lotuses: " + lotuses;
-//		}
 		
 	}
 	

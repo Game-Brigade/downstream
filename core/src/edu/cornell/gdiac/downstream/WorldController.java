@@ -29,6 +29,7 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.graphics.g2d.freetype.*;
 
 import edu.cornell.gdiac.util.*;
+import edu.cornell.gdiac.downstream.models.TetherModel;
 import edu.cornell.gdiac.downstream.obstacle.*;
 
 /**
@@ -66,11 +67,14 @@ public abstract class WorldController implements Screen {
 	
 	// Pathnames to shared assets
 	/** The background image for the battle */
-	private static final String BACKGROUND_FILE = "terrain/water.png";
+	private static final String BACKGROUND_FILE_N = "terrain/Water_Day.jpg";
+	private static final String BACKGROUND_FILE_D = "terrain/Water_Day.jpg";
+	private static final String BACKGROUND_FILE_S = "terrain/Water_Sunset.jpg";
+	private static final String OVERLAY_FILE = "terrain/texture.jpg";
 	
 
 	/** Retro font for displaying messages */
-	private static String FONT_FILE = "loading/RetroGame.ttf";
+	private static String FONT_FILE = "loading/marathon.ttf";
 	private static int FONT_SIZE = 64;
 
 
@@ -78,6 +82,8 @@ public abstract class WorldController implements Screen {
 	protected BitmapFont displayFont;
 	/** The background image for the battle */
 	private static Texture background; 
+	private static Texture overlay;
+	private Color referenceC = Color.WHITE.cpy();
 
 	/**
 	 * Preloads the assets for this controller.
@@ -96,8 +102,19 @@ public abstract class WorldController implements Screen {
 		
 		worldAssetState = AssetState.LOADING;
 
-		manager.load(BACKGROUND_FILE, Texture.class);
-		assets.add(BACKGROUND_FILE);
+		manager.load(BACKGROUND_FILE_N, Texture.class);
+		assets.add(BACKGROUND_FILE_N);
+		
+		manager.load(BACKGROUND_FILE_D, Texture.class);
+		assets.add(BACKGROUND_FILE_D);
+		
+		manager.load(BACKGROUND_FILE_S, Texture.class);
+		assets.add(BACKGROUND_FILE_S);
+		
+		manager.load(OVERLAY_FILE, Texture.class);
+		assets.add(OVERLAY_FILE);
+		
+		referenceC.a = .3f;
 		
 		// Load the font
 		FreetypeFontLoader.FreeTypeFontLoaderParameter size2Params = new FreetypeFontLoader.FreeTypeFontLoaderParameter();
@@ -124,8 +141,11 @@ public abstract class WorldController implements Screen {
 		
 		// Allocate the tiles
 
-		setBackground(manager.get(BACKGROUND_FILE, Texture.class));
+		setBackground(manager.get(BACKGROUND_FILE_N, Texture.class));
 		getBackground().setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
+		
+		overlay = manager.get(OVERLAY_FILE, Texture.class);
+		overlay.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
 		
 		// Allocate the font
 		if (manager.isLoaded(FONT_FILE)) {
@@ -210,8 +230,11 @@ public abstract class WorldController implements Screen {
 	public static final int EXIT_MAIN = 3;
 	/** Exit code for first level */
 	public static final int EXIT_PLAY = 4;
+	
 	public static final int EXIT_SELECT = 5;
 	public static final int EXIT_EDIT = 6;
+	public static final int EXIT_OPTIONS = 7;
+	public static final int EXIT_PAUSE = 8;
     /** How many frames after winning/losing do we continue? */
 	public static final int EXIT_COUNT = 120;
 
@@ -236,7 +259,9 @@ public abstract class WorldController implements Screen {
 	/** Queue for adding objects */
 	protected PooledList<Obstacle> addQueue = new PooledList<Obstacle>();
 	/** Listener that will update the player mode when we are done */
-	private ScreenListener listener;
+	protected ScreenListener listener;
+	
+	protected HUDitems HUD;
 
 	/** The Box2D world */
 	protected World world;
@@ -246,7 +271,7 @@ public abstract class WorldController implements Screen {
 	protected Vector2 scale;
 	
 	/** Whether or not this is an active controller */
-	private boolean active;
+	public boolean active;
 	/** Whether we have completed this level */
 	private boolean complete;
 	/** Whether we have failed at this world (and need a reset) */
@@ -255,6 +280,7 @@ public abstract class WorldController implements Screen {
 	private boolean debug;
 	/** Countdown active for winning or losing */
 	private int countdown;
+	
 
 	/**
 	 * Returns true if debug mode is active.
@@ -459,6 +485,10 @@ public abstract class WorldController implements Screen {
 		objects.remove(obj);
 		obj.deactivatePhysics(world);
 	}
+	
+	protected void addHUD(HUDitems h){
+		HUD = h;
+	}
 
 	/**
 	 * Returns true if the object is in bounds.
@@ -529,7 +559,7 @@ public abstract class WorldController implements Screen {
 				listener.exitScreen(this, EXIT_NEXT);
 				return false;
 			}
-		}
+		} 
 		return true;
 	}
 	
@@ -595,14 +625,22 @@ public abstract class WorldController implements Screen {
 		canvas.begin();
 		for (int i = -5; i < 5; i++) {
 			for (int j = -5; j < 5; j++) {
-				canvas.draw(getBackground(), Color.WHITE, canvas.getWidth()*i, canvas.getHeight()*j, 
-													 canvas.getWidth(),   canvas.getHeight());
+
+				canvas.draw(getBackground(), Color.WHITE, canvas.getWidth()*i * 2, canvas.getHeight()*j * 2, 
+													 canvas.getWidth() * 2,   canvas.getHeight() * 2);
 			}
 		}
 //		canvas.draw(background, Color.WHITE, 0, 0, canvas.getWidth(), canvas.getHeight());
 		//canvas.draw(rocks, Color.WHITE, 0, 0, canvas.getWidth(), canvas.getHeight());
 		for(Obstacle obj : objects) {
 			obj.draw(canvas);
+		}
+		
+		for (int i = -5; i < 5; i++) {
+			for (int j = -5; j < 5; j++) {
+				canvas.draw(overlay, referenceC, canvas.getWidth()*i, canvas.getHeight()*j, 
+						 canvas.getWidth(),   canvas.getHeight());
+			}
 		}
 		
 		canvas.end();
@@ -615,6 +653,8 @@ public abstract class WorldController implements Screen {
 			canvas.endDebug();
 		}
 		
+		
+		
 		// Final message
 		if (complete && !failed) {
 			displayFont.setColor(Color.YELLOW);
@@ -622,7 +662,7 @@ public abstract class WorldController implements Screen {
 			canvas.drawTextCentered("VICTORY!", displayFont, 0.0f);
 			canvas.end();
 		} else if (failed) {
-			displayFont.setColor(Color.RED);
+			//displayFont.setColor(Color.RED);
 			canvas.begin(); // DO NOT SCALE
 			canvas.drawTextCentered("FAILURE!", displayFont, 0.0f);
 			canvas.end();
@@ -651,10 +691,12 @@ public abstract class WorldController implements Screen {
 	 * @param delta Number of seconds since last animation frame
 	 */
 	public void render(float delta) {
+		InputController input = InputController.getInstance();
 		if (active) {
 			if (preUpdate(delta)) {
-				update(delta); // This is the one that must be defined.
-				postUpdate(delta);
+					update(delta); // This is the one that must be defined.
+					postUpdate(delta);
+				
 			}
 			draw(delta);
 		}
@@ -710,6 +752,17 @@ public abstract class WorldController implements Screen {
 
 	public static void setBackground(Texture background) {
 		WorldController.background = background;
+	}
+	
+	protected static Vector2 vectorOfString(String s) {
+		int comma = s.indexOf(",");
+		int openParens = s.indexOf("(");
+		int closeParens = s.indexOf(")");
+		String xstr = s.substring(openParens+1,comma);
+		String ystr = s.substring(comma+1,closeParens);
+		float x = Float.parseFloat(xstr);
+		float y = Float.parseFloat(ystr);
+		return new Vector2(x,y);
 	}
 
 }

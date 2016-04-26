@@ -1,13 +1,14 @@
 /*
  * FishController.java
  *
- * Author: Walker M. White && Dashiell Brown
+ * Author: Walker M. White && Dashiell Brown && Omar Abdelaziz
  * Based on original PhysicsDemo Lab by Don Holden, 2007
  * LibGDX version, 2/6/2015
  */
 package edu.cornell.gdiac.downstream;
 
 import java.util.ArrayList;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Stack;
@@ -15,12 +16,16 @@ import java.util.Stack;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.*;
 import com.badlogic.gdx.audio.*;
 import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 import com.badlogic.gdx.utils.Array;
 
 import edu.cornell.gdiac.util.*;
@@ -38,7 +43,8 @@ import edu.cornell.gdiac.downstream.models.TetherModel.TetherType;
  * This is the purpose of our AssetState variable; it ensures that multiple instances
  * place nicely with the static assets.
  */
-public class DownstreamController extends WorldController implements ContactListener {
+public class DownstreamController extends WorldController implements ContactListener, Screen, InputProcessor{
+	//Texture References//
 	/** Reference to the fish texture */
 	private static final String KOI_TEXTURE = "koi/koi.png";
 	/** Reference to the lilypad texture  */
@@ -49,31 +55,23 @@ public class DownstreamController extends WorldController implements ContactList
 	private static final String LANTERN_TEXTURE = "tethers/notlit.png";
 	/** Reference to the lighting texture */
 	private static final String LIGHTING_TEXTURE = "tethers/aura.png";
-	/** Reference to the 4-sided land texture */
-	private static final String LAND_4SIDE_TEXTURE = "terrain/repeat tile.png";
-	/** Reference to the left land texture */
-	private static final String LEFT_LAND_TEXTURE = "terrain/left-border.png";
-	/** Reference to the right land texture */
-	private static final String RIGHT_LAND_TEXTURE = "terrain/right-border.png";
-	/** Reference to the top land texture */
-	private static final String TOP_LAND_TEXTURE = "terrain/top-border.png";
-	/** Reference to the bottom land texture */
-	private static final String BOTTOM_LAND_TEXTURE = "terrain/bottom-border.png";
-	/** Reference to the lotus texture */
-	private static final String LOTUS_TEXTURE= null;
 	/** Reference to the repeating land texture */
+
 	private static final String EARTH_FILE = "terrain/repeat tile.png";
+	private static final String EARTH_FILE_N = "terrain/swirl_grass.png";
+	private static final String EARTH_FILE_D = "terrain/Grass_day.jpg";
+	private static final String EARTH_FILE_S = "terrain/Grass_sunset.jpg";
+
 	/** Reference to the whirlpool texture */
 	private static final String WHIRLPOOL_TEXTURE = "terrain/whirlpool.png";
 	/** Reference to the flipped whirlpool texture */
 	private static final String WHIRLPOOL_FLIP_TEXTURE = "terrain/whirlpool_flip.png";
-
-	/** References to sounds */
-	private static final String CLICK_SOUND = "SOUNDS/menu_click.wav";
-	private static final String LIGHTING_SOUND = "SOUNDS/lighting_1.mp3";
-	private static final String DEATH_SOUND = "SOUNDS/fish_death.wav";
-	private static final String BACKGROUND_SOUND = "SOUNDS/background_sound.mp3";
-
+	/** HUD textures */
+	private static final String ENERGYBAR_TEXTURE = "MENUS/UI_bar.png";
+	private static final String UI_FLOWER = "MENUS/UI_lotus.png";
+	private static final String OVERLAY = "terrain/texture.jpg";
+	
+	//TextureRegions//
 	/** Texture assets for the koi */
 	private TextureRegion koiTexture;
 	/** Texture assets for lilypads */
@@ -84,73 +82,132 @@ public class DownstreamController extends WorldController implements ContactList
 	private TextureRegion lanternTexture;
 	/** Texture assets for light */
 	private TextureRegion lightingTexture;
-	/** Texture assets for land */
-	private TextureRegion land4Texture;
-	private TextureRegion leftLandTexture;
-	private TextureRegion rightLandTexture;
-	private TextureRegion topLandTexture;
-	private TextureRegion bottomLandTexture;
 	/** Texture assets for walls and platforms */
 	private TextureRegion earthTile;
+	
+	private TextureRegion earthTileDay;
+	private TextureRegion earthTileNight;
+	private TextureRegion earthTileSunset;
+	
+	
 	/** Texture assets for whirlpools */
 	private TextureRegion whirlpoolTexture;
 	private TextureRegion whirlpoolFlipTexture;
-
+	/** Texture assets for HUD */
+	private TextureRegion energyBarTexture;
+	private TextureRegion UILotusTexture;
+	
+	/** The HUD */
+	public HUDitems HUD;
+	
+	//Game States//
 	/** Track asset loading from all instances and subclasses */
 	private AssetState fishAssetState = AssetState.EMPTY;
-
+	/** Pause menu and button states */
+	public PauseMenuMode pauseMenu;
+	private int backState;
+	private int resumeState;
+	private int restartState;
+	private int optionsState;
+	private boolean wasPaused;
+	private boolean paused;
 	private boolean dead;
 	private boolean whirled;
+<<<<<<< HEAD
 	private TetherModel checkpoint;
 	
+=======
+>>>>>>> b0759998a9a98328febf9a791889916bcce8759d
 	private float PLAYER_LINEAR_VELOCITY = 6f;
-
 	private boolean enableSlow = false;
 	private boolean enableLeadingLine = false;
 	private boolean enableTetherRadius = true;
 	
-	//animations
+	//Sounds//
+	/** References to sounds */
+	private static final String LIGHTING_SOUND = "SOUNDS/lighting_1.mp3";
+	private Music deathSound;
 	
-	float stateTime;  
-    float relativeTime = 0;
-    
+	//Animations//
+	private float stateTime;  
+	private float relativeTime = 0;
 
-	Animation                      	lilyAnimation;          // #3
-    Texture                         lilySheet;              // #4
-    TextureRegion[]                 lilyFrames;             // #5
-    SpriteBatch                     lilyspriteBatch;            // #6
-    TextureRegion                   lilycurrentFrame;           // #7
-    
-    Animation                      	closedFlowerAnimation;          // #3
-    Texture                         closedFlowerSheet;              // #4
-    TextureRegion[]                 closedFlowerFrames;             // #5
-    SpriteBatch                     closedFlowerspriteBatch;            // #6
-    TextureRegion                   closedFlowercurrentFrame;           // #7
-    
-    Animation                      	openFlowerAnimation;          // #3
-    Texture                         openFlowerSheet;              // #4
-    TextureRegion[]                 openFlowerFrames;             // #5
-    SpriteBatch                     openFlowerspriteBatch;            // #6
-    TextureRegion                   openFlowercurrentFrame;           // #7
-    
-    Animation                      	openingFlowerAnimation;          // #3
-    Texture                         openingFlowerSheet;              // #4
-    TextureRegion[]                 openingFlowerFrames;             // #5
-    SpriteBatch                     openingFlowerspriteBatch;            // #6
-    TextureRegion                   openingFlowercurrentFrame;           // #7
+	private Animation lilyAnimation; // #3
+	private Texture lilySheet; // #4
+	private TextureRegion[] lilyFrames; // #5
+	private SpriteBatch lilyspriteBatch; // #6
+	private TextureRegion lilycurrentFrame; // #7
 
-    Animation                      	closingFlowerAnimation;          // #3
-    Texture                         closingFlowerSheet;              // #4
-    TextureRegion[]                 closingFlowerFrames;             // #5
-    SpriteBatch                     closingFlowerspriteBatch;            // #6
-    TextureRegion                   closingFlowercurrentFrame;           // #7
-    
-    Animation                      	koiSAnimation;          // #3
-    Texture                         koiSSheet;              // #4
-    TextureRegion[]                 koiSFrames;             // #5
-    SpriteBatch                     koiSspriteBatch;            // #6
-    TextureRegion                   koiScurrentFrame;           // #7
+	private Animation closedFlowerAnimation; // #3
+	private Texture closedFlowerSheet; // #4
+	private TextureRegion[] closedFlowerFrames; // #5
+	private SpriteBatch closedFlowerspriteBatch; // #6
+	private TextureRegion closedFlowercurrentFrame; // #7
 
+	private Animation openFlowerAnimation; // #3
+	private Texture openFlowerSheet; // #4
+	private TextureRegion[] openFlowerFrames; // #5
+	private SpriteBatch openFlowerspriteBatch; // #6
+	private TextureRegion openFlowercurrentFrame; // #7
+
+	private Animation openingFlowerAnimation; // #3
+	private Texture openingFlowerSheet; // #4
+	private TextureRegion[] openingFlowerFrames; // #5
+	private SpriteBatch openingFlowerspriteBatch; // #6
+	private TextureRegion openingFlowercurrentFrame; // #7
+
+	private Animation closingFlowerAnimation; // #3
+	private Texture closingFlowerSheet; // #4
+	private TextureRegion[] closingFlowerFrames; // #5
+	private SpriteBatch closingFlowerspriteBatch; // #6
+	private TextureRegion closingFlowercurrentFrame; // #7
+
+	private Animation koiSAnimation; // #3
+	private Texture koiSSheet; // #4
+	private TextureRegion[] koiSFrames; // #5
+	private SpriteBatch koiSspriteBatch; // #6
+	private TextureRegion koiScurrentFrame; // #7
+
+	private Animation koiCAnimation; // #3
+	private Texture koiCSheet; // #4
+	private TextureRegion[] koiCFrames; // #5
+	private SpriteBatch koiCspriteBatch; // #6
+	private TextureRegion koiCcurrentFrame; // #7
+	
+	private Animation koiCAnimationFlipped;
+	private TextureRegion[]	koiCFramesFlipped;
+	private TextureRegion KoiCcurrentFrameFlipped;
+	
+	// Physics constants for initialization //
+	/** Density of non-enemy objects */
+	private static final float BASIC_DENSITY   = 0.0f;
+	/** Density of the enemy objects */
+	private static final float ENEMY_DENSITY   = 1.0f;
+	/** Friction of non-enemy objects */
+	private static final float BASIC_FRICTION  = 0.1f;
+	/** Friction of the enemy objects */
+	private static final float ENEMY_FRICTION  = 0.3f;
+	/** Collision restitution for all objects */
+	private static final float BASIC_RESTITUTION = 0.1f;
+	private static final float TETHER_DENSITY = ENEMY_DENSITY;
+	private static final float TETHER_FRICTION = ENEMY_FRICTION;
+	private static final float TETHER_RESTITUTION = BASIC_RESTITUTION;
+
+	// Important game objects, lists, and controllers //
+	private ArrayList<TetherModel> tethers = new ArrayList<TetherModel>();
+	private ArrayList<TetherModel> lanterns = new ArrayList<TetherModel>();
+	private ArrayList<TetherModel> litlanterns = new ArrayList<TetherModel>();
+	private ArrayList<EnemyModel> enemies = new ArrayList<EnemyModel>();
+	private ArrayList<WhirlpoolModel> wpools = new ArrayList<WhirlpoolModel>();
+	private PlayerModel koi;
+	private EnemyModel eFish;
+	private CameraController cameraController;
+	private CollisionController collisionController;
+	private TetherModel closestTether;
+	private WhirlpoolModel closestWhirlpool;
+	private int litLotusCount;
+
+    
 
 	/**
 	 * Preloads the assets for this controller.
@@ -186,37 +243,29 @@ public class DownstreamController extends WorldController implements ContactList
 		
 		manager.load(EARTH_FILE,Texture.class);
 		assets.add(EARTH_FILE);
-
-		manager.load(LAND_4SIDE_TEXTURE, Texture.class);
-		assets.add(LAND_4SIDE_TEXTURE);
-
-		manager.load(LEFT_LAND_TEXTURE, Texture.class);
-		assets.add(LEFT_LAND_TEXTURE);
-
-		manager.load(RIGHT_LAND_TEXTURE, Texture.class);
-		assets.add(RIGHT_LAND_TEXTURE);
-
-		manager.load(TOP_LAND_TEXTURE, Texture.class);
-		assets.add(TOP_LAND_TEXTURE);
-
-		manager.load(BOTTOM_LAND_TEXTURE, Texture.class);
-		assets.add(BOTTOM_LAND_TEXTURE);
+		
+		manager.load(EARTH_FILE_D,Texture.class);
+		assets.add(EARTH_FILE_D);
+		manager.load(EARTH_FILE_N,Texture.class);
+		assets.add(EARTH_FILE_N);
+		manager.load(EARTH_FILE_S,Texture.class);
+		assets.add(EARTH_FILE_S);
+		
 		
 		manager.load(WHIRLPOOL_TEXTURE, Texture.class);
 		assets.add(WHIRLPOOL_TEXTURE);
 		
 		manager.load(WHIRLPOOL_FLIP_TEXTURE, Texture.class);
 		assets.add(WHIRLPOOL_FLIP_TEXTURE);
-/*
-		manager.load(CLICK_SOUND, Sound.class);
-		assets.add(CLICK_SOUND);
 		
-		manager.load(LIGHTING_SOUND, Sound.class);
-		assets.add(LIGHTING_SOUND);
+		manager.load(ENERGYBAR_TEXTURE, Texture.class);
+		assets.add(ENERGYBAR_TEXTURE);
 		
-		manager.load(DEATH_SOUND, Sound.class);
-		assets.add(DEATH_SOUND);
-		*/
+		manager.load(UI_FLOWER, Texture.class);
+		assets.add(UI_FLOWER);
+		
+		manager.load(OVERLAY, Texture.class);
+		assets.add(OVERLAY);
 	
 		super.preLoadContent(manager);
 	}
@@ -237,7 +286,8 @@ public class DownstreamController extends WorldController implements ContactList
 		}
 		int cols = 11;
 		int rows = 1;
-		//animations
+		
+		//animationDef
 		lilySheet = new Texture(Gdx.files.internal("tethers/lotus_strip.png"));
 		    
 	      	//walkSheet = new Texture(Gdx.files.internal("koi/unnamed.png")); // #9
@@ -309,8 +359,8 @@ public class DownstreamController extends WorldController implements ContactList
         closingFlowerspriteBatch = new SpriteBatch(); 
         
         
-        cols = 9;
-        koiSSheet = new Texture(Gdx.files.internal("koi/straight koi spritesheet.png"));
+        cols = 12;
+        koiSSheet = new Texture(Gdx.files.internal("koi/Straight_Koi.png"));
         TextureRegion[][] tmpkoiS = TextureRegion.split(koiSSheet, koiSSheet.getWidth()/cols, koiSSheet.getHeight()/rows);              // #10
         koiSFrames = new TextureRegion[cols * rows];
         index = 0;
@@ -319,38 +369,57 @@ public class DownstreamController extends WorldController implements ContactList
             	koiSFrames[index++] = tmpkoiS[i][j];
             }
         }
-        koiSAnimation = new Animation(.1f, koiSFrames); 
+        koiSAnimation = new Animation(.05f, koiSFrames); 
         koiSspriteBatch = new SpriteBatch(); 
+        
+        cols = 31;
+        //remeber kiddies, animate both directions
+        koiCSheet = new Texture(Gdx.files.internal("koi/curved_koi.png"));
+        TextureRegion[][] tmpkoiC = TextureRegion.split(koiCSheet, koiCSheet.getWidth()/cols, koiCSheet.getHeight()/rows);              // #10
+        TextureRegion[][] tmpkoiCFlipped = TextureRegion.split(koiCSheet, koiCSheet.getWidth()/cols, koiCSheet.getHeight()/rows);              // #10
+        
+        koiCFrames = new TextureRegion[cols * rows];
+        koiCFramesFlipped = new TextureRegion[cols * rows];
+        index = 0;
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+            	//tmpkoiC[i][j].flip(false, true);
+            	koiCFrames[index] = tmpkoiC[i][j];
+            	tmpkoiCFlipped[i][j].flip(false, true);
+            	koiCFramesFlipped[index++] = tmpkoiCFlipped[i][j];
+            }
+        }
+        koiCAnimation = new Animation(.05f, koiCFrames); 
+        koiCAnimationFlipped = new Animation(.05f, koiCFramesFlipped);
+        koiCspriteBatch = new SpriteBatch(); 
+        
 		
-
+        
+        energyBarTexture = createTexture(manager, ENERGYBAR_TEXTURE, false);
 		enemyTexture = createTexture(manager,ENEMY_TEXTURE,false);
 		//koiTexture = koiSFrames[0];
 		koiTexture = createTexture(manager, KOI_TEXTURE, false);
 		lilyTexture = lilyFrames[0];
 		lanternTexture = closedFlowerFrames[0];
 		lightingTexture = createTexture(manager, LIGHTING_TEXTURE, false);
+		UILotusTexture = createTexture(manager, UI_FLOWER, false);
 
-		earthTile = createTexture(manager,EARTH_FILE,true);
-
-		land4Texture = createTexture(manager,LAND_4SIDE_TEXTURE,false);
-		leftLandTexture = createTexture(manager,LEFT_LAND_TEXTURE,false);
-		rightLandTexture = createTexture(manager,RIGHT_LAND_TEXTURE,false);
-		topLandTexture = createTexture(manager,TOP_LAND_TEXTURE,false);
-		bottomLandTexture = createTexture(manager,BOTTOM_LAND_TEXTURE,false);
+		earthTile = createTexture(manager,EARTH_FILE_N,true);
+		earthTileDay = createTexture(manager,EARTH_FILE_D, true);
+		earthTileNight = createTexture(manager,EARTH_FILE_N, true);
+		earthTileSunset = createTexture(manager,EARTH_FILE_S, true);
+		
 		whirlpoolTexture = createTexture(manager,WHIRLPOOL_TEXTURE,false);
 		whirlpoolFlipTexture = createTexture(manager,WHIRLPOOL_FLIP_TEXTURE,false);
-/*
-		SoundController sounds = SoundController.getInstance();
-		sounds.allocate(manager,CLICK_SOUND);
-		sounds.allocate(manager, LIGHTING_SOUND);
-		sounds.allocate(manager, DEATH_SOUND);
-		*/
-
-
+		
+		deathSound = Gdx.audio.newMusic(Gdx.files.internal(LIGHTING_SOUND));
+		deathSound.setLooping(false);
+		
 		super.loadContent(manager);
 		fishAssetState = AssetState.COMPLETE;
 	}
 
+<<<<<<< HEAD
 	// Physics constants for initialization
 	/** Density of non-enemy objects */
 	private static final float BASIC_DENSITY   = 0.0f;
@@ -402,10 +471,12 @@ public class DownstreamController extends WorldController implements ContactList
 	private TetherModel checkpoint0;
 	private boolean respawning;
 
+=======
+>>>>>>> b0759998a9a98328febf9a791889916bcce8759d
 	/**
 	 * Creates and initialize a new instance of Downstream
 	 *
-	 * The game has no  gravity and deafault settings
+	 * The game has no  gravity and default settings
 	 */
 	public DownstreamController() {
 		setDebug(false);
@@ -414,6 +485,8 @@ public class DownstreamController extends WorldController implements ContactList
 		world.setContactListener(this);
 		dead = false;
 		whirled = false;
+		paused = false;
+		wasPaused = false;
 	}
 
 	/**
@@ -434,15 +507,17 @@ public class DownstreamController extends WorldController implements ContactList
 		objects.clear();
 		addQueue.clear();
 		world.dispose();
+		
 		dead = false;
 		whirled = false;
-
+		paused = false;
+		wasPaused = false;
+		pauseMenu = new PauseMenuMode(canvas);
 		world = new World(gravity,false);
 		world.setContactListener(this);
 		setComplete(false);
 		setFailure(false);
 		populateLevel();
-		canvas.setCameraPosition(koi.getPosition().cpy().scl(scale));
 	}
 
 	/**
@@ -461,7 +536,7 @@ public class DownstreamController extends WorldController implements ContactList
 		float rad = lilyTexture.getRegionWidth()/scale.x/2;
 
 		boolean sensorTethers = true;
-
+		boolean sensorPools = true;
 
 		for (Vector2 lilypad : level.lilypads) {
 			TetherModel lily = new TetherModel(lilypad.x, lilypad.y, rad);
@@ -476,24 +551,22 @@ public class DownstreamController extends WorldController implements ContactList
 			addObject(lily);
 			tethers.add(lily);
 		}
-
-		boolean sensorPools = true;
 		
-		/*
-		WhirlpoolModel pool = new WhirlpoolModel(-2, -5);
-		pool.setBodyType(BodyDef.BodyType.StaticBody);
-		pool.setName("whirlpool" + 1);
-		pool.setDensity(TETHER_DENSITY);
-		pool.setRestitution(TETHER_RESTITUTION);
-		pool.setSensor(sensorPools);
-		pool.setDrawScale(scale);
-		pool.setTexture(whirlpoolFlipTexture);
-		addObject(pool);
-		wpools.add(pool);
-		
-		*/
-
-		
+		if (!level.wpools.isEmpty()) {
+			for (Vector2 whirlpool : level.wpools) {
+				WhirlpoolModel pool = new WhirlpoolModel(whirlpool.x, whirlpool.y,1);
+				pool.setBodyType(BodyDef.BodyType.StaticBody);
+				pool.setName("whirlpool" + 1);
+				pool.setDensity(TETHER_DENSITY);
+				pool.setFriction(TETHER_FRICTION);
+				pool.setRestitution(TETHER_RESTITUTION);
+				pool.setSensor(sensorPools);
+				pool.setDrawScale(scale);
+				pool.setTexture(whirlpoolFlipTexture);
+				addObject(pool);
+				wpools.add(pool);
+			}
+		}
 		for (Vector2 lotus : level.lotuses) {
 			TetherModel lantern = new TetherModel(lotus.x, lotus.y, rad, true);
 			lantern.setBodyType(BodyDef.BodyType.StaticBody);
@@ -526,7 +599,7 @@ public class DownstreamController extends WorldController implements ContactList
 			addObject(obj);
 		}
 		
-		for (Map.Entry<String,ArrayList<Vector2>> entry : level.enemies.entrySet()) {
+		for (Map.Entry<String,ArrayList<Vector2>> entry : level.enemiesLevel.entrySet()) {
 			Vector2 enemyPos = vectorOfString(entry.getKey());
 			ArrayList<Vector2> enemyPath = entry.getValue();
 //			for (Vector2 vector : enemyPath) {vector.x /= scale.x; vector.y /= scale.y;}
@@ -565,8 +638,20 @@ public class DownstreamController extends WorldController implements ContactList
 		addObject(koi);
 		
 		collisionController = new CollisionController(koi);
+<<<<<<< HEAD
 		checkpoint = getClosestTetherTo(koi.initPos);
 		checkpoint0 = getClosestTetherTo(koi.initPos);
+=======
+
+		float width = Math.abs(level.map.get(0).x - level.map.get(1).x);
+		float height = Math.abs(level.map.get(0).y - level.map.get(1).y);
+		Vector2 center = new Vector2((level.map.get(0).x + level.map.get(1).x)/2,
+									 (level.map.get(0).y + level.map.get(1).y)/2);
+		cameraController.zoomStart(width, height, center, koi.getPosition().cpy().scl(scale));
+		
+		HUD = new HUDitems(lanterns.size(), UILotusTexture, energyBarTexture, displayFont);
+		addHUD(HUD);
+>>>>>>> b0759998a9a98328febf9a791889916bcce8759d
 
 	}
 
@@ -609,6 +694,7 @@ public class DownstreamController extends WorldController implements ContactList
 	 *
 	 * @param delta Number of seconds since last animation frame
 	 */
+<<<<<<< HEAD
 	public void update(float dt) {
 		if(koi.isDead()){
 			respawn();
@@ -627,6 +713,65 @@ public class DownstreamController extends WorldController implements ContactList
 			}
 			if(litlanterns.size() > 0){
 				checkpoint = litlanterns.peek();
+=======
+	public void update(float dt) {		
+		
+		if (!cameraController.isZoomedToPlayer()) {
+			cameraController.zoomToPlayer();
+			return;
+		}
+		InputController input = InputController.getInstance();
+		
+		litLotusCount = 0;
+		for(TetherModel t : lanterns){
+			if(t.lit){
+				litLotusCount++;
+			}
+		}
+		if(lanterns.size() == litLotusCount){
+			this.setComplete(true);
+		}
+		
+		if(dead){
+			deathSound.play();
+
+			objects.remove(koi);
+			setFailure(dead);
+			cameraController.resetCameraVelocity(); 
+			return;
+		}
+		closestTether = getClosestTether();
+		if (wpools.isEmpty()){
+			closestWhirlpool = null;
+		}
+		else{
+			closestWhirlpool = getClosestWhirl();
+		}
+		
+		// CHECK IF KOI WILL BE SUCKED INTO WHIRLPOOL //
+		Vector2 close;
+		Vector2 init;
+		if (closestWhirlpool != null) {
+			close = closestWhirlpool.getPosition();
+			init = koi.getInitialTangentPoint(close);
+			if (close.dst(koi.getPosition()) < WhirlpoolModel.WHIRL_DEFAULT_RANGE) {
+				koi.setWhirled(true);
+			}
+			if (koi.getPosition().sub(init).len2() < .01) {
+				koi.setWhirled(true);
+				koi.refreshWhirlForce(close, closestWhirlpool.getOrbitRadius());
+			} else {
+				koi.applyWhirlForce(close, closestWhirlpool.getOrbitRadius());
+			}
+		}
+		
+		// TETHER TOGGLE CODE
+		if (input.didTether() && !isWhirled()) {
+			if(koi.isTethered() || koi.isAttemptingTether()){
+				koi.setTethered(false);					
+				koi.setAttemptingTether(false); 
+				cameraController.resetCameraVelocity();
+>>>>>>> b0759998a9a98328febf9a791889916bcce8759d
 			}
 			
 			//CLEAR SHADOW CODE
@@ -657,6 +802,7 @@ public class DownstreamController extends WorldController implements ContactList
 				return;
 			}
 
+<<<<<<< HEAD
 			// ENEMY PATROL CODE
 			for (EnemyModel enemy : enemies) {
 				enemy.patrol();
@@ -666,10 +812,30 @@ public class DownstreamController extends WorldController implements ContactList
 
 			// KOI VEOLOCITY CODE
 			koi.updateSpeed(PLAYER_LINEAR_VELOCITY);
+=======
+		// ENEMY PATROL CODE
+		for (EnemyModel enemy : enemies) {
+			enemy.patrol();
+			enemy.moveTowardsGoal();
+			enemy.fleeFind();
+			enemy.fleeFind(lanterns);
+			if (enemy.dead){
+				enemy.deactivatePhysics(world);
+			}
+		}
+		
+		// KOI VEOLOCITY CODE
+		if (isTethered() && !isWhirled()) {
+			koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*1.5f));
+		} else{
+			koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*2));
+		}
+>>>>>>> b0759998a9a98328febf9a791889916bcce8759d
 
 			// LOTUS LIGHTING CODE
 			closestTether.setTethered(isTethered() && closestTether.isLotus() && collisionController.inRangeOf(closestTether));
 
+<<<<<<< HEAD
 			// TETHER FORCE CODE
 			Vector2 close = getClosestTether().getPosition();
 			Vector2 init = koi.getInitialTangentPoint(close);
@@ -747,6 +913,95 @@ public class DownstreamController extends WorldController implements ContactList
 						if (tethers.get(i).set){
 							tethers.get(i).setOpening(1);
 						}
+=======
+		// TETHER FORCE CODE
+		close = closestTether.getPosition();
+		init = koi.getInitialTangentPoint(close);
+		if (close.dst(koi.getPosition()) > TetherModel.TETHER_DEFAULT_RANGE){
+			koi.setAttemptingTether(false);
+		}
+		// HIT TANGENT
+		
+		if (koi.isAttemptingTether() && (koi.getPosition().sub(init).len2() < .01)) {
+			koi.setTethered(true);
+			koi.setAttemptingTether(false);
+			koi.refreshTetherForce(close, closestTether.getOrbitRadius());
+		}
+		// PAST TANGENT
+		else if (koi.isAttemptingTether() && !koi.willIntersect(init) ) {
+			koi.passAdjust(close);
+		}
+		else {}
+		koi.applyTetherForce(close, closestTether.getOrbitRadius());
+
+
+		// RESOLVE FISH IMG
+		koi.resolveDirection();
+		
+		koi.updateRestore();
+
+		// CAMERA ZOOM CODE
+		if (isTethered()){  
+			cameraController.moveCameraTowards(closestTether.getPosition().cpy().scl(scale));
+			cameraController.zoomOut();
+		}
+		else{
+			cameraController.moveCameraTowards(koi.getPosition().cpy().scl(scale));
+			cameraController.zoomIn();
+		}
+		
+		//burst code
+		koi.updateRestore();
+		if (input.fast) {
+			koi.burst();
+			cameraController.moveCameraTowards(koi.getPosition().cpy().scl(scale));
+		}
+		
+		//ANIMATION CODE
+		stateTime += Gdx.graphics.getDeltaTime();           // #15
+		lilycurrentFrame = lilyAnimation.getKeyFrame(stateTime, true);
+		closedFlowercurrentFrame = closedFlowerAnimation.getKeyFrame(stateTime, true);
+		openFlowercurrentFrame = openFlowerAnimation.getKeyFrame(stateTime, true);
+		koiScurrentFrame = koiSAnimation.getKeyFrame(stateTime, true);
+		koiCcurrentFrame = koiCAnimation.getKeyFrame(stateTime, true);
+		KoiCcurrentFrameFlipped = koiCAnimationFlipped.getKeyFrame(stateTime, true);
+		
+		//FSM to handle Koi
+ 
+		//koiCcurrentFrame.flip(koi.left(closestTether), false);
+		if (koi.isTethered()){
+			koi.setCurved(true);
+			if (koi.left(closestTether)){
+				koi.setTexture(koiCcurrentFrame);
+			}
+			else{
+				koi.setTexture(KoiCcurrentFrameFlipped);
+			}
+		}
+		else{
+			koi.setCurved(false);
+			koi.setTexture(koiScurrentFrame);
+		}
+		//koi.setTexture(koiCcurrentFrame);
+		
+		
+		//FSM to handle Lotus
+		for (int i = 0; i < tethers.size(); i++){
+			if (collisionController.inRangeOf(tethers.get(i))){
+				tethers.get(i).inrange = true;
+			}
+			else{
+				tethers.get(i).inrange = false;
+			}
+			if (tethers.get(i).getTetherType() == TetherType.Lilypad){
+				tethers.get(i).setTexture(lilycurrentFrame);
+			}
+			if (tethers.get(i).getTetherType() == TetherType.Lantern) {
+				if (tethers.get(i).getOpening() == 0){
+					tethers.get(i).setTexture(closedFlowercurrentFrame);
+					if (tethers.get(i).set){
+						tethers.get(i).setOpening(1);
+>>>>>>> b0759998a9a98328febf9a791889916bcce8759d
 					}
 					if (tethers.get(i).getOpening() == 1){
 						//TODO
@@ -792,13 +1047,24 @@ public class DownstreamController extends WorldController implements ContactList
 						tethers.get(i).setTexture(openFlowercurrentFrame);
 					}
 				}
+<<<<<<< HEAD
 			}
 
 
 			SoundController.getInstance().update();
 
 		}
+=======
+				if(tethers.get(i).lit){
+					tethers.get(i).setTexture(openFlowercurrentFrame);
+				}
+			}
+		}
+		SoundController.getInstance().update();
+		HUD.updateHUD(litLotusCount, koi.getEnergy());
+>>>>>>> b0759998a9a98328febf9a791889916bcce8759d
 	}
+	
 
 	private void clearShadows(boolean b) {
 		// TODO Auto-generated method stub
@@ -830,6 +1096,7 @@ public class DownstreamController extends WorldController implements ContactList
 		return closestTether;
 	}
 	
+<<<<<<< HEAD
 	private TetherModel getClosestTetherTo(Vector2 v) {
 		if(collisionController.inRange()){
 			return collisionController.getClosestTetherInRange();
@@ -844,36 +1111,116 @@ public class DownstreamController extends WorldController implements ContactList
 			}
 		}
 		return closestTether;
+=======
+	private boolean isWhirled(){
+		return koi.isWhirled();
+>>>>>>> b0759998a9a98328febf9a791889916bcce8759d
 	}
 	
 	private WhirlpoolModel getClosestWhirl() {
-		WhirlpoolModel closestWhirl = wpools.get(0);
+		if(collisionController.inRangePool()){
+			return collisionController.getClosestWhirlpoolInRange();
+		}
+		WhirlpoolModel closestPool = wpools.get(0);
 		float closestDistance = wpools.get(0).getPosition().sub(koi.getPosition()).len2();
-		for(WhirlpoolModel w: wpools){
-			float newDistance = w.getPosition().sub(koi.getPosition()).len2();
-			if(newDistance < closestDistance){
+		for (WhirlpoolModel wp : wpools) {
+			float newDistance = wp.getPosition().sub(koi.getPosition()).len2();
+			if (newDistance < closestDistance) {
 				closestDistance = newDistance;
-				closestWhirl = w;
+				closestWhirlpool = wp;
 			}
 		}
-		return closestWhirl;
+		return closestWhirlpool;
 	}
 
 	public void draw(float delta) {
-		super.draw(delta);
 
-		if (enableLeadingLine) {
-			Vector2 farOff = koi.getPosition().cpy();
-			farOff.add(koi.getLinearVelocity().cpy().scl(1000));
-			canvas.drawLeadingLine(koi.getPosition().cpy(), farOff);
+//		System.out.println("paused: " + paused);
+//		System.out.println("waspaused: " + wasPaused);
+
+		if (paused){
+			pauseMenu.draw();
 		}
-		if (enableTetherRadius) {
-			Vector2 closestTether = getClosestTether().getPosition().cpy().scl(scale);
-			Vector2 initialTangent = koi.getInitialTangentPoint(getClosestTether().getPosition()).scl(scale);
-			float radius = closestTether.dst(initialTangent);
-			canvas.drawTetherCircle(closestTether, TetherModel.TETHER_DEFAULT_RANGE*scale.x*.9f);
+		else {
+			super.draw(delta);
+			canvas.beginHUD();
+			HUD.draw(canvas);
+			canvas.end();
+		}
+<<<<<<< HEAD
+=======
+
+>>>>>>> b0759998a9a98328febf9a791889916bcce8759d
+	}
+	
+	/**
+	 * Called when the Screen should render itself.
+	 *
+	 * We defer to the other methods update() and draw().  However, it is VERY important
+	 * that we only quit AFTER a draw.
+	 *
+	 * @param delta Number of seconds since last animation frame
+	 */
+	public void render(float delta) {
+		InputController input = InputController.getInstance();
+		if(wasPaused){
+			
+			paused =true;
+			
+		}
+		else{
+			paused = input.didPause();
+			wasPaused = paused;
+//			if (paused) cameraController.pauseCamera();
+		}
+		
+		if (active) {
+			if (preUpdate(delta) && !paused) {
+					update(delta); // This is the one that must be defined.
+					postUpdate(delta);
+			}
+			this.draw(delta);
+			if (goOptions() && listener != null) {
+				listener.exitScreen(this, WorldController.EXIT_OPTIONS);
+			}
+			if (goBack() && listener != null) {
+				listener.exitScreen(this, WorldController.EXIT_MAIN);
+			}
+			if (restartLevel() && listener != null) {
+				listener.exitScreen(this, WorldController.EXIT_PLAY);
+			}
+			if (resumePlay() && listener != null) {
+				resumeState = 0;
+				restartState = 0;
+				optionsState = 0;
+				backState = 0;
+				wasPaused = false;
+				paused = false;
+//				cameraController.unpauseCamera();
+			}
+			
 		}
 	}
+	
+	/**
+	 * Dispose of all (non-static) resources allocated to this mode.
+	 */
+	public void dispose() {
+		for(Obstacle obj : objects) {
+			obj.deactivatePhysics(world);
+		}
+		objects.clear();
+		addQueue.clear();
+		world.dispose();
+		pauseMenu.dispose();
+		objects = null;
+		addQueue = null;
+		bounds = null;
+		scale  = null;
+		world  = null;
+		canvas = null;
+	}
+	
 
 	/// CONTACT LISTENER METHODS
 	/**
@@ -887,17 +1234,6 @@ public class DownstreamController extends WorldController implements ContactList
 	 */
 	public void beginContact(Contact contact) {
 		koi.setDead(collisionController.begin(contact));
-	}
-	
-	private static Vector2 vectorOfString(String s) {
-		int comma = s.indexOf(",");
-		int openParens = s.indexOf("(");
-		int closeParens = s.indexOf(")");
-		String xstr = s.substring(openParens+1,comma);
-		String ystr = s.substring(comma+1,closeParens);
-		float x = Float.parseFloat(xstr);
-		float y = Float.parseFloat(ystr);
-		return new Vector2(x,y);
 	}
 
 	/**
@@ -942,20 +1278,154 @@ public class DownstreamController extends WorldController implements ContactList
 		cache.set(body1.getLinearVelocityFromWorldPoint(wp));
 		cache.sub(body2.getLinearVelocityFromWorldPoint(wp));
 		speed = cache.dot(worldManifold.getNormal());
+	}
 
-		/*
-		// Play a sound if above threshold
-		if (speed > SOUND_THRESHOLD) {
-			String s1 = ((Obstacle)body1.getUserData()).getName();
-			String s2 = ((Obstacle)body2.getUserData()).getName();
-			if (s1.equals("koi") || s1.startsWith("enemy") || s1.startsWith("tether")) {
-				SoundController.getInstance().play(s1, COLLISION_SOUND, false, 0.5f);
+	//PAUSE MENU METHODS
+	
+	
+	public boolean goBack() {
+		return backState == 2;
+	}
+	
+	public boolean resumePlay(){
+		return resumeState == 2;
+	}
+	
+	public boolean goOptions(){
+		return optionsState == 2;
+	}
+	
+	public boolean restartLevel(){
+		return restartState == 2;
+	}
+
+	// PROCESSING PLAYER INPUT
+	/**
+	 * Called when the screen was touched or a mouse button was pressed.
+	 *
+	 * This method checks to see if the play button is available and if the
+	 * click is in the bounds of the play button. If so, it signals the that the
+	 * button has been pressed and is currently down. Any mouse button is
+	 * accepted.
+	 *
+	 * @param screenX
+	 *            the x-coordinate of the mouse on the screen
+	 * @param screenY
+	 *            the y-coordinate of the mouse on the screen
+	 * @param pointer
+	 *            the button or touch finger number
+	 * @return whether to hand the event to other listeners.
+	 */
+	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+		if (paused) {
+			
+			// Flip to match graphics coordinates
+			screenY = canvas.getHeight() - screenY;
+			float dx = Math.abs(screenX - PauseMenuMode.backPos.x);
+			float dy = Math.abs(screenY - PauseMenuMode.backPos.y);
+
+			if (dx < pauseMenu.scale * pauseMenu.back.getWidth() / 2
+					&& dy < pauseMenu.scale * pauseMenu.back.getHeight() / 2) {
+				backState = 1;
 			}
-			if (s2.equals("koi") || s2.startsWith("enemy") || s2.startsWith("tether")) {
-				SoundController.getInstance().play(s2, COLLISION_SOUND, false, 0.5f);
+
+			dx = Math.abs(screenX - PauseMenuMode.resumePos.x);
+			dy = Math.abs(screenY - PauseMenuMode.resumePos.y);
+
+			if (dx < pauseMenu.scale * pauseMenu.resume.getWidth() / 2
+					&& dy < pauseMenu.scale * pauseMenu.resume.getHeight() / 2) {
+				resumeState = 1;
+			}
+
+			dx = Math.abs(screenX - PauseMenuMode.restartPos.x);
+			dy = Math.abs(screenY - PauseMenuMode.restartPos.y);
+
+			if (dx < pauseMenu.scale * pauseMenu.restart.getWidth() / 2
+					&& dy < pauseMenu.scale * pauseMenu.restart.getHeight() / 2) {
+				restartState = 1;
+			}
+
+			dx = Math.abs(screenX - PauseMenuMode.optionsPos.x);
+			dy = Math.abs(screenY - PauseMenuMode.optionsPos.y);
+
+			if (dx < pauseMenu.scale * pauseMenu.options.getWidth() / 2
+					&& dy < pauseMenu.scale * pauseMenu.options.getHeight() / 2) {
+				optionsState = 1;
 			}
 		}
-		 */
+		return false;
+	}
+
+	/**
+	 * Called when a finger was lifted or a mouse button was released.
+	 *
+	 * This method checks to see if the play button is currently pressed down.
+	 * If so, it signals the that the player is ready to go.
+	 *
+	 * @param screenX
+	 *            the x-coordinate of the mouse on the screen
+	 * @param screenY
+	 *            the y-coordinate of the mouse on the screen
+	 * @param pointer
+	 *            the button or touch finger number
+	 * @return whether to hand the event to other listeners.
+	 */
+	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+		if (paused) {
+			if (backState == 1) {
+				backState = 2;
+				return false;
+			}
+			if (resumeState == 1) {
+				resumeState = 2;
+				return false;
+			}
+			if (restartState == 1) {
+				restartState = 2;
+				return false;
+			}
+			if (optionsState == 1) {
+				optionsState = 2;
+				return false;
+			}
+		}
+		return true;
+	}
+
+	@Override
+	public boolean keyDown(int keycode) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean keyUp(int keycode) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean keyTyped(char character) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean touchDragged(int screenX, int screenY, int pointer) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean mouseMoved(int screenX, int screenY) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean scrolled(int amount) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 

@@ -62,7 +62,7 @@ public class InputController {
 	/** Whether the secondary action button was pressed. */
 	private boolean secondPressed;
 	private boolean secondPrevious;
-	/** Whether the teritiary action button was pressed. */
+	/** Whether the tertiary action button was pressed. */
 	private boolean tertiaryPressed;
 	/** Whether the debug toggle was pressed. */
 	private boolean debugPressed;
@@ -73,6 +73,9 @@ public class InputController {
 	
 	private boolean tetherPressed;
 	private boolean tetherPrevious;
+	
+	private boolean pausePressed;
+	private boolean pausePrevious;
 	
 	private boolean upPressed;
 	private boolean downPressed;
@@ -108,7 +111,7 @@ public class InputController {
 	public boolean kill;
 	
 	public enum SelectionType {
-		Lilypad, Lantern, Enemy, Player, Wall, Goal;
+		Lilypad, Lantern, Enemy, Player, Wall, MapArea, Goal, WhirlpoolCCW, WhirlpoolCW;
 	} 
 	
 	private SelectionType currentSelection;
@@ -248,6 +251,11 @@ public class InputController {
 		return tetherPressed && !tetherPrevious;
 	}
 	
+	public boolean didPause() {
+		
+		return pausePressed && !pausePrevious;
+	}
+	
 	public boolean getUp() {
 		return upPressed;
 	}
@@ -330,6 +338,7 @@ public class InputController {
 		nextPrevious = nextPressed;
 		prevPrevious = prevPressed;
 		tetherPrevious = tetherPressed;
+		pausePrevious = pausePressed;
 		leftPrevious = leftClick;
 		enterPrevious = enterPressed;
 		
@@ -396,10 +405,11 @@ public class InputController {
 		debugPressed = (secondary && debugPressed) || (Gdx.input.isKeyPressed(Input.Keys.D));
 		primePressed = (secondary && primePressed) || (Gdx.input.isKeyPressed(Input.Keys.UP));
 		secondPressed = (secondary && secondPressed) || (Gdx.input.isKeyPressed(Input.Keys.SPACE));
-		prevPressed = (secondary && prevPressed) || (Gdx.input.isKeyPressed(Input.Keys.P));
+		prevPressed = (secondary && prevPressed) || (Gdx.input.isKeyPressed(Input.Keys.Z));
 		nextPressed = (secondary && nextPressed) || (Gdx.input.isKeyPressed(Input.Keys.N));
 		exitPressed  = (secondary && exitPressed) || (Gdx.input.isKeyPressed(Input.Keys.ESCAPE));
 		tetherPressed  = (secondary && tetherPressed) || (Gdx.input.isKeyPressed(Input.Keys.SPACE));
+		pausePressed = (secondary && pausePressed) || (Gdx.input.isKeyPressed(Input.Keys.P));
 		leftClick = (secondary && leftClick) || (Gdx.input.isButtonPressed(Input.Buttons.LEFT));
 		
 		// level editor commands
@@ -412,7 +422,10 @@ public class InputController {
 		if (Gdx.input.isKeyPressed(Input.Keys.NUM_3)) currentSelection = SelectionType.Enemy;
 		if (Gdx.input.isKeyPressed(Input.Keys.NUM_4)) currentSelection = SelectionType.Player;
 		if (Gdx.input.isKeyPressed(Input.Keys.NUM_5)) currentSelection = SelectionType.Wall;
-		if (Gdx.input.isKeyPressed(Input.Keys.NUM_6)) currentSelection = SelectionType.Goal;
+		if (Gdx.input.isKeyPressed(Input.Keys.NUM_6)) currentSelection = SelectionType.MapArea;
+		if (Gdx.input.isKeyPressed(Input.Keys.NUM_7)) currentSelection = SelectionType.Goal;
+		if (Gdx.input.isKeyPressed(Input.Keys.NUM_8)) currentSelection = SelectionType.WhirlpoolCCW;
+		if (Gdx.input.isKeyPressed(Input.Keys.NUM_9)) currentSelection = SelectionType.WhirlpoolCW;
 		
 		fast = (Gdx.input.isKeyPressed(Input.Keys.F));
 		

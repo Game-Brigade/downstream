@@ -19,6 +19,7 @@ import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.g2d.freetype.*;
 import com.badlogic.gdx.assets.loaders.*;
 import com.badlogic.gdx.assets.loaders.resolvers.*;
+import com.badlogic.gdx.audio.Music;
 
 import edu.cornell.gdiac.util.*;
 
@@ -28,7 +29,7 @@ import edu.cornell.gdiac.util.*;
  * This class is technically not the ROOT CLASS. Each platform has another class above
  * this (e.g. PC games use DesktopLauncher) which serves as the true root.  However, 
  * those classes are unique to each platform, while this class is the same across all 
- * plaforms. In addition, this functions as the root class all intents and purposes, 
+ * platforms. In addition, this functions as the root class all intents and purposes, 
  * and you would draw it as a root class in an architecture specification.  
  */
 public class GDXRoot extends Game implements ScreenListener {
@@ -40,13 +41,15 @@ public class GDXRoot extends Game implements ScreenListener {
 	private LoadingMode loading;
 	/** Player mode for the main menu */
 	private MainMenuMode mainMenu;
+	/** Player mode for the level select menu */
 	private LevelSelectMode levelSelect;
-	/** Player mode for the pause menu */
-	//private PauseMenuMode pauseMenu;
-	/** Player mode for the the game proper (CONTROLLER CLASS) */
-	private int current;
-	/** List of all WorldControllers */
-	private WorldController[] controllers;
+	/** Player controller for playing the game */
+	private DownstreamController playGame;
+	/** Player mode for level editing */
+	private LevelEditor editor;
+	/** Background music */
+	private static final String BACKGROUND_SOUND = "SOUNDS/background_sound.mp3";
+	private Music backgroundMusic;
 	
 	/**
 	 * Creates a new game from the configuration settings.
@@ -75,14 +78,12 @@ public class GDXRoot extends Game implements ScreenListener {
 		loading = new LoadingMode(canvas,manager,1);
 		mainMenu = new MainMenuMode(canvas,manager);
 		levelSelect = new LevelSelectMode(canvas,manager);
+		playGame = new DownstreamController();
+		editor = new LevelEditor();
 		
-		controllers = new WorldController[2];
-		controllers[1] = new LevelEditor();
-		controllers[0] = new DownstreamController(); 
-		for(int ii = 0; ii < controllers.length; ii++) {
-			controllers[ii].preLoadContent(manager);
-		}
-		current = 0;
+		playGame.preLoadContent(manager);
+		editor.preLoadContent(manager);
+		
 		loading.setScreenListener(this);
 		setScreen(loading);
 	}
@@ -95,10 +96,6 @@ public class GDXRoot extends Game implements ScreenListener {
 	public void dispose() {
 		// Call dispose on our children
 		setScreen(null);
-		for(int ii = 0; ii < controllers.length; ii++) {
-			controllers[ii].unloadContent(manager);
-			controllers[ii].dispose();
-		}
 
 		canvas.dispose();
 		canvas = null;
@@ -138,65 +135,72 @@ public class GDXRoot extends Game implements ScreenListener {
 			mainMenu.setScreenListener(this);
 			setScreen(mainMenu);
 			Gdx.input.setInputProcessor(mainMenu);
-		}
 		
+			backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal(BACKGROUND_SOUND));
+			backgroundMusic.setLooping(true);
+			//backgroundMusic.play();
+		}
 		else if (screen == mainMenu && exitCode == WorldController.EXIT_PLAY) {
-			for(int ii = 0; ii < controllers.length; ii++) {
-				controllers[ii].loadContent(manager);
-				controllers[ii].setScreenListener(this);
-				controllers[ii].setCanvas(canvas);
-			}
-			controllers[current].reset();
-			setScreen(controllers[current]);
-			
+			playGame = new DownstreamController();
+			playGame.preLoadContent(manager);
+			playGame.loadContent(manager);
+			playGame.setScreenListener(this);
+			playGame.setCanvas(canvas);
+			playGame.reset();
+			setScreen(playGame);
+			Gdx.input.setInputProcessor(playGame);
 			mainMenu.dispose();
 			mainMenu = null;
-		
 		} 
-		
 		else if (screen == mainMenu && exitCode == WorldController.EXIT_EDIT){
-			for(int ii = 0; ii < controllers.length; ii++) {
-				controllers[ii].loadContent(manager);
-				controllers[ii].setScreenListener(this);
-				controllers[ii].setCanvas(canvas);
-			}
-			controllers[1].reset();
-			setScreen(controllers[1]);
-			
+			editor = new LevelEditor();
+			editor.preLoadContent(manager);
+			editor.loadContent(manager);
+			editor.setScreenListener(this);
+			editor.setCanvas(canvas);
+			editor.reset();
+			setScreen(editor);
 			mainMenu.dispose();
 			mainMenu = null;
 		}
-		
 		else if (screen == mainMenu && exitCode == WorldController.EXIT_SELECT){
-			
-			mainMenu.dispose();
-			mainMenu = null;
 			levelSelect = new LevelSelectMode(canvas,manager);
 			levelSelect.setScreenListener(this);
 			setScreen(levelSelect);
 			Gdx.input.setInputProcessor(levelSelect);
+			mainMenu.dispose();
+			mainMenu = null;
 		}
-		
 		else if (screen == levelSelect && exitCode == WorldController.EXIT_MAIN){
+			mainMenu = new MainMenuMode(canvas,manager);
+			mainMenu.setScreenListener(this);
+			setScreen(mainMenu);
+			Gdx.input.setInputProcessor(mainMenu);
 			levelSelect.dispose();
 			levelSelect = null;
+		}
+		else if (screen == playGame && exitCode == WorldController.EXIT_MAIN){
+			playGame.unloadContent(manager);
+			playGame.dispose();
+			playGame = null;
 			mainMenu = new MainMenuMode(canvas,manager);
-			
 			mainMenu.setScreenListener(this);
 			setScreen(mainMenu);
 			Gdx.input.setInputProcessor(mainMenu);
 		}
-		
-		else if (exitCode == WorldController.EXIT_NEXT) {
-			current = (current+1) % controllers.length;
-			controllers[current].reset();
-			setScreen(controllers[current]);
-		} else if (exitCode == WorldController.EXIT_PREV) {
-			current = (current+controllers.length-1) % controllers.length;
-			controllers[current].reset();
-			setScreen(controllers[current]);
-		} else if (exitCode == WorldController.EXIT_QUIT) {
-			// We quit the main application
+		else if (screen == playGame && exitCode == WorldController.EXIT_PLAY){
+			playGame.unloadContent(manager);
+			playGame.dispose();
+			playGame = new DownstreamController();
+			playGame.preLoadContent(manager);
+			playGame.loadContent(manager);
+			playGame.setScreenListener(this);
+			playGame.setCanvas(canvas);
+			playGame.reset();
+			setScreen(playGame);
+			Gdx.input.setInputProcessor(playGame);
+		}
+		else if (exitCode == WorldController.EXIT_QUIT){
 			Gdx.app.exit();
 		}
 	}

@@ -40,8 +40,13 @@ public class PlayerModel extends BoxObstacle {
 	/** Cache object for right afterburner origin */
 	public Vector2 rghtOrigin = new Vector2();
 	
+<<<<<<< HEAD
 	public Vector2 initPos;
 
+=======
+	private Vector2 cachedPos = new Vector2(0, 0);
+	
+>>>>>>> b0759998a9a98328febf9a791889916bcce8759d
 	private int health;
 
 	private Vector2 force;
@@ -64,6 +69,12 @@ public class PlayerModel extends BoxObstacle {
 	private boolean bursting;
 	
 	private float energy;
+	
+	private boolean curved;
+	
+	private boolean left;
+	
+	private boolean cachedLeft = false;
 
 	private boolean pastTanTether;
 	
@@ -90,6 +101,7 @@ public class PlayerModel extends BoxObstacle {
 		cent = Vector2.Zero;
 		dest = Vector2.Zero;
 	}
+	
 
 	public boolean isAlive() {
 		return health > 0;
@@ -112,6 +124,13 @@ public class PlayerModel extends BoxObstacle {
 		body.applyForceToCenter(calculateWhirlForce(whirlPos,rad), true);
 	}
 	
+<<<<<<< HEAD
+=======
+	public void setCurved(boolean b){
+		curved = b;
+	}
+
+>>>>>>> b0759998a9a98328febf9a791889916bcce8759d
 	public void refreshTetherForce(Vector2 tetherPos, float rad){
 		pull = tetherPos.cpy().sub(getPosition());
 		pull.setLength(pull.len() + rad);
@@ -164,15 +183,26 @@ public class PlayerModel extends BoxObstacle {
 	
 	public Vector2 calculateWhirlForce(Vector2 whirlPos, float rad){
 		if(isWhirled()){
+			// TRUE CIRCLE
 			if(getPosition().sub(dest).len2() < .01){
 				dest = getPosition();
+				
+				// set force direction
 				pull = whirlPos.sub(getPosition());
-				float forceMagnitude = (float)(getMass() * getLinearVelocity().len2() / rad);
-				return pull.setLength(forceMagnitude);
+				
+				// set force magnitude
+			    float forceMagnitude = (float) (getMass() * getLinearVelocity().len2() / rad);
+			    return pull.setLength(forceMagnitude);
+			} 
+			
+			// CORRECTIVE CIRCLE
+			else{
+			    float forceMagnitude = (float) (getMass() * getLinearVelocity().len2() / (pull.len()/2));
+			    return cent.cpy().sub(getPosition()).setLength(forceMagnitude);			
 			}
 		}
-		
 		return Vector2.Zero;
+		
 	}
 	
 	public void passAdjust(Vector2 tetherPos){
@@ -241,7 +271,36 @@ public class PlayerModel extends BoxObstacle {
 		isWhirled = newState;
 	}
 	
+	public boolean left(TetherModel t){
+		boolean b;
+		
+		if (cachedPos.x - .5 > t.getX()){
+			if (this.getPosition().x > t.getX() && this.getPosition().y > cachedPos.y){
+				b = true;
+			}
+			else{ b = false;}
+			cachedLeft = b;
+		}
+		else{
+			b = cachedLeft;
+		}
+		
+		if (cachedPos.x + .5 < t.getX()){
+			if (this.getPosition().x < t.getX() && this.getPosition().y < cachedPos.y){
+				b = true;
+			}
+			else{b = false;}
+			cachedLeft = b;
+		}
+		else{
+			b = cachedLeft;
+		}
+		
+		cachedPos = getPosition().cpy();
+		left = b;
+		return b;
 
+	}
 	
 	/**
 	 * Draws the physics object.
@@ -249,10 +308,30 @@ public class PlayerModel extends BoxObstacle {
 	 * @param canvas Drawing context
 	 */
 	public void draw(GameCanvas canvas) {
+<<<<<<< HEAD
 //		canvas.drawLeadingLine(body.getPosition(), new Vector2(0,0));
 		if(!dead){
 			super.draw(canvas);  
 		}
+=======
+		//super.draw(canvas);  
+//		canvas.drawLeadingLine(body.getPosition(), new Vector2(0,0));
+		if (texture != null) {
+			if (!curved){canvas.draw(texture, Color.WHITE,origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x,getAngle() + 2.2f, .28f, .28f);}
+			else{
+				if(left){
+					if (curved)canvas.draw(texture, Color.WHITE,origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x, getAngle() + 2.6f, .3f, .3f);
+				}
+				else{
+					if (curved)canvas.draw(texture, Color.WHITE,origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x, getAngle() + 3.7f, .3f, .3f);
+				}
+			}
+			
+			
+			//canvas.draw(texture,Color.WHITE,origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x,getAngle(),1,1);
+		}
+
+>>>>>>> b0759998a9a98328febf9a791889916bcce8759d
 	}
 	
 	
@@ -390,6 +469,7 @@ public class PlayerModel extends BoxObstacle {
 	public void burst(){
 		if (energy >= 2){
 			bursting = true;
+			setTethered(false);
 		}
 		
 	}
@@ -411,6 +491,7 @@ public class PlayerModel extends BoxObstacle {
 		}
 		
 	}
+<<<<<<< HEAD
 
 	public void updateSpeed(float v) {
 		if(!this.isDead()){
@@ -450,6 +531,11 @@ public class PlayerModel extends BoxObstacle {
 		System.out.println("Pull: "+ pull);		
 	}
 	
+=======
+>>>>>>> b0759998a9a98328febf9a791889916bcce8759d
 	
+	public float getEnergy(){
+		return energy;
+	}
 	
 }
