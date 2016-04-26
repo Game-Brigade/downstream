@@ -873,13 +873,7 @@ public class DownstreamController extends WorldController implements ContactList
 				canvas.drawTetherCircle(closestTether, TetherModel.TETHER_DEFAULT_RANGE * scale.x * .9f);
 			}
 		}
-<<<<<<< HEAD
-=======
 
-
-		
-
->>>>>>> 379fb3ab6bb38efde9249a9f121425ad6a6efc14
 	}
 	
 	/**
