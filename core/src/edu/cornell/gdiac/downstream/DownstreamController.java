@@ -688,7 +688,6 @@ public class DownstreamController extends WorldController implements ContactList
 		
 		if(koi.isDead()){
 			deathSound.play();
-
 			respawn();
 		} else{
 			//ZOOM IN TO PLAYER AT START OF LEVEL
@@ -717,7 +716,7 @@ public class DownstreamController extends WorldController implements ContactList
 			moveShadows();
 
 
-			closestTether = getClosestTether();
+			closestTether = getClosestTetherTo(koi.getPosition());
 			// INPUT CODE
 			if (input.didTether() && !isWhirled() && !koi.bursting) {
 				if((koi.isTethered() || koi.isAttemptingTether())){
@@ -791,14 +790,16 @@ public class DownstreamController extends WorldController implements ContactList
 				koi.setTethered(false);
 			}
 			// HIT TANGENT
-			if (koi.isAttemptingTether() && (koi.getPosition().sub(init).len2() < .01)) {
+			if (koi.isAttemptingTether() && (koi.getPosition().sub(init).len2() < .01) ) {
+				System.out.println("tether");
 				koi.setTethered(true);
 				koi.setAttemptingTether(false);
 				koi.refreshTetherForce(close, closestTether.getOrbitRadius());
 			}
 			// PAST TANGENT
 			else if (koi.isAttemptingTether() && !koi.willIntersect(init) && koi.pastTangent(init)) {
-				koi.passAdjust(close);
+				//koi.passAdjust(close);
+				System.out.println("TURN AWAY??");
 			}
 			else {}
 			koi.applyTetherForce(close, closestTether.getOrbitRadius());
@@ -955,9 +956,6 @@ public class DownstreamController extends WorldController implements ContactList
 	}
 
 	private TetherModel getClosestTetherTo(Vector2 v) {
-		if(collisionController.inRange()){
-			return collisionController.getClosestTetherInRange();
-		}
 		TetherModel closestTether = tethers.get(0);
 		float closestDistance = tethers.get(0).getPosition().sub(v).len();
 		for (TetherModel tether : tethers) {

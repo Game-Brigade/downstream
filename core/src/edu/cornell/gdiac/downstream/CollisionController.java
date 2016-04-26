@@ -99,8 +99,6 @@ public class CollisionController {
 				else if(sCollide.startsWith("wall")){}
 				else { System.out.println("COLLISION ERROR: "+sCollide);}
 				
-				
-				
 	}
 		
 	
