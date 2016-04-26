@@ -67,7 +67,7 @@ public abstract class WorldController implements Screen {
 	
 	// Pathnames to shared assets
 	/** The background image for the battle */
-	private static final String BACKGROUND_FILE_N = "terrain/Water_Day.jpg";
+	private static final String BACKGROUND_FILE_N = "terrain/Water_Night.jpg";
 	private static final String BACKGROUND_FILE_D = "terrain/Water_Day.jpg";
 	private static final String BACKGROUND_FILE_S = "terrain/Water_Sunset.jpg";
 	private static final String OVERLAY_FILE = "terrain/texture.jpg";

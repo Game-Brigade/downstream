@@ -544,6 +544,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private void populateLevel() {
 
 		int NDS = new Random().nextInt(3);
+		System.out.println(NDS);
 
 		// 0 is day 1 is night 2 is sunset
 		setDayTime(NDS);
