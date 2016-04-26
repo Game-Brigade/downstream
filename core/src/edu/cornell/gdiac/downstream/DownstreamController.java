@@ -63,7 +63,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private static final String CLICK_SOUND = "SOUNDS/menu_click.wav";
 	private static final String LIGHTING_SOUND = "SOUNDS/lighting_1.mp3";
 	private static final String DEATH_SOUND = "SOUNDS/fish_death.wav";
-	private static final String BACKGROUND_SOUND = "SOUNDS/background_sound.mp3";
+	
 	private static final String ENERGYBAR_TEXTURE = "MENUS/UI_bar.png";
 	private static final String UI_FLOWER = "MENUS/UI_lotus.png";
 	private static final String OVERLAY = "terrain/texture.jpg";
@@ -110,6 +110,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private boolean enableTetherRadius = true;
 	
 	private Music deathSound;
+	
 	
 	//animations
 	
@@ -363,6 +364,8 @@ public class DownstreamController extends WorldController implements ContactList
 		*/
 		
 		deathSound = Gdx.audio.newMusic(Gdx.files.internal(LIGHTING_SOUND));
+		deathSound.setLooping(false);
+		
 		super.loadContent(manager);
 		fishAssetState = AssetState.COMPLETE;
 	}
@@ -636,6 +639,7 @@ public class DownstreamController extends WorldController implements ContactList
 		
 		if(dead){
 			deathSound.play();
+
 			objects.remove(koi);
 			setFailure(dead);
 			cameraController.resetCameraVelocity(); 
@@ -862,6 +866,9 @@ public class DownstreamController extends WorldController implements ContactList
 		}
 		else {
 			super.draw(delta);
+			canvas.beginHUD();
+			HUD.draw(canvas);
+			canvas.end();
 			if (enableLeadingLine) {
 				Vector2 farOff = koi.getPosition().cpy();
 				farOff.add(koi.getLinearVelocity().cpy().scl(1000));
@@ -876,9 +883,7 @@ public class DownstreamController extends WorldController implements ContactList
 		}
 
 
-		canvas.beginHUD();
-		HUD.draw(canvas);
-		canvas.end();
+		
 
 	}
 	

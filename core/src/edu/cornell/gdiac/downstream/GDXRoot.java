@@ -19,6 +19,7 @@ import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.g2d.freetype.*;
 import com.badlogic.gdx.assets.loaders.*;
 import com.badlogic.gdx.assets.loaders.resolvers.*;
+import com.badlogic.gdx.audio.Music;
 
 import edu.cornell.gdiac.util.*;
 
@@ -48,6 +49,9 @@ public class GDXRoot extends Game implements ScreenListener {
 	private LevelEditor editor;
 	/** Player mode for the the game proper (CONTROLLER CLASS) */
 	private int current;
+	
+	private Music backgroundMusic;
+	private static final String BACKGROUND_SOUND = "SOUNDS/background_sound.mp3";
 	
 	
 	/**
@@ -138,6 +142,10 @@ public class GDXRoot extends Game implements ScreenListener {
 			mainMenu.setScreenListener(this);
 			setScreen(mainMenu);
 			Gdx.input.setInputProcessor(mainMenu);
+		
+			backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal(BACKGROUND_SOUND));
+			backgroundMusic.setLooping(true);
+			backgroundMusic.play();
 		}
 		
 		else if (screen == mainMenu && exitCode == WorldController.EXIT_PLAY) {
