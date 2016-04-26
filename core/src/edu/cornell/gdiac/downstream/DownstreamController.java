@@ -719,7 +719,7 @@ public class DownstreamController extends WorldController implements ContactList
 				koi.setDead(true);
 				return;
 			}
-
+/*
 			//WHIRLPOOL CODE
 			if (wpools.isEmpty()){
 				closestWhirlpool = null;
@@ -743,7 +743,7 @@ public class DownstreamController extends WorldController implements ContactList
 					koi.applyWhirlForce(close, closestWhirlpool.getOrbitRadius());
 				}
 			}
-
+*/
 
 			// ENEMY PATROL CODE
 			for (EnemyModel enemy : enemies) {
@@ -767,8 +767,8 @@ public class DownstreamController extends WorldController implements ContactList
 			closestTether.setTethered(isTethered() && closestTether.isLotus() && collisionController.inRangeOf(closestTether));
 
 			// TETHER FORCE CODE
-			close = getClosestTether().getPosition();
-			init = koi.getInitialTangentPoint(close);
+			Vector2 close = getClosestTether().getPosition();
+			Vector2 init = koi.getInitialTangentPoint(close);
 
 			if (close.dst(koi.getPosition()) > TetherModel.TETHER_DEFAULT_RANGE*1.3){
 				koi.setAttemptingTether(false);
