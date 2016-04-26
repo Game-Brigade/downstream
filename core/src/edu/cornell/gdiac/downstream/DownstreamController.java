@@ -168,9 +168,9 @@ public class DownstreamController extends WorldController implements ContactList
 	private SpriteBatch koiCspriteBatch; // #6
 	private TextureRegion koiCcurrentFrame; // #7
 	
-	private Animation						koiCAnimationFlipped;
-	private TextureRegion[]					koiCFramesFlipped;
-	private TextureRegion					KoiCcurrentFrameFlipped;
+	private Animation koiCAnimationFlipped;
+	private TextureRegion[]	koiCFramesFlipped;
+	private TextureRegion KoiCcurrentFrameFlipped;
 	
 	// Physics constants for initialization //
 	/** Density of non-enemy objects */
@@ -493,21 +493,21 @@ public class DownstreamController extends WorldController implements ContactList
 			tethers.add(lily);
 		}
 		
-		/*
-		for (Vector2 whirlpool: level.wpools) {
-			WhirlpoolModel pool = new WhirlpoolModel(whirlpool.x, whirlpool.y);
-			pool.setBodyType(BodyDef.BodyType.StaticBody);
-			pool.setName("whirlpool" + 1);
-			pool.setDensity(TETHER_DENSITY);
-			pool.setFriction(TETHER_FRICTION);
-			pool.setRestitution(TETHER_RESTITUTION);
-			pool.setSensor(sensorPools);
-			pool.setDrawScale(scale);
-			pool.setTexture(whirlpoolFlipTexture);
-			addObject(pool);
-			wpools.add(pool);
+		if (!level.wpools.isEmpty()) {
+			for (Vector2 whirlpool : level.wpools) {
+				WhirlpoolModel pool = new WhirlpoolModel(whirlpool.x, whirlpool.y,1);
+				pool.setBodyType(BodyDef.BodyType.StaticBody);
+				pool.setName("whirlpool" + 1);
+				pool.setDensity(TETHER_DENSITY);
+				pool.setFriction(TETHER_FRICTION);
+				pool.setRestitution(TETHER_RESTITUTION);
+				pool.setSensor(sensorPools);
+				pool.setDrawScale(scale);
+				pool.setTexture(whirlpoolFlipTexture);
+				addObject(pool);
+				wpools.add(pool);
+			}
 		}
-		*/
 		for (Vector2 lotus : level.lotuses) {
 			TetherModel lantern = new TetherModel(lotus.x, lotus.y, rad, true);
 			lantern.setBodyType(BodyDef.BodyType.StaticBody);
