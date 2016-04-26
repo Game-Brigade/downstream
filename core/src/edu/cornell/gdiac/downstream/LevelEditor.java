@@ -243,6 +243,7 @@ public class LevelEditor extends WorldController {
 	
 	private void populateLevel() {
 		cameraController = new CameraController(canvas.getCamera());
+		goal = new ArrayList<Vector2>();
 		lilypads = new ArrayList<Vector2>();
 		lanterns = new ArrayList<Vector2>();
 		enemies = new HashMap<String,ArrayList<Vector2>>();
@@ -301,7 +302,7 @@ public class LevelEditor extends WorldController {
 					addPlayer(currentClick);
 					return;
 				case Wall:
-					System.out.println(newClick);
+//					System.out.println(newClick);
 					addWall(currentClick,didEnter);
 					return;
 				case MapArea:
@@ -441,7 +442,7 @@ public class LevelEditor extends WorldController {
 			float[] wallFloat = new float[wall.size()];
 			for (int i = 0; i < wall.size(); i++) wallFloat[i] = wall.get(i);
 			if (wallFloat.length == 0) return;
-			System.out.println(Arrays.toString(wallFloat));
+//			System.out.println(Arrays.toString(wallFloat));
 			obj = new PolygonObstacle(wallFloat, 0, 0);
 			obj.setBodyType(BodyDef.BodyType.StaticBody);
 			obj.setDensity(BASIC_DENSITY);
@@ -453,8 +454,8 @@ public class LevelEditor extends WorldController {
 			addObject(obj);
 			return;
 		}
-		System.out.println("Not building leveL: " + !buildingLevel);
-		System.out.println("Not new click: " + !newClick);
+//		System.out.println("Not building leveL: " + !buildingLevel);
+//		System.out.println("Not new click: " + !newClick);
 		if (!newClick && !buildingLevel) return;
 		if (settingWallPath) {
 			if (wallPath.get(wallPath.size()-1) != click) wallPath.add(click.cpy().scl(scale));
