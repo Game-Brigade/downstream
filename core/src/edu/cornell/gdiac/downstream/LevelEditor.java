@@ -310,6 +310,12 @@ public class LevelEditor extends WorldController {
 				case Goal:
 					addGoal(currentClick);
 					return;
+				case WhirlpoolCCW:
+					addWhirlpool(currentClick, 1);
+					return;
+				case WhirlpoolCW:
+					addWhirlpool(currentClick, -1);
+					
 			}
 		}
 //		System.out.println("please");
@@ -339,11 +345,10 @@ public class LevelEditor extends WorldController {
 	}
 	
 
-	private void addWhirlPool(Vector2 click){
+	private void addWhirlpool(Vector2 click, int dir){
 		
 		wpools.add(click.cpy());
-		//rad?
-		WhirlpoolModel pool = new WhirlpoolModel(currentClick.x, currentClick.y, 1);
+		WhirlpoolModel pool = new WhirlpoolModel(currentClick.x, currentClick.y, dir);
 		pool.setBodyType(BodyDef.BodyType.StaticBody);
 		pool.setName("whirlpool" + 1);
 		pool.setDensity(TETHER_DENSITY);
@@ -351,7 +356,12 @@ public class LevelEditor extends WorldController {
 		pool.setRestitution(TETHER_RESTITUTION);
 		pool.setSensor(false);
 		pool.setDrawScale(scale);
-		pool.setTexture(whirlpoolFlipTexture);
+		if(dir == -1){
+			pool.setTexture(whirlpoolTexture);
+		}
+		else{
+			pool.setTexture(whirlpoolFlipTexture);
+		}
 		addObject(pool);
 	}
 	

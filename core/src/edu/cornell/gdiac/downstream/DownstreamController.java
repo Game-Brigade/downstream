@@ -407,6 +407,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private CameraController cameraController;
 	private CollisionController collisionController;
 	private TetherModel closestTether;
+	private WhirlpoolModel closestWhirlpool;
 	private int litLotusCount;
 
 	/**
@@ -695,20 +696,7 @@ public class DownstreamController extends WorldController implements ContactList
 		else {}
 		koi.applyTetherForce(close, closestTether.getOrbitRadius());
 
-		/*
-		WhirlpoolModel closestWhirlpool = getClosestWhirl();
-		
-		if (koi.getPosition().sub(koi.getInitialTangentPoint(closestWhirlpool.getPosition())).len2() < .01){
-			if (!koi.isWhirled()) {
-				koi.refreshWhirlForce(closestWhirlpool.getPosition(), closestWhirlpool.getOrbitRadius());
-			}
-			koi.applyWhirlForce(closestWhirlpool.getPosition(), closestWhirlpool.getOrbitRadius());
-			cameraController.moveCameraTowards(closestWhirlpool.getPosition().cpy().scl(scale));
-			if (camera_zoom) cameraController.zoomOut();
-			koi.setWhirled(true);
-		}
-		
-*/
+
 		// RESOLVE FISH IMG
 		koi.resolveDirection();
 		
@@ -837,23 +825,30 @@ public class DownstreamController extends WorldController implements ContactList
 		return closestTether;
 	}
 	
+	private boolean isWhirled(){
+		return koi.isWhirled();
+	}
 	
 	private WhirlpoolModel getClosestWhirl() {
-		WhirlpoolModel closestWhirl = wpools.get(0);
+		if(collisionController.inRangePool()){
+			return collisionController.getClosestWhirlpoolInRange();
+		}
+		WhirlpoolModel closestPool = wpools.get(0);
 		float closestDistance = wpools.get(0).getPosition().sub(koi.getPosition()).len2();
-		for(WhirlpoolModel w: wpools){
-			float newDistance = w.getPosition().sub(koi.getPosition()).len2();
-			if(newDistance < closestDistance){
+		for (WhirlpoolModel wp : wpools) {
+			float newDistance = wp.getPosition().sub(koi.getPosition()).len2();
+			if (newDistance < closestDistance) {
 				closestDistance = newDistance;
-				closestWhirl = w;
+				closestWhirlpool = wp;
 			}
 		}
-		return closestWhirl;
+		return closestWhirlpool;
 	}
 
 	public void draw(float delta) {
 
 		if (paused){
+			
 			pauseMenu.draw();
 		}
 		else {
@@ -887,6 +882,7 @@ public class DownstreamController extends WorldController implements ContactList
 	public void render(float delta) {
 		InputController input = InputController.getInstance();
 		if(wasPaused){
+			
 			paused =true;
 		}
 		else{
