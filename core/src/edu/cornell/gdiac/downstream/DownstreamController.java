@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Random;
 import java.util.Stack;
 
 import com.badlogic.gdx.math.*;
@@ -129,9 +130,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private static final String LIGHTING_SOUND = "SOUNDS/lighting_1.mp3";
 	private Music deathSound;
 
-	//Animations//
-	private float stateTime;  
-	private float relativeTime = 0;
+	
 
 	private Animation lilyAnimation; // #3
 	private Texture lilySheet; // #4
@@ -212,6 +211,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private static final int RESPAWN_TIME = 100;
 	private int respawnTimer = RESPAWN_TIME;
 	private TetherModel checkpoint0;
+
 
 	private double rot = 0;
 
@@ -433,6 +433,10 @@ public class DownstreamController extends WorldController implements ContactList
 		fishAssetState = AssetState.COMPLETE;
 	}
 
+
+		private float stateTime;  
+		private float relativeTime = 0;
+
 	/**
 	 * Creates and initialize a new instance of Downstream
 	 *
@@ -489,14 +493,20 @@ public class DownstreamController extends WorldController implements ContactList
 	 * Lays out the game geography.
 	 */
 	private void populateLevel() {
+	
+		int NDS = new Random().nextInt(3);
+		//follow convention chicos
+		// 0 is day 1 is night 2 is sunset
+		setDayTime(NDS);
+
+
 		LevelEditor.Level level;
 		if (this.level != -1) {
 			level = LevelEditor.loadFromJson(this.level);
 		} else {
 			level = LevelEditor.loadFromJson();
 		}
-		// Add level goal
-		//		System.out.println(Arrays.toString(Thread.currentThread().getStackTrace()));
+
 		cameraController = new CameraController(canvas.getCamera());
 
 		float dwidth;
@@ -562,7 +572,16 @@ public class DownstreamController extends WorldController implements ContactList
 			obj.setFriction(BASIC_FRICTION);
 			obj.setRestitution(BASIC_RESTITUTION);
 			obj.setDrawScale(scale);
-			obj.setTexture(earthTile);
+			if (NDS == 0){
+				obj.setTexture(earthTileDay);
+			}
+			if (NDS == 1){
+				obj.setTexture(earthTileNight);
+			}
+			if (NDS == 2){
+				obj.setTexture(earthTileSunset);
+			}
+			//obj.setTexture(earthTile);
 			obj.setName("wall1");
 			ArrayList<Float> scaledWall = new ArrayList<Float>();
 			for (Float f : wall) scaledWall.add(f*scale.x);
@@ -591,10 +610,6 @@ public class DownstreamController extends WorldController implements ContactList
 			addObject(eFish);
 			enemies.add(eFish);
 		}
-
-
-
-		// Create the fish avatar
 
 		dwidth  = koiTexture.getRegionWidth()/scale.x;
 		dheight = koiTexture.getRegionHeight()/scale.y;
@@ -719,7 +734,7 @@ public class DownstreamController extends WorldController implements ContactList
 				koi.setDead(true);
 				return;
 			}
-
+/*
 			//WHIRLPOOL CODE
 			if (wpools.isEmpty()){
 				closestWhirlpool = null;
@@ -743,7 +758,7 @@ public class DownstreamController extends WorldController implements ContactList
 					koi.applyWhirlForce(close, closestWhirlpool.getOrbitRadius());
 				}
 			}
-
+*/
 
 			// ENEMY PATROL CODE
 			for (EnemyModel enemy : enemies) {
@@ -765,10 +780,14 @@ public class DownstreamController extends WorldController implements ContactList
 
 			// LOTUS LIGHTING CODE
 			closestTether.setTethered(isTethered() && closestTether.isLotus() && collisionController.inRangeOf(closestTether));
-
+			//System.out.println(isTethered());
+			//System.out.println(closestTether.isLotus());
+			//System.out.println(collisionController.inRangeOf(closestTether));
+			//System.out.println(closestTether.set);
+			
 			// TETHER FORCE CODE
-			close = getClosestTether().getPosition();
-			init = koi.getInitialTangentPoint(close);
+			Vector2 close = getClosestTether().getPosition();
+			Vector2 init = koi.getInitialTangentPoint(close);
 
 			if (close.dst(koi.getPosition()) > TetherModel.TETHER_DEFAULT_RANGE*1.3){
 				koi.setAttemptingTether(false);
@@ -821,8 +840,7 @@ public class DownstreamController extends WorldController implements ContactList
 			koiCcurrentFrame = koiCAnimation.getKeyFrame(stateTime, true);
 			KoiCcurrentFrameFlipped = koiCAnimationFlipped.getKeyFrame(stateTime, true);
 
-			//FSM to handle Koi
-
+			//System.out.println(relativeTime);
 			//koiCcurrentFrame.flip(koi.left(closestTether), false);
 			if (koi.isTethered()){
 				koi.setCurved(true);
@@ -848,17 +866,21 @@ public class DownstreamController extends WorldController implements ContactList
 				else{
 					tethers.get(i).inrange = false;
 				}
+				
 				if (tethers.get(i).getTetherType() == TetherType.Lilypad){
 					tethers.get(i).setTexture(lilycurrentFrame);
 				}
 				if (tethers.get(i).getTetherType() == TetherType.Lantern) {
+					//System.out.println("here");
 					if (tethers.get(i).getOpening() == 0){
 						tethers.get(i).setTexture(closedFlowercurrentFrame);
 						if (tethers.get(i).set){
+
 							tethers.get(i).setOpening(1);
 						}
+					}
 						if (tethers.get(i).getOpening() == 1){
-							//TODO
+							
 							if (!openingFlowerAnimation.isAnimationFinished(relativeTime))
 							{openingFlowercurrentFrame = openingFlowerAnimation.getKeyFrame(relativeTime, true);
 							relativeTime += Gdx.graphics.getDeltaTime();  
@@ -870,6 +892,7 @@ public class DownstreamController extends WorldController implements ContactList
 							}
 							}
 							if (openingFlowerAnimation.isAnimationFinished(relativeTime)){
+								System.out.println("finished");
 								tethers.get(i).setOpening(2);
 								relativeTime = 0;
 							}
@@ -878,8 +901,8 @@ public class DownstreamController extends WorldController implements ContactList
 						if (tethers.get(i).getOpening() == 2){
 							tethers.get(i).setTexture(openFlowercurrentFrame);
 							/*if (tethers.get(i).set){
-						tethers.get(i).setOpening(1);
-					}*/
+							tethers.get(i).setOpening(1);
+						}*/
 						}
 						if (tethers.get(i).getOpening() == 3){ 
 							if(!tethers.get(i).set){
@@ -903,10 +926,13 @@ public class DownstreamController extends WorldController implements ContactList
 					}
 				}
 			}
+
+		HUD.updateHUD(litlanterns.size(), koi.getEnergy());
 		}
-		SoundController.getInstance().update();
-		HUD.updateHUD(lanterns.size()-litlanterns.size(), koi.getEnergy());
-	}
+		//SoundController.getInstance().update();
+
+		
+
 
 
 	private void clearShadows(boolean b) {
