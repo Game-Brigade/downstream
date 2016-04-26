@@ -71,7 +71,7 @@ public abstract class WorldController implements Screen {
 	
 
 	/** Retro font for displaying messages */
-	private static String FONT_FILE = "loading/RetroGame.ttf";
+	private static String FONT_FILE = "loading/marathon.ttf";
 	private static int FONT_SIZE = 64;
 
 
@@ -639,7 +639,7 @@ public abstract class WorldController implements Screen {
 			canvas.drawTextCentered("VICTORY!", displayFont, 0.0f);
 			canvas.end();
 		} else if (failed) {
-			displayFont.setColor(Color.RED);
+			//displayFont.setColor(Color.RED);
 			canvas.begin(); // DO NOT SCALE
 			canvas.drawTextCentered("FAILURE!", displayFont, 0.0f);
 			canvas.end();

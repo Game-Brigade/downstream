@@ -973,7 +973,7 @@ public class GameCanvas {
     	float h = 100;
     	float w = 100;
     	GlyphLayout layout = new GlyphLayout(font,text);
-    	spriteBatch.draw(lilypad, (getWidth() - w/2)/1.1f - 14, (getHeight() - h/2)/1.1f + offset, w, h);
+    	spriteBatch.draw(lilypad, (getWidth() - w/2)/1.1f - 14, (getHeight() - h/2)/1.1f + offset + 10, w, h);
     	
 		float x = (getWidth()  - layout.width) / 1.1f;
 		float y = (getHeight() + layout.height) / 1.1f;
@@ -1238,13 +1238,13 @@ public class GameCanvas {
 		local.translate(-ox,-oy);
 	}
 	
-	public void drawLeadingLine(Vector2 start, Vector2 end) {
+	public void drawLeadingLine(Vector2 start, Vector2 end, int width) {
 		start = start.cpy();
 		end = end.cpy();
-		Gdx.gl.glLineWidth(1);
+		Gdx.gl.glLineWidth(width);
         leadingLine.setProjectionMatrix(camera.combined);
         leadingLine.begin(ShapeRenderer.ShapeType.Line);
-        leadingLine.setColor(Color.WHITE);
+        leadingLine.setColor(Color.BLACK);
 //        local.applyTo(start);
 //        local.applyTo(end);
         leadingLine.line(start, end);
@@ -1252,13 +1252,25 @@ public class GameCanvas {
         Gdx.gl.glLineWidth(1);
     }
 	
+	public void drawLeadingLine(Vector2 start, Vector2 end) {
+		drawLeadingLine(start, end, 4);
+	}
+	
 	public void drawTetherCircle(Vector2 tetherPos, float radius) {
 		tetherRadiusLine.setProjectionMatrix(camera.combined);
 		tetherRadiusLine.begin(ShapeRenderer.ShapeType.Line);
 		tetherRadiusLine.setColor(Color.WHITE);
-//		System.out.println(tetherPos);
-//		System.out.println(radius);
 		tetherRadiusLine.circle(tetherPos.x, tetherPos.y, radius);
 		tetherRadiusLine.end();
+	}
+	
+	public void drawRectangle(Vector2 ll, Vector2 ur) {
+//		System.out.println("RECTANGLE BOYS");
+		ShapeRenderer rectangle = new ShapeRenderer();
+		rectangle.setProjectionMatrix(camera.combined);
+		rectangle.begin(ShapeRenderer.ShapeType.Line);
+		rectangle.setColor(Color.WHITE);
+		rectangle.rect(ll.x, ll.y, ur.x-ll.x, ur.y-ll.y);
+		rectangle.end();
 	}
 }
