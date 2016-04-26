@@ -61,13 +61,13 @@ public class CameraController {
 		mapHeight = height;
 		mapCenter = center;
 		playerPosition.x = player.x; playerPosition.y = player.y;
+		System.out.println("PLAYERPOSITION START: " + playerPosition);
 		numSteps = (center.cpy().sub(player).len()) / MAX_VELOCITY;
 		stepMove.x = (player.x - center.x) / numSteps;
 		stepMove.y = (player.y - center.y) / numSteps;
 		
 		camera.position.x = center.x; camera.position.y = center.y;
 		camera.zoom = width / Gdx.graphics.getWidth() * .95f;
-		System.out.println(camera.zoom + " " + numSteps);
 		stepZoom = (camera.zoom - MAX_ZOOM_OUT) / numSteps; 
 		
 		camera.update();
@@ -127,18 +127,20 @@ public class CameraController {
 //		camera.zoom = 2;
 		Vector2 difference = newPosition.cpy().sub(new Vector2(camera.position.x, camera.position.y));
 //		System.out.println(difference);
-		float camLeft = camera.position.x - Gdx.graphics.getWidth()/2*camera.zoom + difference.x;
+		float camLeft = camera.position.x - Gdx.graphics.getWidth() + difference.x;
 		float mapLeft = mapCenter.x - mapWidth/2;
-		float camRight = camera.position.x + Gdx.graphics.getWidth()/2*camera.zoom + difference.x;
+		float camRight = camera.position.x + Gdx.graphics.getWidth() + difference.x;
 		float mapRight = mapCenter.x + mapWidth/2;
-		float camTop = camera.position.y + Gdx.graphics.getHeight()/2*camera.zoom + difference.y;
+		float camTop = camera.position.y + Gdx.graphics.getHeight() + difference.y;
 		float mapTop = mapCenter.y + mapHeight/2;
-		float camBot = camera.position.y - Gdx.graphics.getHeight()/2*camera.zoom + difference.y;
+		float camBot = camera.position.y - Gdx.graphics.getHeight() + difference.y;
 		float mapBot = mapCenter.y - mapHeight/2;
-		if (camLeft < mapLeft) newPosition.x = mapLeft + Gdx.graphics.getWidth()/2*camera.zoom;
-		if (camRight > mapRight) newPosition.x = mapRight - Gdx.graphics.getWidth()/2*camera.zoom;
-		if (camTop > mapTop) newPosition.y = mapTop - Gdx.graphics.getHeight()/2*camera.zoom;
-		if (camBot < mapBot) newPosition.y = mapBot + Gdx.graphics.getHeight()/2*camera.zoom;
+		if (camLeft < mapLeft) newPosition.x = mapLeft + Gdx.graphics.getWidth();
+		if (camRight > mapRight) newPosition.x = mapRight - Gdx.graphics.getWidth();
+		if (camTop > mapTop) newPosition.y = mapTop - Gdx.graphics.getHeight();
+		if (camBot < mapBot) newPosition.y = mapBot + Gdx.graphics.getHeight();
+		System.out.println("NEW POSIITON: " + newPosition);
+		playerPosition.x = newPosition.x; playerPosition.y = newPosition.y;
 		difference = newPosition.cpy().sub(new Vector2(camera.position.x, camera.position.y));
 		if (difference.len() < velocity) {
 			camera.position.set(newPosition,0);
@@ -146,6 +148,7 @@ public class CameraController {
 			camera.translate(difference.setLength(velocity));
 		}
 		camera.update();
+		System.out.println(playerPosition);
 	}
 	
 	public void moveCameraTowards(Vector2 newPosition) {

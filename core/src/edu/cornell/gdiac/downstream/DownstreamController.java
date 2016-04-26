@@ -200,6 +200,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private Stack<TetherModel> litlanterns = new Stack<TetherModel>();
 	private ArrayList<EnemyModel> enemies = new ArrayList<EnemyModel>();
 	private ArrayList<WhirlpoolModel> wpools = new ArrayList<WhirlpoolModel>();
+	private ArrayList<ArrayList<Float>> walls = new ArrayList<ArrayList<Float>>();
 	private PlayerModel koi;
 	private EnemyModel eFish;
 	private CameraController cameraController;
@@ -207,25 +208,18 @@ public class DownstreamController extends WorldController implements ContactList
 	private TetherModel closestTether;
 	private WhirlpoolModel closestWhirlpool;
 	private int litLotusCount;
+	private int level = -1;
 	private static final int RESPAWN_TIME = 100;
 	private int respawnTimer = RESPAWN_TIME;
 	private TetherModel checkpoint0;
 
-
 	private double rot = 0;
-
 
 	/** The goal door position */
 	private static Vector2 GOAL_POS = new Vector2( 6, 12);
 	/** Reference to the goalDoor (for collision detection) */
 	private BoxObstacle goalDoor;
 
-	
-
-	/** Reference to the player avatar */
-
-	
-	
 	private boolean respawning;
 
 
@@ -454,6 +448,11 @@ public class DownstreamController extends WorldController implements ContactList
 		paused = false;
 		wasPaused = false;
 	}
+	
+	public DownstreamController(int level) {
+		this();
+		this.level = level;
+	}
 
 	/**
 	 * Resets the status of the game so that we can play again.
@@ -490,9 +489,12 @@ public class DownstreamController extends WorldController implements ContactList
 	 * Lays out the game geography.
 	 */
 	private void populateLevel() {
-
-		LevelEditor.Level level = LevelEditor.loadFromJson();
-
+		LevelEditor.Level level;
+		if (this.level != -1) {
+			level = LevelEditor.loadFromJson(this.level);
+		} else {
+			level = LevelEditor.loadFromJson();
+		}
 		// Add level goal
 		//		System.out.println(Arrays.toString(Thread.currentThread().getStackTrace()));
 		cameraController = new CameraController(canvas.getCamera());
@@ -562,6 +564,9 @@ public class DownstreamController extends WorldController implements ContactList
 			obj.setDrawScale(scale);
 			obj.setTexture(earthTile);
 			obj.setName("wall1");
+			ArrayList<Float> scaledWall = new ArrayList<Float>();
+			for (Float f : wall) scaledWall.add(f*scale.x);
+			walls.add(scaledWall);
 			addObject(obj);
 		}
 
@@ -661,7 +666,26 @@ public class DownstreamController extends WorldController implements ContactList
 	 *
 	 * @param delta Number of seconds since last animation frame
 	 */
-	public void update(float dt) {
+	public void update(float dt) {	
+		
+		System.out.println("KOI POSIITON: " + koi.getPosition().cpy().scl(scale));
+		
+		if (!cameraController.isZoomedToPlayer()) {
+			cameraController.zoomToPlayer();
+			return;
+		}
+		InputController input = InputController.getInstance();
+		
+		litLotusCount = 0;
+		for(TetherModel t : lanterns){
+			if(t.lit){
+				litLotusCount++;
+			}
+		}
+		if(lanterns.size() == litLotusCount){
+			this.setComplete(true);
+		}
+		
 		if(koi.isDead()){
 			deathSound.play();
 
@@ -695,7 +719,6 @@ public class DownstreamController extends WorldController implements ContactList
 
 			closestTether = getClosestTether();
 			// INPUT CODE
-			InputController input = InputController.getInstance();
 			if (input.didTether() && !isWhirled() && !koi.bursting) {
 				if((koi.isTethered() || koi.isAttemptingTether())){
 					koi.setTethered(false);					
@@ -978,6 +1001,7 @@ public class DownstreamController extends WorldController implements ContactList
 			super.draw(delta);
 			canvas.beginHUD();
 			HUD.draw(canvas);
+			for (ArrayList<Float> wall : walls) canvas.drawPath(wall);
 			canvas.end();
 		}
 
