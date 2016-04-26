@@ -222,19 +222,14 @@ public abstract class WorldController implements Screen {
 	
 	/** Exit code for quitting the game */
 	public static final int EXIT_QUIT = 0;
-	/** Exit code for advancing to next level */
-	public static final int EXIT_NEXT = 1;
-	/** Exit code for jumping back to previous level */
-	public static final int EXIT_PREV = 2;
-	/** Exit code for main menu */
-	public static final int EXIT_MAIN = 3;
-	/** Exit code for first level */
-	public static final int EXIT_PLAY = 4;
+	public static final int EXIT_MAIN = 9;
+	public static final int EXIT_SELECT = 10;
+	public static final int EXIT_PAUSE = 11;
+	public static final int EXIT_EDIT = 12;
+	public static final int EXIT_OPTIONS = 13;
+	public static final int EXIT_NEXT = 14;
+	public static final int EXIT_PREV = 15;
 	
-	public static final int EXIT_SELECT = 5;
-	public static final int EXIT_EDIT = 6;
-	public static final int EXIT_OPTIONS = 7;
-	public static final int EXIT_PAUSE = 8;
     /** How many frames after winning/losing do we continue? */
 	public static final int EXIT_COUNT = 120;
 

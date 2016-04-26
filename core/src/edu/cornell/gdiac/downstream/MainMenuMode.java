@@ -154,7 +154,7 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 			
 			// We are are ready, notify our listener
 			if (startPlay() && listener != null) {
-				listener.exitScreen(this, WorldController.EXIT_PLAY);
+				listener.exitScreen(this, 0);
 			}
 			if (startSelect() && listener != null){
 				listener.exitScreen(this, WorldController.EXIT_SELECT);

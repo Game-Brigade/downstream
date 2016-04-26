@@ -551,6 +551,18 @@ public class LevelEditor extends WorldController {
 			return null;
 		}
 	}
+	
+	public static Level loadFromJson(int lvl) {
+		Gson gson = new Gson();
+		try {
+			JsonReader reader = new JsonReader(new FileReader("" + lvl + ".json"));
+			Level level = gson.fromJson(reader, Level.class);
+			return level;
+		} catch (Exception e) {
+			System.out.println(e);
+			return null;
+		}
+	}
 
 	public void draw(float delta) {
 		super.draw(delta);

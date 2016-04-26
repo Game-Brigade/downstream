@@ -78,7 +78,7 @@ public class GDXRoot extends Game implements ScreenListener {
 		loading = new LoadingMode(canvas,manager,1);
 		mainMenu = new MainMenuMode(canvas,manager);
 		levelSelect = new LevelSelectMode(canvas,manager);
-		playGame = new DownstreamController();
+		playGame = new DownstreamController(0);
 		editor = new LevelEditor();
 		
 		playGame.preLoadContent(manager);
@@ -137,21 +137,6 @@ public class GDXRoot extends Game implements ScreenListener {
 			Gdx.input.setInputProcessor(mainMenu);
 		
 		}
-		else if (screen == mainMenu && exitCode == WorldController.EXIT_PLAY) {
-			playGame = new DownstreamController();
-			playGame.preLoadContent(manager);
-			playGame.loadContent(manager);
-			playGame.setScreenListener(this);
-			playGame.setCanvas(canvas);
-			playGame.reset();
-			setScreen(playGame);
-			Gdx.input.setInputProcessor(playGame);
-			mainMenu.dispose();
-			mainMenu = null;
-			backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal(BACKGROUND_SOUND));
-			backgroundMusic.setLooping(true);
-			backgroundMusic.play();
-		} 
 		else if (screen == mainMenu && exitCode == WorldController.EXIT_EDIT){
 			editor = new LevelEditor();
 			editor.preLoadContent(manager);
@@ -171,6 +156,21 @@ public class GDXRoot extends Game implements ScreenListener {
 			mainMenu.dispose();
 			mainMenu = null;
 		}
+		else if (screen == mainMenu) {
+			playGame = new DownstreamController(0);
+			playGame.preLoadContent(manager);
+			playGame.loadContent(manager);
+			playGame.setScreenListener(this);
+			playGame.setCanvas(canvas);
+			playGame.reset();
+			setScreen(playGame);
+			Gdx.input.setInputProcessor(playGame);
+			mainMenu.dispose();
+			mainMenu = null;
+			backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal(BACKGROUND_SOUND));
+			backgroundMusic.setLooping(true);
+			backgroundMusic.play();
+		} 
 		else if (screen == levelSelect && exitCode == WorldController.EXIT_MAIN){
 			mainMenu = new MainMenuMode(canvas,manager);
 			mainMenu.setScreenListener(this);
@@ -178,6 +178,21 @@ public class GDXRoot extends Game implements ScreenListener {
 			Gdx.input.setInputProcessor(mainMenu);
 			levelSelect.dispose();
 			levelSelect = null;
+		}
+		else if (screen == levelSelect){
+			playGame = new DownstreamController(exitCode);
+			playGame.preLoadContent(manager);
+			playGame.loadContent(manager);
+			playGame.setScreenListener(this);
+			playGame.setCanvas(canvas);
+			playGame.reset();
+			setScreen(playGame);
+			Gdx.input.setInputProcessor(playGame);
+			levelSelect.dispose();
+			levelSelect = null;
+			backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal(BACKGROUND_SOUND));
+			backgroundMusic.setLooping(true);
+			backgroundMusic.play();
 		}
 		else if (screen == playGame && exitCode == WorldController.EXIT_MAIN){
 			playGame.unloadContent(manager);
@@ -188,10 +203,10 @@ public class GDXRoot extends Game implements ScreenListener {
 			setScreen(mainMenu);
 			Gdx.input.setInputProcessor(mainMenu);
 		}
-		else if (screen == playGame && exitCode == WorldController.EXIT_PLAY){
+		else if (screen == playGame){
 			playGame.unloadContent(manager);
 			playGame.dispose();
-			playGame = new DownstreamController();
+			playGame = new DownstreamController(exitCode);
 			playGame.preLoadContent(manager);
 			playGame.loadContent(manager);
 			playGame.setScreenListener(this);
@@ -204,5 +219,7 @@ public class GDXRoot extends Game implements ScreenListener {
 			Gdx.app.exit();
 		}
 	}
+	
+	
 
 }
