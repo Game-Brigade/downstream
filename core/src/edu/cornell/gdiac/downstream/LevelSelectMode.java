@@ -228,6 +228,31 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 			if (goBack() && listener != null) {
 				listener.exitScreen(this, WorldController.EXIT_MAIN);
 			}
+			if (Level1() && listener != null) {
+				listener.exitScreen(this, WorldController.EXIT_LEVEL1);
+			}
+			if (Level2() && listener != null) {
+				listener.exitScreen(this, WorldController.EXIT_LEVEL2);
+			}
+			if (Level3() && listener != null) {
+				listener.exitScreen(this, WorldController.EXIT_LEVEL3);
+			}
+			if (Level4() && listener != null) {
+				listener.exitScreen(this, WorldController.EXIT_LEVEL4);
+			}
+			if (Level5() && listener != null) {
+				listener.exitScreen(this, WorldController.EXIT_LEVEL5);
+			}
+			if (Level6() && listener != null) {
+				listener.exitScreen(this, WorldController.EXIT_LEVEL6);
+			}
+			if (Level7() && listener != null) {
+				listener.exitScreen(this, WorldController.EXIT_LEVEL7);
+			}
+			if (Level8() && listener != null) {
+				listener.exitScreen(this, WorldController.EXIT_LEVEL8);
+			}
+			
 			
 			
 		}

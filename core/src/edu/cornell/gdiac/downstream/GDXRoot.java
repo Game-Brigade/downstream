@@ -137,7 +137,7 @@ public class GDXRoot extends Game implements ScreenListener {
 			Gdx.input.setInputProcessor(mainMenu);
 		
 		}
-		else if (screen == mainMenu && exitCode == WorldController.EXIT_PLAY) {
+		else if (screen == mainMenu && exitCode == WorldController.EXIT_LEVEL1) {
 			playGame = new DownstreamController();
 			playGame.preLoadContent(manager);
 			playGame.loadContent(manager);
@@ -188,7 +188,7 @@ public class GDXRoot extends Game implements ScreenListener {
 			setScreen(mainMenu);
 			Gdx.input.setInputProcessor(mainMenu);
 		}
-		else if (screen == playGame && exitCode == WorldController.EXIT_PLAY){
+		else if (screen == playGame && exitCode == WorldController.EXIT_LEVEL1){
 			playGame.unloadContent(manager);
 			playGame.dispose();
 			playGame = new DownstreamController();

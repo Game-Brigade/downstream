@@ -1017,7 +1017,7 @@ public class DownstreamController extends WorldController implements ContactList
 				listener.exitScreen(this, WorldController.EXIT_MAIN);
 			}
 			if (restartLevel() && listener != null) {
-				listener.exitScreen(this, WorldController.EXIT_PLAY);
+				listener.exitScreen(this, WorldController.EXIT_LEVEL1);
 			}
 			if (resumePlay() && listener != null) {
 				resumeState = 0;
