@@ -243,6 +243,7 @@ public class LevelEditor extends WorldController {
 	
 	private void populateLevel() {
 		cameraController = new CameraController(canvas.getCamera());
+		goal = new ArrayList<Vector2>();
 		lilypads = new ArrayList<Vector2>();
 		lanterns = new ArrayList<Vector2>();
 		enemies = new HashMap<String,ArrayList<Vector2>>();

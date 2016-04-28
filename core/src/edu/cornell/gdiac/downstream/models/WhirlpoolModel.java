@@ -13,10 +13,10 @@ public class WhirlpoolModel extends WheelObstacle {
 	private static final int WHIRL_DEFAULT_RADIUS = 1;
 
 	/** The radius at which the player spins around a whirlpool */
-	public static final float WHIRL_DEFAULT_ORBIT = 2f;  
+	public static final float WHIRL_DEFAULT_ORBIT = 1.5f;  
 
 	/** The range at which the player gets pulled into a whirlpool */
-	public static final float WHIRL_DEFAULT_RANGE = 2.5f;
+	public static final float WHIRL_DEFAULT_RANGE = 1.5f;
 	
 	/** The direction the pool spins; 1 is ccw, -1 is cw */
 	private int direction;
