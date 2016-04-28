@@ -134,6 +134,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private boolean paused;
 	private boolean dead;
 	private boolean whirled;
+	float speed;
 
 
 	private TetherModel checkpoint;
@@ -236,6 +237,8 @@ public class DownstreamController extends WorldController implements ContactList
 	private int litLotusCount;
 	private int level = -1;
 	private static final int RESPAWN_TIME = 100;
+	private static final float MIN_SPEED = .5f;
+	private static final float MAX_SPEED = 1.75f;
 	private int respawnTimer = RESPAWN_TIME;
 	private TetherModel checkpoint0;
 
@@ -501,6 +504,7 @@ public class DownstreamController extends WorldController implements ContactList
 		world.setGravity(Vector2.Zero);
 		paused = false;
 		wasPaused = false;
+		speed = 1;
 	}
 
 	public DownstreamController(int level) {
@@ -861,7 +865,15 @@ public class DownstreamController extends WorldController implements ContactList
 			} else if(input.didKill()){
 				koi.setDead(true);
 				return;
+			} else if (input.didFaster()){
+				speed += .5f;
+				speed = Math.min(speed, MAX_SPEED);
+			} else if (input.didSlower()){
+				speed -= .5f;
+				speed = Math.max(speed, MIN_SPEED);
 			}
+			cameraController.scaleSpeed(speed);
+			koi.scaleSpeed(speed);
 			/*
 			//WHIRLPOOL CODE
 			if (wpools.isEmpty()){
@@ -901,9 +913,9 @@ public class DownstreamController extends WorldController implements ContactList
 
 			// KOI VEOLOCITY CODE
 			if (isTethered() && !isWhirled()) {
-				koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*1.5f));
+				koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*1.5f*speed));
 			} else{
-				koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*2));
+				koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*2*speed));
 			}
 
 			// LOTUS LIGHTING CODE
@@ -1139,9 +1151,9 @@ public class DownstreamController extends WorldController implements ContactList
 		}
 		else {
 			super.draw(delta);
+			for (ArrayList<Float> wall : walls) canvas.drawPath(wall);
 			canvas.beginHUD();
 			HUD.draw(canvas);
-			for (ArrayList<Float> wall : walls) canvas.drawPath(wall);
 			canvas.end();
 		}
 
@@ -1157,6 +1169,10 @@ public class DownstreamController extends WorldController implements ContactList
 	 */
 	public void render(float delta) {
 		InputController input = InputController.getInstance();
+		if(input.didPause()){
+			paused = !paused;
+		}
+		/*
 		if(wasPaused){
 
 			paused = true;
@@ -1166,7 +1182,7 @@ public class DownstreamController extends WorldController implements ContactList
 			paused = input.didPause();
 			wasPaused = paused;
 			//			if (paused) cameraController.pauseCamera();
-		}
+		}*/
 
 		if (active) {
 			if (preUpdate(delta) && !paused) {

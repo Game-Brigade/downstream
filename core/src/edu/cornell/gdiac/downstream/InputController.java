@@ -88,6 +88,10 @@ public class InputController {
 	private boolean enterPressed;
 	private boolean enterPrevious;
 	
+	private boolean plusPressed;
+	private boolean plusPrevious;
+	private boolean minusPressed;
+	private boolean minusPrevious;
 	
 	/** How much did we move horizontally? */
 	private float horizontal;
@@ -341,6 +345,8 @@ public class InputController {
 		pausePrevious = pausePressed;
 		leftPrevious = leftClick;
 		enterPrevious = enterPressed;
+		plusPrevious = plusPressed;
+		minusPrevious = minusPressed;
 		
 		// Check to see if a GamePad is connected
 		if (xbox.isConnected()) {
@@ -410,6 +416,8 @@ public class InputController {
 		exitPressed  = (secondary && exitPressed) || (Gdx.input.isKeyPressed(Input.Keys.ESCAPE));
 		tetherPressed  = (secondary && tetherPressed) || (Gdx.input.isKeyPressed(Input.Keys.SPACE));
 		pausePressed = (secondary && pausePressed) || (Gdx.input.isKeyPressed(Input.Keys.P));
+		plusPressed = (secondary && pausePressed) || (Gdx.input.isKeyPressed(Input.Keys.EQUALS));
+		minusPressed = (secondary && pausePressed) || (Gdx.input.isKeyPressed(Input.Keys.MINUS));
 		leftClick = (secondary && leftClick) || (Gdx.input.isButtonPressed(Input.Buttons.LEFT));
 		
 		// level editor commands
@@ -490,5 +498,12 @@ public class InputController {
 	private void clampPosition(Rectangle bounds) {
 		crosshair.x = Math.max(bounds.x, Math.min(bounds.x+bounds.width, crosshair.x));
 		crosshair.y = Math.max(bounds.y, Math.min(bounds.y+bounds.height, crosshair.y));
+	}
+
+	public boolean didFaster() {
+		return plusPressed && !plusPrevious;
+	}
+	public boolean didSlower() {
+		return minusPressed && !minusPrevious;
 	}
 }

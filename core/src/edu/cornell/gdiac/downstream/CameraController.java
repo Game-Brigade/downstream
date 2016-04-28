@@ -23,6 +23,7 @@ public class CameraController {
 	private float stepZoom;
 	private boolean isZooming;
 	private OrthographicCamera saveCamera;
+	private float speed;
 	
 	public CameraController(OrthographicCamera cam) {
 		camera = cam;
@@ -34,6 +35,7 @@ public class CameraController {
 		mapHeight = 0;
 		mapCenter = new Vector2();
 		saveCamera = new OrthographicCamera();
+		speed = 1;
 	}
 	
 	public void zoomOut() {
@@ -153,12 +155,12 @@ public class CameraController {
 	
 	public void moveCameraTowards(Vector2 newPosition) {
 //		System.out.println(currentVelocity);
-		currentVelocity = Math.min(currentVelocity+ACCELERATION,MAX_VELOCITY);
+		currentVelocity = Math.min(currentVelocity+ACCELERATION,MAX_VELOCITY*speed);
 		moveCameraTowards(newPosition, currentVelocity);
 	}
 	
 	public void resetCameraVelocity() {
-		currentVelocity = MIN_VELOCITY;
+		currentVelocity = MIN_VELOCITY*speed;
 	}
 	
 	public Vector2 getCameraPosition() {
@@ -175,6 +177,10 @@ public class CameraController {
 		if (left)  camera.translate(new Vector2(-MAX_VELOCITY,0));
 		else if (right) camera.translate(new Vector2(MAX_VELOCITY,0));
 		camera.update();
+	}
+	
+	public void scaleSpeed(float s){
+		speed = s;
 	}
 	
 }
