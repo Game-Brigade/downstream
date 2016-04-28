@@ -78,6 +78,8 @@ public class PlayerModel extends BoxObstacle {
 	
 	private boolean dead;
 
+	private float speed;
+
 	/** Create a new player at x,y. */
 	public PlayerModel(float x, float y, float width, float height) {
 		super(x, y, width, height);
@@ -95,6 +97,7 @@ public class PlayerModel extends BoxObstacle {
 		attemptingTether = true;
 		isWhirled = false;
 		setLinearVelocity(NE);
+		speed = 1;
 		pull = Vector2.Zero;
 		cent = Vector2.Zero;
 		dest = Vector2.Zero;
@@ -458,6 +461,7 @@ public class PlayerModel extends BoxObstacle {
 		if (energy >= 2){
 			bursting = true;
 			setTethered(false);
+			setAttemptingTether(false);
 		}
 		
 	}
@@ -468,7 +472,7 @@ public class PlayerModel extends BoxObstacle {
 			energy = energy + .01f;
 		}
 		else if (bursting && energy >= 0){
-			this.setLinearVelocity(this.getLinearVelocity().setLength(4f*9));
+			this.setLinearVelocity(this.getLinearVelocity().setLength(4f*9*speed));
 			energy = energy - .05f;
 		}
 		else if (energy <= 0){
@@ -484,9 +488,9 @@ public class PlayerModel extends BoxObstacle {
 	public void updateSpeed(float v) {
 		if(!this.isDead()){
 		if (isTethered()) {
-			setLinearVelocity(getLinearVelocity().setLength(v*1.5f));
+			setLinearVelocity(getLinearVelocity().setLength(v*1.5f*speed));
 		} else{
-			setLinearVelocity(getLinearVelocity().setLength(v*2));
+			setLinearVelocity(getLinearVelocity().setLength(v*2*speed));
 		}
 		}
 	}
@@ -523,6 +527,10 @@ public class PlayerModel extends BoxObstacle {
 	
 	public float getEnergy(){
 		return energy;
+	}
+	
+	public void scaleSpeed(float s){
+		speed = s;
 	}
 	
 }
