@@ -56,7 +56,8 @@ public class PlayerModel extends BoxObstacle {
 
 	public Vector2 pull;
 
-
+	private int fishAlpha = Color.alpha(.3f);
+	
 	public Vector2 cent;
 
 	private Vector2 dest;
@@ -309,18 +310,18 @@ public class PlayerModel extends BoxObstacle {
 			//super.draw(canvas);  
 			//		canvas.drawLeadingLine(body.getPosition(), new Vector2(0,0));
 			if (texture != null) {
-				if (!curved){canvas.draw(texture, Color.WHITE,origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x,getAngle() + 2.2f, .28f, .28f);}
+				if (!curved){canvas.draw(texture, Color.WHITE.mul(1, 1, 1, fishAlpha),origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x,getAngle() + 2.2f, .28f, .28f);}
 				else{
 					if(left){
-						if (curved)canvas.draw(texture, Color.WHITE,origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x, getAngle() + 2.6f, .3f, .3f);
+						if (curved)canvas.draw(texture, Color.WHITE.mul(1, 1, 1, fishAlpha),origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x, getAngle() + 2.6f, .3f, .3f);
 					}
 					else{
-						if (curved)canvas.draw(texture, Color.WHITE,origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x, getAngle() + 3.7f, .3f, .3f);
+						if (curved)canvas.draw(texture, Color.WHITE.mul(1, 1, 1, fishAlpha),origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x, getAngle() + 3.7f, .3f, .3f);
 					}
 				}
 
 
-				//canvas.draw(texture,Color.WHITE,origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x,getAngle(),1,1);
+				//canvas.draw(texture,Color.WHITE.mul(1, 1, 1, fishAlpha),origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x,getAngle(),1,1);
 			}
 		}
 
@@ -513,9 +514,9 @@ public class PlayerModel extends BoxObstacle {
 	}
 
 	public void getVectors() {
-		System.out.println("Cent: "+ cent);		
-		System.out.println("Dest: "+ dest);		
-		System.out.println("Pull: "+ pull);		
+//		System.out.println("Cent: "+ cent);		
+//		System.out.println("Dest: "+ dest);		
+//		System.out.println("Pull: "+ pull);		
 	}
 	
 

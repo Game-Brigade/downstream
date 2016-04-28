@@ -1,5 +1,4 @@
 /*
- * Tether.java
  *
  * A tether object. A player enters it's radius and begins orbitting
  *
@@ -192,6 +191,8 @@ public class TetherModel extends WheelObstacle {
 	
 	
 	private void findCircle(){
+//		System.out.println(lightCircle);
+//		System.out.println(lightingTexture);
 		lightCircle.setRadius((lightingTexture.getRegionWidth()/2 * sparkSize)/drawScale.x);
 	}
 	

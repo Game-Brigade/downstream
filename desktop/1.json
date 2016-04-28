@@ -6,12 +6,12 @@
   },
   "goal": [
     {
-      "x": 0,
-      "y": 0
+      "x": 47.862225,
+      "y": -7.3327384
     },
     {
-      "x": 0,
-      "y": 0
+      "x": 59.01847,
+      "y": -21.969727
     }
   ],
   "enemiesLevel": {},
@@ -67,4 +67,4 @@
     }
   ]
 }
-Controllers: removed manager for application, 0 managers active
+
