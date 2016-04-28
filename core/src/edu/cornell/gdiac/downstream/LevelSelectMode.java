@@ -240,9 +240,11 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 			if (Level4() && listener != null) {
 				listener.exitScreen(this, 4);
 			}
+
 			if (Level5() && listener != null) {
 				listener.exitScreen(this, 5);
 			}
+			/*
 			if (Level6() && listener != null) {
 				listener.exitScreen(this, 6);
 			}
@@ -253,7 +255,7 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 				listener.exitScreen(this, 8);
 			}
 			
-			
+			*/
 			
 		}
 	}

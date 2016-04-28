@@ -41,6 +41,8 @@ public abstract class SimpleObstacle extends Obstacle {
 
 	/** The texture origin for drawing */
 	protected Vector2 origin;
+
+	private Vector2 speed;
 	
 	/// BodyDef Methods
 	/**

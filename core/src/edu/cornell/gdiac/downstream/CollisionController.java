@@ -46,7 +46,6 @@ public class CollisionController {
 			bCollide = body1;
 		}
 		else {
-//			System.out.println("s1: "+ s1+ " s2: "+s2);
 			return false;
 		}
 		if(sCollide.startsWith("lily") || 
@@ -62,8 +61,12 @@ public class CollisionController {
 		else if(sCollide.startsWith("rock")){return LETHAL_ROCKS;}
 		else if(sCollide.startsWith("shadow")){return LETHAL_SHADOWS;}
 		else if(sCollide.startsWith("enemy")){return LETHAL_ENEMIES;}
-		else if(sCollide.startsWith("wall")){return LETHAL_WALLS;}
-//		else { System.out.println("COLLISION ERROR: "+sCollide);}
+		else if(sCollide.startsWith("wall")){
+			koi.setTethered(false);
+			koi.setAttemptingTether(false);
+			return LETHAL_WALLS;
+		}
+		else { System.out.println("COLLISION ERROR: "+sCollide);}
 		return false;
 	}
 	
@@ -92,7 +95,6 @@ public class CollisionController {
 						sCollide.startsWith("fade") || 
 						sCollide.startsWith("lantern")){
 					tethers.remove((TetherModel) bCollide.getUserData());
-
 				}
 				else if(sCollide.startsWith("whirl")){}
 				else if(sCollide.startsWith("rock")){}

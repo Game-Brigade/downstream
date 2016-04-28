@@ -134,6 +134,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private boolean paused;
 	private boolean dead;
 	private boolean whirled;
+	float speed;
 
 
 	private TetherModel checkpoint;
@@ -236,6 +237,8 @@ public class DownstreamController extends WorldController implements ContactList
 	private int litLotusCount;
 	private int level = -1;
 	private static final int RESPAWN_TIME = 100;
+	private static final float MIN_SPEED = .5f;
+	private static final float MAX_SPEED = 1.75f;
 	private int respawnTimer = RESPAWN_TIME;
 	private TetherModel checkpoint0;
 
@@ -482,6 +485,9 @@ public class DownstreamController extends WorldController implements ContactList
 
 	private float stateTime;  
 	private float relativeTime = 0;
+	private float levelCamWidth;
+	private float levelCamHeight;
+	private Vector2 center;
 
 	/**
 	 * Creates and initialize a new instance of Downstream
@@ -498,6 +504,7 @@ public class DownstreamController extends WorldController implements ContactList
 		world.setGravity(Vector2.Zero);
 		paused = false;
 		wasPaused = false;
+		speed = 1;
 	}
 
 	public DownstreamController(int level) {
@@ -665,25 +672,27 @@ public class DownstreamController extends WorldController implements ContactList
 			addObject(obj);
 		}
 		
-//		for (Vector2 rock : level.rocks) {
-//			WheelObstacle obj;
-//			obj = new WheelObstacle(rock.x,rock.y,rockDay.getRegionWidth()/2);
-//			obj.setBodyType(BodyDef.BodyType.StaticBody);
-//			obj.setSensor(true);
-//			obj.setDrawScale(scale);
-//			if (NDS == 0){
-//				obj.setTexture(rockDay);
-//			}
-//			if (NDS == 1){
-//				obj.setTexture(rockNight);
-//			}
-//			if (NDS == 2){
-//				obj.setTexture(rockSunset);
-//			}
-//			obj.setName("rock");
-//			rocks.add(obj);
-//			addObject(obj);
-//		}
+		/*
+		for (Vector2 rock : level.rocks) {
+			WheelObstacle obj;
+			obj = new WheelObstacle(rock.x,rock.y,rockDay.getRegionWidth()/2);
+			obj.setBodyType(BodyDef.BodyType.StaticBody);
+			obj.setSensor(true);
+			obj.setDrawScale(scale);
+			if (NDS == 0){
+				obj.setTexture(rockDay);
+			}
+			if (NDS == 1){
+				obj.setTexture(rockNight);
+			}
+			if (NDS == 2){
+				obj.setTexture(rockSunset);
+			}
+			obj.setName("rock");
+			rocks.add(obj);
+			addObject(obj);
+		}
+		*/
 
 		// Create the fish avatar
 		dwidth  = koiTexture.getRegionWidth()/scale.x;
@@ -746,13 +755,17 @@ public class DownstreamController extends WorldController implements ContactList
 		collisionController = new CollisionController(koi);
 		checkpoint0 = getClosestTetherTo(koi.initPos);
 		checkpoint = checkpoint0;
+		koi.setPosition(checkpoint.getPosition().add(koi.NE.cpy().rotate90(1).nor().scl(TetherModel.TETHER_DEFAULT_ORBIT)));
+		koi.setTethered(true);
+		koi.setLinearVelocity(koi.NE);
 
 
-		float width = Math.abs(level.map.get(0).x - level.map.get(1).x);
-		float height = Math.abs(level.map.get(0).y - level.map.get(1).y);
-		Vector2 center = new Vector2((level.map.get(0).x + level.map.get(1).x)/2,
+
+		levelCamWidth = Math.abs(level.map.get(0).x - level.map.get(1).x);
+		levelCamHeight = Math.abs(level.map.get(0).y - level.map.get(1).y);
+		center = new Vector2((level.map.get(0).x + level.map.get(1).x)/2,
 				(level.map.get(0).y + level.map.get(1).y)/2);
-		cameraController.zoomStart(width, height, center, koi.getPosition().cpy().scl(scale));
+		cameraController.zoomStart(levelCamWidth, levelCamHeight, center, koi.getPosition().cpy().scl(scale));
 
 		HUD = new HUDitems(lanterns.size(), UILotusTexture, energyBarTexture, displayFont);
 		addHUD(HUD);
@@ -803,6 +816,9 @@ public class DownstreamController extends WorldController implements ContactList
 		}
 		if(koi.isDead()){
 			deathSound.play();
+			for (TetherModel t : tethers) {
+				t.setTethered(false);
+			}
 			respawn();
 		} else{
 			//ZOOM IN TO PLAYER AT START OF LEVEL
@@ -827,7 +843,6 @@ public class DownstreamController extends WorldController implements ContactList
 			}
 
 			//CLEAR SHADOW CODE
-			System.out.println("WINNER: "+(lanterns.size() == litlanterns.size()));
 			clearShadows(lanterns.size() == litlanterns.size());
 			moveShadows();
 
@@ -850,8 +865,19 @@ public class DownstreamController extends WorldController implements ContactList
 			} else if(input.didKill()){
 				koi.setDead(true);
 				return;
+			} else if (input.didFaster()){
+				speed += .5f;
+				speed = Math.min(speed, MAX_SPEED);
+			} else if (input.didSlower()){
+				speed -= .5f;
+				speed = Math.max(speed, MIN_SPEED);
 			}
+
+			cameraController.scaleSpeed(speed);
+			koi.scaleSpeed(speed);
+
 			/*
+>>>>>>> 06a08b36bf2df8f0c1d2c17934f9ba04e13ae789
 			//WHIRLPOOL CODE
 			if (wpools.isEmpty()){
 				closestWhirlpool = null;
@@ -875,7 +901,9 @@ public class DownstreamController extends WorldController implements ContactList
 					koi.applyWhirlForce(close, closestWhirlpool.getOrbitRadius());
 				}
 			}
+
 			 */
+
 
 			// ENEMY PATROL CODE
 			for (EnemyModel enemy : enemies) {
@@ -890,9 +918,9 @@ public class DownstreamController extends WorldController implements ContactList
 
 			// KOI VEOLOCITY CODE
 			if (isTethered() && !isWhirled()) {
-				koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*1.5f));
+				koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*1.5f*speed));
 			} else{
-				koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*2));
+				koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*2*speed));
 			}
 
 			// LOTUS LIGHTING CODE
@@ -1045,7 +1073,6 @@ public class DownstreamController extends WorldController implements ContactList
 			}
 		}
 		HUD.updateHUD(litlanterns.size(), koi.getEnergy());
-
 	}
 
 
@@ -1123,13 +1150,15 @@ public class DownstreamController extends WorldController implements ContactList
 		//		System.out.println("waspaused: " + wasPaused);
 
 		if (paused){
+			cameraController.zoomStart(levelCamWidth, levelCamHeight, center, koi.getPosition().cpy().scl(scale));
+			super.draw(delta);
 			pauseMenu.draw();
 		}
 		else {
 			super.draw(delta);
+			for (ArrayList<Float> wall : walls) canvas.drawPath(wall);
 			canvas.beginHUD();
 			HUD.draw(canvas);
-			for (ArrayList<Float> wall : walls) canvas.drawPath(wall);
 			canvas.end();
 		}
 
@@ -1145,16 +1174,20 @@ public class DownstreamController extends WorldController implements ContactList
 	 */
 	public void render(float delta) {
 		InputController input = InputController.getInstance();
+		if(input.didPause()){
+			paused = !paused;
+		}
+		/*
 		if(wasPaused){
 
-			paused =true;
+			paused = true;
 
 		}
 		else{
 			paused = input.didPause();
 			wasPaused = paused;
 			//			if (paused) cameraController.pauseCamera();
-		}
+		}*/
 
 		if (active) {
 			if (preUpdate(delta) && !paused) {
