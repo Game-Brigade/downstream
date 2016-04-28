@@ -317,6 +317,8 @@ public class LevelEditor extends WorldController {
 					return;
 				case WhirlpoolCW:
 					addWhirlpool(currentClick, -1);
+				case Save:
+					saveToJson();
 					
 			}
 		}
@@ -348,23 +350,22 @@ public class LevelEditor extends WorldController {
 	
 
 	private void addWhirlpool(Vector2 click, int dir){
-		saveToJson();
-//		wpools.add(click.cpy());
-//		WhirlpoolModel pool = new WhirlpoolModel(currentClick.x, currentClick.y, dir);
-//		pool.setBodyType(BodyDef.BodyType.StaticBody);
-//		pool.setName("whirlpool" + 1);
-//		pool.setDensity(TETHER_DENSITY);
-//		pool.setFriction(TETHER_FRICTION);
-//		pool.setRestitution(TETHER_RESTITUTION);
-//		pool.setSensor(false);
-//		pool.setDrawScale(scale);
-//		if(dir == -1){
-//			pool.setTexture(whirlpoolTexture);
-//		}
-//		else{
-//			pool.setTexture(whirlpoolFlipTexture);
-//		}
-//		addObject(pool);
+		wpools.add(click.cpy());
+		WhirlpoolModel pool = new WhirlpoolModel(currentClick.x, currentClick.y, dir);
+		pool.setBodyType(BodyDef.BodyType.StaticBody);
+		pool.setName("whirlpool" + 1);
+		pool.setDensity(TETHER_DENSITY);
+		pool.setFriction(TETHER_FRICTION);
+		pool.setRestitution(TETHER_RESTITUTION);
+		pool.setSensor(false);
+		pool.setDrawScale(scale);
+		if(dir == -1){
+			pool.setTexture(whirlpoolTexture);
+		}
+		else{
+			pool.setTexture(whirlpoolFlipTexture);
+		}
+		addObject(pool);
 	}
 	
 

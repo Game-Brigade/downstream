@@ -78,7 +78,7 @@ public class PlayerModel extends BoxObstacle {
 	
 	private boolean dead;
 
-	private float speed;
+	public float speed;
 
 	/** Create a new player at x,y. */
 	public PlayerModel(float x, float y, float width, float height) {

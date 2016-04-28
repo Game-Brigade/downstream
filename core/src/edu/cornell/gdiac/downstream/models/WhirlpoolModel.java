@@ -57,11 +57,12 @@ public class WhirlpoolModel extends WheelObstacle {
 	
 	public void rotationPass(PlayerModel koi){
 		assert entry != null;
-		if(true){
-			//rotations = 
+		if(numOfRotations>4 && koi.getPosition().x == this.getPosition().x - WHIRL_DEFAULT_RADIUS){
+			koi.setLinearVelocity(this.getLinearVelocity().setLength(4f*9*koi.speed));
 		}
-		
-		//numOfRotations = numOfRotations + .5f;
+		else if(koi.getPosition().x == this.getPosition().x - WHIRL_DEFAULT_RADIUS || koi.getPosition().x == this.getPosition().x + WHIRL_DEFAULT_RADIUS){
+			numOfRotations = numOfRotations + .5f;
+		}
 	}
 	
 
