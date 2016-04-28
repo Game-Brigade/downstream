@@ -872,13 +872,10 @@ public class DownstreamController extends WorldController implements ContactList
 				speed -= .5f;
 				speed = Math.max(speed, MIN_SPEED);
 			}
-<<<<<<< HEAD
-	
 
-=======
 			cameraController.scaleSpeed(speed);
 			koi.scaleSpeed(speed);
->>>>>>> 022fb349013cc9aebea018a0e2f1d4a5e157d675
+
 			/*
 >>>>>>> 06a08b36bf2df8f0c1d2c17934f9ba04e13ae789
 			//WHIRLPOOL CODE
