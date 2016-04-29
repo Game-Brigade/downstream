@@ -588,9 +588,12 @@ public class DownstreamController extends WorldController implements ContactList
 		boolean sensorPools = true;
 
 
-		if (!level.wpools.isEmpty()) {
-			for (Vector2 whirlpool : level.wpools) {
-				WhirlpoolModel pool = new WhirlpoolModel(whirlpool.x, whirlpool.y,1);
+		if (level.whirlpoolLocs != null && !level.whirlpoolLocs.isEmpty()) {
+			for (int x=0; x<level.whirlpoolLocs.size(); x++) {
+				WhirlpoolModel pool = new WhirlpoolModel(level.whirlpoolLocs.get(x).x, level.whirlpoolLocs.get(x).y);
+				pool.setDirection(level.whirlpoolInfo.get(x).x);
+				pool.setRotations(0);
+				pool.setExit((float)Math.PI);
 				pool.setBodyType(BodyDef.BodyType.StaticBody);
 				pool.setName("whirlpool" + 1);
 				pool.setDensity(TETHER_DENSITY);
@@ -598,12 +601,15 @@ public class DownstreamController extends WorldController implements ContactList
 				pool.setRestitution(TETHER_RESTITUTION);
 				pool.setSensor(sensorPools);
 				pool.setDrawScale(scale);
-				pool.setTexture(whirlpoolFlipTexture);
+				if(pool.getDirection() == -1){
+					pool.setTexture(whirlpoolTexture);
+				}
+				else{
+					pool.setTexture(whirlpoolFlipTexture);
+				}
 				addObject(pool);
-				wpools.add(pool);
 			}
 		}
-
 
 
 		for (Map.Entry<String,ArrayList<Vector2>> entry : level.enemiesLevel.entrySet()) {
@@ -1073,6 +1079,7 @@ public class DownstreamController extends WorldController implements ContactList
 			}
 		}
 		HUD.updateHUD(litlanterns.size(), koi.getEnergy());
+		System.out.println(koi.isTethered());
 	}
 
 
