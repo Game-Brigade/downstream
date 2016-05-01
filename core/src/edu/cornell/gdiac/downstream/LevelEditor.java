@@ -1,10 +1,12 @@
 package edu.cornell.gdiac.downstream;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.Writer;
 import java.util.ArrayList;
@@ -550,10 +552,12 @@ public class LevelEditor extends WorldController {
 	}
 	
 	protected static Level loadFromJson() {
+//		return defaultLevel();
 		Gson gson = new Gson();
 		try {
 			if (filename == null) filename = getFileName();
 			JsonReader reader = new JsonReader(new FileReader(filename));
+//			JsonReader reader = new JsonReader(new InputStreamReader(LevelEditor.class.getResourceAsStream("/json/"+filename)));
 			Level level = gson.fromJson(reader, Level.class);
 //			System.out.println(level);
 			return level;
@@ -565,14 +569,18 @@ public class LevelEditor extends WorldController {
 	}
 	
 	public static Level loadFromJson(int lvl) {
+//		return defaultLevel();
 		Gson gson = new Gson();
 		try {
-			JsonReader reader = new JsonReader(new FileReader("" + lvl + ".json"));
+			filename = lvl + ".json";
+//			JsonReader reader = new JsonReader(new FileReader(filename));
+			System.out.println(System.getProperty("user.dir"));
+			JsonReader reader = new JsonReader(new InputStreamReader(new FileInputStream(filename)));
 			Level level = gson.fromJson(reader, Level.class);
 			return level;
 		} catch (Exception e) {
 			System.out.println(e);
-			return null;
+			return defaultLevel();
 		}
 	}
 
@@ -581,9 +589,52 @@ public class LevelEditor extends WorldController {
 		drawPaths();
 	}
 	
+	private static Level defaultLevel() {
+		int number = 1;
+		Vector2 player = new Vector2(-4.537486f,16.284998f);
+		ArrayList<Vector2> goal = new ArrayList<Vector2>();
+		goal.add(new Vector2(47.862225f,-7.3327384f));goal.add(new Vector2(59.01847f,-21.969727f));
+		HashMap<String,ArrayList<Vector2>> enemiesLevel = new HashMap<String,ArrayList<Vector2>>();
+		ArrayList<Vector2> lilypads = new ArrayList<Vector2>();
+		lilypads.add(new Vector2(-1.4039901f,19.247744f));lilypads.add(new Vector2(29.854492f,-1.2477448f));
+		ArrayList<Vector2> lotuses = new ArrayList<Vector2>();
+		lotuses.add(new Vector2(14.511503f,9.057251f));
+		ArrayList<Vector2> wpools = new ArrayList<Vector2>();
+		ArrayList<Vector2> map = new ArrayList<Vector2>();
+		map.add(new Vector2(-719.5991f,1317.8994f));map.add(new Vector2(2249.889f,-604.0794f));
+		ArrayList<ArrayList<Float>> walls = new ArrayList<ArrayList<Float>>();
+		walls.add(new ArrayList<Float>(Arrays.asList(new Float[] {
+				 -18.874977f,
+			      33.954987f,
+			      58.15998f,
+			      33.489986f,
+			      57.617474f,
+			      -16.652487f,
+			      -19.882475f,
+			      -14.792486f,
+			      -19.107475f,
+			      28.14249f,
+			      -13.44998f,
+			      28.14249f,
+			      -12.597481f,
+			      -8.514992f,
+			      50.64248f,
+			      -9.90999f,
+			      51.804974f,
+			      28.064991f,
+			      -19.02998f,
+			      27.754993f})));
+		LevelEditor le = new LevelEditor();
+		ArrayList<ArrayList<Vector2>> w = new ArrayList<ArrayList<Vector2>>();
+		Level defaultLevel =  le.new Level(number, player, goal, enemiesLevel, lilypads, lotuses, w, wpools, map);
+		defaultLevel.walls = walls;
+		return defaultLevel;
+	}
+	
 	private void loadPartialLevel() {
 		buildingLevel = true;
 		Level level = loadFromJson();
+		System.out.println(level);
 		if (level == null) return;
 		ArrayList<ArrayList<Vector2>> tempWalls = new ArrayList<ArrayList<Vector2>>();
 		for (int i = 0; i < level.walls.size(); i++) {
@@ -599,6 +650,9 @@ public class LevelEditor extends WorldController {
 		}
 		if (level.map != null) {
 			mapArea = level.map;
+		}
+		if (level.goal != null) {
+			goal = level.goal;
 		}
 		for (Vector2 lilypad : level.lilypads) {
 			addLilypad(lilypad);
@@ -637,7 +691,9 @@ public class LevelEditor extends WorldController {
 	    return null;
 	}
 	
-	public class Level {
+	
+	
+	class Level {
 		int number;
 		Vector2 player;
 		ArrayList<Vector2> goal;
@@ -650,7 +706,6 @@ public class LevelEditor extends WorldController {
 
 		ArrayList<Vector2> map;
 		ArrayList<Vector2> rocks;
-
 		
 		private Level(int n, Vector2 p, 
 					  ArrayList<Vector2> g, 
@@ -686,8 +741,7 @@ public class LevelEditor extends WorldController {
 			map = m;
 		}
 		
+		
 	}
-	
-	
 	
 }
