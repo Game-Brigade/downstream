@@ -194,6 +194,16 @@ public class GDXRoot extends Game implements ScreenListener {
 			backgroundMusic.setLooping(true);
 			backgroundMusic.play();
 		}
+		else if(screen == editor){
+			mainMenu = new MainMenuMode(canvas,manager);
+			mainMenu.setScreenListener(this);
+			setScreen(mainMenu);
+			Gdx.input.setInputProcessor(mainMenu);
+			editor.unloadContent(manager);
+			editor.dispose();
+			editor = null;
+			
+		}
 		else if (screen == playGame && exitCode == WorldController.EXIT_MAIN){
 			playGame.unloadContent(manager);
 			playGame.dispose();
