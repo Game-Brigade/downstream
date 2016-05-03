@@ -309,7 +309,7 @@ public class PlayerModel extends BoxObstacle {
 	 */
 	public void draw(GameCanvas canvas) {
 		//		canvas.drawLeadingLine(body.getPosition(), new Vector2(0,0));
-		if(!dead){
+		if(!dead || true){
 			//super.draw(canvas);  
 			//		canvas.drawLeadingLine(body.getPosition(), new Vector2(0,0));
 			if (texture != null) {

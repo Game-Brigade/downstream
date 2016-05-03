@@ -236,7 +236,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private WhirlpoolModel closestWhirlpool;
 	private int litLotusCount;
 	private int level = -1;
-	private static final int RESPAWN_TIME = 100;
+	private static final int RESPAWN_TIME = 150;
 	private static final float MIN_SPEED = .5f;
 	private static final float MAX_SPEED = 1.75f;
 	private int respawnTimer = RESPAWN_TIME;
@@ -644,10 +644,34 @@ public class DownstreamController extends WorldController implements ContactList
 		goalTile.setName("goal");
 		goalTile.setDrawScale(scale);
 		goalTile.setTexture(goalTexture);
+		goalTile.setDensity(BASIC_DENSITY);
+		goalTile.setFriction(BASIC_FRICTION);
+		goalTile.setRestitution(BASIC_RESTITUTION);
 		goalTile.setSensor(true);
 		goalTile.setAngle((float) Math.atan2(shadowDest.y-goalPos.y,shadowDest.x-goalPos.x));
 		addObject(goalTile);
 
+		//create shadow(s)
+		if(level.lilypads.size() + level.lilypads.size() > 0){
+			dwidth = shadowTexture.getRegionWidth()/scale.x*.85f;
+			dheight = shadowTexture.getRegionHeight()/scale.y*.85f;
+			ShadowModel shadow = new ShadowModel(goalPos.x, goalPos.y, dwidth, dheight, shadowDest);
+			shadow.setName("shadow");
+			shadow.setDrawScale(scale);
+			shadow.setTexture(shadowTexture);
+			
+			shadow.setDensity(BASIC_DENSITY);
+			shadow.setFriction(BASIC_FRICTION);
+			shadow.setRestitution(BASIC_RESTITUTION);
+			
+			shadow.setSensor(false);			
+			shadow.setAngle((float) Math.atan2(shadowDest.y-goalPos.y,shadowDest.x-goalPos.x));
+			shadows.add(shadow);
+			addObject(shadow);
+		}
+		
+		
+		
 		for (ArrayList<Float> wall : level.walls) {
 			PolygonObstacle obj;
 			float[] wallFloat = new float[wall.size()];
@@ -740,19 +764,7 @@ public class DownstreamController extends WorldController implements ContactList
 			tethers.add(lily);
 		}
 
-		//create shadow(s)
-		if(lanterns.size() > 0){
-			dwidth = shadowTexture.getRegionWidth()/scale.x/2;
-			dheight = shadowTexture.getRegionHeight()/scale.y/2;
-			ShadowModel shadow = new ShadowModel(goalPos.x, goalPos.y, dwidth*1.5f, dheight, shadowDest);
-			shadow.setName("shadow");
-			shadow.setDrawScale(scale);
-			shadow.setTexture(shadowTexture);
-			shadow.setSensor(true);
-			shadow.setAngle((float) Math.atan2(shadowDest.y-goalPos.y,shadowDest.x-goalPos.x));
-			shadows.add(shadow);
-			addObject(shadow);
-		}
+
 
 		//Setup checkpoint and collisioncontroller
 		collisionController = new CollisionController(koi);
@@ -1012,7 +1024,7 @@ public class DownstreamController extends WorldController implements ContactList
 
 			//FSM to handle Lotus
 			for (int i = 0; i < tethers.size(); i++){
-				if (collisionController.inRangeOf(tethers.get(i))){
+				if (collisionController.inRangeOf(tethers.get(i)) && tethers.get(i)==closestTether){
 					tethers.get(i).inrange = true;
 				}
 				else{
@@ -1092,7 +1104,8 @@ public class DownstreamController extends WorldController implements ContactList
 	private void clearShadows(boolean b) {
 		for (ShadowModel s : shadows){
 			s.clearShadow(b);;
-		}	}
+		}	
+	}
 
 	private void moveShadows() {
 		for (ShadowModel s : shadows){
