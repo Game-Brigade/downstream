@@ -610,7 +610,7 @@ public abstract class WorldController implements Screen {
 	 */
 	public void postUpdate(float dt) {
 		// Add any objects created by actions
-		while (addQueue != null && !addQueue.isEmpty()) {
+		while (!addQueue.isEmpty()) {
 			addObject(addQueue.poll());
 		}
 		
