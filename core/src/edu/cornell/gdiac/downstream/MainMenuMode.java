@@ -134,7 +134,7 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 		canvas.draw(logo, Color.WHITE, logo.getWidth()/2, logo.getHeight()/2, logoPos.x, logoPos.y, 0, scale*0.6f, scale*0.6f);
 		canvas.draw(play, Color.WHITE, play.getWidth()/2, play.getHeight()/2, playPos.x, playPos.y, 0, scale, scale);
 		canvas.draw(select, Color.WHITE, select.getWidth()/2, select.getHeight()/2, selectPos.x, selectPos.y, 0, scale, scale);
-		canvas.draw(edit, Color.WHITE, edit.getWidth()/2, edit.getHeight()/2, editPos.x, editPos.y, 0, scale, scale);
+		canvas.draw(edit, Color.WHITE, edit.getWidth()/2, edit.getHeight()/2, editPos.x, editPos.y, 0, scale*0.9f, scale*0.9f);
 		canvas.end();
 	}
 
