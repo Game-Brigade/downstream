@@ -58,23 +58,19 @@ public class DownstreamController extends WorldController implements ContactList
 	private static final String LIGHTING_TEXTURE = "tethers/aura.png";
 	private static final String SHADOW_TEXTURE = "terrain/shadow.png";
 	private static final String GOAL_TEXTURE = "terrain/goal.png";
-
-	/** Reference to the repeating land texture */
-
+	/** References to the repeating land texture */
 	private static final String EARTH_FILE = "terrain/repeat tile.png";
 	private static final String EARTH_FILE_N = "terrain/Grass_Night.jpg";
 	private static final String EARTH_FILE_D = "terrain/Grass_Day.jpg";
 	private static final String EARTH_FILE_S = "terrain/Grass_Sunset.jpg";
-	
+	/** References to the rock textures */
 	private static final String ROCK_FILE_N = "terrain/Rock_Night.png";
 	private static final String ROCK_FILE_D = "terrain/Rock_Day.png";
 	private static final String ROCK_FILE_S = "terrain/Rock_Sunset.png";
-
-	
+	/** References to lily textures */
 	private static final String LILY_TEXTURE_S = "tethers/Lily_Sunset.png";
 	private static final String LILY_TEXTURE_N = "tethers/Lily_Night.png";
 	private static final String LILY_TEXTURE_D = "tethers/Lily_Day.png";
-
 	/** Reference to the whirlpool texture */
 	private static final String WHIRLPOOL_TEXTURE = "terrain/whirlpool.png";
 	/** Reference to the flipped whirlpool texture */
@@ -96,28 +92,25 @@ public class DownstreamController extends WorldController implements ContactList
 	private TextureRegion enemyTexture;
 	/** Texture assets for lanterns */
 	private TextureRegion lanternTexture;
-	/** Texture assets for light */
+	/** Texture assets for light, shadow, and goal */
 	private TextureRegion lightingTexture;
 	private TextureRegion shadowTexture;
 	private TextureRegion goalTexture;
 	/** Texture assets for walls and platforms */
 	private TextureRegion earthTile;
-
 	private TextureRegion earthTileDay;
 	private TextureRegion earthTileNight;
 	private TextureRegion earthTileSunset;
-
+	/** Texture assets for the rocks */
 	private TextureRegion rockDay;
 	private TextureRegion rockNight;
 	private TextureRegion rockSunset;
-
 	/** Texture assets for whirlpools */
 	private TextureRegion whirlpoolTexture;
 	private TextureRegion whirlpoolFlipTexture;
 	/** Texture assets for HUD */
 	private TextureRegion energyBarTexture;
 	private TextureRegion UILotusTexture;
-
 	/** The HUD */
 	public HUDitems HUD;
 
@@ -135,12 +128,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private boolean dead;
 	private boolean whirled;
 	float speed;
-
-
 	private TetherModel checkpoint;
-
-
-
 	private float PLAYER_LINEAR_VELOCITY = 6f;
 	private boolean enableSlow = false;
 	private boolean enableLeadingLine = false;
@@ -150,13 +138,10 @@ public class DownstreamController extends WorldController implements ContactList
 	/** References to sounds */
 	private static final String LIGHTING_SOUND = "SOUNDS/lighting_1.mp3";
 	private Music deathSound;
-
-
-
 	
+	//Animations//
 	private Animation lilyAnimation; // This is the only one
 	 
-
 	private TextureRegion[] lilyFrames;
 	private TextureRegion[] lilyFramesDay;
 	private TextureRegion[] lilyFramesNight;
