@@ -1,0 +1,2 @@
+- Curved Koi and Straight Koi spritesheets: 30% transparency
+- Star is just for aesthetic and to place around the level
