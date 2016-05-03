@@ -38,6 +38,18 @@ public class CameraController {
 		speed = 1;
 	}
 	
+	public void reset(){
+		playerPosition = new Vector2();
+		stepMove = new Vector2();
+		stepZoom = 0;
+		isZooming = true;
+		mapWidth = 0;
+		mapHeight = 0;
+		mapCenter = new Vector2();
+		saveCamera = new OrthographicCamera();
+		speed = 1;
+	}
+	
 	public void zoomOut() {
 		camera.zoom = Math.min(MAX_ZOOM_OUT, camera.zoom + 0.01f);
 		camera.update();

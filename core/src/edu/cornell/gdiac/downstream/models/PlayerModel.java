@@ -78,7 +78,7 @@ public class PlayerModel extends BoxObstacle {
 	
 	private boolean dead;
 
-	public float speed;
+	private float speed;
 
 	/** Create a new player at x,y. */
 	public PlayerModel(float x, float y, float width, float height) {
@@ -246,8 +246,8 @@ public class PlayerModel extends BoxObstacle {
 	
 	public boolean willIntersect(Vector2 target) {
 		Vector2 time = timeToIntersect(target);
-		return time.x > -0.009 && time.y > -0.009;
-		//return getLinearVelocity().isCollinear(target.sub(getPosition()), .009f);
+		//return time.x > -0.009 && time.y > -0.009;
+		return getLinearVelocity().isCollinear(target.sub(getPosition()), .09f);
 	}
 	
 	public boolean pastTangent(Vector2 target){
@@ -309,7 +309,7 @@ public class PlayerModel extends BoxObstacle {
 	 */
 	public void draw(GameCanvas canvas) {
 		//		canvas.drawLeadingLine(body.getPosition(), new Vector2(0,0));
-		if(!dead){
+		if(!dead || true){
 			//super.draw(canvas);  
 			//		canvas.drawLeadingLine(body.getPosition(), new Vector2(0,0));
 			if (texture != null) {
@@ -469,11 +469,11 @@ public class PlayerModel extends BoxObstacle {
 	
 	public void updateRestore(){
 		if (energy < 2 && !bursting){
-			energy = energy + .01f;
+			energy = energy + .02f;
 		}
 		else if (bursting && energy >= 0){
 			this.setLinearVelocity(this.getLinearVelocity().setLength(4f*9*speed));
-			energy = energy - .05f;
+			energy = energy - .07f;
 		}
 		else if (energy <= 0){
 			bursting = false;
