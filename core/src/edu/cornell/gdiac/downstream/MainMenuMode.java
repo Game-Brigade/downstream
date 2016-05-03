@@ -22,10 +22,10 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 	
 	
 	/** Textures necessary to support the main menu screen */
-	private static final String LOGO_FILE = "MENUS/logo-big.png";
-	private static final String PLAY_FILE = "MENUS/Main/play-b.png";
-	private static final String SELECT_FILE = "MENUS/Main/level_select-b.png";
-	private static final String EDIT_FILE = "MENUS/Main/level_edit-b.png";
+	private static final String LOGO_FILE = "Final_Assets/downstream_logo.png";
+	private static final String PLAY_FILE = "Final_Assets/Menus/play.png";
+	private static final String SELECT_FILE = "Final_Assets/Menus/levelselect.png";
+	private static final String EDIT_FILE = "Final_Assets/Menus/levelbuild.png";
 	private static final String BACKGROUND_FILE = "MENUS/general_background_new.png";
 	
 	/** Logo texture */
@@ -132,9 +132,9 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 		canvas.clear();
 		canvas.draw(background, Color.WHITE, background.getWidth()/2, background.getHeight()/2, backPos.x, backPos.y, 0, scale, scale);
 		canvas.draw(logo, Color.WHITE, logo.getWidth()/2, logo.getHeight()/2, logoPos.x, logoPos.y, 0, scale*0.6f, scale*0.6f);
-		canvas.draw(play, Color.WHITE, play.getWidth()/2, play.getHeight()/2, playPos.x, playPos.y, 0, scale*0.8f, scale*0.8f);
-		canvas.draw(select, Color.WHITE, select.getWidth()/2, select.getHeight()/2, selectPos.x, selectPos.y, 0, scale*0.8f, scale*0.8f);
-		canvas.draw(edit, Color.WHITE, edit.getWidth()/2, edit.getHeight()/2, editPos.x, editPos.y, 0, scale*0.8f, scale*0.8f);
+		canvas.draw(play, Color.WHITE, play.getWidth()/2, play.getHeight()/2, playPos.x, playPos.y, 0, scale, scale);
+		canvas.draw(select, Color.WHITE, select.getWidth()/2, select.getHeight()/2, selectPos.x, selectPos.y, 0, scale, scale);
+		canvas.draw(edit, Color.WHITE, edit.getWidth()/2, edit.getHeight()/2, editPos.x, editPos.y, 0, scale, scale);
 		canvas.end();
 	}
 
