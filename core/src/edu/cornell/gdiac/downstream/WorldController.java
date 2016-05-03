@@ -67,10 +67,49 @@ public abstract class WorldController implements Screen {
 	
 	// Pathnames to shared assets
 	/** The background image for the battle */
-	private static final String BACKGROUND_FILE_N = "terrain/Water_Night.jpg";
-	private static final String BACKGROUND_FILE_D = "terrain/Water_Day.jpg";
-	private static final String BACKGROUND_FILE_S = "terrain/Water_Sunset.jpg";
-	private static final String OVERLAY_FILE = "terrain/texture.jpg";
+	protected static final String BACKGROUND_FILE_N = "terrain/Water_Night.jpg";
+	protected static final String BACKGROUND_FILE_D = "terrain/Water_Day.jpg";
+	protected static final String BACKGROUND_FILE_S = "terrain/Water_Sunset.jpg";
+	protected static final String OVERLAY_FILE = "terrain/texture.jpg";
+	
+	/** Reference to the fish texture */
+	protected static final String KOI_TEXTURE = "koi/koi.png";
+	/** Reference to the lilypad texture  */
+	protected static final String LILY_TEXTURE = "tethers/lilypad.png";
+	/** Reference to the enemy texture */
+	protected static final String ENEMY_TEXTURE = "enemy/enemy.png";
+	/** Reference to the lantern texture */
+	protected static final String LANTERN_TEXTURE = "tethers/notlit.png";
+	/** Reference to the lighting texture */
+	protected static final String LIGHTING_TEXTURE = "tethers/aura.png";
+	protected static final String SHADOW_TEXTURE = "terrain/shadow.png";
+	protected static final String GOAL_TEXTURE = "terrain/goal.png";
+
+	/** Reference to the repeating land texture */
+
+	protected static final String EARTH_FILE = "terrain/repeat tile.png";
+	protected static final String EARTH_FILE_N = "terrain/Grass_Night.jpg";
+	protected static final String EARTH_FILE_D = "terrain/Grass_Day.jpg";
+	protected static final String EARTH_FILE_S = "terrain/Grass_Sunset.jpg";
+	
+	protected static final String ROCK_FILE_N = "terrain/Rock_Night.png";
+	protected static final String ROCK_FILE_D = "terrain/Rock_Day.png";
+	protected static final String ROCK_FILE_S = "terrain/Rock_Sunset.png";
+
+	
+	protected static final String LILY_TEXTURE_S = "tethers/Lily_Sunset.png";
+	protected static final String LILY_TEXTURE_N = "tethers/Lily_Night.png";
+	protected static final String LILY_TEXTURE_D = "tethers/Lily_Day.png";
+
+	/** Reference to the whirlpool texture */
+	protected static final String WHIRLPOOL_TEXTURE = "terrain/whirlpool.png";
+	/** Reference to the flipped whirlpool texture */
+	protected static final String WHIRLPOOL_FLIP_TEXTURE = "terrain/whirlpool_flip.png";
+	/** HUD textures */
+	protected static final String ENERGYBAR_TEXTURE = "MENUS/UI_bar.png";
+	protected static final String UI_FLOWER = "MENUS/UI_lotus.png";
+	protected static final String OVERLAY = "terrain/texture.jpg";
+	
 	
 	private static int dayTime = 0;
 	
@@ -88,6 +127,86 @@ public abstract class WorldController implements Screen {
 	private static Texture backgroundS;
 	private static Texture overlay;
 	private Color referenceC = Color.WHITE.cpy();
+	
+	protected TextureRegion[] lilyFrames;
+	protected TextureRegion[] lilyFramesDay;
+	protected TextureRegion[] lilyFramesNight;
+	protected TextureRegion[] lilyFramesSunset;
+	protected TextureRegion lilycurrentFrame; // also the only one! 
+
+	protected Animation closedFlowerAnimation; // #3
+	protected Texture closedFlowerSheet; // #4
+	protected TextureRegion[] closedFlowerFrames; // #5
+	protected SpriteBatch closedFlowerspriteBatch; // #6
+	protected TextureRegion closedFlowercurrentFrame; // #7
+
+	protected Animation openFlowerAnimation; // #3
+	protected Texture openFlowerSheet; // #4
+	protected TextureRegion[] openFlowerFrames; // #5
+	protected SpriteBatch openFlowerspriteBatch; // #6
+	protected TextureRegion openFlowercurrentFrame; // #7
+
+	protected Animation openingFlowerAnimation; // #3
+	protected Texture openingFlowerSheet; // #4
+	protected TextureRegion[] openingFlowerFrames; // #5
+	protected SpriteBatch openingFlowerspriteBatch; // #6
+	protected TextureRegion openingFlowercurrentFrame; // #7
+
+	protected Animation closingFlowerAnimation; // #3
+	protected Texture closingFlowerSheet; // #4
+	protected TextureRegion[] closingFlowerFrames; // #5
+	protected SpriteBatch closingFlowerspriteBatch; // #6
+	protected TextureRegion closingFlowercurrentFrame; // #7
+
+	protected Animation koiSAnimation; // #3
+	protected Texture koiSSheet; // #4
+	protected TextureRegion[] koiSFrames; // #5
+	protected SpriteBatch koiSspriteBatch; // #6
+	protected TextureRegion koiScurrentFrame; // #7
+
+	protected Animation koiCAnimation; // #3
+	protected Texture koiCSheet; // #4
+	protected TextureRegion[] koiCFrames; // #5
+	protected SpriteBatch koiCspriteBatch; // #6
+	protected TextureRegion koiCcurrentFrame; // #7
+
+	protected Animation koiCAnimationFlipped;
+	protected TextureRegion[]	koiCFramesFlipped;
+	protected TextureRegion KoiCcurrentFrameFlipped;
+	
+	//TextureRegions//
+	/** Texture assets for the koi */
+	protected TextureRegion koiTexture;
+	/** Texture assets for lilypads */
+	protected TextureRegion lilyTexture;
+	protected TextureRegion lilyTextureDay;
+	protected TextureRegion lilyTextureNight;
+	protected TextureRegion lilyTextureSunset;
+	/** Texture assets for enemy fish */
+	protected TextureRegion enemyTexture;
+	/** Texture assets for lanterns */
+	protected TextureRegion lanternTexture;
+	/** Texture assets for light */
+	protected TextureRegion lightingTexture;
+	protected TextureRegion shadowTexture;
+	protected TextureRegion goalTexture;
+	/** Texture assets for walls and platforms */
+	protected TextureRegion earthTile;
+
+	protected TextureRegion earthTileDay;
+	protected TextureRegion earthTileNight;
+	protected TextureRegion earthTileSunset;
+
+	protected TextureRegion rockDay;
+	protected TextureRegion rockNight;
+	protected TextureRegion rockSunset;
+
+	/** Texture assets for whirlpools */
+	protected TextureRegion whirlpoolTexture;
+	protected TextureRegion whirlpoolFlipTexture;
+	/** Texture assets for HUD */
+	protected TextureRegion energyBarTexture;
+	protected TextureRegion UILotusTexture;
 
 	/**
 	 * Preloads the assets for this controller.
@@ -105,6 +224,60 @@ public abstract class WorldController implements Screen {
 		}
 		
 		worldAssetState = AssetState.LOADING;
+		
+		manager.load(KOI_TEXTURE, Texture.class);
+		assets.add(KOI_TEXTURE);
+
+		manager.load(ENEMY_TEXTURE, Texture.class);
+		assets.add(ENEMY_TEXTURE);
+
+		manager.load(LILY_TEXTURE, Texture.class);
+		assets.add(LILY_TEXTURE);
+
+		manager.load(LANTERN_TEXTURE, Texture.class);
+		assets.add(LANTERN_TEXTURE);
+
+		manager.load(LIGHTING_TEXTURE, Texture.class);
+		assets.add(LIGHTING_TEXTURE);
+
+		manager.load(SHADOW_TEXTURE, Texture.class);
+		assets.add(SHADOW_TEXTURE);
+
+		manager.load(GOAL_TEXTURE, Texture.class);
+		assets.add(GOAL_TEXTURE);
+
+		manager.load(EARTH_FILE,Texture.class);
+		assets.add(EARTH_FILE);
+
+		manager.load(EARTH_FILE_D,Texture.class);
+		assets.add(EARTH_FILE_D);
+		manager.load(EARTH_FILE_N,Texture.class);
+		assets.add(EARTH_FILE_N);
+		manager.load(EARTH_FILE_S,Texture.class);
+		assets.add(EARTH_FILE_S);
+
+		manager.load(ROCK_FILE_D,Texture.class);
+		assets.add(ROCK_FILE_D);
+		manager.load(ROCK_FILE_N,Texture.class);
+		assets.add(ROCK_FILE_N);
+		manager.load(ROCK_FILE_S,Texture.class);
+		assets.add(ROCK_FILE_S);
+
+		manager.load(WHIRLPOOL_TEXTURE, Texture.class);
+		assets.add(WHIRLPOOL_TEXTURE);
+
+		manager.load(WHIRLPOOL_FLIP_TEXTURE, Texture.class);
+		assets.add(WHIRLPOOL_FLIP_TEXTURE);
+
+		manager.load(ENERGYBAR_TEXTURE, Texture.class);
+		assets.add(ENERGYBAR_TEXTURE);
+
+		manager.load(UI_FLOWER, Texture.class);
+		assets.add(UI_FLOWER);
+
+		manager.load(OVERLAY, Texture.class);
+		assets.add(OVERLAY);
+		
 
 		manager.load(BACKGROUND_FILE_N, Texture.class);
 		assets.add(BACKGROUND_FILE_N);
@@ -128,6 +301,24 @@ public abstract class WorldController implements Screen {
 		assets.add(FONT_FILE);
 	}
 
+	
+	protected TextureRegion[] splice(int images, String filePath){
+		
+		Texture sheet = new Texture(Gdx.files.internal(filePath));
+
+		TextureRegion[][] tmp = TextureRegion.split(sheet, sheet.getWidth()/images, sheet.getHeight());
+		TextureRegion[] Frames = new TextureRegion[images];
+		int index = 0;
+		for (int i = 0; i < 1; i++) {
+			for (int j = 0; j < images; j++) {
+				Frames[index++] = tmp[i][j];
+			}
+		}
+		return Frames;
+	}	
+	
+	
+	
 	/**
 	 * Loads the assets for this controller.
 	 *
@@ -142,6 +333,136 @@ public abstract class WorldController implements Screen {
 		if (worldAssetState != AssetState.LOADING) {
 			return;
 		}
+		
+		int cols = 11;
+		int rows = 1;
+
+		//animationDef
+		//load the animation content here
+		
+		lilyFrames = splice(11, "tethers/lotus_strip.png");
+		//lilyFramesDay = splice(47, "tethers/Lily_Day.png");
+		lilyFramesNight = splice(47, LILY_TEXTURE_N);
+		//lilyFramesSunset = splice(47, LILY_TEXTURE_S);
+
+		//lilyAnimation = new Animation(.2f, lilyFrames);
+
+
+		cols = 11;
+		rows = 1;
+
+		closedFlowerSheet = new Texture(Gdx.files.internal("tethers/flowerclosed_spritesheet.png"));
+
+		//walkSheet = new Texture(Gdx.files.internal("koi/unnamed.png")); // #9
+		TextureRegion[][] tmpclosed = TextureRegion.split(closedFlowerSheet, closedFlowerSheet.getWidth()/cols, closedFlowerSheet.getHeight()/rows);              // #10
+		closedFlowerFrames = new TextureRegion[cols * rows];
+		int index = 0;
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				closedFlowerFrames[index++] = tmpclosed[i][j];
+			}
+		}
+		closedFlowerAnimation = new Animation(.2f, closedFlowerFrames);  
+		closedFlowerspriteBatch = new SpriteBatch(); 
+
+		openFlowerSheet = new Texture(Gdx.files.internal("tethers/floweropen_spritesheet.png"));
+		TextureRegion[][] tmpOpen = TextureRegion.split(openFlowerSheet, openFlowerSheet.getWidth()/cols, openFlowerSheet.getHeight()/rows);              // #10
+		openFlowerFrames = new TextureRegion[cols * rows];
+		index = 0;
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				openFlowerFrames[index++] = tmpOpen[i][j];
+			}
+		}
+		openFlowerAnimation = new Animation(.2f, openFlowerFrames);  
+		openFlowerspriteBatch = new SpriteBatch(); 
+
+		cols = 8; 
+
+		openingFlowerSheet = new Texture(Gdx.files.internal("tethers/flower_opening_spritesheet.png"));
+		TextureRegion[][] tmpOpening = TextureRegion.split(openingFlowerSheet, openingFlowerSheet.getWidth()/cols, openingFlowerSheet.getHeight()/rows);              // #10
+		openingFlowerFrames = new TextureRegion[cols * rows];
+		index = 0;
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				openingFlowerFrames[index++] = tmpOpening[i][j];
+			}
+		}
+		openingFlowerAnimation = new Animation(.5f, openingFlowerFrames); 
+		openingFlowerspriteBatch = new SpriteBatch(); 
+
+
+		closingFlowerSheet = new Texture(Gdx.files.internal("tethers/flower_closing_spritesheet.png"));
+		TextureRegion[][] tmpClosing = TextureRegion.split(closingFlowerSheet, closingFlowerSheet.getWidth()/cols, closingFlowerSheet.getHeight()/rows);              // #10
+		closingFlowerFrames = new TextureRegion[cols * rows];
+		index = 0;
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				closingFlowerFrames[index++] = tmpClosing[i][j];
+			}
+		}
+		closingFlowerAnimation = new Animation(.5f, closingFlowerFrames); 
+		closingFlowerspriteBatch = new SpriteBatch(); 
+
+
+		cols = 12;
+		koiSSheet = new Texture(Gdx.files.internal("koi/Straight_Koi.png"));
+		TextureRegion[][] tmpkoiS = TextureRegion.split(koiSSheet, koiSSheet.getWidth()/cols, koiSSheet.getHeight()/rows);              // #10
+		koiSFrames = new TextureRegion[cols * rows];
+		index = 0;
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				koiSFrames[index++] = tmpkoiS[i][j];
+			}
+		}
+		koiSAnimation = new Animation(.05f, koiSFrames); 
+		koiSspriteBatch = new SpriteBatch(); 
+
+		cols = 31;
+		//remeber kiddies, animate both directions
+		koiCSheet = new Texture(Gdx.files.internal("koi/curved_koi.png"));
+		TextureRegion[][] tmpkoiC = TextureRegion.split(koiCSheet, koiCSheet.getWidth()/cols, koiCSheet.getHeight()/rows);              // #10
+		TextureRegion[][] tmpkoiCFlipped = TextureRegion.split(koiCSheet, koiCSheet.getWidth()/cols, koiCSheet.getHeight()/rows);              // #10
+
+		koiCFrames = new TextureRegion[cols * rows];
+		koiCFramesFlipped = new TextureRegion[cols * rows];
+		index = 0;
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				//tmpkoiC[i][j].flip(false, true);
+				koiCFrames[index] = tmpkoiC[i][j];
+				tmpkoiCFlipped[i][j].flip(false, true);
+				koiCFramesFlipped[index++] = tmpkoiCFlipped[i][j];
+			}
+		}
+		koiCAnimation = new Animation(.05f, koiCFrames); 
+		koiCAnimationFlipped = new Animation(.05f, koiCFramesFlipped);
+		koiCspriteBatch = new SpriteBatch(); 
+
+
+
+		energyBarTexture = createTexture(manager, ENERGYBAR_TEXTURE, false);
+		enemyTexture = createTexture(manager,ENEMY_TEXTURE,false);
+		//koiTexture = koiSFrames[0];
+		koiTexture = createTexture(manager, KOI_TEXTURE, false);
+		//lilyTexture = lilyFramesNight[0];
+		lilyTexture = lilyFrames[0];
+		lanternTexture = closedFlowerFrames[0];
+		lightingTexture = createTexture(manager, LIGHTING_TEXTURE, false);
+		shadowTexture = createTexture(manager, SHADOW_TEXTURE, false);
+		goalTexture = createTexture(manager, GOAL_TEXTURE, false);
+		UILotusTexture = createTexture(manager, UI_FLOWER, false);
+
+		earthTile = createTexture(manager,EARTH_FILE_N,true);
+		earthTileDay = createTexture(manager,EARTH_FILE_D, true);
+		earthTileNight = createTexture(manager,EARTH_FILE_N, true);
+		earthTileSunset = createTexture(manager,EARTH_FILE_S, true);
+
+		whirlpoolTexture = createTexture(manager,WHIRLPOOL_TEXTURE,false);
+		whirlpoolFlipTexture = createTexture(manager,WHIRLPOOL_FLIP_TEXTURE,false);
+		
+		
+		
 		
 		// Allocate the tiles
 
