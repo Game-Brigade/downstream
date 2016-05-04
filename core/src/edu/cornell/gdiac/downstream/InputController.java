@@ -115,7 +115,7 @@ public class InputController {
 	public boolean kill;
 	
 	public enum SelectionType {
-		Lilypad, Lantern, Enemy, Player, Wall, MapArea, Goal, WhirlpoolCCW, WhirlpoolCW;
+		Lilypad, Lantern, Enemy, Player, Wall, MapArea, Goal, WhirlpoolCCW, WhirlpoolCW, Save;
 	} 
 	
 	private SelectionType currentSelection;
@@ -425,6 +425,7 @@ public class InputController {
 		downPressed  = Gdx.input.isKeyPressed(Input.Keys.DOWN);
 		leftPressed  = Gdx.input.isKeyPressed(Input.Keys.LEFT);
 		rightPressed = Gdx.input.isKeyPressed(Input.Keys.RIGHT);
+		if (Gdx.input.isKeyPressed(Input.Keys.NUM_0)) currentSelection = SelectionType.Save;
 		if (Gdx.input.isKeyPressed(Input.Keys.NUM_1)) currentSelection = SelectionType.Lilypad;
 		if (Gdx.input.isKeyPressed(Input.Keys.NUM_2)) currentSelection = SelectionType.Lantern;
 		if (Gdx.input.isKeyPressed(Input.Keys.NUM_3)) currentSelection = SelectionType.Enemy;
