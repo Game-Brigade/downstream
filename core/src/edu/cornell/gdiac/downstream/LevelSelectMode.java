@@ -24,7 +24,7 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 	
 	
 	/** Textures necessary to support the level select screen */
-	private static final String BACKGROUND = "MENUS/general_background_new.png";
+	private static final String BACKGROUND = "Final_Assets/Beta Art Assets/Textures(JPGs)/homescreen.png";
 	private static final String BACK_BUTTON = "MENUS/back to main-b.png";
 	private static final String LEVEL1_BUTTON = "MENUS/Level Select/lvl 1.png";
 	private static final String LEVEL2_BUTTON = "MENUS/Level Select/lvl 2.png";
