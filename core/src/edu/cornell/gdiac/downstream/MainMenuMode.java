@@ -26,7 +26,7 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 	private static final String PLAY_FILE = "Final_Assets/Menus/play.png";
 	private static final String SELECT_FILE = "Final_Assets/Menus/levelselect.png";
 	private static final String EDIT_FILE = "Final_Assets/Menus/levelbuild.png";
-	private static final String BACKGROUND_FILE = "MENUS/general_background_new.png";
+	private static final String BACKGROUND_FILE = "Final_Assets/Beta Art Assets/Textures(JPGs)/homescreen.png";
 	
 	/** Logo texture */
 	private Texture logo;
@@ -271,21 +271,18 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 		float dy = Math.abs(screenY - playPos.y);
 		
 		if (dx < scale*play.getWidth()/2 && dy < scale*play.getHeight()/2) {
-			//System.out.println("hello");
 			playState = 1;
 		}
 		
 		dx = Math.abs(screenX - selectPos.x);
 		dy = Math.abs(screenY - selectPos.y);
 		if (dx < scale*select.getWidth()/2 && dy < scale*select.getHeight()/2) {
-			//System.out.println("hello");
 			selectState = 1;
 		}
 		
 		dx = Math.abs(screenX - editPos.x);
 		dy = Math.abs(screenY - editPos.y);
 		if (dx < scale*edit.getWidth()/2 && dy < scale*edit.getHeight()/2) {
-			//System.out.println("hello");
 			editState = 1;
 		}
 		

@@ -185,9 +185,14 @@ public class PlayerModel extends BoxObstacle {
 
 	
 	public Vector2 calculateWhirlForce(Vector2 whirlPos, float rad){
+		if(cent.isZero() || dest.isZero() || pull.isZero()){
+			return cent;
+		}
 		if(isWhirled()){
 			// TRUE CIRCLE
 			if(getPosition().sub(dest).len2() < .01){
+				//pastTanTether = false;
+				//attemptingTether = false;
 				dest = getPosition();
 				
 				// set force direction

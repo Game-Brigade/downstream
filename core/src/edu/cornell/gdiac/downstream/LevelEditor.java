@@ -169,8 +169,7 @@ public class LevelEditor extends WorldController {
 	
 	private ArrayList<Vector2> lilypads;
 	private ArrayList<Vector2> lanterns;
-	private ArrayList<Vector2> whirlpoolLocs;
-	private ArrayList<Vector2> whirlpoolInfo;
+	private ArrayList<Vector3> whirlpools;
 	private ArrayList<Vector2> rocks;
 	private HashMap<String,ArrayList<Vector2>> enemies;
 	private Vector2 player;
@@ -207,7 +206,7 @@ public class LevelEditor extends WorldController {
 		enemies = new HashMap<String,ArrayList<Vector2>>();
 		enemyPath = new ArrayList<Vector2>();
 		walls = new ArrayList<ArrayList<Vector2>>();
-		whirlpoolLocs = new ArrayList<Vector2>();
+		whirlpools = new ArrayList<Vector3>();
 		newClick = false;
 		currentClick = new Vector2(0,0);
 		mapArea = new ArrayList<Vector2>();
@@ -260,7 +259,6 @@ public class LevelEditor extends WorldController {
 					addPlayer(currentClick);
 					return;
 				case Wall:
-//					System.out.println(newClick);
 					addWall(currentClick,didEnter);
 					return;
 				case MapArea:
@@ -274,7 +272,10 @@ public class LevelEditor extends WorldController {
 					return;
 				case WhirlpoolCW:
 					addWhirlpool(currentClick, -1);
-					
+					return;
+				case Save:
+					this.saveToJson();
+					return;
 			}
 		}
 //		System.out.println("please");
@@ -304,24 +305,23 @@ public class LevelEditor extends WorldController {
 	}
 	
 
-	private void addWhirlpool(Vector2 click, int dir){
-		saveToJson();
-//		wpools.add(click.cpy());
-//		WhirlpoolModel pool = new WhirlpoolModel(currentClick.x, currentClick.y, dir);
-//		pool.setBodyType(BodyDef.BodyType.StaticBody);
-//		pool.setName("whirlpool" + 1);
-//		pool.setDensity(TETHER_DENSITY);
-//		pool.setFriction(TETHER_FRICTION);
-//		pool.setRestitution(TETHER_RESTITUTION);
-//		pool.setSensor(false);
-//		pool.setDrawScale(scale);
-//		if(dir == -1){
-//			pool.setTexture(whirlpoolTexture);
-//		}
-//		else{
-//			pool.setTexture(whirlpoolFlipTexture);
-//		}
-//		addObject(pool);
+	private void addWhirlpool(Vector2 click, float dir){
+		whirlpools.add(new Vector3(click.cpy().x, click.cpy().y, dir));
+		WhirlpoolModel pool = new WhirlpoolModel(currentClick.x, currentClick.y, dir);
+		pool.setBodyType(BodyDef.BodyType.StaticBody);
+		pool.setName("whirlpool" + 1);
+		pool.setDensity(TETHER_DENSITY);
+		pool.setFriction(TETHER_FRICTION);
+		pool.setRestitution(TETHER_RESTITUTION);
+		pool.setSensor(false);
+		pool.setDrawScale(scale);
+		if(dir == -1){
+			pool.setTexture(whirlpoolTexture);
+		}
+		else{
+			pool.setTexture(whirlpoolFlipTexture);
+		}
+		addObject(pool);
 	}
 	
 
@@ -492,7 +492,7 @@ public class LevelEditor extends WorldController {
 		ArrayList<Vector2> li = lilypads;
 		ArrayList<Vector2> lo = lanterns;
 		ArrayList<ArrayList<Vector2>> w = walls;
-		ArrayList<Vector2> wp = whirlpoolLocs;
+		ArrayList<Vector3> wp = whirlpools;
 		ArrayList<Vector2> m = mapArea;
 		
 		Level level = new Level(n,p,g,e,li,lo,w,wp,m);
@@ -549,7 +549,7 @@ public class LevelEditor extends WorldController {
 	    lilypads.add(new Vector2(-1.4039901f,19.247744f));lilypads.add(new Vector2(29.854492f,-1.2477448f));
 	    ArrayList<Vector2> lotuses = new ArrayList<Vector2>();
 	    lotuses.add(new Vector2(14.511503f,9.057251f));
-	    ArrayList<Vector2> wpools = new ArrayList<Vector2>();
+	    ArrayList<Vector3> wpools = new ArrayList<Vector3>();
 	    ArrayList<Vector2> map = new ArrayList<Vector2>();
 	    map.add(new Vector2(-719.5991f,1317.8994f));map.add(new Vector2(2249.889f,-604.0794f));
 	    ArrayList<ArrayList<Float>> walls = new ArrayList<ArrayList<Float>>();
@@ -607,7 +607,14 @@ public class LevelEditor extends WorldController {
 	      mapArea = level.map;
 	    }
 	    if (level.goal != null) {
-	      goal = level.goal;
+	    	for(Vector2 g: level.goal){
+	    		addGoal(g);
+	    	}
+	    }
+	    if (level.whirlpools != null){
+	    	for(Vector3 pool: level.whirlpools){
+	    		addWhirlpool(new Vector2(pool.x, pool.y), pool.z);
+	    	}
 	    }
 	    for (Vector2 lilypad : level.lilypads) {
 	      addLilypad(lilypad);
@@ -615,9 +622,7 @@ public class LevelEditor extends WorldController {
 	    for (Vector2 lotus : level.lotuses) {
 	      addLantern(lotus);
 	    }
-	    for(Vector2 goal: level.goal){
-	      addGoal(goal);
-	    }
+	    
 	    for (ArrayList<Vector2> wall : tempWalls) {
 	      settingWallPath = false;
 	      for (Vector2 vertex : wall) {
@@ -658,7 +663,7 @@ public class LevelEditor extends WorldController {
 		ArrayList<Vector2> lotuses;
 		ArrayList<ArrayList<Float>> walls;
 
-		ArrayList<Vector2> wpools;
+		ArrayList<Vector3> whirlpools;
 
 		ArrayList<Vector2> map;
 		ArrayList<Vector2> rocks;
@@ -669,7 +674,7 @@ public class LevelEditor extends WorldController {
 					  HashMap<String,ArrayList<Vector2>> e,
 					  ArrayList<Vector2> li,
 					  ArrayList<Vector2> lo,
-					  ArrayList<ArrayList<Vector2>> w, ArrayList<Vector2> wp, ArrayList<Vector2> m) {
+					  ArrayList<ArrayList<Vector2>> w, ArrayList<Vector3> wp, ArrayList<Vector2> m) {
 //			System.out.println(e.values());
 
 
@@ -685,7 +690,7 @@ public class LevelEditor extends WorldController {
 			}
 			lilypads = li;
 			lotuses = lo;
-			wpools = wp;
+			whirlpools = wp;
 			walls = new ArrayList<ArrayList<Float>>();
 			for (ArrayList<Vector2> vectorList : w) {
 				ArrayList<Float> floatList = new ArrayList<Float>();

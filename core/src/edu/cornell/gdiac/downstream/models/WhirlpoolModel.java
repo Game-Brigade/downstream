@@ -19,14 +19,14 @@ public class WhirlpoolModel extends WheelObstacle {
 	public static final float WHIRL_DEFAULT_RANGE = 1.5f;
 	
 	/** The direction the pool spins; 1 is ccw, -1 is cw */
-	private int direction;
+	private float direction;
 	
 	private float rot = 0;
 	
 	private float numOfRotations; 
 	private Vector2 entry;
 
-	public WhirlpoolModel(float x, float y, int dir) {
+	public WhirlpoolModel(float x, float y, float dir) {
 		super(x, y, WHIRL_DEFAULT_RANGE);
 		direction = dir;
 		numOfRotations = 0;
