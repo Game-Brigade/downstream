@@ -63,7 +63,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private TetherModel checkpoint;
 	private float PLAYER_LINEAR_VELOCITY = 6f;
 	private boolean enableSlow = false;
-	private boolean enableLeadingLine = false;
+	private boolean enableLeadingLine = true;
 	private boolean enableTetherRadius = true;
 
 	// Physics constants //
@@ -91,7 +91,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private ArrayList<WhirlpoolModel> wpools = new ArrayList<WhirlpoolModel>();
 	private ArrayList<ArrayList<Float>> walls = new ArrayList<ArrayList<Float>>();
 	private PlayerModel koi;
-	private BoxObstacle goalDoor;
+	private BoxObstacle goalTile;
 	private EnemyModel eFish;
 	private CameraController cameraController;
 	private CollisionController collisionController;
@@ -305,7 +305,7 @@ public class DownstreamController extends WorldController implements ContactList
 		dheight = goalTexture.getRegionHeight()/scale.y;
 		goalTexture.setRegionHeight(goalTexture.getRegionHeight());
 		goalTexture.setRegionWidth(goalTexture.getRegionWidth());
-		BoxObstacle goalTile = new BoxObstacle(goalPos.x+cache.x, goalPos.y+cache.y, dwidth/2, dheight/2);
+		goalTile = new BoxObstacle(goalPos.x+cache.x, goalPos.y+cache.y, dwidth/2, dheight/2);
 		goalTile.setName("goal");
 		goalTile.setDrawScale(scale);
 		goalTile.setTexture(goalTexture);
@@ -395,6 +395,7 @@ public class DownstreamController extends WorldController implements ContactList
 		koi.setTexture(koiTexture);
 		koi.setTethered(false);
 		koi.setWhirled(false);
+		koi.ArrowTexture = Arrow;
 		addObject(koi);
 
 
@@ -668,6 +669,7 @@ public class DownstreamController extends WorldController implements ContactList
 			koiScurrentFrame = koiSAnimation.getKeyFrame(stateTime, true);
 			koiCcurrentFrame = koiCAnimation.getKeyFrame(stateTime, true);
 			KoiCcurrentFrameFlipped = koiCAnimationFlipped.getKeyFrame(stateTime, true);
+			goalCurrentFrame = goalAnimation.getKeyFrame(stateTime, true);
 
 			//System.out.println(relativeTime);
 			//koiCcurrentFrame.flip(koi.left(closestTether), false);
@@ -688,6 +690,9 @@ public class DownstreamController extends WorldController implements ContactList
 
 
 			//FSM to handle Lotus
+			goalTile.setTexture(goalCurrentFrame);
+			
+			
 			for (int i = 0; i < tethers.size(); i++){
 				if (collisionController.inRangeOf(tethers.get(i)) && tethers.get(i)==closestTether){
 					tethers.get(i).inrange = true;

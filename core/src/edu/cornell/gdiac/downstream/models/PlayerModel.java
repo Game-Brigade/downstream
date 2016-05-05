@@ -11,6 +11,7 @@ package edu.cornell.gdiac.downstream.models;
 
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.physics.box2d.*;
 
@@ -79,6 +80,8 @@ public class PlayerModel extends BoxObstacle {
 	private boolean dead;
 
 	private float speed;
+	
+	public TextureRegion ArrowTexture;
 
 	/** Create a new player at x,y. */
 	public PlayerModel(float x, float y, float width, float height) {
@@ -309,6 +312,20 @@ public class PlayerModel extends BoxObstacle {
 	 */
 	public void draw(GameCanvas canvas) {
 		//		canvas.drawLeadingLine(body.getPosition(), new Vector2(0,0));
+		if (true){
+			if(isTethered()){
+				//System.out.println("isTethered");
+				/*Vector2 farOff = this.getPosition().cpy();
+				farOff.add(this.getLinearVelocity().cpy().scl(1000));
+				canvas.drawDirection(this.getPosition().cpy(), farOff);*/
+				Vector2 farOff = new Vector2(getX(), getY());
+				farOff.add(this.getLinearVelocity().cpy().scl(.4f));
+				//canvas.drawLeadingLine(this.getPosition().cpy(), farOff.cpy());
+				//canvas.draw(texture, x, y);
+				canvas.draw(ArrowTexture, Color.WHITE ,origin.x,origin.y,farOff.x*drawScale.x,farOff.y*drawScale.x,getAngle() + 2.2f, .6f, .6f);
+				//canvas.draw(texture, farOff.x, farOff.y);
+			}
+		}
 		if(!dead || true){
 			//super.draw(canvas);  
 			//		canvas.drawLeadingLine(body.getPosition(), new Vector2(0,0));
