@@ -275,7 +275,7 @@ public class LevelEditor extends WorldController {
 					return;
 				case Save:
 					this.saveToJson();
-					
+					return;
 			}
 		}
 //		System.out.println("please");
@@ -607,7 +607,9 @@ public class LevelEditor extends WorldController {
 	      mapArea = level.map;
 	    }
 	    if (level.goal != null) {
-	      goal = level.goal;
+	    	for(Vector2 g: level.goal){
+	    		addGoal(g);
+	    	}
 	    }
 	    if (level.whirlpools != null){
 	    	for(Vector3 pool: level.whirlpools){
@@ -620,9 +622,7 @@ public class LevelEditor extends WorldController {
 	    for (Vector2 lotus : level.lotuses) {
 	      addLantern(lotus);
 	    }
-	    for(Vector2 goal: level.goal){
-	      addGoal(goal);
-	    }
+	    
 	    for (ArrayList<Vector2> wall : tempWalls) {
 	      settingWallPath = false;
 	      for (Vector2 vertex : wall) {

@@ -563,7 +563,7 @@ public class DownstreamController extends WorldController implements ContactList
 			koi.scaleSpeed(speed);
 
 			/*
->>>>>>> 06a08b36bf2df8f0c1d2c17934f9ba04e13ae789
+
 			//WHIRLPOOL CODE
 			if (wpools.isEmpty()){
 				closestWhirlpool = null;
@@ -826,17 +826,13 @@ public class DownstreamController extends WorldController implements ContactList
 			float newDistance = wp.getPosition().sub(koi.getPosition()).len2();
 			if (newDistance < closestDistance) {
 				closestDistance = newDistance;
-				closestWhirlpool = wp;
+				closestPool = wp;
 			}
 		}
-		return closestWhirlpool;
+		return closestPool;
 	}
 
 	public void draw(float delta) {
-
-		//		System.out.println("paused: " + paused);
-		//		System.out.println("waspaused: " + wasPaused);
-
 		if (paused){
 			cameraController.zoomStart(levelCamWidth, levelCamHeight, center, koi.getPosition().cpy().scl(scale));
 			super.draw(delta);
@@ -865,17 +861,6 @@ public class DownstreamController extends WorldController implements ContactList
 		if(input.didPause()){
 			paused = !paused;
 		}
-		/*
-		if(wasPaused){
-
-			paused = true;
-
-		}
-		else{
-			paused = input.didPause();
-			wasPaused = paused;
-			//			if (paused) cameraController.pauseCamera();
-		}*/
 
 		if (active) {
 			if (preUpdate(delta) && !paused) {
@@ -897,9 +882,8 @@ public class DownstreamController extends WorldController implements ContactList
 				restartState = 0;
 				optionsState = 0;
 				backState = 0;
-				
+			
 				paused = false;
-				//				cameraController.unpauseCamera();
 			}
 
 		}

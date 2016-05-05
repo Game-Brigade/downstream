@@ -271,21 +271,18 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 		float dy = Math.abs(screenY - playPos.y);
 		
 		if (dx < scale*play.getWidth()/2 && dy < scale*play.getHeight()/2) {
-			//System.out.println("hello");
 			playState = 1;
 		}
 		
 		dx = Math.abs(screenX - selectPos.x);
 		dy = Math.abs(screenY - selectPos.y);
 		if (dx < scale*select.getWidth()/2 && dy < scale*select.getHeight()/2) {
-			//System.out.println("hello");
 			selectState = 1;
 		}
 		
 		dx = Math.abs(screenX - editPos.x);
 		dy = Math.abs(screenY - editPos.y);
 		if (dx < scale*edit.getWidth()/2 && dy < scale*edit.getHeight()/2) {
-			//System.out.println("hello");
 			editState = 1;
 		}
 		
