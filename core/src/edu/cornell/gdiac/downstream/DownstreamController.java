@@ -167,7 +167,7 @@ public class DownstreamController extends WorldController implements ContactList
 		world.setContactListener(this);
 		dead = false;
 		whirled = false;
-		whirlpoolsOn = true;
+		whirlpoolsOn = false;
 		world.setGravity(Vector2.Zero);
 		paused = false;
 		
