@@ -667,6 +667,14 @@ public class DownstreamController extends WorldController implements ContactList
 				initPool = koi.getInitialTangentPoint(closePool);
 			}
 			
+			// light up tethers ahead of you
+			for (TetherModel tether : tethers) {
+				tether.inpath = false;
+				if (koi.willIntersectTether(tether.getPosition(), TetherModel.TETHER_DEFAULT_RANGE)) {
+					tether.inpath = true;
+				}
+			}
+			
 			
 			//check if koi is closer to a whirlpool than a tether
 			if (whirlpoolsOn && !wpools.isEmpty() && koi.getPosition().sub(closePool).len2() < koi.getPosition().sub(closeTeth).len2()) {
