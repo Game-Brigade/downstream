@@ -16,6 +16,7 @@
  */
 package edu.cornell.gdiac.downstream;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import com.badlogic.gdx.*;

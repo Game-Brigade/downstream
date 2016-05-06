@@ -838,6 +838,7 @@ public class DownstreamController extends WorldController implements ContactList
 	}
 
 	public void draw(float delta) {
+		
 		if (paused){
 			cameraController.zoomStart(levelCamWidth, levelCamHeight, center, koi.getPosition().cpy().scl(scale));
 			super.draw(delta);
