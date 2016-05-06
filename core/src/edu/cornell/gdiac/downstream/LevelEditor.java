@@ -273,6 +273,8 @@ public class LevelEditor extends WorldController {
 				case WhirlpoolCW:
 					addWhirlpool(currentClick, -1);
 					return;
+				case WhirlpoolAngle:
+					return;
 				case Save:
 					this.saveToJson();
 					return;
@@ -529,7 +531,7 @@ public class LevelEditor extends WorldController {
 	    try {
 	      filename = lvl + ".json";
 //	      JsonReader reader = new JsonReader(new FileReader(filename));
-	      System.out.println(System.getProperty("user.dir"));
+//	      System.out.println(System.getProperty("user.dir"));
 	      JsonReader reader = new JsonReader(new InputStreamReader(new FileInputStream(filename)));
 	      Level level = gson.fromJson(reader, Level.class);
 	      return level;
@@ -587,58 +589,59 @@ public class LevelEditor extends WorldController {
 	}
 	
 	private void loadPartialLevel() {
-	    buildingLevel = true;
-	    Level level = loadFromJson();
-	    System.out.println(level);
-	    if (level == null) return;
-	    ArrayList<ArrayList<Vector2>> tempWalls = new ArrayList<ArrayList<Vector2>>();
-	    for (int i = 0; i < level.walls.size(); i++) {
-	      ArrayList<Vector2> wall = new ArrayList<Vector2>();
-	      for (int j = 0; j < level.walls.get(i).size(); j+=2) {
-	        wall.add(new Vector2(level.walls.get(i).get(j),
-	                   level.walls.get(i).get(j+1)));
-	      }
-	      tempWalls.add(wall);
-	    }
-	    if (level.player != null) {
-	      addPlayer(level.player);
-	    }
-	    if (level.map != null) {
-	      mapArea = level.map;
-	    }
-	    if (level.goal != null) {
-	    	for(Vector2 g: level.goal){
-	    		addGoal(g);
-	    	}
-	    }
-	    if (level.whirlpools != null){
+		buildingLevel = true;
+		Level level = loadFromJson();
+		System.out.println(level);
+		if (level == null) return;
+		ArrayList<ArrayList<Vector2>> tempWalls = new ArrayList<ArrayList<Vector2>>();
+		for (int i = 0; i < level.walls.size(); i++) {
+			ArrayList<Vector2> wall = new ArrayList<Vector2>();
+			for (int j = 0; j < level.walls.get(i).size(); j+=2) {
+				wall.add(new Vector2(level.walls.get(i).get(j),
+									 level.walls.get(i).get(j+1)));
+			}
+			tempWalls.add(wall);
+		}
+		if (level.player != null) {
+			addPlayer(level.player);
+		}
+		if (level.map != null) {
+			mapArea = level.map;
+		}
+		if (level.goal != null) {
+			goal = level.goal;
+		}
+		for (Vector2 lilypad : level.lilypads) {
+			addLilypad(lilypad);
+		}
+		for (Vector2 lotus : level.lotuses) {
+			addLantern(lotus);
+		}
+		if (level.whirlpools != null){
 	    	for(Vector3 pool: level.whirlpools){
 	    		addWhirlpool(new Vector2(pool.x, pool.y), pool.z);
 	    	}
 	    }
-	    for (Vector2 lilypad : level.lilypads) {
-	      addLilypad(lilypad);
-	    }
-	    for (Vector2 lotus : level.lotuses) {
-	      addLantern(lotus);
-	    }
-	    
-	    for (ArrayList<Vector2> wall : tempWalls) {
-	      settingWallPath = false;
-	      for (Vector2 vertex : wall) {
-	        addWall(vertex, false);
-	      }
-	      addWall(null,true);
-	    }
-	    for (String enemy : level.enemiesLevel.keySet()) {
-	      addEnemy(vectorOfString(enemy), false);
-	      for (Vector2 waypoint : level.enemiesLevel.get(enemy)) {
-	        addEnemy(waypoint,false);
-	      }
-	      addEnemy(null,true);
-	    }
-	    buildingLevel = false;
-	  }
+	
+		for(Vector2 goal: level.goal){
+			addGoal(goal);
+		}
+		for (ArrayList<Vector2> wall : tempWalls) {
+			settingWallPath = false;
+			for (Vector2 vertex : wall) {
+				addWall(vertex, false);
+			}
+			addWall(null,true);
+		}
+		for (String enemy : level.enemiesLevel.keySet()) {
+			addEnemy(vectorOfString(enemy), false);
+			for (Vector2 waypoint : level.enemiesLevel.get(enemy)) {
+				addEnemy(waypoint,false);
+			}
+			addEnemy(null,true);
+		}
+		buildingLevel = false;
+	}
 	
 	private static String getFileName() throws IOException {
 	    JFileChooser fileChooser = new JFileChooser();
@@ -654,7 +657,9 @@ public class LevelEditor extends WorldController {
 	    return null;
 	}
 	
-	public class Level {
+	
+	
+	class Level {
 		int number;
 		Vector2 player;
 		ArrayList<Vector2> goal;
@@ -667,7 +672,6 @@ public class LevelEditor extends WorldController {
 
 		ArrayList<Vector2> map;
 		ArrayList<Vector2> rocks;
-
 		
 		private Level(int n, Vector2 p, 
 					  ArrayList<Vector2> g, 
@@ -703,8 +707,10 @@ public class LevelEditor extends WorldController {
 			map = m;
 		}
 		
+		
 	}
 	
 	
-	
 }
+
+

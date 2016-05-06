@@ -59,11 +59,12 @@ public class DownstreamController extends WorldController implements ContactList
 	/** Player states */
 	private boolean dead;
 	private boolean whirled;
+	private boolean whirlpoolsOn;
 	float speed;
 	private TetherModel checkpoint;
 	private float PLAYER_LINEAR_VELOCITY = 6f;
 	private boolean enableSlow = false;
-	private boolean enableLeadingLine = false;
+	private boolean enableLeadingLine = true;
 	private boolean enableTetherRadius = true;
 
 	// Physics constants //
@@ -91,7 +92,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private ArrayList<WhirlpoolModel> wpools = new ArrayList<WhirlpoolModel>();
 	private ArrayList<ArrayList<Float>> walls = new ArrayList<ArrayList<Float>>();
 	private PlayerModel koi;
-	private BoxObstacle goalDoor;
+	private BoxObstacle goalTile;
 	private EnemyModel eFish;
 	private CameraController cameraController;
 	private CollisionController collisionController;
@@ -166,6 +167,7 @@ public class DownstreamController extends WorldController implements ContactList
 		world.setContactListener(this);
 		dead = false;
 		whirled = false;
+		whirlpoolsOn = false;
 		world.setGravity(Vector2.Zero);
 		paused = false;
 		
@@ -175,6 +177,38 @@ public class DownstreamController extends WorldController implements ContactList
 	public DownstreamController(int level) {
 		this();
 		this.level = level;
+	}
+	/***
+	 * use when clearing the level to populate a new level
+	 */
+	public void deleteAll(){
+		Vector2 gravity = new Vector2(world.getGravity() );
+
+		for(Obstacle obj : objects) {
+			obj.deactivatePhysics(world);
+		}
+		enemies.clear();
+		lanterns.clear();
+		litlanterns.clear();
+		tethers.clear();
+		shadows.clear();
+		wpools.clear();
+		objects.clear();
+		addQueue.clear();
+		world.dispose();
+		walls.clear();
+
+		dead = false;
+		whirled = false;
+		
+		paused = false;
+		
+		pauseMenu = new PauseMenuMode(canvas);
+		world = new World(gravity,false);
+		world.setContactListener(this);
+		setComplete(false);
+		setFailure(false);
+		
 	}
 
 	/**
@@ -197,9 +231,11 @@ public class DownstreamController extends WorldController implements ContactList
 		objects.clear();
 		addQueue.clear();
 		world.dispose();
+		walls.clear();
 
 		dead = false;
 		whirled = false;
+		
 		paused = false;
 		
 		pauseMenu = new PauseMenuMode(canvas);
@@ -226,14 +262,26 @@ public class DownstreamController extends WorldController implements ContactList
 		if (NDS == 0){
 			//day
 			lilyAnimation = new Animation(.1f, lilyFrames);
+			openingFlowerAnimation = new Animation(.2f, openingFlowerFramesDay);
+			closingFlowerAnimation = new Animation(.2f, closingFlowerFramesDay);
+			closedFlowerAnimation = new Animation(.2f, closedFlowerFramesDay);
+			openFlowerAnimation = new Animation(.2f, openFlowerFramesDay);
 		}
 		else if (NDS == 1){
 			//night
 			lilyAnimation = new Animation(.1f, lilyFrames);
+			openingFlowerAnimation = new Animation(.2f, openingFlowerFramesNight);
+			closingFlowerAnimation = new Animation(.2f, closingFlowerFramesNight);
+			closedFlowerAnimation = new Animation(.2f, closedFlowerFramesNight);
+			openFlowerAnimation = new Animation(.2f, openFlowerFramesNight);
 		}
 		else{
 			//sunset
 			lilyAnimation = new Animation(.1f, lilyFrames);
+			openingFlowerAnimation = new Animation(.2f, openingFlowerFramesSunset);
+			closingFlowerAnimation = new Animation(.2f, closingFlowerFramesSunset);
+			closedFlowerAnimation = new Animation(.2f, closedFlowerFramesSunset);
+			openFlowerAnimation = new Animation(.2f, openFlowerFramesNight);
 		}
 
 		LevelEditor.Level level;
@@ -307,7 +355,7 @@ public class DownstreamController extends WorldController implements ContactList
 		dheight = goalTexture.getRegionHeight()/scale.y;
 		goalTexture.setRegionHeight(goalTexture.getRegionHeight());
 		goalTexture.setRegionWidth(goalTexture.getRegionWidth());
-		BoxObstacle goalTile = new BoxObstacle(goalPos.x+cache.x, goalPos.y+cache.y, dwidth/2, dheight/2);
+		goalTile = new BoxObstacle(goalPos.x+cache.x, goalPos.y+cache.y, dwidth/2, dheight/2);
 		goalTile.setName("goal");
 		goalTile.setDrawScale(scale);
 		goalTile.setTexture(goalTexture);
@@ -397,6 +445,7 @@ public class DownstreamController extends WorldController implements ContactList
 		koi.setTexture(koiTexture);
 		koi.setTethered(false);
 		koi.setWhirled(false);
+		koi.ArrowTexture = Arrow;
 		addObject(koi);
 
 
@@ -433,7 +482,7 @@ public class DownstreamController extends WorldController implements ContactList
 
 
 
-		//Setup checkpoint and collisioncontroller
+		//Setup checkpoint and collision controller
 		collisionController = new CollisionController(koi);
 		checkpoint0 = getClosestTetherTo(koi.initPos);
 		checkpoint = checkpoint0;
@@ -474,6 +523,7 @@ public class DownstreamController extends WorldController implements ContactList
 			cacheAttempt = checkpoint;
 			koi.setLinearVelocity(koi.NE);
 			koi.setDead(false);
+			koi.setWhirled(false);
 			respawnTimer = RESPAWN_TIME;
 			//cameraController.zoomStart(levelCamWidth, levelCamHeight, center, koi.getPosition().cpy().scl(scale));
 			return;
@@ -503,16 +553,24 @@ public class DownstreamController extends WorldController implements ContactList
 	 * @param delta Number of seconds since last animation frame
 	 */
 	public void update(float dt) {	
+	
 		if(collisionController.didWin()){
 			setComplete(true);
+			deleteAll();
+			this.level = this.level + 1;
+			populateLevel();
 		}
+		
 		if(koi.isDead()){
 			deathSound.play();
+			koi.die();
 			for (TetherModel t : tethers) {
 				t.setTethered(false);
 			}
 			respawn();
-		} else{			
+		} 
+		else{			
+			koi.restoreAlpha();
 			//ZOOM IN TO PLAYER AT START OF LEVEL
 			cacheVel = koi.getLinearVelocity();
 			System.out.println(cacheVel);
@@ -529,7 +587,8 @@ public class DownstreamController extends WorldController implements ContactList
 					if(!litlanterns.contains(t)){
 						litlanterns.push(t);	
 					}
-				} else{
+				} 
+				else{
 					litlanterns.remove(t);
 				}
 			}
@@ -540,12 +599,26 @@ public class DownstreamController extends WorldController implements ContactList
 			//CLEAR SHADOW CODE
 			clearShadows(lanterns.size() == litlanterns.size());
 			moveShadows();
+			
+			// ENEMY PATROL CODE
+			for (EnemyModel enemy : enemies) {
+				enemy.patrol();
+				enemy.moveTowardsGoal();
+				enemy.fleeFind();
+				enemy.fleeFind(lanterns);
+				if (enemy.dead) {
+					enemy.deactivatePhysics(world);
+				}
+			}
 
 
 			closestTether = getClosestTetherTo(koi.getPosition());
+			if(whirlpoolsOn && !wpools.isEmpty()){
+				closestWhirlpool = getClosestWhirlpoolTo(koi.getPosition());
+			}
 			// INPUT CODE
 			InputController input = InputController.getInstance();
-			if (input.didTether() && !isWhirled() && !koi.bursting) {
+			if (!isWhirled() && input.didTether() && !koi.bursting) {
 				if((koi.isTethered() || koi.isAttemptingTether())){
 					koi.setTethered(false);					
 					koi.setAttemptingTether(false); 
@@ -557,13 +630,16 @@ public class DownstreamController extends WorldController implements ContactList
 						cameraController.resetCameraVelocity();
 					}
 				}
-			} else if(input.didKill()){
+			} 
+			else if(input.didKill()){
 				koi.setDead(true);
 				return;
-			} else if (input.didFaster()){
+			} 
+			else if (!isWhirled() && input.didFaster()){
 				speed += .5f;
 				speed = Math.min(speed, MAX_SPEED);
-			} else if (input.didSlower()){
+			} 
+			else if (!isWhirled() && input.didSlower()){
 				speed -= .5f;
 				speed = Math.max(speed, MIN_SPEED);
 			}
@@ -571,50 +647,15 @@ public class DownstreamController extends WorldController implements ContactList
 			cameraController.scaleSpeed(speed);
 			koi.scaleSpeed(speed);
 
-			/*
-
-			//WHIRLPOOL CODE
-			if (wpools.isEmpty()){
-				closestWhirlpool = null;
-			}
-			else{
-				closestWhirlpool = getClosestWhirl();
-			}
-			// CHECK IF KOI WILL BE SUCKED INTO WHIRLPOOL //
-			Vector2 close;
-			Vector2 init;
-			if (closestWhirlpool != null) {
-				close = closestWhirlpool.getPosition();
-				init = koi.getInitialTangentPoint(close);
-				if (close.dst(koi.getPosition()) < WhirlpoolModel.WHIRL_DEFAULT_RANGE) {
-					koi.setWhirled(true);
-				}
-				if (koi.getPosition().sub(init).len2() < .01) {
-					koi.setWhirled(true);
-					koi.refreshWhirlForce(close, closestWhirlpool.getOrbitRadius());
-				} else {
-					koi.applyWhirlForce(close, closestWhirlpool.getOrbitRadius());
-				}
-			}
-
-			 */
-
-
-			// ENEMY PATROL CODE
-			for (EnemyModel enemy : enemies) {
-				enemy.patrol();
-				enemy.moveTowardsGoal();
-				enemy.fleeFind();
-				enemy.fleeFind(lanterns);
-				if (enemy.dead){
-					enemy.deactivatePhysics(world);
-				}
-			}
 
 			// KOI VEOLOCITY CODE
-			if (isTethered() && !isWhirled()) {
+			if (isTethered()) {
 				koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*1.5f*speed));
-			} else{
+			} 
+			else if(isWhirled()){
+				koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*1.8f*speed));
+			}
+			else{
 				koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*2*speed));
 			}
 
@@ -625,38 +666,75 @@ public class DownstreamController extends WorldController implements ContactList
 			//System.out.println(collisionController.inRangeOf(closestTether));
 			//System.out.println(closestTether.set);
 
-			// TETHER FORCE CODE
-			Vector2 close = getClosestTether().getPosition();
-			Vector2 init = koi.getInitialTangentPoint(close);
-
-			if (close.dst(koi.getPosition()) > TetherModel.TETHER_DEFAULT_RANGE*1.3){
-				koi.setAttemptingTether(false);
-				koi.setTethered(false);
+			// TETHER/WHIRLPOOL FORCE CODE
+			Vector2 closeTeth = getClosestTether().getPosition();
+			Vector2 initTeth = koi.getInitialTangentPoint(closeTeth);
+			Vector2 closePool = new Vector2();
+			Vector2 initPool = new Vector2();
+			if(whirlpoolsOn && !wpools.isEmpty()){
+				closePool = getClosestWhirlpool().getPosition();
+				initPool = koi.getInitialTangentPoint(closePool);
 			}
-			// HIT TANGENT
-			if (koi.isAttemptingTether() && (koi.getPosition().sub(init).len2() < .01) ) {
-				//				System.out.println("tether");
-				koi.setTethered(true);
-				koi.setAttemptingTether(false);
-				koi.refreshTetherForce(close, closestTether.getOrbitRadius());
+			
+			// light up tethers ahead of you
+			for (TetherModel tether : tethers) {
+				tether.inpath = false;
+				if (koi.willIntersectTether(tether.getPosition(), TetherModel.TETHER_DEFAULT_RANGE)) {
+					tether.inpath = true;
+				}
 			}
-			// PAST TANGENT
-			else if (koi.isAttemptingTether() && !koi.willIntersect(init) && koi.pastTangent(init)) {
-				koi.passAdjust(close);
+			
+			
+			//check if koi is closer to a whirlpool than a tether
+			if (whirlpoolsOn && !wpools.isEmpty() && koi.getPosition().sub(closePool).len2() < koi.getPosition().sub(closeTeth).len2()) {
+				// whirlpool
+				System.out.println(isWhirled());
+				if (closePool.dst(koi.getPosition()) > WhirlpoolModel.WHIRL_DEFAULT_RANGE*1.1) {
+					koi.setWhirled(false);
+					//System.out.println(isWhirled());
+				}
+				// hit tangent
+				else if (koi.getPosition().sub(initPool).len2() < .01) {
+					koi.setWhirled(true);
+					//System.out.println(isWhirled());
+					koi.refreshWhirlForce(closePool, closestWhirlpool.getOrbitRadius());
+				} else {
+					//System.out.println(isWhirled());
+					koi.setWhirled(true);
+					koi.applyWhirlForce(closePool, closestWhirlpool.getOrbitRadius());
+				}
 			}
-			else {}
-			koi.applyTetherForce(close, closestTether.getOrbitRadius());
-
-
+			else {
+				// tether
+				if (closeTeth.dst(koi.getPosition()) > TetherModel.TETHER_DEFAULT_RANGE * 1.3) {
+					koi.setAttemptingTether(false);
+					koi.setTethered(false);
+				}
+				// HIT TANGENT
+				if (koi.isAttemptingTether() && (koi.getPosition().sub(initTeth).len2() < .01)) {
+					// System.out.println("tether");
+					koi.setTethered(true);
+					koi.setAttemptingTether(false);
+					koi.refreshTetherForce(closeTeth, closestTether.getOrbitRadius());
+				}
+				// PAST TANGENT
+				else if (koi.isAttemptingTether() && !koi.willIntersect(initTeth) && koi.pastTangent(initTeth)) {
+					koi.passAdjust(closeTeth);
+				} else {
+					koi.applyTetherForce(closeTeth, closestTether.getOrbitRadius());
+				}
+			}
+			
 			// RESOLVE FISH IMG
 			koi.resolveDirection();
-
-
-
 
 			// CAMERA ZOOM CODE
 			if (isTethered()){  
 				cameraController.moveCameraTowards(closestTether.getPosition().cpy().scl(scale));
+				cameraController.zoomOut();
+			}
+			else if(isWhirled()){
+				cameraController.moveCameraTowards(closestWhirlpool.getPosition().cpy().scl(scale));
 				cameraController.zoomOut();
 			}
 			else{
@@ -666,7 +744,7 @@ public class DownstreamController extends WorldController implements ContactList
 
 			//burst code
 			koi.updateRestore();
-			if (input.fast) {
+			if (!isWhirled() && input.fast) {
 				koi.burst();
 				cameraController.moveCameraTowards(koi.getPosition().cpy().scl(scale));
 			}
@@ -679,16 +757,27 @@ public class DownstreamController extends WorldController implements ContactList
 			koiScurrentFrame = koiSAnimation.getKeyFrame(stateTime, true);
 			koiCcurrentFrame = koiCAnimation.getKeyFrame(stateTime, true);
 			KoiCcurrentFrameFlipped = koiCAnimationFlipped.getKeyFrame(stateTime, true);
+			goalCurrentFrame = goalAnimation.getKeyFrame(stateTime, true);
 
 			//System.out.println(relativeTime);
 			//koiCcurrentFrame.flip(koi.left(closestTether), false);
-			if (koi.isTethered()){
+			if (isWhirled() || isTethered()){
 				koi.setCurved(true);
-				if (koi.left(closestTether)){
-					koi.setTexture(koiCcurrentFrame);
+				if(isWhirled()){
+					if(koi.left(closestWhirlpool)){
+						koi.setTexture(koiCcurrentFrame);
+					}
+					else{
+						koi.setTexture(KoiCcurrentFrameFlipped);
+					}
 				}
-				else{
-					koi.setTexture(KoiCcurrentFrameFlipped);
+				else if(isTethered()){
+					if (koi.left(closestTether)){
+						koi.setTexture(koiCcurrentFrame);
+					}
+					else{
+						koi.setTexture(KoiCcurrentFrameFlipped);
+					}
 				}
 			}
 			else{
@@ -699,6 +788,9 @@ public class DownstreamController extends WorldController implements ContactList
 
 
 			//FSM to handle Lotus
+			goalTile.setTexture(goalCurrentFrame);
+			
+			
 			for (int i = 0; i < tethers.size(); i++){
 				if (collisionController.inRangeOf(tethers.get(i)) && tethers.get(i)==closestTether){
 					tethers.get(i).inrange = true;
@@ -821,11 +913,12 @@ public class DownstreamController extends WorldController implements ContactList
 		}
 		return closestTether;
 	}
+	
 	private boolean isWhirled(){
-		return koi.isWhirled();
+		return whirlpoolsOn && koi.isWhirled();
 	}
 
-	private WhirlpoolModel getClosestWhirl() {
+	private WhirlpoolModel getClosestWhirlpool() {
 		if(collisionController.inRangePool()){
 			return collisionController.getClosestWhirlpoolInRange();
 		}
@@ -840,8 +933,22 @@ public class DownstreamController extends WorldController implements ContactList
 		}
 		return closestPool;
 	}
+	
+	private WhirlpoolModel getClosestWhirlpoolTo(Vector2 v){
+		WhirlpoolModel closestWhirlpool = wpools.get(0);
+		float closestDistance = wpools.get(0).getPosition().sub(v).len();
+		for (WhirlpoolModel pool: wpools){
+			float newDistance = pool.getPosition().sub(v).len();
+			if (newDistance < closestDistance){
+				closestDistance = newDistance;
+				closestWhirlpool = pool;
+			}
+		}
+		return closestWhirlpool;
+	}
 
 	public void draw(float delta) {
+		
 		if (paused){
 			cameraController.zoomStart(levelCamWidth, levelCamHeight, center, koi.getPosition().cpy().scl(scale));
 			super.draw(delta);

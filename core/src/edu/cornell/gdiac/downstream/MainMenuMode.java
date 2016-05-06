@@ -26,7 +26,7 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 	private static final String PLAY_FILE = "Final_Assets/Menus/play.png";
 	private static final String SELECT_FILE = "Final_Assets/Menus/levelselect.png";
 	private static final String EDIT_FILE = "Final_Assets/Menus/levelbuild.png";
-	private static final String BACKGROUND_FILE = "Final_Assets/Beta Art Assets/Textures(JPGs)/homescreen.png";
+	private static final String BACKGROUND_FILE = "Final_Assets/Beta Art Assets/Textures(JPGs)/homescreen.png"; //britt will provide new bg
 	
 	/** Logo texture */
 	private Texture logo;
@@ -38,6 +38,7 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 	private Texture edit;
 	/** Background texture */
 	private Texture background;
+	
 	
 	/** AssetManager to be loading in the background */
 	private AssetManager manager;
@@ -70,6 +71,7 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 	private static Vector2 backPos = new Vector2();
 	
 	
+	
 
 	/**
 	 * Creates a LoadingMode with the default budget, size and position.
@@ -85,8 +87,8 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 		resize(canvas.getWidth(),canvas.getHeight());
 		
 		logoPos.set(new Vector2((float)canvas.getWidth()/2,(float)canvas.getHeight()/2+50));
-		playPos.set(new Vector2((float)canvas.getWidth()/3,(float)canvas.getHeight()/5));
-		selectPos.set(new Vector2((float)canvas.getWidth()/3*2,(float)canvas.getHeight()/5));
+		playPos.set(new Vector2((float)canvas.getWidth()/3-70,(float)canvas.getHeight()/5-20));
+		selectPos.set(new Vector2((float)canvas.getWidth()/3*2+70,(float)canvas.getHeight()/5-20));
 		editPos.set(new Vector2((float)canvas.getWidth()/8*7,(float)canvas.getHeight()/8*7));
 		backPos.set(new Vector2((float)canvas.getWidth()/2,(float)canvas.getHeight()/2));
 
@@ -131,7 +133,7 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 		canvas.beginMENU();
 		canvas.clear();
 		canvas.draw(background, Color.WHITE, background.getWidth()/2, background.getHeight()/2, backPos.x, backPos.y, 0, scale, scale);
-		canvas.draw(logo, Color.WHITE, logo.getWidth()/2, logo.getHeight()/2, logoPos.x, logoPos.y, 0, scale*0.6f, scale*0.6f);
+		canvas.draw(logo, Color.WHITE, logo.getWidth()/2, logo.getHeight()/2, logoPos.x, logoPos.y, 0, scale*0.8f, scale*0.8f);
 		canvas.draw(play, Color.WHITE, play.getWidth()/2, play.getHeight()/2, playPos.x, playPos.y, 0, scale, scale);
 		canvas.draw(select, Color.WHITE, select.getWidth()/2, select.getHeight()/2, selectPos.x, selectPos.y, 0, scale, scale);
 		canvas.draw(edit, Color.WHITE, edit.getWidth()/2, edit.getHeight()/2, editPos.x, editPos.y, 0, scale*0.9f, scale*0.9f);

@@ -170,7 +170,7 @@ public class GDXRoot extends Game implements ScreenListener {
 			if(backgroundMusic == null){
 				backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal(BACKGROUND_SOUND));
 				backgroundMusic.setLooping(true);
-				backgroundMusic.play();
+				//backgroundMusic.play();
 			}
 
 		} 
@@ -196,7 +196,7 @@ public class GDXRoot extends Game implements ScreenListener {
 			if(backgroundMusic == null){
 				backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal(BACKGROUND_SOUND));
 				backgroundMusic.setLooping(true);
-				backgroundMusic.play();
+				//backgroundMusic.play();
 			}
 		}
 		else if (screen == playGame && exitCode == WorldController.EXIT_MAIN){
@@ -222,6 +222,9 @@ public class GDXRoot extends Game implements ScreenListener {
 		}
 		else if (exitCode == WorldController.EXIT_QUIT){
 			Gdx.app.exit();
+		}
+		if(playGame.active){
+			System.out.println(playGame.speed);
 		}
 	}
 	

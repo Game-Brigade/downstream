@@ -16,6 +16,7 @@
  */
 package edu.cornell.gdiac.downstream;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import com.badlogic.gdx.*;
@@ -82,7 +83,7 @@ public abstract class WorldController implements Screen {
 	protected static final String LIGHTING_TEXTURE = "tethers/aura.png";
 	/** References to shadow and goal textures */
 	protected static final String SHADOW_TEXTURE = "terrain/shadow.png";
-	protected static final String GOAL_TEXTURE = "terrain/goal.png";
+	protected static final String GOAL_TEXTURE = "koi/Goal State small.png";
 	/** References to the repeating land textures */
 	protected static final String EARTH_FILE = "terrain/repeat tile.png";
 	protected static final String EARTH_FILE_N = "terrain/Grass_Night.jpg";
@@ -105,6 +106,7 @@ public abstract class WorldController implements Screen {
 	protected static final String ENERGYBAR_TEXTURE = "MENUS/UI_bar.png";
 	protected static final String UI_FLOWER = "MENUS/UI_lotus.png";
 	protected static final String OVERLAY = "terrain/texture.jpg";
+	protected static final String ARROW = "koi/arrow.png";
 	
 	// TextureRegions//
 	/** Texture assets for the koi */
@@ -136,7 +138,7 @@ public abstract class WorldController implements Screen {
 	/** Texture assets for HUD */
 	protected TextureRegion energyBarTexture;
 	protected TextureRegion UILotusTexture;
-	
+	protected TextureRegion Arrow;
 	//Sounds//
 	protected static final String LIGHTING_SOUND = "SOUNDS/lighting_1.mp3";
 	protected Music deathSound;
@@ -165,27 +167,27 @@ public abstract class WorldController implements Screen {
 	protected TextureRegion lilycurrentFrame; // also the only one! 
 
 	protected Animation closedFlowerAnimation; // #3
-	protected Texture closedFlowerSheet; // #4
-	protected TextureRegion[] closedFlowerFrames; // #5
-	protected SpriteBatch closedFlowerspriteBatch; // #6
+	protected TextureRegion[] closedFlowerFramesDay; 
+	protected TextureRegion[] closedFlowerFramesNight;
+	protected TextureRegion[] closedFlowerFramesSunset;
 	protected TextureRegion closedFlowercurrentFrame; // #7
 
 	protected Animation openFlowerAnimation; // #3
-	protected Texture openFlowerSheet; // #4
-	protected TextureRegion[] openFlowerFrames; // #5
-	protected SpriteBatch openFlowerspriteBatch; // #6
+	protected TextureRegion[] openFlowerFramesDay;
+	protected TextureRegion[] openFlowerFramesNight;
+	protected TextureRegion[] openFlowerFramesSunset;
 	protected TextureRegion openFlowercurrentFrame; // #7
 
 	protected Animation openingFlowerAnimation; // #3
-	protected Texture openingFlowerSheet; // #4
-	protected TextureRegion[] openingFlowerFrames; // #5
-	protected SpriteBatch openingFlowerspriteBatch; // #6
+	protected TextureRegion[] openingFlowerFramesDay; // #5
+	protected TextureRegion[] openingFlowerFramesNight;
+	protected TextureRegion[] openingFlowerFramesSunset;
 	protected TextureRegion openingFlowercurrentFrame; // #7
 
 	protected Animation closingFlowerAnimation; // #3
-	protected Texture closingFlowerSheet; // #4
-	protected TextureRegion[] closingFlowerFrames; // #5
-	protected SpriteBatch closingFlowerspriteBatch; // #6
+	protected TextureRegion[] closingFlowerFramesDay; // #5
+	protected TextureRegion[] closingFlowerFramesNight; // #5
+	protected TextureRegion[] closingFlowerFramesSunset; // #5
 	protected TextureRegion closingFlowercurrentFrame; // #7
 
 	protected Animation koiSAnimation; // #3
@@ -203,6 +205,11 @@ public abstract class WorldController implements Screen {
 	protected Animation koiCAnimationFlipped;
 	protected TextureRegion[]	koiCFramesFlipped;
 	protected TextureRegion KoiCcurrentFrameFlipped;
+	
+	protected Animation goalAnimation;
+	protected TextureRegion goalCurrentFrame;
+	protected TextureRegion[] goalFrames;
+	
 	
 	
 
@@ -288,6 +295,9 @@ public abstract class WorldController implements Screen {
 		manager.load(OVERLAY_FILE, Texture.class);
 		assets.add(OVERLAY_FILE);
 		
+		manager.load(ARROW, Texture.class);
+		assets.add(ARROW);
+		
 		referenceC.a = .3f;
 		
 		// Load the font
@@ -299,15 +309,15 @@ public abstract class WorldController implements Screen {
 	}
 
 	
-	protected TextureRegion[] splice(int images, String filePath){
+	protected TextureRegion[] splice(int cols, int rows, String filePath){
 		
 		Texture sheet = new Texture(Gdx.files.internal(filePath));
 
-		TextureRegion[][] tmp = TextureRegion.split(sheet, sheet.getWidth()/images, sheet.getHeight());
-		TextureRegion[] Frames = new TextureRegion[images];
+		TextureRegion[][] tmp = TextureRegion.split(sheet, sheet.getWidth()/cols, sheet.getHeight()/rows);
+		TextureRegion[] Frames = new TextureRegion[cols * rows];
 		int index = 0;
-		for (int i = 0; i < 1; i++) {
-			for (int j = 0; j < images; j++) {
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
 				Frames[index++] = tmp[i][j];
 			}
 		}
@@ -340,69 +350,40 @@ public abstract class WorldController implements Screen {
 		//animationDef
 		//load the animation content here
 		
-		lilyFrames = splice(11, "tethers/lotus_strip.png");
+		lilyFrames = splice(11, 1, "tethers/lotus_strip.png");
 		//lilyFramesDay = splice(47, "tethers/Lily_Day.png");
-		lilyFramesNight = splice(47, LILY_TEXTURE_N);
+		lilyFramesNight = splice(47, 1, LILY_TEXTURE_N);
 		//lilyFramesSunset = splice(47, LILY_TEXTURE_S);
-
+		goalFrames = splice(4,20, GOAL_TEXTURE);
+		goalAnimation = new Animation(.01f, goalFrames);
 		//lilyAnimation = new Animation(.2f, lilyFrames);
-
+		
 
 		cols = 11;
 		rows = 1;
 
-		closedFlowerSheet = new Texture(Gdx.files.internal("tethers/flowerclosed_spritesheet.png"));
+		
+		closedFlowerFramesDay = splice(26, 1, "tethers/Floating_Closed_Day_small.png");
+		closedFlowerFramesNight = splice(26, 1, "tethers/Floating_Closed_Night_small.png");
+		closedFlowerFramesSunset = splice(26, 1, "tethers/Floating_Closed_Sunset_small.png");
 
-		//walkSheet = new Texture(Gdx.files.internal("koi/unnamed.png")); // #9
-		TextureRegion[][] tmpclosed = TextureRegion.split(closedFlowerSheet, closedFlowerSheet.getWidth()/cols, closedFlowerSheet.getHeight()/rows);              // #10
-		closedFlowerFrames = new TextureRegion[cols * rows];
+		
 		int index = 0;
-		for (int i = 0; i < rows; i++) {
-			for (int j = 0; j < cols; j++) {
-				closedFlowerFrames[index++] = tmpclosed[i][j];
-			}
-		}
-		closedFlowerAnimation = new Animation(.2f, closedFlowerFrames);  
-		closedFlowerspriteBatch = new SpriteBatch(); 
+		
+		openFlowerFramesDay = splice(26, 1, "tethers/Floating_Open_Day_small.png");
+		openFlowerFramesNight = splice(26, 1, "tethers/Floating_Open_Night_small.png");
+		openFlowerFramesSunset = splice(26, 1, "tethers/Floating_Open_Sunset_small.png");
 
-		openFlowerSheet = new Texture(Gdx.files.internal("tethers/floweropen_spritesheet.png"));
-		TextureRegion[][] tmpOpen = TextureRegion.split(openFlowerSheet, openFlowerSheet.getWidth()/cols, openFlowerSheet.getHeight()/rows);              // #10
-		openFlowerFrames = new TextureRegion[cols * rows];
-		index = 0;
-		for (int i = 0; i < rows; i++) {
-			for (int j = 0; j < cols; j++) {
-				openFlowerFrames[index++] = tmpOpen[i][j];
-			}
-		}
-		openFlowerAnimation = new Animation(.2f, openFlowerFrames);  
-		openFlowerspriteBatch = new SpriteBatch(); 
 
 		cols = 8; 
 
-		openingFlowerSheet = new Texture(Gdx.files.internal("tethers/flower_opening_spritesheet.png"));
-		TextureRegion[][] tmpOpening = TextureRegion.split(openingFlowerSheet, openingFlowerSheet.getWidth()/cols, openingFlowerSheet.getHeight()/rows);              // #10
-		openingFlowerFrames = new TextureRegion[cols * rows];
-		index = 0;
-		for (int i = 0; i < rows; i++) {
-			for (int j = 0; j < cols; j++) {
-				openingFlowerFrames[index++] = tmpOpening[i][j];
-			}
-		}
-		openingFlowerAnimation = new Animation(.5f, openingFlowerFrames); 
-		openingFlowerspriteBatch = new SpriteBatch(); 
+		openingFlowerFramesDay = splice(26, 1, "tethers/Opening_Flower_Day_small.png" );
+		openingFlowerFramesNight = splice(26, 1, "tethers/Opening_Flower_Night_small.png");
+		openingFlowerFramesSunset = splice(26, 1, "tethers/Opening_Flower_Sunset_small.png");
 
-
-		closingFlowerSheet = new Texture(Gdx.files.internal("tethers/flower_closing_spritesheet.png"));
-		TextureRegion[][] tmpClosing = TextureRegion.split(closingFlowerSheet, closingFlowerSheet.getWidth()/cols, closingFlowerSheet.getHeight()/rows);              // #10
-		closingFlowerFrames = new TextureRegion[cols * rows];
-		index = 0;
-		for (int i = 0; i < rows; i++) {
-			for (int j = 0; j < cols; j++) {
-				closingFlowerFrames[index++] = tmpClosing[i][j];
-			}
-		}
-		closingFlowerAnimation = new Animation(.5f, closingFlowerFrames); 
-		closingFlowerspriteBatch = new SpriteBatch(); 
+		closingFlowerFramesDay = splice(26, 1, "tethers/Closing_Flower_Day_small.png");
+		closingFlowerFramesNight = splice(26, 1, "tethers/Closing_Flower_Night_small.png");
+		closingFlowerFramesSunset = splice(26, 1, "tethers/Closing_Flower_Sunset_small.png");
 
 
 		cols = 12;
@@ -419,7 +400,7 @@ public abstract class WorldController implements Screen {
 		koiSspriteBatch = new SpriteBatch(); 
 
 		cols = 31;
-		//remeber kiddies, animate both directions
+
 		koiCSheet = new Texture(Gdx.files.internal("koi/curved_koi.png"));
 		TextureRegion[][] tmpkoiC = TextureRegion.split(koiCSheet, koiCSheet.getWidth()/cols, koiCSheet.getHeight()/rows);              // #10
 		TextureRegion[][] tmpkoiCFlipped = TextureRegion.split(koiCSheet, koiCSheet.getWidth()/cols, koiCSheet.getHeight()/rows);              // #10
@@ -447,10 +428,11 @@ public abstract class WorldController implements Screen {
 		koiTexture = createTexture(manager, KOI_TEXTURE, false);
 		//lilyTexture = lilyFramesNight[0];
 		lilyTexture = lilyFrames[0];
-		lanternTexture = closedFlowerFrames[0];
+		lanternTexture = closedFlowerFramesDay[0];
 		lightingTexture = createTexture(manager, LIGHTING_TEXTURE, false);
 		shadowTexture = createTexture(manager, SHADOW_TEXTURE, false);
-		goalTexture = createTexture(manager, GOAL_TEXTURE, false);
+		//goalTexture = createTexture(manager, GOAL_TEXTURE, false);
+		goalTexture = goalFrames[0];
 		UILotusTexture = createTexture(manager, UI_FLOWER, false);
 
 		earthTile = createTexture(manager,EARTH_FILE_N,true);
@@ -460,6 +442,7 @@ public abstract class WorldController implements Screen {
 
 		whirlpoolTexture = createTexture(manager,WHIRLPOOL_TEXTURE,false);
 		whirlpoolFlipTexture = createTexture(manager,WHIRLPOOL_FLIP_TEXTURE,false);
+		Arrow = createTexture(manager, ARROW, false);
 		
 		
 		
@@ -1000,6 +983,7 @@ public abstract class WorldController implements Screen {
 			canvas.begin(); // DO NOT SCALE
 			canvas.drawTextCentered("VICTORY!", displayFont, 0.0f);
 			canvas.end();
+			displayFont.setColor(Color.BLACK);
 		} else if (failed) {
 			//displayFont.setColor(Color.RED);
 			canvas.begin(); // DO NOT SCALE

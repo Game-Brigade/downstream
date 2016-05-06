@@ -1257,8 +1257,33 @@ public class GameCanvas {
         Gdx.gl.glLineWidth(1);
     }
 	
+	public void drawDirection(Vector2 start, Vector2 end){
+		start = start.cpy();
+		end = end.cpy();
+		Gdx.gl.glLineWidth(1);
+        leadingLine.setProjectionMatrix(camera.combined);
+        leadingLine.begin(ShapeRenderer.ShapeType.Line);
+        leadingLine.setColor(Color.BLACK);
+//        local.applyTo(start);
+//        local.applyTo(end);
+        leadingLine.line(start, end);
+        leadingLine.end();
+        Gdx.gl.glLineWidth(1);
+	}
+	
 	public void drawLeadingLine(Vector2 start, Vector2 end) {
-		drawLeadingLine(start, end, 4);
+		drawLeadingLine(start, end, 100);
+	}
+	
+	public void drawOutline(Vector2 start, Vector2 end){
+		start = start.cpy();
+		end = end.cpy();
+		leadingLine.setProjectionMatrix(camera.combined);
+		leadingLine.begin(ShapeRenderer.ShapeType.Filled);
+		leadingLine.rectLine(start, end, 50);
+		leadingLine.setColor(0, 0, 0, .5f);
+		leadingLine.end();
+		
 	}
 	
 	public void drawTetherCircle(Vector2 tetherPos, float radius) {
@@ -1280,13 +1305,19 @@ public class GameCanvas {
 	}
 	
 	public void drawPath(ArrayList<Float> path) {
+		
+		Gdx.gl.glEnable(GL30.GL_BLEND);
+		Gdx.gl.glBlendFunc(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA);
 		ArrayList<Vector2> vectorPath = new ArrayList<Vector2>();
 		for (int i = 0; i < path.size(); i+=2) {
 			vectorPath.add(new Vector2(path.get(i),path.get(i+1)));
 		}
 		for (int i = 0; i < vectorPath.size()-1;i++) {
 			drawLeadingLine(vectorPath.get(i), vectorPath.get(i+1));
+			//drawOutline(vectorPath.get(i), vectorPath.get(i+1));
 		}
 		drawLeadingLine(vectorPath.get(0), vectorPath.get(vectorPath.size()-1));
+		//drawOutline(vectorPath.get(0), vectorPath.get(vectorPath.size()-1));
+		Gdx.gl.glDisable(GL30.GL_BLEND);
 	}
 }

@@ -11,6 +11,7 @@ package edu.cornell.gdiac.downstream.models;
 
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.physics.box2d.*;
 
@@ -56,7 +57,8 @@ public class PlayerModel extends BoxObstacle {
 
 	public Vector2 pull;
 
-	private int fishAlpha = Color.alpha(.3f);
+	private float fishAlpha = .7f;
+	private Color fishColor = new Color(255, 255, 255, 1);
 	
 	public Vector2 cent;
 
@@ -79,6 +81,8 @@ public class PlayerModel extends BoxObstacle {
 	private boolean dead;
 
 	private float speed;
+	
+	public TextureRegion ArrowTexture;
 
 	/** Create a new player at x,y. */
 	public PlayerModel(float x, float y, float width, float height) {
@@ -196,13 +200,13 @@ public class PlayerModel extends BoxObstacle {
 				pull = whirlPos.sub(getPosition());
 				
 				// set force magnitude
-			    float forceMagnitude = (float) (getMass() * getLinearVelocity().len2() / rad);
+			    float forceMagnitude = (float) (1.9*getMass() * getLinearVelocity().len2() / rad);
 			    return pull.setLength(forceMagnitude);
 			} 
 			
 			// CORRECTIVE CIRCLE
 			else{
-			    float forceMagnitude = (float) (getMass() * getLinearVelocity().len2() / (pull.len()/2));
+			    float forceMagnitude = (float) (1.9*getMass() * getLinearVelocity().len2() / (pull.len()/2));
 			    return cent.cpy().sub(getPosition()).setLength(forceMagnitude);			
 			}
 		}
@@ -220,6 +224,18 @@ public class PlayerModel extends BoxObstacle {
 		cent = getPosition().cpy().add(pull.cpy().scl(0.5f));
 		
 		pastTanTether = true;
+		
+	}
+	
+	public void passAdjustWhirl(Vector2 whirlPos){
+		Vector2 perp = whirlPos.cpy().sub(getInitialTangentPoint(whirlPos)).scl(.5f);
+		float rad = perp.len();
+		cent = getPosition().add(getLinearVelocity().setLength(rad/2)).add(perp);
+		
+		dest = getPosition().add(perp.cpy().scl(2)).add(getLinearVelocity().setLength(rad));
+		pull = dest.cpy().sub(getPosition());
+		cent = getPosition().cpy().add(pull.cpy().scl(0.5f));
+		
 		
 	}
 	
@@ -253,6 +269,15 @@ public class PlayerModel extends BoxObstacle {
 		Vector2 time = timeToIntersect(target);
 		//return time.x > -0.009 && time.y > -0.009;
 		return getLinearVelocity().isCollinear(target.sub(getPosition()), .09f);
+	}
+	
+	public boolean willIntersectTether(Vector2 tether, int tetherRange) {
+		Vector2 initialTangent = getInitialTangentPoint(tether);
+		Vector2 difference = new Vector2(tether.x - getX(), tether.y - getY());
+		boolean timeIsPositive = Math.signum(difference.x) == Math.signum(getVX()) && 
+								 Math.signum(difference.y) == Math.signum(getVY());
+		if (initialTangent.dst2(tether) > tetherRange*tetherRange || !timeIsPositive) return false;
+		return true;
 	}
 	
 	public boolean pastTangent(Vector2 target){
@@ -307,6 +332,37 @@ public class PlayerModel extends BoxObstacle {
 
 	}
 	
+	public boolean left(WhirlpoolModel t){
+		boolean b;
+		
+		if (cachedPos.x - .5 > t.getX()){
+			if (this.getPosition().x > t.getX() && this.getPosition().y > cachedPos.y){
+				b = true;
+			}
+			else{ b = false;}
+			cachedLeft = b;
+		}
+		else{
+			b = cachedLeft;
+		}
+		
+		if (cachedPos.x + .5 < t.getX()){
+			if (this.getPosition().x < t.getX() && this.getPosition().y < cachedPos.y){
+				b = true;
+			}
+			else{b = false;}
+			cachedLeft = b;
+		}
+		else{
+			b = cachedLeft;
+		}
+		
+		cachedPos = getPosition().cpy();
+		left = b;
+		return b;
+
+	}
+	
 	/**
 	 * Draws the physics object.
 	 *
@@ -314,17 +370,29 @@ public class PlayerModel extends BoxObstacle {
 	 */
 	public void draw(GameCanvas canvas) {
 		//		canvas.drawLeadingLine(body.getPosition(), new Vector2(0,0));
+		if (true){
+			if(isTethered()){
+
+				Vector2 farOff = new Vector2(getX(), getY());
+				farOff.add(this.getLinearVelocity().cpy().scl(.4f));
+
+				canvas.draw(ArrowTexture, Color.WHITE ,origin.x,origin.y,farOff.x*drawScale.x,farOff.y*drawScale.x,getAngle() + 2.2f, .6f, .6f);
+				//canvas.draw(texture, farOff.x, farOff.y);
+			}
+		}
 		if(!dead || true){
 			//super.draw(canvas);  
 			//		canvas.drawLeadingLine(body.getPosition(), new Vector2(0,0));
 			if (texture != null) {
-				if (!curved){canvas.draw(texture, Color.WHITE.mul(1, 1, 1, fishAlpha),origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x,getAngle() + 2.2f, .28f, .28f);}
+				fishColor.set(255, 255, 255, fishAlpha);
+				//DO NOT USE COLORS DIRECTRLY!!!!!!!!
+				if (!curved){canvas.draw(texture, fishColor ,origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x,getAngle() + 2.2f, .28f, .28f);}
 				else{
 					if(left){
-						if (curved)canvas.draw(texture, Color.WHITE.mul(1, 1, 1, fishAlpha),origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x, getAngle() + 2.6f, .3f, .3f);
+						if (curved)canvas.draw(texture, fishColor,origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x, getAngle() + 2.6f, .3f, .3f);
 					}
 					else{
-						if (curved)canvas.draw(texture, Color.WHITE.mul(1, 1, 1, fishAlpha),origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x, getAngle() + 3.7f, .3f, .3f);
+						if (curved)canvas.draw(texture, fishColor,origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x, getAngle() + 3.7f, .3f, .3f);
 					}
 				}
 
@@ -527,8 +595,14 @@ public class PlayerModel extends BoxObstacle {
 //		System.out.println("Dest: "+ dest);		
 //		System.out.println("Pull: "+ pull);		
 	}
-	
 
+	public void die(){
+		if (fishAlpha > 0) fishAlpha = fishAlpha - .01f;
+	}
+	
+	public void restoreAlpha(){
+		fishAlpha = .7f;
+	}
 	
 	public float getEnergy(){
 		return energy;

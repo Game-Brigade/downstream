@@ -25,15 +25,26 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 	
 	/** Textures necessary to support the level select screen */
 	private static final String BACKGROUND = "Final_Assets/Beta Art Assets/Textures(JPGs)/homescreen.png";
-	private static final String BACK_BUTTON = "MENUS/back to main-b.png";
-	private static final String LEVEL1_BUTTON = "MENUS/Level Select/lvl 1.png";
-	private static final String LEVEL2_BUTTON = "MENUS/Level Select/lvl 2.png";
-	private static final String LEVEL3_BUTTON = "MENUS/Level Select/lvl 3.png";
-	private static final String LEVEL4_BUTTON = "MENUS/Level Select/lvl 4.png";
-	private static final String LEVEL5_BUTTON = "MENUS/Level Select/lvl 5.png";
-	private static final String LEVEL6_BUTTON = "MENUS/Level Select/lvl 6.png";
-	private static final String LEVEL7_BUTTON = "MENUS/Level Select/lvl 7.png";
-	private static final String LEVEL8_BUTTON = "MENUS/Level Select/lvl 8.png";
+	private static final String BACK_BUTTON = "Final_Assets/Menus/backtomain.png";
+	private static final String LEVEL1_BUTTON = "Final_Assets/Menus/Level_Select/lvl_1.png";
+	private static final String LEVEL2_BUTTON = "Final_Assets/Menus/Level_Select/lvl_2.png";
+	private static final String LEVEL3_BUTTON = "Final_Assets/Menus/Level_Select/lvl_3.png";
+	private static final String LEVEL4_BUTTON = "Final_Assets/Menus/Level_Select/lvl_4.png";
+	private static final String LEVEL5_BUTTON = "Final_Assets/Menus/Level_Select/lvl_5.png";
+	private static final String LEVEL6_BUTTON = "Final_Assets/Menus/Level_Select/lvl_6.png";
+	private static final String LEVEL7_BUTTON = "Final_Assets/Menus/Level_Select/lvl_7.png";
+	private static final String LEVEL8_BUTTON = "Final_Assets/Menus/Level_Select/lvl_8.png";
+	private static final String LEVEL9_BUTTON = "Final_Assets/Menus/Level_Select/lvl_9.png";
+	private static final String LEVEL10_BUTTON = "Final_Assets/Menus/Level_Select/lvl_10.png";
+	private static final String LEVEL11_BUTTON = "Final_Assets/Menus/Level_Select/lvl_11.png";
+	private static final String LEVEL12_BUTTON = "Final_Assets/Menus/Level_Select/lvl_12.png";
+	private static final String LEVEL13_BUTTON = "Final_Assets/Menus/Level_Select/lvl_13.png";
+	private static final String LEVEL14_BUTTON = "Final_Assets/Menus/Level_Select/lvl_14.png";
+	private static final String LEVEL15_BUTTON = "Final_Assets/Menus/Level_Select/lvl_15.png";
+	private static final String LEVEL16_BUTTON = "Final_Assets/Menus/Level_Select/lvl_16.png";
+
+	private static final String LEFT_ARROW = "MENUS/Level Select/Arrow-l.png";
+	private static final String RIGHT_ARROW = "MENUS/Level Select/Arrow-r.png";
 	
 	
 	/** Retro font for displaying messages */
@@ -41,8 +52,9 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 	private static int FONT_SIZE = 150;
 	/** The font for giving messages to the player */
 	protected BitmapFont displayFont;
-	
+	/** Back to main menu button */
 	private Texture back;
+	/** Level buttons */
 	private Texture level1button;
 	private Texture level2button;
 	private Texture level3button;
@@ -51,7 +63,18 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 	private Texture level6button;
 	private Texture level7button;
 	private Texture level8button;
+	private Texture level9button;
+	private Texture level10button;
+	private Texture level11button;
+	private Texture level12button;
+	private Texture level13button;
+	private Texture level14button;
+	private Texture level15button;
+	private Texture level16button;
 	private Texture background;
+	/** Arrow textures */
+	private Texture leftArrow;
+	private Texture rightArrow;
 
 	/** AssetManager to be loading in the background */
 	private AssetManager manager;
@@ -72,7 +95,8 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 	private int button6State;
 	private int button7State;
 	private int button8State;
-	
+	private int leftState;
+	private int rightState;
 	
 	/** Scaling factor for when the student changes the resolution. */
 	private float scale;
@@ -92,7 +116,11 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 	private static Vector2 button6 = new Vector2();
 	private static Vector2 button7 = new Vector2();
 	private static Vector2 button8 = new Vector2();
+	private static Vector2 leftArrowPos = new Vector2();
+	private static Vector2 rightArrowPos = new Vector2();
 	
+	/** Page of levels we are on */
+	private int pageNumber;
 	
 
 	/**
@@ -104,19 +132,23 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 	public LevelSelectMode(GameCanvas canvas, AssetManager manager) {
 		this.manager = manager;
 		this.canvas = canvas;
+		this.pageNumber = 1;
 		
 		// Compute the dimensions from the canvas
 		resize(canvas.getWidth(),canvas.getHeight());
 		
+		//screen positions of the buttons
+		leftArrowPos.set(new Vector2((float)canvas.getWidth()/2-60,(float)canvas.getHeight()/18*4));
+		rightArrowPos.set(new Vector2((float)canvas.getWidth()/2+60,(float)canvas.getHeight()/18*4));
 		backPos.set(new Vector2((float)canvas.getWidth()/2,(float)canvas.getHeight()/18*2));
-		button1.set(new Vector2((float)canvas.getWidth()/12*3,(float)canvas.getHeight()/12*8));
-		button2.set(new Vector2((float)canvas.getWidth()/12*5,(float)canvas.getHeight()/12*8));
-		button3.set(new Vector2((float)canvas.getWidth()/12*7,(float)canvas.getHeight()/12*8));
-		button4.set(new Vector2((float)canvas.getWidth()/12*9,(float)canvas.getHeight()/12*8));
-		button5.set(new Vector2((float)canvas.getWidth()/12*3,(float)canvas.getHeight()/12*5));
-		button6.set(new Vector2((float)canvas.getWidth()/12*5,(float)canvas.getHeight()/12*5));
-		button7.set(new Vector2((float)canvas.getWidth()/12*7,(float)canvas.getHeight()/12*5));
-		button8.set(new Vector2((float)canvas.getWidth()/12*9,(float)canvas.getHeight()/12*5));
+		button1.set(new Vector2((float)canvas.getWidth()/8,(float)canvas.getHeight()/12*8));
+		button2.set(new Vector2((float)canvas.getWidth()/8*3,(float)canvas.getHeight()/12*8));
+		button3.set(new Vector2((float)canvas.getWidth()/8*5,(float)canvas.getHeight()/12*8));
+		button4.set(new Vector2((float)canvas.getWidth()/8*7,(float)canvas.getHeight()/12*8));
+		button5.set(new Vector2((float)canvas.getWidth()/8,(float)canvas.getHeight()/12*5));
+		button6.set(new Vector2((float)canvas.getWidth()/8*3,(float)canvas.getHeight()/12*5));
+		button7.set(new Vector2((float)canvas.getWidth()/8*5,(float)canvas.getHeight()/12*5));
+		button8.set(new Vector2((float)canvas.getWidth()/8*7,(float)canvas.getHeight()/12*5));
 		
 		// Load the font
 		FreetypeFontLoader.FreeTypeFontLoaderParameter size2Params = new FreetypeFontLoader.FreeTypeFontLoaderParameter();
@@ -141,7 +173,17 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 		level6button = new Texture(LEVEL6_BUTTON);
 		level7button = new Texture(LEVEL7_BUTTON);
 		level8button = new Texture(LEVEL8_BUTTON);
+		level9button = new Texture(LEVEL9_BUTTON);
+		level10button = new Texture(LEVEL10_BUTTON);
+		level11button = new Texture(LEVEL11_BUTTON);
+		level12button = new Texture(LEVEL12_BUTTON);
+		level13button = new Texture(LEVEL13_BUTTON);
+		level14button = new Texture(LEVEL14_BUTTON);
+		level15button = new Texture(LEVEL15_BUTTON);
+		level16button = new Texture(LEVEL16_BUTTON);
 		background = new Texture(BACKGROUND);
+		leftArrow = new Texture(LEFT_ARROW);
+		rightArrow = new Texture(RIGHT_ARROW);
 			
 		// No progress so far.
 		backState = 0;
@@ -153,7 +195,8 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 		button6State = 0;
 		button7State = 0;
 		button8State = 0;
-		
+		leftState = 0;
+		rightState = 0;
 		active = true;
 	}
 	
@@ -170,8 +213,18 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 		level6button.dispose();
 		level7button.dispose();
 		level8button.dispose();
+		level9button.dispose();
+		level10button.dispose();
+		level11button.dispose();
+		level12button.dispose();
+		level13button.dispose();
+		level14button.dispose();
+		level15button.dispose();
+		level16button.dispose();
 		back.dispose();
 		background.dispose();
+		leftArrow.dispose();
+		rightArrow.dispose();
 	}
 
 
@@ -186,27 +239,53 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 		canvas.beginMENU();
 		canvas.clear();
 		
+		//draw bg, title, back, and arrows
 		canvas.draw(background, Color.WHITE, background.getWidth()/2, background.getHeight()/2, 
 				canvas.getWidth()/2, canvas.getHeight()/2, 0, scale, scale);
-		canvas.drawText("Level Select", displayFont, canvas.getWidth()/3-15, canvas.getHeight()/8*7+10);
-		canvas.draw(level1button, Color.WHITE, level1button.getWidth()/2, level1button.getHeight()/2, 
-				button1.x, button1.y, 0, scale, scale);
-		canvas.draw(level2button, Color.WHITE, level2button.getWidth()/2, level2button.getHeight()/2, 
-				button2.x, button2.y, 0, scale, scale);
-		canvas.draw(level3button, Color.WHITE, level3button.getWidth()/2, level3button.getHeight()/2, 
-				button3.x, button3.y, 0, scale, scale);
-		canvas.draw(level4button, Color.WHITE, level4button.getWidth()/2, level4button.getHeight()/2, 
-				button4.x, button4.y, 0, scale, scale);
-		canvas.draw(level5button, Color.WHITE, level5button.getWidth()/2, level5button.getHeight()/2, 
-				button5.x, button5.y, 0, scale, scale);
-		canvas.draw(level6button, Color.WHITE, level6button.getWidth()/2, level6button.getHeight()/2, 
-				button6.x, button6.y, 0, scale, scale);
-		canvas.draw(level7button, Color.WHITE, level7button.getWidth()/2, level7button.getHeight()/2, 
-				button7.x, button7.y, 0, scale, scale);
-		canvas.draw(level8button, Color.WHITE, level8button.getWidth()/2, level8button.getHeight()/2, 
-				button8.x, button8.y, 0, scale, scale);
-		
+		canvas.drawText("Level Select", displayFont, canvas.getWidth()/3-20, canvas.getHeight()/8*7+20);
+		canvas.draw(leftArrow, Color.WHITE, leftArrow.getWidth()/2, leftArrow.getHeight()/2, 
+				leftArrowPos.x, leftArrowPos.y, 0, scale, scale);
+		canvas.draw(rightArrow, Color.WHITE, rightArrow.getWidth()/2, rightArrow.getHeight()/2, 
+				rightArrowPos.x, rightArrowPos.y, 0, scale, scale);
 		canvas.draw(back, Color.WHITE, back.getWidth()/2, back.getHeight()/2, backPos.x, backPos.y, 0, scale, scale);
+		
+		//draw the correct set of level numbers
+		if (pageNumber == 1) {
+			canvas.draw(level1button, Color.WHITE, level1button.getWidth() / 2, level1button.getHeight() / 2, button1.x,
+					button1.y, 0, scale, scale);
+			canvas.draw(level2button, Color.WHITE, level2button.getWidth() / 2, level2button.getHeight() / 2, button2.x,
+					button2.y, 0, scale, scale);
+			canvas.draw(level3button, Color.WHITE, level3button.getWidth() / 2, level3button.getHeight() / 2, button3.x,
+					button3.y, 0, scale, scale);
+			canvas.draw(level4button, Color.WHITE, level4button.getWidth() / 2, level4button.getHeight() / 2, button4.x,
+					button4.y, 0, scale, scale);
+			canvas.draw(level5button, Color.WHITE, level5button.getWidth() / 2, level5button.getHeight() / 2, button5.x,
+					button5.y, 0, scale, scale);
+			canvas.draw(level6button, Color.WHITE, level6button.getWidth() / 2, level6button.getHeight() / 2, button6.x,
+					button6.y, 0, scale, scale);
+			canvas.draw(level7button, Color.WHITE, level7button.getWidth() / 2, level7button.getHeight() / 2, button7.x,
+					button7.y, 0, scale, scale);
+			canvas.draw(level8button, Color.WHITE, level8button.getWidth() / 2, level8button.getHeight() / 2, button8.x,
+					button8.y, 0, scale, scale);
+		}
+		else{
+			canvas.draw(level9button, Color.WHITE, level9button.getWidth() / 2, level9button.getHeight() / 2, button1.x,
+					button1.y, 0, scale, scale);
+			canvas.draw(level10button, Color.WHITE, level10button.getWidth() / 2, level10button.getHeight() / 2, button2.x,
+					button2.y, 0, scale, scale);
+			canvas.draw(level11button, Color.WHITE, level11button.getWidth() / 2, level11button.getHeight() / 2, button3.x,
+					button3.y, 0, scale, scale);
+			canvas.draw(level12button, Color.WHITE, level12button.getWidth() / 2, level12button.getHeight() / 2, button4.x,
+					button4.y, 0, scale, scale);
+			canvas.draw(level13button, Color.WHITE, level13button.getWidth() / 2, level13button.getHeight() / 2, button5.x,
+					button5.y, 0, scale, scale);
+			canvas.draw(level14button, Color.WHITE, level14button.getWidth() / 2, level14button.getHeight() / 2, button6.x,
+					button6.y, 0, scale, scale);
+			canvas.draw(level15button, Color.WHITE, level15button.getWidth() / 2, level15button.getHeight() / 2, button7.x,
+					button7.y, 0, scale, scale);
+			canvas.draw(level16button, Color.WHITE, level16button.getWidth() / 2, level16button.getHeight() / 2, button8.x,
+					button8.y, 0, scale, scale);
+		}
 		canvas.end();
 	}
 
@@ -224,38 +303,105 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 		if (active) {
 			draw();
 			
-			// We are are ready, notify our listener
+			//Change screens if buttons were pressed
+			
 			if (goBack() && listener != null) {
 				listener.exitScreen(this, WorldController.EXIT_MAIN);
 			}
-			if (Level1() && listener != null) {
-				listener.exitScreen(this, 1);
-			}
-			if (Level2() && listener != null) {
-				listener.exitScreen(this, 2);
-			}
-			if (Level3() && listener != null) {
-				listener.exitScreen(this, 3);
-			}
-			if (Level4() && listener != null) {
-				listener.exitScreen(this, 4);
-			}
-
-			if (Level5() && listener != null) {
-				listener.exitScreen(this, 5);
-			}
-			/*
-			if (Level6() && listener != null) {
-				listener.exitScreen(this, 6);
-			}
-			if (Level7() && listener != null) {
-				listener.exitScreen(this, 7);
-			}
-			if (Level8() && listener != null) {
-				listener.exitScreen(this, 8);
+			
+			if (goLeft() && listener != null) {
+				if(pageNumber == 1){
+					leftState = 0;
+				}
+				else{
+					pageNumber = 1;
+					leftState = 0;
+				}
 			}
 			
+			if (goRight() && listener != null) {
+				if(pageNumber == 2){
+					rightState = 0;
+				}
+				else{
+					pageNumber = 2;
+					rightState = 0;
+				}
+			}
+			
+			if (b1() && listener != null) {
+				if(pageNumber == 1){
+					listener.exitScreen(this, 1);
+				}
+				else{
+					listener.exitScreen(this, 9);
+				}
+			}
+			
+			if (b2() && listener != null) {
+				if(pageNumber == 1){
+					listener.exitScreen(this, 2);
+				}
+				else{
+					listener.exitScreen(this, 10);
+				}
+			}
+			
+			if (b3() && listener != null) {
+				if(pageNumber == 1){
+					listener.exitScreen(this, 3);
+				}
+				else{
+					listener.exitScreen(this, 11);
+				}
+			}
+			
+			if (b4() && listener != null) {
+				if(pageNumber == 1){
+					listener.exitScreen(this, 4);
+				}
+				else{
+					listener.exitScreen(this, 12);
+				}
+			}
+
+			if (b5() && listener != null) {
+				if(pageNumber == 1){
+					listener.exitScreen(this, 5);
+				}
+				else{
+					listener.exitScreen(this, 13);
+				}
+			}
+			/*
+			if (b6() && listener != null) {
+				if(pageNumber == 1){
+					listener.exitScreen(this, 6);
+				}
+				else{
+					listener.exitScreen(this, 14);
+				}
+			}
+			
+			if (b7() && listener != null) {
+				if(pageNumber == 1){
+					listener.exitScreen(this, 7);
+				}
+				else{
+					listener.exitScreen(this, 15);
+				}
+			}
+			
+			if (b8() && listener != null) {
+				if(pageNumber == 1){
+					listener.exitScreen(this, 8);
+				}
+				else{
+					listener.exitScreen(this, 16);
+				}
+			}
 			*/
+			
 			
 		}
 	}
@@ -269,35 +415,43 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 		return backState == 2;
 	}
 	
-	public boolean Level1() {
+	public boolean goLeft(){
+		return leftState == 2;
+	}
+	
+	public boolean goRight(){
+		return rightState == 2;
+	}
+	
+	public boolean b1() {
 		return button1State == 2;
 	}
 	
-	public boolean Level2() {
+	public boolean b2() {
 		return button2State == 2;
 	}
 	
-	public boolean Level3() {
+	public boolean b3() {
 		return button3State == 2;
 	}
 	
-	public boolean Level4() {
+	public boolean b4() {
 		return button4State == 2;
 	}
 	
-	public boolean Level5() {
+	public boolean b5() {
 		return button5State == 2;
 	}
 	
-	public boolean Level6() {
+	public boolean b6() {
 		return button6State == 2;
 	}
 	
-	public boolean Level7() {
+	public boolean b7() {
 		return button7State == 2;
 	}
 	
-	public boolean Level8() {
+	public boolean b8() {
 		return button8State == 2;
 	}
 
@@ -441,6 +595,18 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 			button8State = 1;
 		}
 		
+		dx = Math.abs(screenX - leftArrowPos.x);
+		dy = Math.abs(screenY - leftArrowPos.y);
+		if (dx < scale*leftArrow.getWidth()/2 && dy < scale*leftArrow.getHeight()/2) {
+			leftState = 1;
+		}
+		
+		dx = Math.abs(screenX - rightArrowPos.x);
+		dy = Math.abs(screenY - rightArrowPos.y);
+		if (dx < scale*rightArrow.getWidth()/2 && dy < scale*rightArrow.getHeight()/2) {
+			rightState = 1;
+		}
+		
 		
 		return false;
 	}
@@ -461,7 +627,7 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 	 */
 	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
 		if (backState == 1 || button1State == 1 || button2State == 1 || button3State == 1 || button4State == 1
-				|| button5State == 1 || button6State == 1 || button7State == 1 || button8State == 1) {
+				|| button5State == 1 || button6State == 1 || button7State == 1 || button8State == 1 || leftState == 1 || rightState ==1) {
 			if(backState == 1){
 				backState = 2;
 				return false;
@@ -496,6 +662,14 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 			}
 			if(button8State == 1){
 				button8State = 2;
+				return false;
+			}
+			if(leftState == 1){
+				leftState = 2;
+				return false;
+			}
+			if(rightState == 1){
+				rightState = 2;
 				return false;
 			}
 			
