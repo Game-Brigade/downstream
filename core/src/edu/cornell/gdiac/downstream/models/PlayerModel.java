@@ -199,13 +199,13 @@ public class PlayerModel extends BoxObstacle {
 				pull = whirlPos.sub(getPosition());
 				
 				// set force magnitude
-			    float forceMagnitude = (float) (getMass() * getLinearVelocity().len2() / rad);
+			    float forceMagnitude = (float) (1.9*getMass() * getLinearVelocity().len2() / rad);
 			    return pull.setLength(forceMagnitude);
 			} 
 			
 			// CORRECTIVE CIRCLE
 			else{
-			    float forceMagnitude = (float) (getMass() * getLinearVelocity().len2() / (pull.len()/2));
+			    float forceMagnitude = (float) (1.9*getMass() * getLinearVelocity().len2() / (pull.len()/2));
 			    return cent.cpy().sub(getPosition()).setLength(forceMagnitude);			
 			}
 		}
@@ -223,6 +223,18 @@ public class PlayerModel extends BoxObstacle {
 		cent = getPosition().cpy().add(pull.cpy().scl(0.5f));
 		
 		pastTanTether = true;
+		
+	}
+	
+	public void passAdjustWhirl(Vector2 whirlPos){
+		Vector2 perp = whirlPos.cpy().sub(getInitialTangentPoint(whirlPos)).scl(.5f);
+		float rad = perp.len();
+		cent = getPosition().add(getLinearVelocity().setLength(rad/2)).add(perp);
+		
+		dest = getPosition().add(perp.cpy().scl(2)).add(getLinearVelocity().setLength(rad));
+		pull = dest.cpy().sub(getPosition());
+		cent = getPosition().cpy().add(pull.cpy().scl(0.5f));
+		
 		
 	}
 	
@@ -280,6 +292,37 @@ public class PlayerModel extends BoxObstacle {
 	}
 	
 	public boolean left(TetherModel t){
+		boolean b;
+		
+		if (cachedPos.x - .5 > t.getX()){
+			if (this.getPosition().x > t.getX() && this.getPosition().y > cachedPos.y){
+				b = true;
+			}
+			else{ b = false;}
+			cachedLeft = b;
+		}
+		else{
+			b = cachedLeft;
+		}
+		
+		if (cachedPos.x + .5 < t.getX()){
+			if (this.getPosition().x < t.getX() && this.getPosition().y < cachedPos.y){
+				b = true;
+			}
+			else{b = false;}
+			cachedLeft = b;
+		}
+		else{
+			b = cachedLeft;
+		}
+		
+		cachedPos = getPosition().cpy();
+		left = b;
+		return b;
+
+	}
+	
+	public boolean left(WhirlpoolModel t){
 		boolean b;
 		
 		if (cachedPos.x - .5 > t.getX()){
