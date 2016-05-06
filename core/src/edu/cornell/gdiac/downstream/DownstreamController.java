@@ -229,14 +229,26 @@ public class DownstreamController extends WorldController implements ContactList
 		if (NDS == 0){
 			//day
 			lilyAnimation = new Animation(.1f, lilyFrames);
+			openingFlowerAnimation = new Animation(.2f, openingFlowerFramesDay);
+			closingFlowerAnimation = new Animation(.2f, closingFlowerFramesDay);
+			closedFlowerAnimation = new Animation(.2f, closedFlowerFramesDay);
+			openFlowerAnimation = new Animation(.2f, openFlowerFramesDay);
 		}
 		else if (NDS == 1){
 			//night
 			lilyAnimation = new Animation(.1f, lilyFrames);
+			openingFlowerAnimation = new Animation(.2f, openingFlowerFramesNight);
+			closingFlowerAnimation = new Animation(.2f, closingFlowerFramesNight);
+			closedFlowerAnimation = new Animation(.2f, closedFlowerFramesNight);
+			openFlowerAnimation = new Animation(.2f, openFlowerFramesNight);
 		}
 		else{
 			//sunset
 			lilyAnimation = new Animation(.1f, lilyFrames);
+			openingFlowerAnimation = new Animation(.2f, openingFlowerFramesSunset);
+			closingFlowerAnimation = new Animation(.2f, closingFlowerFramesSunset);
+			closedFlowerAnimation = new Animation(.2f, closedFlowerFramesSunset);
+			openFlowerAnimation = new Animation(.2f, openFlowerFramesNight);
 		}
 
 		LevelEditor.Level level;
