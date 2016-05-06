@@ -82,7 +82,7 @@ public abstract class WorldController implements Screen {
 	protected static final String LIGHTING_TEXTURE = "tethers/aura.png";
 	/** References to shadow and goal textures */
 	protected static final String SHADOW_TEXTURE = "terrain/shadow.png";
-	protected static final String GOAL_TEXTURE = "terrain/goal.png";
+	protected static final String GOAL_TEXTURE = "koi/Goal State small.png";
 	/** References to the repeating land textures */
 	protected static final String EARTH_FILE = "terrain/repeat tile.png";
 	protected static final String EARTH_FILE_N = "terrain/Grass_Night.jpg";
@@ -105,6 +105,7 @@ public abstract class WorldController implements Screen {
 	protected static final String ENERGYBAR_TEXTURE = "MENUS/UI_bar.png";
 	protected static final String UI_FLOWER = "MENUS/UI_lotus.png";
 	protected static final String OVERLAY = "terrain/texture.jpg";
+	protected static final String ARROW = "koi/arrow.png";
 	
 	// TextureRegions//
 	/** Texture assets for the koi */
@@ -136,7 +137,7 @@ public abstract class WorldController implements Screen {
 	/** Texture assets for HUD */
 	protected TextureRegion energyBarTexture;
 	protected TextureRegion UILotusTexture;
-	
+	protected TextureRegion Arrow;
 	//Sounds//
 	protected static final String LIGHTING_SOUND = "SOUNDS/lighting_1.mp3";
 	protected Music deathSound;
@@ -203,6 +204,11 @@ public abstract class WorldController implements Screen {
 	protected Animation koiCAnimationFlipped;
 	protected TextureRegion[]	koiCFramesFlipped;
 	protected TextureRegion KoiCcurrentFrameFlipped;
+	
+	protected Animation goalAnimation;
+	protected TextureRegion goalCurrentFrame;
+	protected TextureRegion[] goalFrames;
+	
 	
 	
 
@@ -288,6 +294,9 @@ public abstract class WorldController implements Screen {
 		manager.load(OVERLAY_FILE, Texture.class);
 		assets.add(OVERLAY_FILE);
 		
+		manager.load(ARROW, Texture.class);
+		assets.add(ARROW);
+		
 		referenceC.a = .3f;
 		
 		// Load the font
@@ -299,15 +308,15 @@ public abstract class WorldController implements Screen {
 	}
 
 	
-	protected TextureRegion[] splice(int images, String filePath){
+	protected TextureRegion[] splice(int cols, int rows, String filePath){
 		
 		Texture sheet = new Texture(Gdx.files.internal(filePath));
 
-		TextureRegion[][] tmp = TextureRegion.split(sheet, sheet.getWidth()/images, sheet.getHeight());
-		TextureRegion[] Frames = new TextureRegion[images];
+		TextureRegion[][] tmp = TextureRegion.split(sheet, sheet.getWidth()/cols, sheet.getHeight()/rows);
+		TextureRegion[] Frames = new TextureRegion[cols * rows];
 		int index = 0;
-		for (int i = 0; i < 1; i++) {
-			for (int j = 0; j < images; j++) {
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
 				Frames[index++] = tmp[i][j];
 			}
 		}
@@ -340,13 +349,14 @@ public abstract class WorldController implements Screen {
 		//animationDef
 		//load the animation content here
 		
-		lilyFrames = splice(11, "tethers/lotus_strip.png");
+		lilyFrames = splice(11, 1, "tethers/lotus_strip.png");
 		//lilyFramesDay = splice(47, "tethers/Lily_Day.png");
-		lilyFramesNight = splice(47, LILY_TEXTURE_N);
+		lilyFramesNight = splice(47, 1, LILY_TEXTURE_N);
 		//lilyFramesSunset = splice(47, LILY_TEXTURE_S);
-
+		goalFrames = splice(4,20, GOAL_TEXTURE);
+		goalAnimation = new Animation(.01f, goalFrames);
 		//lilyAnimation = new Animation(.2f, lilyFrames);
-
+		
 
 		cols = 11;
 		rows = 1;
@@ -450,7 +460,8 @@ public abstract class WorldController implements Screen {
 		lanternTexture = closedFlowerFrames[0];
 		lightingTexture = createTexture(manager, LIGHTING_TEXTURE, false);
 		shadowTexture = createTexture(manager, SHADOW_TEXTURE, false);
-		goalTexture = createTexture(manager, GOAL_TEXTURE, false);
+		//goalTexture = createTexture(manager, GOAL_TEXTURE, false);
+		goalTexture = goalFrames[0];
 		UILotusTexture = createTexture(manager, UI_FLOWER, false);
 
 		earthTile = createTexture(manager,EARTH_FILE_N,true);
@@ -460,6 +471,7 @@ public abstract class WorldController implements Screen {
 
 		whirlpoolTexture = createTexture(manager,WHIRLPOOL_TEXTURE,false);
 		whirlpoolFlipTexture = createTexture(manager,WHIRLPOOL_FLIP_TEXTURE,false);
+		Arrow = createTexture(manager, ARROW, false);
 		
 		
 		
