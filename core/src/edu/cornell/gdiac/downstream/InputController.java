@@ -115,7 +115,7 @@ public class InputController {
 	public boolean kill;
 	
 	public enum SelectionType {
-		Lilypad, Lantern, Enemy, Player, Wall, MapArea, Goal, WhirlpoolCCW, WhirlpoolCW, Save;
+		Lilypad, Lantern, Enemy, Player, Wall, MapArea, Goal, WhirlpoolCCW, WhirlpoolCW, WhirlpoolAngle, Save;
 	} 
 	
 	private SelectionType currentSelection;
@@ -435,6 +435,7 @@ public class InputController {
 		if (Gdx.input.isKeyPressed(Input.Keys.NUM_7)) currentSelection = SelectionType.Goal;
 		if (Gdx.input.isKeyPressed(Input.Keys.NUM_8)) currentSelection = SelectionType.WhirlpoolCCW;
 		if (Gdx.input.isKeyPressed(Input.Keys.NUM_9)) currentSelection = SelectionType.WhirlpoolCW;
+		if (Gdx.input.isKeyPressed(Input.Keys.A)) currentSelection = SelectionType.WhirlpoolAngle;
 		
 		fast = (Gdx.input.isKeyPressed(Input.Keys.F));
 		

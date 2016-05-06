@@ -273,6 +273,8 @@ public class LevelEditor extends WorldController {
 				case WhirlpoolCW:
 					addWhirlpool(currentClick, -1);
 					return;
+				case WhirlpoolAngle:
+					return;
 				case Save:
 					this.saveToJson();
 					return;
