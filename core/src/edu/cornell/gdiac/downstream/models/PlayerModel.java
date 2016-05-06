@@ -48,7 +48,7 @@ public class PlayerModel extends BoxObstacle {
 
 	private Vector2 force;
 	
-	public static final Vector2 NE = (new Vector2(1,1)).nor();
+	public static final Vector2 NE = (new Vector2(1,-1)).nor();
 	
 	private boolean isTethered;
 	

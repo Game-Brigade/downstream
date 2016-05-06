@@ -437,11 +437,19 @@ public class DownstreamController extends WorldController implements ContactList
 		collisionController = new CollisionController(koi);
 		checkpoint0 = getClosestTetherTo(koi.initPos);
 		checkpoint = checkpoint0;
+		
+		//Start tethered to first tether
+		/*
 		koi.initPos = checkpoint.getPosition().add(koi.NE.cpy().rotate90(1).nor().scl(TetherModel.TETHER_DEFAULT_ORBIT));
 		koi.setPosition(koi.initPos);
 		koi.setTethered(true);
-		koi.setLinearVelocity(Vector2.Zero);
 		cacheVel = koi.NE;
+		*/
+		
+		cacheVel = checkpoint0.getPosition().cpy().sub(koi.initPos.cpy()).nor();
+		koi.setLinearVelocity(Vector2.Zero);
+
+		
 		
 		levelCamWidth = Math.abs(level.map.get(0).x - level.map.get(1).x);
 		levelCamHeight = Math.abs(level.map.get(0).y - level.map.get(1).y);
@@ -507,6 +515,7 @@ public class DownstreamController extends WorldController implements ContactList
 		} else{			
 			//ZOOM IN TO PLAYER AT START OF LEVEL
 			cacheVel = koi.getLinearVelocity();
+			System.out.println(cacheVel);
 			if (!cameraController.isZoomedToPlayer()) {
 				cameraController.zoomToPlayer();
 				return;
