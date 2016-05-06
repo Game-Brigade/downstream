@@ -242,7 +242,7 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 		//draw bg, title, back, and arrows
 		canvas.draw(background, Color.WHITE, background.getWidth()/2, background.getHeight()/2, 
 				canvas.getWidth()/2, canvas.getHeight()/2, 0, scale, scale);
-		canvas.drawTextCentered("Level Select", displayFont, canvas.getHeight()/2-80);
+		canvas.drawText("Level Select", displayFont, canvas.getWidth()/3-20, canvas.getHeight()/8*7+20);
 		canvas.draw(leftArrow, Color.WHITE, leftArrow.getWidth()/2, leftArrow.getHeight()/2, 
 				leftArrowPos.x, leftArrowPos.y, 0, scale, scale);
 		canvas.draw(rightArrow, Color.WHITE, rightArrow.getWidth()/2, rightArrow.getHeight()/2, 
