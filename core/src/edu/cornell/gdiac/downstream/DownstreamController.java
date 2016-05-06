@@ -178,6 +178,38 @@ public class DownstreamController extends WorldController implements ContactList
 		this();
 		this.level = level;
 	}
+	/***
+	 * use when clearing the level to populate a new level
+	 */
+	public void deleteAll(){
+		Vector2 gravity = new Vector2(world.getGravity() );
+
+		for(Obstacle obj : objects) {
+			obj.deactivatePhysics(world);
+		}
+		enemies.clear();
+		lanterns.clear();
+		litlanterns.clear();
+		tethers.clear();
+		shadows.clear();
+		wpools.clear();
+		objects.clear();
+		addQueue.clear();
+		world.dispose();
+		walls.clear();
+
+		dead = false;
+		whirled = false;
+		
+		paused = false;
+		
+		pauseMenu = new PauseMenuMode(canvas);
+		world = new World(gravity,false);
+		world.setContactListener(this);
+		setComplete(false);
+		setFailure(false);
+		
+	}
 
 	/**
 	 * Resets the status of the game so that we can play again.
@@ -199,6 +231,7 @@ public class DownstreamController extends WorldController implements ContactList
 		objects.clear();
 		addQueue.clear();
 		world.dispose();
+		walls.clear();
 
 		dead = false;
 		whirled = false;
@@ -512,18 +545,24 @@ public class DownstreamController extends WorldController implements ContactList
 	 * @param delta Number of seconds since last animation frame
 	 */
 	public void update(float dt) {	
+	
 		if(collisionController.didWin()){
 			setComplete(true);
+			deleteAll();
+			this.level = this.level + 1;
+			populateLevel();
 		}
 		
 		if(koi.isDead()){
 			deathSound.play();
+			koi.die();
 			for (TetherModel t : tethers) {
 				t.setTethered(false);
 			}
 			respawn();
 		} 
 		else{			
+			koi.restoreAlpha();
 			//ZOOM IN TO PLAYER AT START OF LEVEL
 			cacheVel = koi.getLinearVelocity();
 			if (!cameraController.isZoomedToPlayer()) {

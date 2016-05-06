@@ -1313,11 +1313,11 @@ public class GameCanvas {
 			vectorPath.add(new Vector2(path.get(i),path.get(i+1)));
 		}
 		for (int i = 0; i < vectorPath.size()-1;i++) {
-			//drawLeadingLine(vectorPath.get(i), vectorPath.get(i+1));
-			drawOutline(vectorPath.get(i), vectorPath.get(i+1));
+			drawLeadingLine(vectorPath.get(i), vectorPath.get(i+1));
+			//drawOutline(vectorPath.get(i), vectorPath.get(i+1));
 		}
-		//drawLeadingLine(vectorPath.get(0), vectorPath.get(vectorPath.size()-1));
-		drawOutline(vectorPath.get(0), vectorPath.get(vectorPath.size()-1));
+		drawLeadingLine(vectorPath.get(0), vectorPath.get(vectorPath.size()-1));
+		//drawOutline(vectorPath.get(0), vectorPath.get(vectorPath.size()-1));
 		Gdx.gl.glDisable(GL30.GL_BLEND);
 	}
 }
