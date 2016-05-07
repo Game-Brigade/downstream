@@ -488,15 +488,15 @@ public class DownstreamController extends WorldController implements ContactList
 		checkpoint = checkpoint0;
 		
 		//Start tethered to first tether
-		/*
+		
 		koi.initPos = checkpoint.getPosition().add(koi.NE.cpy().rotate90(1).nor().scl(TetherModel.TETHER_DEFAULT_ORBIT));
 		koi.setPosition(koi.initPos);
 		koi.setTethered(true);
 		cacheVel = koi.NE;
-		*/
 		
-		cacheVel = checkpoint0.getPosition().cpy().sub(koi.initPos.cpy()).nor();
-		koi.setLinearVelocity(Vector2.Zero);
+		
+		//cacheVel = checkpoint0.getPosition().cpy().sub(koi.initPos.cpy()).nor();
+		//koi.setLinearVelocity(Vector2.Zero);
 
 		
 		
