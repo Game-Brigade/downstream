@@ -49,7 +49,7 @@ public class PlayerModel extends BoxObstacle {
 
 	private Vector2 force;
 	
-	public static final Vector2 NE = (new Vector2(1,1)).nor();
+	public static final Vector2 NE = (new Vector2(1,-1)).nor();
 	
 	private boolean isTethered;
 	
@@ -57,7 +57,8 @@ public class PlayerModel extends BoxObstacle {
 
 	public Vector2 pull;
 
-	private int fishAlpha = Color.alpha(.3f);
+	private float fishAlpha = .7f;
+	private Color fishColor = new Color(255, 255, 255, 1);
 	
 	public Vector2 cent;
 
@@ -270,6 +271,15 @@ public class PlayerModel extends BoxObstacle {
 		return getLinearVelocity().isCollinear(target.sub(getPosition()), .09f);
 	}
 	
+	public boolean willIntersectTether(Vector2 tether, int tetherRange) {
+		Vector2 initialTangent = getInitialTangentPoint(tether);
+		Vector2 difference = new Vector2(tether.x - getX(), tether.y - getY());
+		boolean timeIsPositive = Math.signum(difference.x) == Math.signum(getVX()) && 
+								 Math.signum(difference.y) == Math.signum(getVY());
+		if (initialTangent.dst2(tether) > tetherRange*tetherRange || !timeIsPositive) return false;
+		return true;
+	}
+	
 	public boolean pastTangent(Vector2 target){
 		return !getLinearVelocity().isZero() &&
 				getLinearVelocity().hasOppositeDirection(target.cpy().sub(getPosition()));
@@ -362,14 +372,10 @@ public class PlayerModel extends BoxObstacle {
 		//		canvas.drawLeadingLine(body.getPosition(), new Vector2(0,0));
 		if (true){
 			if(isTethered()){
-				//System.out.println("isTethered");
-				/*Vector2 farOff = this.getPosition().cpy();
-				farOff.add(this.getLinearVelocity().cpy().scl(1000));
-				canvas.drawDirection(this.getPosition().cpy(), farOff);*/
+
 				Vector2 farOff = new Vector2(getX(), getY());
 				farOff.add(this.getLinearVelocity().cpy().scl(.4f));
-				//canvas.drawLeadingLine(this.getPosition().cpy(), farOff.cpy());
-				//canvas.draw(texture, x, y);
+
 				canvas.draw(ArrowTexture, Color.WHITE ,origin.x,origin.y,farOff.x*drawScale.x,farOff.y*drawScale.x,getAngle() + 2.2f, .6f, .6f);
 				//canvas.draw(texture, farOff.x, farOff.y);
 			}
@@ -378,13 +384,15 @@ public class PlayerModel extends BoxObstacle {
 			//super.draw(canvas);  
 			//		canvas.drawLeadingLine(body.getPosition(), new Vector2(0,0));
 			if (texture != null) {
-				if (!curved){canvas.draw(texture, Color.WHITE.mul(1, 1, 1, fishAlpha),origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x,getAngle() + 2.2f, .28f, .28f);}
+				fishColor.set(255, 255, 255, fishAlpha);
+				//DO NOT USE COLORS DIRECTRLY!!!!!!!!
+				if (!curved){canvas.draw(texture, fishColor ,origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x,getAngle() + 2.2f, .28f, .28f);}
 				else{
 					if(left){
-						if (curved)canvas.draw(texture, Color.WHITE.mul(1, 1, 1, fishAlpha),origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x, getAngle() + 2.6f, .3f, .3f);
+						if (curved)canvas.draw(texture, fishColor,origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x, getAngle() + 2.6f, .3f, .3f);
 					}
 					else{
-						if (curved)canvas.draw(texture, Color.WHITE.mul(1, 1, 1, fishAlpha),origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x, getAngle() + 3.7f, .3f, .3f);
+						if (curved)canvas.draw(texture, fishColor,origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x, getAngle() + 3.7f, .3f, .3f);
 					}
 				}
 
@@ -587,8 +595,14 @@ public class PlayerModel extends BoxObstacle {
 //		System.out.println("Dest: "+ dest);		
 //		System.out.println("Pull: "+ pull);		
 	}
-	
 
+	public void die(){
+		if (fishAlpha > 0) fishAlpha = fishAlpha - .01f;
+	}
+	
+	public void restoreAlpha(){
+		fishAlpha = .7f;
+	}
 	
 	public float getEnergy(){
 		return energy;

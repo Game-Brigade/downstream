@@ -223,6 +223,9 @@ public class GDXRoot extends Game implements ScreenListener {
 		else if (exitCode == WorldController.EXIT_QUIT){
 			Gdx.app.exit();
 		}
+		if(playGame.active){
+			System.out.println(playGame.speed);
+		}
 	}
 	
 	

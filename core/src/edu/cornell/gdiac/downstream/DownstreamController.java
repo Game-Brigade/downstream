@@ -178,6 +178,38 @@ public class DownstreamController extends WorldController implements ContactList
 		this();
 		this.level = level;
 	}
+	/***
+	 * use when clearing the level to populate a new level
+	 */
+	public void deleteAll(){
+		Vector2 gravity = new Vector2(world.getGravity() );
+
+		for(Obstacle obj : objects) {
+			obj.deactivatePhysics(world);
+		}
+		enemies.clear();
+		lanterns.clear();
+		litlanterns.clear();
+		tethers.clear();
+		shadows.clear();
+		wpools.clear();
+		objects.clear();
+		addQueue.clear();
+		world.dispose();
+		walls.clear();
+
+		dead = false;
+		whirled = false;
+		
+		paused = false;
+		
+		pauseMenu = new PauseMenuMode(canvas);
+		world = new World(gravity,false);
+		world.setContactListener(this);
+		setComplete(false);
+		setFailure(false);
+		
+	}
 
 	/**
 	 * Resets the status of the game so that we can play again.
@@ -199,6 +231,7 @@ public class DownstreamController extends WorldController implements ContactList
 		objects.clear();
 		addQueue.clear();
 		world.dispose();
+		walls.clear();
 
 		dead = false;
 		whirled = false;
@@ -229,14 +262,26 @@ public class DownstreamController extends WorldController implements ContactList
 		if (NDS == 0){
 			//day
 			lilyAnimation = new Animation(.1f, lilyFrames);
+			openingFlowerAnimation = new Animation(.2f, openingFlowerFramesDay);
+			closingFlowerAnimation = new Animation(.2f, closingFlowerFramesDay);
+			closedFlowerAnimation = new Animation(.2f, closedFlowerFramesDay);
+			openFlowerAnimation = new Animation(.2f, openFlowerFramesDay);
 		}
 		else if (NDS == 1){
 			//night
 			lilyAnimation = new Animation(.1f, lilyFrames);
+			openingFlowerAnimation = new Animation(.2f, openingFlowerFramesNight);
+			closingFlowerAnimation = new Animation(.2f, closingFlowerFramesNight);
+			closedFlowerAnimation = new Animation(.2f, closedFlowerFramesNight);
+			openFlowerAnimation = new Animation(.2f, openFlowerFramesNight);
 		}
 		else{
 			//sunset
 			lilyAnimation = new Animation(.1f, lilyFrames);
+			openingFlowerAnimation = new Animation(.2f, openingFlowerFramesSunset);
+			closingFlowerAnimation = new Animation(.2f, closingFlowerFramesSunset);
+			closedFlowerAnimation = new Animation(.2f, closedFlowerFramesSunset);
+			openFlowerAnimation = new Animation(.2f, openFlowerFramesNight);
 		}
 
 		LevelEditor.Level level;
@@ -438,11 +483,19 @@ public class DownstreamController extends WorldController implements ContactList
 		collisionController = new CollisionController(koi);
 		checkpoint0 = getClosestTetherTo(koi.initPos);
 		checkpoint = checkpoint0;
+		
+		//Start tethered to first tether
+		/*
 		koi.initPos = checkpoint.getPosition().add(koi.NE.cpy().rotate90(1).nor().scl(TetherModel.TETHER_DEFAULT_ORBIT));
 		koi.setPosition(koi.initPos);
 		koi.setTethered(true);
-		koi.setLinearVelocity(Vector2.Zero);
 		cacheVel = koi.NE;
+		*/
+		
+		cacheVel = checkpoint0.getPosition().cpy().sub(koi.initPos.cpy()).nor();
+		koi.setLinearVelocity(Vector2.Zero);
+
+		
 		
 		levelCamWidth = Math.abs(level.map.get(0).x - level.map.get(1).x);
 		levelCamHeight = Math.abs(level.map.get(0).y - level.map.get(1).y);
@@ -498,18 +551,27 @@ public class DownstreamController extends WorldController implements ContactList
 	 * @param delta Number of seconds since last animation frame
 	 */
 	public void update(float dt) {	
+	
 		if(collisionController.didWin()){
 			setComplete(true);
+			deleteAll();
+			this.level = this.level + 1;
+			populateLevel();
 		}
 		if(koi.isDead()){
 			deathSound.play();
+			koi.die();
 			for (TetherModel t : tethers) {
 				t.setTethered(false);
 			}
 			respawn();
-		} else{			
+		}
+		else{			
+			koi.restoreAlpha();
+		
 			//ZOOM IN TO PLAYER AT START OF LEVEL
 			cacheVel = koi.getLinearVelocity();
+			System.out.println(cacheVel);
 			if (!cameraController.isZoomedToPlayer()) {
 				cameraController.zoomToPlayer();
 				return;
@@ -565,31 +627,6 @@ public class DownstreamController extends WorldController implements ContactList
 			cameraController.scaleSpeed(speed);
 			koi.scaleSpeed(speed);
 
-			/*
-			//WHIRLPOOL CODE
-			if (wpools.isEmpty()){
-				closestWhirlpool = null;
-			}
-			else{
-				closestWhirlpool = getClosestWhirl();
-			}
-			// CHECK IF KOI WILL BE SUCKED INTO WHIRLPOOL //
-			Vector2 close;
-			Vector2 init;
-			if (closestWhirlpool != null) {
-				close = closestWhirlpool.getPosition();
-				init = koi.getInitialTangentPoint(close);
-				if (close.dst(koi.getPosition()) < WhirlpoolModel.WHIRL_DEFAULT_RANGE) {
-					koi.setWhirled(true);
-				}
-				if (koi.getPosition().sub(init).len2() < .01) {
-					koi.setWhirled(true);
-					koi.refreshWhirlForce(close, closestWhirlpool.getOrbitRadius());
-				} else {
-					koi.applyWhirlForce(close, closestWhirlpool.getOrbitRadius());
-				}
-			}
-			 */
 
 
 			// ENEMY PATROL CODE
@@ -632,6 +669,7 @@ public class DownstreamController extends WorldController implements ContactList
 				koi.setAttemptingTether(false);
 				koi.refreshTetherForce(close, closestTether.getOrbitRadius());
 			}
+			
 			// PAST TANGENT
 			else if (koi.isAttemptingTether() && !koi.willIntersect(init) && koi.pastTangent(init)) {
 				koi.passAdjust(close);
@@ -852,6 +890,7 @@ public class DownstreamController extends WorldController implements ContactList
 	}
 
 	public void draw(float delta) {
+		
 		if (paused){
 			cameraController.zoomStart(levelCamWidth, levelCamHeight, center, koi.getPosition().cpy().scl(scale));
 			super.draw(delta);
