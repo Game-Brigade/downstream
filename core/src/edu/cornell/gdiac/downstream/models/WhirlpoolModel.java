@@ -22,7 +22,7 @@ public class WhirlpoolModel extends WheelObstacle {
 	private float direction;
 	
 	private float rot = 0;
-	
+	private double angle;
 	private float numOfRotations; 
 	private Vector2 entry;
 
@@ -30,6 +30,11 @@ public class WhirlpoolModel extends WheelObstacle {
 		super(x, y, WHIRL_DEFAULT_RANGE);
 		direction = dir;
 		numOfRotations = 0;
+	}
+	
+	public WhirlpoolModel(float x, float y, float dir, double ang){
+		this(x,y,dir);
+		this.angle = ang;
 	}
 	
 	public float getRadius() {

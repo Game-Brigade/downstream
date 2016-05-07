@@ -24,7 +24,8 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 	
 	
 	/** Textures necessary to support the level select screen */
-	private static final String BACKGROUND = "Final_Assets/Beta Art Assets/Textures(JPGs)/homescreen.png";
+	private static final String BACKGROUND = "Final_Assets/Menus/BACKGROUND-final.png";
+	private static final String TITLE = "Final_Assets/Menus/Level_Select/level_select.png";
 	private static final String BACK_BUTTON = "Final_Assets/Menus/backtomain.png";
 	private static final String LEVEL1_BUTTON = "Final_Assets/Menus/Level_Select/lvl_1.png";
 	private static final String LEVEL2_BUTTON = "Final_Assets/Menus/Level_Select/lvl_2.png";
@@ -42,7 +43,6 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 	private static final String LEVEL14_BUTTON = "Final_Assets/Menus/Level_Select/lvl_14.png";
 	private static final String LEVEL15_BUTTON = "Final_Assets/Menus/Level_Select/lvl_15.png";
 	private static final String LEVEL16_BUTTON = "Final_Assets/Menus/Level_Select/lvl_16.png";
-
 	private static final String LEFT_ARROW = "MENUS/Level Select/Arrow-l.png";
 	private static final String RIGHT_ARROW = "MENUS/Level Select/Arrow-r.png";
 	
@@ -72,6 +72,7 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 	private Texture level15button;
 	private Texture level16button;
 	private Texture background;
+	private Texture title;
 	/** Arrow textures */
 	private Texture leftArrow;
 	private Texture rightArrow;
@@ -118,6 +119,7 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 	private static Vector2 button8 = new Vector2();
 	private static Vector2 leftArrowPos = new Vector2();
 	private static Vector2 rightArrowPos = new Vector2();
+	private static Vector2 titlePos = new Vector2();
 	
 	/** Page of levels we are on */
 	private int pageNumber;
@@ -141,14 +143,15 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 		leftArrowPos.set(new Vector2((float)canvas.getWidth()/2-60,(float)canvas.getHeight()/18*4));
 		rightArrowPos.set(new Vector2((float)canvas.getWidth()/2+60,(float)canvas.getHeight()/18*4));
 		backPos.set(new Vector2((float)canvas.getWidth()/2,(float)canvas.getHeight()/18*2));
-		button1.set(new Vector2((float)canvas.getWidth()/8,(float)canvas.getHeight()/12*8));
-		button2.set(new Vector2((float)canvas.getWidth()/8*3,(float)canvas.getHeight()/12*8));
-		button3.set(new Vector2((float)canvas.getWidth()/8*5,(float)canvas.getHeight()/12*8));
-		button4.set(new Vector2((float)canvas.getWidth()/8*7,(float)canvas.getHeight()/12*8));
-		button5.set(new Vector2((float)canvas.getWidth()/8,(float)canvas.getHeight()/12*5));
-		button6.set(new Vector2((float)canvas.getWidth()/8*3,(float)canvas.getHeight()/12*5));
-		button7.set(new Vector2((float)canvas.getWidth()/8*5,(float)canvas.getHeight()/12*5));
-		button8.set(new Vector2((float)canvas.getWidth()/8*7,(float)canvas.getHeight()/12*5));
+		button1.set(new Vector2((float)canvas.getWidth()/16*5-30,(float)canvas.getHeight()/12*8));
+		button2.set(new Vector2((float)canvas.getWidth()/16*7-15,(float)canvas.getHeight()/12*8));
+		button3.set(new Vector2((float)canvas.getWidth()/16*9+15,(float)canvas.getHeight()/12*8));
+		button4.set(new Vector2((float)canvas.getWidth()/16*11+30,(float)canvas.getHeight()/12*8));
+		button5.set(new Vector2((float)canvas.getWidth()/16*5-30,(float)canvas.getHeight()/12*5));
+		button6.set(new Vector2((float)canvas.getWidth()/16*7-15,(float)canvas.getHeight()/12*5));
+		button7.set(new Vector2((float)canvas.getWidth()/16*9+15,(float)canvas.getHeight()/12*5));
+		button8.set(new Vector2((float)canvas.getWidth()/16*11+30,(float)canvas.getHeight()/12*5));
+		titlePos.set(new Vector2((float)canvas.getWidth()/2,(float)canvas.getHeight()/8*7));
 		
 		// Load the font
 		FreetypeFontLoader.FreeTypeFontLoaderParameter size2Params = new FreetypeFontLoader.FreeTypeFontLoaderParameter();
@@ -184,7 +187,7 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 		background = new Texture(BACKGROUND);
 		leftArrow = new Texture(LEFT_ARROW);
 		rightArrow = new Texture(RIGHT_ARROW);
-			
+		title = new Texture(TITLE);
 		// No progress so far.
 		backState = 0;
 		button1State = 0;
@@ -225,6 +228,7 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 		background.dispose();
 		leftArrow.dispose();
 		rightArrow.dispose();
+		title.dispose();
 	}
 
 
@@ -242,7 +246,8 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 		//draw bg, title, back, and arrows
 		canvas.draw(background, Color.WHITE, background.getWidth()/2, background.getHeight()/2, 
 				canvas.getWidth()/2, canvas.getHeight()/2, 0, scale, scale);
-		canvas.drawText("Level Select", displayFont, canvas.getWidth()/3-20, canvas.getHeight()/8*7+20);
+		canvas.draw(title, Color.WHITE, title.getWidth()/2, title.getHeight()/2, 
+				titlePos.x, titlePos.y, 0, scale, scale);
 		canvas.draw(leftArrow, Color.WHITE, leftArrow.getWidth()/2, leftArrow.getHeight()/2, 
 				leftArrowPos.x, leftArrowPos.y, 0, scale, scale);
 		canvas.draw(rightArrow, Color.WHITE, rightArrow.getWidth()/2, rightArrow.getHeight()/2, 

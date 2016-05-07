@@ -26,7 +26,7 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 	private static final String PLAY_FILE = "Final_Assets/Menus/play.png";
 	private static final String SELECT_FILE = "Final_Assets/Menus/levelselect.png";
 	private static final String EDIT_FILE = "Final_Assets/Menus/levelbuild.png";
-	private static final String BACKGROUND_FILE = "Final_Assets/Beta Art Assets/Textures(JPGs)/homescreen.png"; //britt will provide new bg
+	private static final String BACKGROUND_FILE = "Final_Assets/Menus/BACKGROUND-final.png";
 	
 	/** Logo texture */
 	private Texture logo;

@@ -1257,6 +1257,20 @@ public class GameCanvas {
         Gdx.gl.glLineWidth(1);
     }
 	
+	public void drawLeadingLinePool(Vector2 start, Vector2 end, int width) {
+		start = start.cpy();
+		end = end.cpy();
+		Gdx.gl.glLineWidth(width);
+        leadingLine.setProjectionMatrix(camera.combined);
+        leadingLine.begin(ShapeRenderer.ShapeType.Line);
+        leadingLine.setColor(Color.BLUE);
+//        local.applyTo(start);
+//        local.applyTo(end);
+        leadingLine.line(start, end);
+        leadingLine.end();
+        Gdx.gl.glLineWidth(1);
+    }
+	
 	public void drawDirection(Vector2 start, Vector2 end){
 		start = start.cpy();
 		end = end.cpy();

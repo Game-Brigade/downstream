@@ -46,7 +46,7 @@ import edu.cornell.gdiac.util.*;
  */
 public class LoadingMode implements Screen, InputProcessor, ControllerListener {
 	// Textures necessary to support the loading screen 
-	private static final String BACKGROUND_FILE = "loading/loading.png";
+	private static final String BACKGROUND_FILE = "loading/GameBrigade1.png";
 	private static final String PROGRESS_FILE = "loading/progressbar.png";
 	private static final String PLAY_BTN_FILE = "loading/play.png";
 	
