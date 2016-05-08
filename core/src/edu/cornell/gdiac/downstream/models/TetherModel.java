@@ -63,8 +63,11 @@ public class TetherModel extends WheelObstacle {
 	private boolean lightingIncrease = false;
 	public boolean inrange = false;
 	public boolean inpath = false;
+	public Color c2;
 	
 	public Circle lightCircle = new Circle(getX(),getY(), 0);
+	
+	private TextureRegion overlayTexture;
 
 	/** Tethers can be lilipads, lanterns, or lotus flowers */
 	public enum TetherType {
@@ -153,8 +156,16 @@ public class TetherModel extends WheelObstacle {
 		canvas.draw(lotusLightTexture,new Color(255, 255, 255, .5f),texture.getRegionHeight()/2,texture.getRegionWidth()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),lightingScale,lightingScale);
 	}
 
-
+	public void setOverlay(TextureRegion tr){
+		overlayTexture = tr;
+	}
+	
+	public void setC2(Color colo){
+		c2 = colo;
+	}
+	
 	public void draw(GameCanvas canvas) {
+		
 		if (texture != null) {
 			if (type == TetherType.Lilypad){
 				canvas.draw(texture,Color.WHITE,texture.getRegionHeight()/2,texture.getRegionWidth()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),.4f,.4f);
@@ -188,12 +199,14 @@ public class TetherModel extends WheelObstacle {
 				drawLight(canvas);
 			}
 		}
+		/*if (overlayTexture != null){
+			canvas.draw(overlayTexture,c2,overlayTexture.getRegionHeight()/2,overlayTexture.getRegionWidth()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),.35f,.35f);
+		}*/
+		
 	}
 	
 	
 	private void findCircle(){
-//		System.out.println(lightCircle);
-//		System.out.println(lightingTexture);
 		lightCircle.setRadius((lightingTexture.getRegionWidth()/2 * sparkSize)/drawScale.x);
 	}
 	
