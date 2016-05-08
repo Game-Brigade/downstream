@@ -8,7 +8,6 @@
 package edu.cornell.gdiac.downstream;
 
 import java.util.ArrayList;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Random;
@@ -267,11 +266,39 @@ public class DownstreamController extends WorldController implements ContactList
 	 * Lays out the game geography.
 	 */
 	private void populateLevel() {
+		
+		LevelEditor.Level level;
+		if (this.level != -1) {
+			level = LevelEditor.loadFromJson(this.level);
+		} else {
+			level = LevelEditor.loadFromJson();
+		}
+		
+		
+		
+		// 0 is day 1 is sunset 2 is night
+		int NDS = NightDayDeterminer(this.level);
+
+		//Set fade for water/background
+		if(this.level <= 7){
+			setDayTime(NDS,0,1);
+		} else if(this.level <= 15){
+			setDayTime(NDS,1,2);
+		}
+		
+		System.out.println(((this.level-1)%4)/4f);
+		setLevelAlpha(((this.level-1)%4)/4f);
+		
+		
+		System.out.println(this.level);
+		System.out.println(levelAlpha);
+		System.out.println(fadeOut);
+		System.out.println(fadeIn);
+		
 
 		//int NDS = new Random().nextInt(3);
-		int NDS = NightDayDeterminer(this.level);
-		// 0 is day 1 is night 2 is sunset
-		setDayTime(NDS);
+
+
 		tillNextLevel = 0;
 
 		//animation is a bitch
@@ -333,13 +360,10 @@ public class DownstreamController extends WorldController implements ContactList
 			}
 		}*/
 
-		LevelEditor.Level level;
-		if (this.level != -1) {
-			level = LevelEditor.loadFromJson(this.level);
-		} else {
-			level = LevelEditor.loadFromJson();
-		}
 
+		
+		
+		
 		cameraController = new CameraController(canvas.getCamera());
 
 		float dwidth;
@@ -470,15 +494,20 @@ public class DownstreamController extends WorldController implements ContactList
 			obj.setFriction(BASIC_FRICTION);
 			obj.setRestitution(BASIC_RESTITUTION);
 			obj.setDrawScale(scale);
-			if (NDS == 0){
+			if (fadeOut == 0){
 				obj.setTexture(earthTileDay);
 			}
-			if (NDS == 1){
-				obj.setTexture(earthTileNight);
-			}
-			if (NDS == 2){
+			if (fadeOut == 1){
 				obj.setTexture(earthTileSunset);
 			}
+
+			if (fadeIn == 1){
+				obj.setOverlay(earthTileSunset,levelAlpha);
+			}
+			if (fadeIn == 2){
+				obj.setOverlay(earthTileNight,levelAlpha);
+			}
+			
 			//obj.setTexture(earthTile);
 			obj.setName("wall1");
 			ArrayList<Float> scaledWall = new ArrayList<Float>();
@@ -487,6 +516,7 @@ public class DownstreamController extends WorldController implements ContactList
 			addObject(obj);
 		}
 		
+
 		if (level.rocks != null) {
 			for (Vector2 rock : level.rocks) {
 				WheelObstacle obj;
@@ -631,6 +661,7 @@ public class DownstreamController extends WorldController implements ContactList
 	 */
 
 	public void update(float dt) {
+		InputController input = InputController.getInstance();
 		if (collisionController.didWin()) {
 			setComplete(true);
 			tillNextLevel++;
@@ -640,6 +671,17 @@ public class DownstreamController extends WorldController implements ContactList
 				populateLevel();
 			}
 		}
+		if(input.didAdvance()){
+			deleteAll();
+			this.level = this.level + 1;
+			populateLevel();
+		}
+		else if(input.didRetreat() && this.level > 1){
+			deleteAll();
+			this.level = this.level - 1;
+			populateLevel();
+		}
+		
 		if (koi.isDead()) {
 			deathSound.play();
 			koi.die();
@@ -688,7 +730,6 @@ public class DownstreamController extends WorldController implements ContactList
 
 			closestTether = getClosestTetherTo(koi.getPosition());
 			// INPUT CODE
-			InputController input = InputController.getInstance();
 			if (input.didTether() && !isWhirled() && !koi.bursting) {
 				if ((koi.isTethered() || koi.isAttemptingTether())) {
 					koi.setTethered(false);

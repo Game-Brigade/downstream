@@ -163,7 +163,7 @@ public abstract class WorldController implements Screen {
 
 	//Animations//
 	protected Animation lilyAnimation; // This is the only one
-
+	
 	protected TextureRegion[] lilyFrames;
 	protected TextureRegion[] lilyFramesDay;
 	protected TextureRegion[] lilyFramesNight;
@@ -213,6 +213,9 @@ public abstract class WorldController implements Screen {
 	protected Animation goalAnimation;
 	protected TextureRegion goalCurrentFrame;
 	protected TextureRegion[] goalFrames;
+	protected Color levelAlpha = new Color(255,255,255,.5f);
+	
+	
 
 	protected Animation lilyAnimation2;
 	protected Animation openingFlowerAnimation2;
@@ -544,12 +547,19 @@ public abstract class WorldController implements Screen {
 			return region;
 		}
 		return null;
-	}
-
-	public void setDayTime(int i){
+	}	
+	
+	
+	public void setDayTime(int i, int fadeOut, int fadeIn){
 		dayTime = i;
+		this.fadeOut = fadeOut;
+		this.fadeIn = fadeIn;
 	}
-
+	
+	public void setLevelAlpha(float alpha){
+		levelAlpha.set(255, 255, 255, alpha);
+	}
+	
 	/**
 	 * Returns a newly loaded filmstrip for the given file.
 	 *
@@ -645,6 +655,11 @@ public abstract class WorldController implements Screen {
 	/** Countdown active for winning or losing */
 	private int countdown;
 
+	private int cw;
+	private int ch;
+	protected int fadeIn;
+	protected int fadeOut;
+	
 
 	/**
 	 * Returns true if debug mode is active.
@@ -979,11 +994,13 @@ public abstract class WorldController implements Screen {
 	public void draw(float delta) {
 		canvas.clear();
 		canvas.begin();
+		cw = canvas.getWidth();
+		ch = canvas.getHeight();
 		for (int i = -5; i < 5; i++) {
 			for (int j = -5; j < 5; j++) {
-
-				canvas.draw(getBackground(dayTime), Color.WHITE, canvas.getWidth()*i * 2, canvas.getHeight()*j * 2, 
-						canvas.getWidth() * 2,   canvas.getHeight() * 2);
+				//canvas.draw(getBackground(dayTime), Color.WHITE, cw*i * 2, ch*j * 2, cw * 2,   ch * 2);
+				canvas.draw(getBackground(fadeOut), Color.WHITE, cw*i * 2, ch*j * 2, cw * 2,   ch * 2);
+				canvas.draw(getBackground(fadeIn), levelAlpha, cw*i * 2, ch*j * 2, cw * 2,   ch * 2);
 			}
 		}
 		//		canvas.draw(background, Color.WHITE, 0, 0, canvas.getWidth(), canvas.getHeight());
@@ -994,8 +1011,7 @@ public abstract class WorldController implements Screen {
 
 		for (int i = -5; i < 5; i++) {
 			for (int j = -5; j < 5; j++) {
-				canvas.draw(overlay, referenceC, canvas.getWidth()*i, canvas.getHeight()*j, 
-						canvas.getWidth(),   canvas.getHeight());
+				canvas.draw(overlay, referenceC, cw*i, ch*j, cw,   ch);
 			}
 		}
 
@@ -1104,25 +1120,26 @@ public abstract class WorldController implements Screen {
 	}
 
 	public static Texture getBackground(int n) {
-		if (n == 1){
-			return backgroundN;
-		}
-		else if (n == 0){
+		if (n == 0){
 			return backgroundD;
 		}
-		else{
+		else if (n == 1){
 			return backgroundS;
 		}
+		else if (n == 2){
+			return backgroundN;
+		}
+		return backgroundD;
 	}
 
 	public static void setBackground(Texture background, int n) {
-		if (n == 1){
+		if (n == 2){
 			WorldController.backgroundN = background;
 		}
 		if (n == 0){
 			WorldController.backgroundD = background;
 		}
-		if (n == 2){
+		if (n == 1){
 			WorldController.backgroundS = background;
 		}
 	}
