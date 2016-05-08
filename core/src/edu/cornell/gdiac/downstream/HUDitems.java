@@ -9,28 +9,29 @@ import edu.cornell.gdiac.downstream.obstacle.Obstacle;
 import edu.cornell.gdiac.downstream.obstacle.SimpleObstacle;
 
 public class HUDitems extends Obstacle {
-	
+
 	public int TotalLotus;
 	public int LotusLit;
 	public float Energy;
-	
+
 	private TextureRegion EnergyTexture;
 	private TextureRegion Lilypad;
 	private BitmapFont font;
-	
+
 	public HUDitems(){
 		TotalLotus = 0;
 		LotusLit = 0;
 		Energy = 0;
 		font = new BitmapFont();
 	}
-	
+
 	public HUDitems(int lotuses, TextureRegion lily, TextureRegion energy, BitmapFont displayFont){
 		TotalLotus = lotuses;
 		LotusLit = 0;
 		Energy = 2f;
-		//font = displayFont;
-		font = new BitmapFont();
+		font = displayFont;
+		//font = new BitmapFont();
+		//font.setColor(Color.WHITE);
 		Lilypad = lily;
 		EnergyTexture = energy;
 	}
@@ -44,13 +45,13 @@ public class HUDitems extends Obstacle {
 	@Override
 	public void deactivatePhysics(World world) {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	private float energyLen(){
 		return Energy * 170f;
 	}
-	
+
 	private Color getBurstColor(){
 		Color c = Color.CORAL.cpy();
 		if (Energy >= 1.9){
@@ -58,31 +59,31 @@ public class HUDitems extends Obstacle {
 		}
 		c.a = .6f;
 		return new Color(0, 0, 0, .2f);
-		
+
 	}
-	
+
 
 	@Override
 	public void draw(GameCanvas canvas) {
 		// TODO Auto-generated method stub
 		if (TotalLotus != 0 && EnergyTexture != null && Lilypad != null) {
-			canvas.draw(EnergyTexture, new Color(0, 0, 0, .5f), canvas.getWidth()/1.1f - 450f , canvas.getHeight()/1.1f, energyLen(), 50);
-			canvas.draw(EnergyTexture, getBurstColor(), canvas.getWidth()/1.1f - 450f , canvas.getHeight()/1.1f - 5, 360, 70);
-			canvas.drawHUDText(TotalLotus - LotusLit  + "", font, -10, Lilypad);
+			canvas.draw(EnergyTexture, new Color(0, 0, 0, .5f), canvas.getWidth()/1.1f - 450f - 40, canvas.getHeight()/1.1f - 20, energyLen(), 50);
+			canvas.draw(EnergyTexture, new Color(0, 0, 0, .2f), canvas.getWidth()/1.1f - 450f - 50 , canvas.getHeight()/1.1f - 30, 360, 70);
+			canvas.drawHUDText(TotalLotus - LotusLit  + "", font, -9, Lilypad);
 		}
 	}
 
 	@Override
 	public void drawDebug(GameCanvas canvas) {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	public void updateHUD(int lanternsLit, float energy){
 		Energy = energy;
 		LotusLit = lanternsLit;
 	}
 
-	
+
 
 }
