@@ -436,8 +436,9 @@ public abstract class WorldController implements Screen {
 
 		energyBarTexture = createTexture(manager, ENERGYBAR_TEXTURE, false);
 		enemyTexture = createTexture(manager,ENEMY_TEXTURE,false);
-		//koiTexture = koiSFrames[0];
-		koiTexture = createTexture(manager, KOI_TEXTURE, false);
+		koiTexture = koiSFrames[0];
+		//koiTexture = createTexture(manager, KOI_TEXTURE, false);
+		
 		//lilyTexture = lilyFramesNight[0];
 		lilyTexture = lilyFrames[0];
 		lanternTexture = closedFlowerFramesDay[0];

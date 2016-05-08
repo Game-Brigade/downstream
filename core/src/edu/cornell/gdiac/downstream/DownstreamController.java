@@ -105,6 +105,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private static final float MAX_SPEED = 1.75f;
 	private int respawnTimer = RESPAWN_TIME;
 	private TetherModel checkpoint0;
+	private int tillNextLevel = 0;
 
 	/**
 	 * Preloads the assets for this controller.
@@ -256,7 +257,7 @@ public class DownstreamController extends WorldController implements ContactList
 
 		// 0 is day 1 is night 2 is sunset
 		setDayTime(NDS);
-
+		tillNextLevel = 0;
 		
 		//animation is a bitch
 		if (NDS == 0){
@@ -436,7 +437,8 @@ public class DownstreamController extends WorldController implements ContactList
 		// Create the fish avatar
 		dwidth  = koiTexture.getRegionWidth()/scale.x;
 		dheight = koiTexture.getRegionHeight()/scale.y;
-		koi = new PlayerModel(level.player.x, level.player.y, dwidth, dheight);
+		System.out.println(dwidth + " " + dheight);
+		koi = new PlayerModel(level.player.x, level.player.y, 2.5f, 0.925f);
 		koi.setDrawScale(scale);
 		koi.setName("koi");
 		koi.setTexture(koiTexture);
@@ -553,12 +555,16 @@ public class DownstreamController extends WorldController implements ContactList
 	public void update(float dt) {
 		if (collisionController.didWin()) {
 			setComplete(true);
-			deleteAll();
-			this.level = this.level + 1;
-			populateLevel();
+			tillNextLevel++;
+			if (tillNextLevel > 100){
+				deleteAll();
+				this.level = this.level + 1;
+				populateLevel();
+			}
 		}
 		if (koi.isDead()) {
 			deathSound.play();
+			koi.die();
 			for (TetherModel t : tethers) {
 				t.setTethered(false);
 			}
