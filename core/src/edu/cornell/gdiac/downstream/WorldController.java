@@ -455,8 +455,8 @@ public abstract class WorldController implements Screen {
 		shadowTexture = createTexture(manager, SHADOW_TEXTURE, false);
 		//goalTexture = createTexture(manager, GOAL_TEXTURE, false);
 		goalTexture = goalFrames[0];
-		UILotusTexture = createTexture(manager, UI_FLOWER, false);
 
+		UILotusTexture = createTexture(manager, UI_FLOWER, false);	
 
 		earthTile = createTexture(manager,EARTH_FILE_N,true);
 		earthTileDay = createTexture(manager,EARTH_FILE_D, true);

@@ -100,7 +100,7 @@ public class PlayerModel extends BoxObstacle {
 		isTethered = false;
 		attemptingTether = true;
 		isWhirled = false;
-		setLinearVelocity(NE);
+		setLinearVelocity(Vector2.Zero);
 		speed = 1;
 		pull = Vector2.Zero;
 		cent = Vector2.Zero;
@@ -547,7 +547,7 @@ public class PlayerModel extends BoxObstacle {
 		}
 		else if (bursting && energy >= 0){
 			this.setLinearVelocity(this.getLinearVelocity().setLength(4f*9*speed));
-			energy = energy - .07f;
+			energy = energy - .2f;
 		}
 		else if (energy <= 0){
 			bursting = false;

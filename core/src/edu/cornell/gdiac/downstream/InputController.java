@@ -115,7 +115,17 @@ public class InputController {
 	public boolean kill;
 	
 	public enum SelectionType {
-		Lilypad, Lantern, Enemy, Player, Wall, MapArea, Goal, Whirlpool, Save;
+		Lilypad, 
+		Lantern, 
+		Enemy, 
+		Player, 
+		Wall,
+		Shore,
+		MapArea, 
+		Goal, 
+		Whirlpool,
+		Rock,
+		Save;
 	} 
 	
 	private SelectionType currentSelection;
@@ -425,16 +435,17 @@ public class InputController {
 		downPressed  = Gdx.input.isKeyPressed(Input.Keys.DOWN);
 		leftPressed  = Gdx.input.isKeyPressed(Input.Keys.LEFT);
 		rightPressed = Gdx.input.isKeyPressed(Input.Keys.RIGHT);
-		if (Gdx.input.isKeyPressed(Input.Keys.NUM_0)) currentSelection = SelectionType.Save;
+		if (Gdx.input.isKeyPressed(Input.Keys.S)) currentSelection = SelectionType.Save;
 		if (Gdx.input.isKeyPressed(Input.Keys.NUM_1)) currentSelection = SelectionType.Lilypad;
 		if (Gdx.input.isKeyPressed(Input.Keys.NUM_2)) currentSelection = SelectionType.Lantern;
 		if (Gdx.input.isKeyPressed(Input.Keys.NUM_3)) currentSelection = SelectionType.Enemy;
 		if (Gdx.input.isKeyPressed(Input.Keys.NUM_4)) currentSelection = SelectionType.Player;
 		if (Gdx.input.isKeyPressed(Input.Keys.NUM_5)) currentSelection = SelectionType.Wall;
-		if (Gdx.input.isKeyPressed(Input.Keys.NUM_6)) currentSelection = SelectionType.MapArea;
-		if (Gdx.input.isKeyPressed(Input.Keys.NUM_7)) currentSelection = SelectionType.Goal;
-		if (Gdx.input.isKeyPressed(Input.Keys.NUM_8)) currentSelection = SelectionType.Whirlpool;
-	
+		if (Gdx.input.isKeyPressed(Input.Keys.NUM_6)) currentSelection = SelectionType.Shore;
+		if (Gdx.input.isKeyPressed(Input.Keys.NUM_7)) currentSelection = SelectionType.MapArea;
+		if (Gdx.input.isKeyPressed(Input.Keys.NUM_8)) currentSelection = SelectionType.Goal;
+		if (Gdx.input.isKeyPressed(Input.Keys.NUM_9)) currentSelection = SelectionType.Whirlpool;
+		if (Gdx.input.isKeyPressed(Input.Keys.NUM_0)) currentSelection = SelectionType.Rock;
 		
 		fast = (Gdx.input.isKeyPressed(Input.Keys.F));
 		
