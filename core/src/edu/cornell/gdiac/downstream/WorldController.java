@@ -435,7 +435,7 @@ public abstract class WorldController implements Screen {
 		goalTexture = goalFrames[0];
 		UILotusTexture = createTexture(manager, UI_FLOWER, false);
 
-		earthTile = createTexture(manager,EARTH_FILE_N,true);
+		earthTile = createTexture(manager,EARTH_FILE,true);
 		earthTileDay = createTexture(manager,EARTH_FILE_D, true);
 		earthTileNight = createTexture(manager,EARTH_FILE_N, true);
 		earthTileSunset = createTexture(manager,EARTH_FILE_S, true);

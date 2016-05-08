@@ -191,6 +191,7 @@ public class DownstreamController extends WorldController implements ContactList
 		lanterns.clear();
 		litlanterns.clear();
 		tethers.clear();
+		rocks.clear();
 		shadows.clear();
 		wpools.clear();
 		objects.clear();
@@ -367,7 +368,7 @@ public class DownstreamController extends WorldController implements ContactList
 		addObject(goalTile);
 
 		//create shadow(s)
-		if(level.lilypads.size() + level.lilypads.size() > 0){
+		if(level.lotuses.size() > 0){
 			dwidth = shadowTexture.getRegionWidth()/scale.x*.85f;
 			dheight = shadowTexture.getRegionHeight()/scale.y*.85f;
 			ShadowModel shadow = new ShadowModel(goalPos.x, goalPos.y, dwidth, dheight, shadowDest);
@@ -385,7 +386,32 @@ public class DownstreamController extends WorldController implements ContactList
 			addObject(shadow);
 		}
 		
-		
+		for (ArrayList<Float> shore : level.shores) {
+			PolygonObstacle obj;
+			float[] shoreFloat = new float[shore.size()];
+			for (int i = 0; i < shore.size(); i++) shoreFloat[i] = shore.get(i);
+			obj = new PolygonObstacle(shoreFloat, 0, 0);
+			obj.setBodyType(BodyDef.BodyType.StaticBody);
+			obj.setDensity(BASIC_DENSITY);
+			obj.setFriction(BASIC_FRICTION);
+			obj.setRestitution(BASIC_RESTITUTION);
+			obj.setDrawScale(scale);
+			if (NDS == 0){
+				obj.setTexture(earthTileDay);
+			}
+			if (NDS == 1){
+				obj.setTexture(earthTileNight);
+			}
+			if (NDS == 2){
+				obj.setTexture(earthTileSunset);
+			}
+			//obj.setTexture(earthTile);
+			obj.setName("shore");
+			ArrayList<Float> scaledShore = new ArrayList<Float>();
+			for (Float f : shore) scaledShore.add(f*scale.x);
+			walls.add(scaledShore);
+			addObject(obj);
+		}
 		
 		for (ArrayList<Float> wall : level.walls) {
 			PolygonObstacle obj;
@@ -414,27 +440,28 @@ public class DownstreamController extends WorldController implements ContactList
 			addObject(obj);
 		}
 		
-		/*
-		for (Vector2 rock : level.rocks) {
-			WheelObstacle obj;
-			obj = new WheelObstacle(rock.x,rock.y,rockDay.getRegionWidth()/2);
-			obj.setBodyType(BodyDef.BodyType.StaticBody);
-			obj.setSensor(true);
-			obj.setDrawScale(scale);
-			if (NDS == 0){
-				obj.setTexture(rockDay);
+		if (level.rocks != null) {
+			for (Vector2 rock : level.rocks) {
+				WheelObstacle obj;
+				System.out.println(rockDay);
+				obj = new WheelObstacle(rock.x,rock.y,rockDay.getRegionWidth()/2);
+				obj.setBodyType(BodyDef.BodyType.StaticBody);
+				obj.setSensor(true);
+				obj.setDrawScale(scale);
+				if (NDS == 0){
+					obj.setTexture(rockDay);
+				}
+				if (NDS == 1){
+					obj.setTexture(rockNight);
+				}
+				if (NDS == 2){
+					obj.setTexture(rockSunset);
+				}
+				obj.setName("rock");
+				rocks.add(obj);
+				addObject(obj);
 			}
-			if (NDS == 1){
-				obj.setTexture(rockNight);
-			}
-			if (NDS == 2){
-				obj.setTexture(rockSunset);
-			}
-			obj.setName("rock");
-			rocks.add(obj);
-			addObject(obj);
-		}
-		*/
+		}	
 
 		// Create the fish avatar
 		dwidth  = koiTexture.getRegionWidth()/scale.x;
