@@ -337,35 +337,31 @@ public class LevelEditor extends WorldController {
 	}
 
 
-	private void addWhirlpool(Vector2 click, boolean enter) {
-		if (enter) {
-			settingWhirlDir = false;
-			didEnter = false;
-			enemies.put(currentEnemy.toString(), enemyPath);
-			return;
+	private void addWhirlpool(Vector2 click, boolean enter){
+		
+		if(enter){
+			if(currentWhirlpool.size() != 2){
+				didEnter = false;
+			}
+			else{
+				placingWhirlpool = false;
+				didEnter = false;
+				Vector2 v = currentWhirlpool.get(0);
+				Vector2 v2 = currentWhirlpool.get(1);
+				whirlpools.add(new Vector4(v.x, v.y, v2.x, v2.y));
+				currentWhirlpool.clear();
+			}
 		}
-		if (settingEnemyPath) {
-			enemyPath.add(click.cpy().scl(scale));
-			return;
+		else if(currentWhirlpool.size() == 2){
+			currentWhirlpool.clear();
+			currentWhirlpool.add(click.cpy());
+			placingWhirlpool = false;
 		}
-		settingEnemyPath = true;
-		currentEnemy = click.cpy();
-		enemyPath = new ArrayList<Vector2>();
-		enemyPath.add(click.cpy().scl(scale));
-		TextureRegion etexture = enemyTexture;
-		float dwidth  = etexture.getRegionWidth()/scale.x;
-		float dheight = etexture.getRegionHeight()/scale.y;
-		EnemyModel eFish = new EnemyModel(click.x, click.y, dwidth, dheight);
-		eFish.setDensity(ENEMY_DENSITY);
-		eFish.setFriction(ENEMY_FRICTION);
-		eFish.setRestitution(BASIC_RESTITUTION);
-		eFish.setName("enemy");
-		eFish.setDrawScale(scale);
-		eFish.setTexture(etexture);
-		eFish.setAngle((float) (Math.PI/2));
-		eFish.setBodyType(BodyDef.BodyType.StaticBody);
-		eFish.setGoal(0, 0);
-		addObject(eFish);
+		else{
+			currentWhirlpool.add(click.cpy());
+			placingWhirlpool = true;
+		}
+		
 	}
 
 

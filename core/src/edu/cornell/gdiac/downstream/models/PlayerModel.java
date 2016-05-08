@@ -100,7 +100,7 @@ public class PlayerModel extends BoxObstacle {
 		isTethered = false;
 		attemptingTether = true;
 		isWhirled = false;
-		setLinearVelocity(NE);
+		setLinearVelocity(Vector2.Zero);
 		speed = 1;
 		pull = Vector2.Zero;
 		cent = Vector2.Zero;

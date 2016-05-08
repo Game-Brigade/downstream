@@ -386,31 +386,33 @@ public class DownstreamController extends WorldController implements ContactList
 			addObject(shadow);
 		}
 		
-		for (ArrayList<Float> shore : level.shores) {
-			PolygonObstacle obj;
-			float[] shoreFloat = new float[shore.size()];
-			for (int i = 0; i < shore.size(); i++) shoreFloat[i] = shore.get(i);
-			obj = new PolygonObstacle(shoreFloat, 0, 0);
-			obj.setBodyType(BodyDef.BodyType.StaticBody);
-			obj.setDensity(BASIC_DENSITY);
-			obj.setFriction(BASIC_FRICTION);
-			obj.setRestitution(BASIC_RESTITUTION);
-			obj.setDrawScale(scale);
-			if (NDS == 0){
-				obj.setTexture(earthTileDay);
+		if (level.shores != null) {
+			for (ArrayList<Float> shore : level.shores) {
+				PolygonObstacle obj;
+				float[] shoreFloat = new float[shore.size()];
+				for (int i = 0; i < shore.size(); i++) shoreFloat[i] = shore.get(i);
+				obj = new PolygonObstacle(shoreFloat, 0, 0);
+				obj.setBodyType(BodyDef.BodyType.StaticBody);
+				obj.setDensity(BASIC_DENSITY);
+				obj.setFriction(BASIC_FRICTION);
+				obj.setRestitution(BASIC_RESTITUTION);
+				obj.setDrawScale(scale);
+				if (NDS == 0){
+					obj.setTexture(earthTileDay);
+				}
+				if (NDS == 1){
+					obj.setTexture(earthTileNight);
+				}
+				if (NDS == 2){
+					obj.setTexture(earthTileSunset);
+				}
+				//obj.setTexture(earthTile);
+				obj.setName("shore");
+				ArrayList<Float> scaledShore = new ArrayList<Float>();
+				for (Float f : shore) scaledShore.add(f*scale.x);
+				walls.add(scaledShore);
+				addObject(obj);
 			}
-			if (NDS == 1){
-				obj.setTexture(earthTileNight);
-			}
-			if (NDS == 2){
-				obj.setTexture(earthTileSunset);
-			}
-			//obj.setTexture(earthTile);
-			obj.setName("shore");
-			ArrayList<Float> scaledShore = new ArrayList<Float>();
-			for (Float f : shore) scaledShore.add(f*scale.x);
-			walls.add(scaledShore);
-			addObject(obj);
 		}
 		
 		for (ArrayList<Float> wall : level.walls) {
@@ -739,8 +741,9 @@ public class DownstreamController extends WorldController implements ContactList
 				else if (koi.isAttemptingTether() && !koi.willIntersect(initTeth) && koi.pastTangent(initTeth)) {
 					koi.passAdjust(closeTeth);
 				} else {
-					koi.applyTetherForce(closeTeth, closestTether.getOrbitRadius());
 				}
+				koi.applyTetherForce(closeTeth, closestTether.getOrbitRadius());
+
 			}
 			
 			// RESOLVE FISH IMG
