@@ -23,7 +23,7 @@ public class TetherModel extends WheelObstacle {
 	private static final int TETHER_DEFAULT_RADIUS = 1;
 
 	/** The radius at which the player orbits a tether */
-	public static final float TETHER_DEFAULT_ORBIT = 2f;  
+	public static final float TETHER_DEFAULT_ORBIT = 3f;  
 
 	/** The range at which the player can enter orbit around this tether */
 	public static final int TETHER_DEFAULT_RANGE = 8;
@@ -173,8 +173,8 @@ public class TetherModel extends WheelObstacle {
 				lit = true;
 				sparkSize = 2f;
 			}
-			if (lit && type == TetherType.Lotus && alpha > 0){
-				alpha = alpha - .001f;
+			if (lit && type == TetherType.Lotus && alpha > 0 && !this.set){
+				alpha = alpha - .005f;
 			}
 			if (alpha <= 0){
 				lit = false;

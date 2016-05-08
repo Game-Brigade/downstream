@@ -416,8 +416,8 @@ public abstract class WorldController implements Screen {
 				koiCFramesFlipped[index++] = tmpkoiCFlipped[i][j];
 			}
 		}
-		koiCAnimation = new Animation(.05f, koiCFrames); 
-		koiCAnimationFlipped = new Animation(.05f, koiCFramesFlipped);
+		koiCAnimation = new Animation(.02f, koiCFrames); 
+		koiCAnimationFlipped = new Animation(.02f, koiCFramesFlipped);
 		koiCspriteBatch = new SpriteBatch(); 
 
 

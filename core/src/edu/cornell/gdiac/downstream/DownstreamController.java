@@ -641,13 +641,13 @@ public class DownstreamController extends WorldController implements ContactList
 
 			// KOI VEOLOCITY CODE
 			if (isTethered()) {
-				koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*1.5f*speed));
+				koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*.8f*speed));
 			} 
 			else if(isWhirled()){
-				koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*1.8f*speed));
+				koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*1.3f*speed));
 			}
 			else{
-				koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*2*speed));
+				koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*3.5f*speed));
 			}
 
 			// LOTUS LIGHTING CODE

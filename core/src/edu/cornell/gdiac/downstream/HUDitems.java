@@ -29,7 +29,8 @@ public class HUDitems extends Obstacle {
 		TotalLotus = lotuses;
 		LotusLit = 0;
 		Energy = 2f;
-		font = displayFont;
+		//font = displayFont;
+		font = new BitmapFont();
 		Lilypad = lily;
 		EnergyTexture = energy;
 	}
@@ -56,7 +57,7 @@ public class HUDitems extends Obstacle {
 			c = Color.GOLD.cpy();
 		}
 		c.a = .6f;
-		return c;
+		return new Color(0, 0, 0, .2f);
 		
 	}
 	
@@ -65,8 +66,8 @@ public class HUDitems extends Obstacle {
 	public void draw(GameCanvas canvas) {
 		// TODO Auto-generated method stub
 		if (TotalLotus != 0 && EnergyTexture != null && Lilypad != null) {
-			canvas.draw(EnergyTexture, getBurstColor(), canvas.getWidth()/1.1f - 450f , canvas.getHeight()/1.1f - 5, energyLen(), 30);
-			canvas.draw(EnergyTexture, Color.WHITE, 0, 0, 0, 0);
+			canvas.draw(EnergyTexture, new Color(0, 0, 0, .5f), canvas.getWidth()/1.1f - 450f , canvas.getHeight()/1.1f, energyLen(), 50);
+			canvas.draw(EnergyTexture, getBurstColor(), canvas.getWidth()/1.1f - 450f , canvas.getHeight()/1.1f - 5, 360, 70);
 			canvas.drawHUDText(TotalLotus - LotusLit  + "", font, -10, Lilypad);
 		}
 	}
