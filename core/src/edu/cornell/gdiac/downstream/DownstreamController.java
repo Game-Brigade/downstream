@@ -105,6 +105,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private static final float MAX_SPEED = 1.75f;
 	private int respawnTimer = RESPAWN_TIME;
 	private TetherModel checkpoint0;
+	private int tillNextLevel = 0;
 
 	/**
 	 * Preloads the assets for this controller.
@@ -257,7 +258,7 @@ public class DownstreamController extends WorldController implements ContactList
 
 		// 0 is day 1 is night 2 is sunset
 		setDayTime(NDS);
-
+		tillNextLevel = 0;
 		
 		//animation is a bitch
 		if (NDS == 0){
@@ -303,21 +304,18 @@ public class DownstreamController extends WorldController implements ContactList
 		
 
 		if (level.whirlpools != null) {
-			for (Vector3 whirlpool : level.whirlpools) {
-				WhirlpoolModel pool = new WhirlpoolModel(whirlpool.x, whirlpool.y, whirlpool.z);
+			for (LevelEditor.Vector4 whirlpool: level.whirlpools) {
+				Vector2 poolPos = new Vector2(whirlpool.x, whirlpool.y);
+				Vector2 ang = new Vector2(whirlpool.z, whirlpool.w);
+				WhirlpoolModel pool = new WhirlpoolModel(poolPos.x, poolPos.y, -1, ang);
 				pool.setBodyType(BodyDef.BodyType.StaticBody);
-				pool.setName("whirlpool" + 1);
+				pool.setName("whirlpool");
 				pool.setDensity(TETHER_DENSITY);
 				pool.setFriction(TETHER_FRICTION);
 				pool.setRestitution(TETHER_RESTITUTION);
 				pool.setSensor(sensorPools);
 				pool.setDrawScale(scale);
-				if(whirlpool.z == -1){
-					pool.setTexture(whirlpoolTexture);
-				}
-				else{
-					pool.setTexture(whirlpoolFlipTexture);
-				}
+				pool.setTexture(whirlpoolTexture);
 				addObject(pool);
 				wpools.add(pool);
 			}
@@ -468,7 +466,8 @@ public class DownstreamController extends WorldController implements ContactList
 		// Create the fish avatar
 		dwidth  = koiTexture.getRegionWidth()/scale.x;
 		dheight = koiTexture.getRegionHeight()/scale.y;
-		koi = new PlayerModel(level.player.x, level.player.y, dwidth, dheight);
+		System.out.println(dwidth + " " + dheight);
+		koi = new PlayerModel(level.player.x, level.player.y, 2.5f, 0.925f);
 		koi.setDrawScale(scale);
 		koi.setName("koi");
 		koi.setTexture(koiTexture);
@@ -515,11 +514,18 @@ public class DownstreamController extends WorldController implements ContactList
 		collisionController = new CollisionController(koi);
 		checkpoint0 = getClosestTetherTo(koi.initPos);
 		checkpoint = checkpoint0;
-		koi.initPos = checkpoint.getPosition().add(koi.NE.cpy().rotate90(1).nor().scl(TetherModel.TETHER_DEFAULT_ORBIT));
-		koi.setPosition(koi.initPos);
-		koi.setTethered(true);
+		
+		//Start tethered to first tether
+		//koi.initPos = checkpoint.getPosition().add(koi.NE.cpy().rotate90(1).nor().scl(TetherModel.TETHER_DEFAULT_ORBIT));
+		//koi.setPosition(koi.initPos);
+		//koi.setTethered(true);
+		//cacheVel = koi.NE;
+		
+		
+		cacheVel = checkpoint0.getPosition().cpy().sub(koi.initPos.cpy()).nor();
 		koi.setLinearVelocity(Vector2.Zero);
-		cacheVel = koi.NE;
+
+		
 		
 		levelCamWidth = Math.abs(level.map.get(0).x - level.map.get(1).x);
 		levelCamHeight = Math.abs(level.map.get(0).y - level.map.get(1).y);
@@ -527,7 +533,7 @@ public class DownstreamController extends WorldController implements ContactList
 				(level.map.get(0).y + level.map.get(1).y)/2);
 		cameraController.zoomStart(levelCamWidth, levelCamHeight, center, koi.getPosition().cpy().scl(scale));
 
-		HUD = new HUDitems(lanterns.size(), UILotusTexture, energyBarTexture, displayFont);
+		HUD = new HUDitems(lanterns.size(), UILotusTexture, energyBarTexture, secondFont);
 		addHUD(HUD);
 
 
@@ -555,6 +561,7 @@ public class DownstreamController extends WorldController implements ContactList
 		}
 		else if(respawnTimer == RESPAWN_TIME){
 			koi.setAttemptingTether(false);
+			koi.setWhirled(false);
 			koi.setTethered(false);
 			koi.bursting = false;
 			koi.setLinearVelocity(Vector2.Zero);
@@ -573,53 +580,52 @@ public class DownstreamController extends WorldController implements ContactList
 	 *
 	 * @param delta Number of seconds since last animation frame
 	 */
-	public void update(float dt) {	
-	
-		if(collisionController.didWin()){
+
+	public void update(float dt) {
+		if (collisionController.didWin()) {
 			setComplete(true);
-			deleteAll();
-			this.level = this.level + 1;
-			populateLevel();
+			tillNextLevel++;
+			if (tillNextLevel > 100){
+				deleteAll();
+				this.level = this.level + 1;
+				populateLevel();
+			}
 		}
-		
-		if(koi.isDead()){
+		if (koi.isDead()) {
 			deathSound.play();
 			koi.die();
 			for (TetherModel t : tethers) {
 				t.setTethered(false);
 			}
 			respawn();
-		} 
-		else{			
-			koi.restoreAlpha();
-			//ZOOM IN TO PLAYER AT START OF LEVEL
+		} else {
+			// ZOOM IN TO PLAYER AT START OF LEVEL
 			cacheVel = koi.getLinearVelocity();
 			if (!cameraController.isZoomedToPlayer()) {
 				cameraController.zoomToPlayer();
 				return;
 			}
 			koi.setLinearVelocity(cacheVel);
-			
-			//CHECKPOINT CODE
+
+			// CHECKPOINT CODE
 			checkpoint = checkpoint0;
-			for(TetherModel t : lanterns){
-				if(t.lit){
-					if(!litlanterns.contains(t)){
-						litlanterns.push(t);	
+			for (TetherModel t : lanterns) {
+				if (t.lit) {
+					if (!litlanterns.contains(t)) {
+						litlanterns.push(t);
 					}
-				} 
-				else{
+				} else {
 					litlanterns.remove(t);
 				}
 			}
-			if(litlanterns.size() > 0){
+			if (litlanterns.size() > 0) {
 				checkpoint = litlanterns.peek();
 			}
 
-			//CLEAR SHADOW CODE
+			// CLEAR SHADOW CODE
 			clearShadows(lanterns.size() == litlanterns.size());
 			moveShadows();
-			
+
 			// ENEMY PATROL CODE
 			for (EnemyModel enemy : enemies) {
 				enemy.patrol();
@@ -631,35 +637,27 @@ public class DownstreamController extends WorldController implements ContactList
 				}
 			}
 
-
 			closestTether = getClosestTetherTo(koi.getPosition());
-			if(whirlpoolsOn && !wpools.isEmpty()){
-				closestWhirlpool = getClosestWhirlpoolTo(koi.getPosition());
-			}
 			// INPUT CODE
 			InputController input = InputController.getInstance();
-			if (!isWhirled() && input.didTether() && !koi.bursting) {
-				if((koi.isTethered() || koi.isAttemptingTether())){
-					koi.setTethered(false);					
-					koi.setAttemptingTether(false); 
+			if (input.didTether() && !isWhirled() && !koi.bursting) {
+				if ((koi.isTethered() || koi.isAttemptingTether())) {
+					koi.setTethered(false);
+					koi.setAttemptingTether(false);
 					cameraController.resetCameraVelocity();
-				}
-				else {
-					if(collisionController.inRange()){
-						koi.setAttemptingTether(true); 
+				} else {
+					if (collisionController.inRange()) {
+						koi.setAttemptingTether(true);
 						cameraController.resetCameraVelocity();
 					}
 				}
-			} 
-			else if(input.didKill()){
+			} else if (input.didKill()) {
 				koi.setDead(true);
 				return;
-			} 
-			else if (!isWhirled() && input.didFaster()){
+			} else if (input.didFaster()) {
 				speed += .5f;
 				speed = Math.min(speed, MAX_SPEED);
-			} 
-			else if (!isWhirled() && input.didSlower()){
+			} else if (input.didSlower()) {
 				speed -= .5f;
 				speed = Math.max(speed, MIN_SPEED);
 			}
@@ -667,36 +665,19 @@ public class DownstreamController extends WorldController implements ContactList
 			cameraController.scaleSpeed(speed);
 			koi.scaleSpeed(speed);
 
-
 			// KOI VEOLOCITY CODE
 			if (isTethered()) {
-				koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*1.5f*speed));
-			} 
-			else if(isWhirled()){
-				koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*1.8f*speed));
-			}
-			else{
-				koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*2*speed));
+
+				koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY * 1.0f * speed));
+			} else {
+				koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY * 2.7f * speed));
 			}
 
 			// LOTUS LIGHTING CODE
-			closestTether.setTethered(isTethered() && closestTether.isLotus() && collisionController.inRangeOf(closestTether));
-			//System.out.println(isTethered());
-			//System.out.println(closestTether.isLotus());
-			//System.out.println(collisionController.inRangeOf(closestTether));
-			//System.out.println(closestTether.set);
+			closestTether.setTethered(
+					isTethered() && closestTether.isLotus() && collisionController.inRangeOf(closestTether));
 
-			// TETHER/WHIRLPOOL FORCE CODE
-			Vector2 closeTeth = getClosestTether().getPosition();
-			Vector2 initTeth = koi.getInitialTangentPoint(closeTeth);
-			Vector2 closePool = new Vector2();
-			Vector2 initPool = new Vector2();
-			if(whirlpoolsOn && !wpools.isEmpty()){
-				closePool = getClosestWhirlpool().getPosition();
-				initPool = koi.getInitialTangentPoint(closePool);
-			}
-			
-			// light up tethers ahead of you
+			//TETHER IN PATH
 			for (TetherModel tether : tethers) {
 				tether.inpath = false;
 				if (koi.willIntersectTether(tether.getPosition(), TetherModel.TETHER_DEFAULT_RANGE)) {
@@ -704,74 +685,72 @@ public class DownstreamController extends WorldController implements ContactList
 				}
 			}
 			
-			
-			//check if koi is closer to a whirlpool than a tether
-			if (whirlpoolsOn && !wpools.isEmpty() && koi.getPosition().sub(closePool).len2() < koi.getPosition().sub(closeTeth).len2()) {
-				// whirlpool
-				System.out.println(isWhirled());
-				if (closePool.dst(koi.getPosition()) > WhirlpoolModel.WHIRL_DEFAULT_RANGE*1.1) {
-					koi.setWhirled(false);
-					//System.out.println(isWhirled());
-				}
-				// hit tangent
-				else if (koi.getPosition().sub(initPool).len2() < .01) {
-					koi.setWhirled(true);
-					//System.out.println(isWhirled());
-					koi.refreshWhirlForce(closePool, closestWhirlpool.getOrbitRadius());
-				} else {
-					//System.out.println(isWhirled());
-					koi.setWhirled(true);
-					koi.applyWhirlForce(closePool, closestWhirlpool.getOrbitRadius());
-				}
-			}
-			else {
-				// tether
-				if (closeTeth.dst(koi.getPosition()) > TetherModel.TETHER_DEFAULT_RANGE * 1.3) {
-					koi.setAttemptingTether(false);
-					koi.setTethered(false);
-				}
-				// HIT TANGENT
-				if (koi.isAttemptingTether() && (koi.getPosition().sub(initTeth).len2() < .01)) {
-					// System.out.println("tether");
-					koi.setTethered(true);
-					koi.setAttemptingTether(false);
-					koi.refreshTetherForce(closeTeth, closestTether.getOrbitRadius());
-				}
-				// PAST TANGENT
-				else if (koi.isAttemptingTether() && !koi.willIntersect(initTeth) && koi.pastTangent(initTeth)) {
-					koi.passAdjust(closeTeth);
-				} else {
-				}
-				koi.applyTetherForce(closeTeth, closestTether.getOrbitRadius());
+			// TETHER FORCE CODE
+			Vector2 close = getClosestTether().getPosition();
+			Vector2 init = koi.getInitialTangentPoint(close);
 
+			if (close.dst(koi.getPosition()) > TetherModel.TETHER_DEFAULT_RANGE * 1.3) {
+				koi.setAttemptingTether(false);
+				koi.setTethered(false);
 			}
-			
+			// HIT TANGENT
+			if (koi.isAttemptingTether() && (koi.getPosition().sub(init).len2() < .01)) {
+				// System.out.println("tether");
+				koi.setTethered(true);
+				koi.setAttemptingTether(false);
+				koi.refreshTetherForce(close, closestTether.getOrbitRadius());
+			}
+//<<<<<<< HEAD
+//			else {
+//				// tether
+//				if (closeTeth.dst(koi.getPosition()) > TetherModel.TETHER_DEFAULT_RANGE * 1.3) {
+//					koi.setAttemptingTether(false);
+//					koi.setTethered(false);
+//				}
+//				// HIT TANGENT
+//				if (koi.isAttemptingTether() && (koi.getPosition().sub(initTeth).len2() < .01)) {
+//					// System.out.println("tether");
+//					koi.setTethered(true);
+//					koi.setAttemptingTether(false);
+//					koi.refreshTetherForce(closeTeth, closestTether.getOrbitRadius());
+//				}
+//				// PAST TANGENT
+//				else if (koi.isAttemptingTether() && !koi.willIntersect(initTeth) && koi.pastTangent(initTeth)) {
+//					koi.passAdjust(closeTeth);
+//				} else {
+//				}
+//				koi.applyTetherForce(closeTeth, closestTether.getOrbitRadius());
+//
+//=======
+			// PAST TANGENT
+			else if (koi.isAttemptingTether() && !koi.willIntersect(init) && koi.pastTangent(init)) {
+				koi.passAdjust(close);
+			} else {
+//>>>>>>> 05666488b25fe6b3096ed2a4c8b18864706081bb
+			}
+			koi.applyTetherForce(close, closestTether.getOrbitRadius());
+
 			// RESOLVE FISH IMG
 			koi.resolveDirection();
 
 			// CAMERA ZOOM CODE
-			if (isTethered()){  
+			if (isTethered()) {
 				cameraController.moveCameraTowards(closestTether.getPosition().cpy().scl(scale));
 				cameraController.zoomOut();
-			}
-			else if(isWhirled()){
-				cameraController.moveCameraTowards(closestWhirlpool.getPosition().cpy().scl(scale));
-				cameraController.zoomOut();
-			}
-			else{
+			} else {
 				cameraController.moveCameraTowards(koi.getPosition().cpy().scl(scale));
 				cameraController.zoomIn();
 			}
 
-			//burst code
+			// burst code
 			koi.updateRestore();
-			if (!isWhirled() && input.fast) {
+			if (input.fast) {
 				koi.burst();
 				cameraController.moveCameraTowards(koi.getPosition().cpy().scl(scale));
 			}
 
-			//ANIMATION CODE
-			stateTime += Gdx.graphics.getDeltaTime();           // #15
+			// ANIMATION CODE
+			stateTime += Gdx.graphics.getDeltaTime(); // #15
 			lilycurrentFrame = lilyAnimation.getKeyFrame(stateTime, true);
 			closedFlowercurrentFrame = closedFlowerAnimation.getKeyFrame(stateTime, true);
 			openFlowercurrentFrame = openFlowerAnimation.getKeyFrame(stateTime, true);
@@ -780,72 +759,57 @@ public class DownstreamController extends WorldController implements ContactList
 			KoiCcurrentFrameFlipped = koiCAnimationFlipped.getKeyFrame(stateTime, true);
 			goalCurrentFrame = goalAnimation.getKeyFrame(stateTime, true);
 
-			//System.out.println(relativeTime);
-			//koiCcurrentFrame.flip(koi.left(closestTether), false);
-			if (isWhirled() || isTethered()){
+			// System.out.println(relativeTime);
+			// koiCcurrentFrame.flip(koi.left(closestTether), false);
+			if (koi.isTethered()) {
 				koi.setCurved(true);
-				if(isWhirled()){
-					if(koi.left(closestWhirlpool)){
-						koi.setTexture(koiCcurrentFrame);
-					}
-					else{
-						koi.setTexture(KoiCcurrentFrameFlipped);
-					}
+				if (koi.left(closestTether)) {
+					koi.setTexture(koiCcurrentFrame);
+				} else {
+					koi.setTexture(KoiCcurrentFrameFlipped);
 				}
-				else if(isTethered()){
-					if (koi.left(closestTether)){
-						koi.setTexture(koiCcurrentFrame);
-					}
-					else{
-						koi.setTexture(KoiCcurrentFrameFlipped);
-					}
-				}
-			}
-			else{
+			} else {
 				koi.setCurved(false);
 				koi.setTexture(koiScurrentFrame);
 			}
-			//koi.setTexture(koiCcurrentFrame);
+			// koi.setTexture(koiCcurrentFrame);
 
-
-			//FSM to handle Lotus
+			// FSM to handle Lotus
 			goalTile.setTexture(goalCurrentFrame);
-			
-			
-			for (int i = 0; i < tethers.size(); i++){
-				if (collisionController.inRangeOf(tethers.get(i)) && tethers.get(i)==closestTether){
+
+			for (int i = 0; i < tethers.size(); i++) {
+				if (collisionController.inRangeOf(tethers.get(i)) && tethers.get(i) == closestTether) {
 					tethers.get(i).inrange = true;
-				}
-				else{
+				} else {
 					tethers.get(i).inrange = false;
 				}
 
-				if (tethers.get(i).getTetherType() == TetherType.Lilypad){
+				if (tethers.get(i).getTetherType() == TetherType.Lilypad) {
 					tethers.get(i).setTexture(lilycurrentFrame);
 				}
 				if (tethers.get(i).getTetherType() == TetherType.Lantern) {
-					//System.out.println("here");
-					if (tethers.get(i).getOpening() == 0){
+					// System.out.println("here");
+					if (tethers.get(i).getOpening() == 0) {
 						tethers.get(i).setTexture(closedFlowercurrentFrame);
-						if (tethers.get(i).set){
+						if (tethers.get(i).set) {
 
 							tethers.get(i).setOpening(1);
 						}
 					}
-					if (tethers.get(i).getOpening() == 1){
+					if (tethers.get(i).getOpening() == 1) {
 
-						if (!openingFlowerAnimation.isAnimationFinished(relativeTime))
-						{openingFlowercurrentFrame = openingFlowerAnimation.getKeyFrame(relativeTime, true);
-						relativeTime += Gdx.graphics.getDeltaTime();  
-						tethers.get(i).setTexture(openingFlowercurrentFrame);
-						if(!tethers.get(i).set){
-							//go to closing
-							//relativeTime = 0;
-							tethers.get(i).setOpening(3);
+						if (!openingFlowerAnimation.isAnimationFinished(relativeTime)) {
+							openingFlowercurrentFrame = openingFlowerAnimation.getKeyFrame(relativeTime, true);
+							relativeTime += Gdx.graphics.getDeltaTime();
+							tethers.get(i).setTexture(openingFlowercurrentFrame);
+							if (!tethers.get(i).set) {
+								// go to closing
+								// relativeTime = 0;
+								tethers.get(i).setOpening(3);
+							}
 						}
-						}
-						if (openingFlowerAnimation.isAnimationFinished(relativeTime)){
-							//								System.out.println("finished");
+						if (openingFlowerAnimation.isAnimationFinished(relativeTime)) {
+							// System.out.println("finished");
 							tethers.get(i).setOpening(2);
 							relativeTime = 0;
 						}
@@ -853,29 +817,29 @@ public class DownstreamController extends WorldController implements ContactList
 					}
 
 				}
-				if (tethers.get(i).getOpening() == 2){
+				if (tethers.get(i).getOpening() == 2) {
 					tethers.get(i).setTexture(openFlowercurrentFrame);
-					/*if (tethers.get(i).set){
-							tethers.get(i).setOpening(1);
-						}*/
+					/*
+					 * if (tethers.get(i).set){ tethers.get(i).setOpening(1); }
+					 */
 				}
-				if (tethers.get(i).getOpening() == 3){ 
-					if(!tethers.get(i).set){
-						if(!closingFlowerAnimation.isAnimationFinished(relativeTime)){
+				if (tethers.get(i).getOpening() == 3) {
+					if (!tethers.get(i).set) {
+						if (!closingFlowerAnimation.isAnimationFinished(relativeTime)) {
 							closingFlowercurrentFrame = closingFlowerAnimation.getKeyFrame(relativeTime, true);
-							relativeTime += Gdx.graphics.getDeltaTime();  
+							relativeTime += Gdx.graphics.getDeltaTime();
 							tethers.get(i).setTexture(closingFlowercurrentFrame);
 						}
-						if(closingFlowerAnimation.isAnimationFinished(relativeTime)){
+						if (closingFlowerAnimation.isAnimationFinished(relativeTime)) {
 							tethers.get(i).setOpening(0);
 							relativeTime = 0;
 						}
 					}
-					if(tethers.get(i).set){
+					if (tethers.get(i).set) {
 						tethers.get(i).setOpening(1);
 					}
 				}
-				if(tethers.get(i).lit){
+				if (tethers.get(i).lit) {
 					tethers.get(i).setTexture(openFlowercurrentFrame);
 				}
 			}
@@ -883,11 +847,6 @@ public class DownstreamController extends WorldController implements ContactList
 		HUD.updateHUD(litlanterns.size(), koi.getEnergy());
 		cacheVel = koi.getLinearVelocity();
 	}
-
-
-
-
-
 
 
 	private void clearShadows(boolean b) {
@@ -977,7 +936,7 @@ public class DownstreamController extends WorldController implements ContactList
 		}
 		else {
 			super.draw(delta);
-			for (ArrayList<Float> wall : walls) canvas.drawPath(wall);
+//			for (ArrayList<Float> wall : walls) canvas.drawPath(wall);
 			canvas.beginHUD();
 			HUD.draw(canvas);
 			canvas.end();

@@ -446,7 +446,6 @@ public class InputController {
 		if (Gdx.input.isKeyPressed(Input.Keys.NUM_8)) currentSelection = SelectionType.Goal;
 		if (Gdx.input.isKeyPressed(Input.Keys.NUM_9)) currentSelection = SelectionType.Whirlpool;
 		if (Gdx.input.isKeyPressed(Input.Keys.NUM_0)) currentSelection = SelectionType.Rock;
-//		if (Gdx.input.isKeyPressed(Input.Keys.A)) currentSelection = SelectionType.WhirlpoolAngle;
 		
 		fast = (Gdx.input.isKeyPressed(Input.Keys.F));
 		
