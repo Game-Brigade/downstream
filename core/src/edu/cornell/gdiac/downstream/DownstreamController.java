@@ -305,7 +305,7 @@ public class DownstreamController extends WorldController implements ContactList
 			for (LevelEditor.Vector4 whirlpool: level.whirlpools) {
 				Vector2 poolPos = new Vector2(whirlpool.x, whirlpool.y);
 				Vector2 ang = new Vector2(whirlpool.z, whirlpool.w);
-				WhirlpoolModel pool = new WhirlpoolModel(poolPos.x, poolPos.y, -1, ang.angleRad());
+				WhirlpoolModel pool = new WhirlpoolModel(poolPos.x, poolPos.y, -1, ang);
 				pool.setBodyType(BodyDef.BodyType.StaticBody);
 				pool.setName("whirlpool");
 				pool.setDensity(TETHER_DENSITY);
@@ -549,257 +549,234 @@ public class DownstreamController extends WorldController implements ContactList
 	 *
 	 * @param delta Number of seconds since last animation frame
 	 */
-		
-	
-		public void update(float dt) {	
-			if(collisionController.didWin()){
-				setComplete(true);
+
+	public void update(float dt) {
+		if (collisionController.didWin()) {
+			setComplete(true);
+		}
+		if (koi.isDead()) {
+			deathSound.play();
+			for (TetherModel t : tethers) {
+				t.setTethered(false);
 			}
-			if(koi.isDead()){
-				deathSound.play();
-				for (TetherModel t : tethers) {
-					t.setTethered(false);
-				}
-				respawn();
-			} else{			
-				//ZOOM IN TO PLAYER AT START OF LEVEL
-				cacheVel = koi.getLinearVelocity();
-				if (!cameraController.isZoomedToPlayer()) {
-					cameraController.zoomToPlayer();
-					return;
-				}
-				koi.setLinearVelocity(cacheVel);
-				
-				//CHECKPOINT CODE
-				checkpoint = checkpoint0;
-				for(TetherModel t : lanterns){
-					if(t.lit){
-						if(!litlanterns.contains(t)){
-							litlanterns.push(t);	
-						}
-					} else{
-						litlanterns.remove(t);
+			respawn();
+		} else {
+			// ZOOM IN TO PLAYER AT START OF LEVEL
+			cacheVel = koi.getLinearVelocity();
+			if (!cameraController.isZoomedToPlayer()) {
+				cameraController.zoomToPlayer();
+				return;
+			}
+			koi.setLinearVelocity(cacheVel);
+
+			// CHECKPOINT CODE
+			checkpoint = checkpoint0;
+			for (TetherModel t : lanterns) {
+				if (t.lit) {
+					if (!litlanterns.contains(t)) {
+						litlanterns.push(t);
 					}
+				} else {
+					litlanterns.remove(t);
 				}
-				if(litlanterns.size() > 0){
-					checkpoint = litlanterns.peek();
+			}
+			if (litlanterns.size() > 0) {
+				checkpoint = litlanterns.peek();
+			}
+
+			// CLEAR SHADOW CODE
+			clearShadows(lanterns.size() == litlanterns.size());
+			moveShadows();
+
+			// ENEMY PATROL CODE
+			for (EnemyModel enemy : enemies) {
+				enemy.patrol();
+				enemy.moveTowardsGoal();
+				enemy.fleeFind();
+				enemy.fleeFind(lanterns);
+				if (enemy.dead) {
+					enemy.deactivatePhysics(world);
 				}
+			}
 
-				//CLEAR SHADOW CODE
-				clearShadows(lanterns.size() == litlanterns.size());
-				moveShadows();
-
-
-				closestTether = getClosestTetherTo(koi.getPosition());
-				// INPUT CODE
-				InputController input = InputController.getInstance();
-				if (input.didTether() && !isWhirled() && !koi.bursting) {
-					if((koi.isTethered() || koi.isAttemptingTether())){
-						koi.setTethered(false);					
-						koi.setAttemptingTether(false); 
+			closestTether = getClosestTetherTo(koi.getPosition());
+			// INPUT CODE
+			InputController input = InputController.getInstance();
+			if (input.didTether() && !isWhirled() && !koi.bursting) {
+				if ((koi.isTethered() || koi.isAttemptingTether())) {
+					koi.setTethered(false);
+					koi.setAttemptingTether(false);
+					cameraController.resetCameraVelocity();
+				} else {
+					if (collisionController.inRange()) {
+						koi.setAttemptingTether(true);
 						cameraController.resetCameraVelocity();
 					}
-					else {
-						if(collisionController.inRange()){
-							koi.setAttemptingTether(true); 
-							cameraController.resetCameraVelocity();
-						}
-					}
-				} else if(input.didKill()){
-					koi.setDead(true);
-					return;
-				} else if (input.didFaster()){
-					speed += .5f;
-					speed = Math.min(speed, MAX_SPEED);
-				} else if (input.didSlower()){
-					speed -= .5f;
-					speed = Math.max(speed, MIN_SPEED);
+				}
+			} else if (input.didKill()) {
+				koi.setDead(true);
+				return;
+			} else if (input.didFaster()) {
+				speed += .5f;
+				speed = Math.min(speed, MAX_SPEED);
+			} else if (input.didSlower()) {
+				speed -= .5f;
+				speed = Math.max(speed, MIN_SPEED);
+			}
+
+			cameraController.scaleSpeed(speed);
+			koi.scaleSpeed(speed);
+
+			// KOI VEOLOCITY CODE
+			if (isTethered()) {
+				koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY * 1.5f * speed));
+			} else {
+				koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY * 2 * speed));
+			}
+
+			// LOTUS LIGHTING CODE
+			closestTether.setTethered(
+					isTethered() && closestTether.isLotus() && collisionController.inRangeOf(closestTether));
+
+			// TETHER FORCE CODE
+			Vector2 close = getClosestTether().getPosition();
+			Vector2 init = koi.getInitialTangentPoint(close);
+
+			if (close.dst(koi.getPosition()) > TetherModel.TETHER_DEFAULT_RANGE * 1.3) {
+				koi.setAttemptingTether(false);
+				koi.setTethered(false);
+			}
+			// HIT TANGENT
+			if (koi.isAttemptingTether() && (koi.getPosition().sub(init).len2() < .01)) {
+				// System.out.println("tether");
+				koi.setTethered(true);
+				koi.setAttemptingTether(false);
+				koi.refreshTetherForce(close, closestTether.getOrbitRadius());
+			}
+			// PAST TANGENT
+			else if (koi.isAttemptingTether() && !koi.willIntersect(init) && koi.pastTangent(init)) {
+				koi.passAdjust(close);
+			} else {
+			}
+			koi.applyTetherForce(close, closestTether.getOrbitRadius());
+
+			// RESOLVE FISH IMG
+			koi.resolveDirection();
+
+			// CAMERA ZOOM CODE
+			if (isTethered()) {
+				cameraController.moveCameraTowards(closestTether.getPosition().cpy().scl(scale));
+				cameraController.zoomOut();
+			} else {
+				cameraController.moveCameraTowards(koi.getPosition().cpy().scl(scale));
+				cameraController.zoomIn();
+			}
+
+			// burst code
+			koi.updateRestore();
+			if (input.fast) {
+				koi.burst();
+				cameraController.moveCameraTowards(koi.getPosition().cpy().scl(scale));
+			}
+
+			// ANIMATION CODE
+			stateTime += Gdx.graphics.getDeltaTime(); // #15
+			lilycurrentFrame = lilyAnimation.getKeyFrame(stateTime, true);
+			closedFlowercurrentFrame = closedFlowerAnimation.getKeyFrame(stateTime, true);
+			openFlowercurrentFrame = openFlowerAnimation.getKeyFrame(stateTime, true);
+			koiScurrentFrame = koiSAnimation.getKeyFrame(stateTime, true);
+			koiCcurrentFrame = koiCAnimation.getKeyFrame(stateTime, true);
+			KoiCcurrentFrameFlipped = koiCAnimationFlipped.getKeyFrame(stateTime, true);
+			goalCurrentFrame = goalAnimation.getKeyFrame(stateTime, true);
+
+			// System.out.println(relativeTime);
+			// koiCcurrentFrame.flip(koi.left(closestTether), false);
+			if (koi.isTethered()) {
+				koi.setCurved(true);
+				if (koi.left(closestTether)) {
+					koi.setTexture(koiCcurrentFrame);
+				} else {
+					koi.setTexture(KoiCcurrentFrameFlipped);
+				}
+			} else {
+				koi.setCurved(false);
+				koi.setTexture(koiScurrentFrame);
+			}
+			// koi.setTexture(koiCcurrentFrame);
+
+			// FSM to handle Lotus
+			goalTile.setTexture(goalCurrentFrame);
+
+			for (int i = 0; i < tethers.size(); i++) {
+				if (collisionController.inRangeOf(tethers.get(i)) && tethers.get(i) == closestTether) {
+					tethers.get(i).inrange = true;
+				} else {
+					tethers.get(i).inrange = false;
 				}
 
-				cameraController.scaleSpeed(speed);
-				koi.scaleSpeed(speed);
-
-
-				// ENEMY PATROL CODE
-				for (EnemyModel enemy : enemies) {
-					enemy.patrol();
-					enemy.moveTowardsGoal();
-					enemy.fleeFind();
-					enemy.fleeFind(lanterns);
-					if (enemy.dead){
-						enemy.deactivatePhysics(world);
-					}
+				if (tethers.get(i).getTetherType() == TetherType.Lilypad) {
+					tethers.get(i).setTexture(lilycurrentFrame);
 				}
+				if (tethers.get(i).getTetherType() == TetherType.Lantern) {
+					// System.out.println("here");
+					if (tethers.get(i).getOpening() == 0) {
+						tethers.get(i).setTexture(closedFlowercurrentFrame);
+						if (tethers.get(i).set) {
 
-				// KOI VEOLOCITY CODE
-				if (isTethered() && !isWhirled()) {
-					koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*1.5f*speed));
-				} else{
-					koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY*2*speed));
-				}
-
-				// LOTUS LIGHTING CODE
-				closestTether.setTethered(isTethered() && closestTether.isLotus() && collisionController.inRangeOf(closestTether));
-				//System.out.println(isTethered());
-				//System.out.println(closestTether.isLotus());
-				//System.out.println(collisionController.inRangeOf(closestTether));
-				//System.out.println(closestTether.set);
-
-				// TETHER FORCE CODE
-				Vector2 close = getClosestTether().getPosition();
-				Vector2 init = koi.getInitialTangentPoint(close);
-
-				if (close.dst(koi.getPosition()) > TetherModel.TETHER_DEFAULT_RANGE*1.3){
-					koi.setAttemptingTether(false);
-					koi.setTethered(false);
-				}
-				// HIT TANGENT
-				if (koi.isAttemptingTether() && (koi.getPosition().sub(init).len2() < .01) ) {
-					//				System.out.println("tether");
-					koi.setTethered(true);
-					koi.setAttemptingTether(false);
-					koi.refreshTetherForce(close, closestTether.getOrbitRadius());
-				}
-				// PAST TANGENT
-				else if (koi.isAttemptingTether() && !koi.willIntersect(init) && koi.pastTangent(init)) {
-					koi.passAdjust(close);
-				}
-				else {}
-				koi.applyTetherForce(close, closestTether.getOrbitRadius());
-				
-
-				// RESOLVE FISH IMG
-				koi.resolveDirection();
-
-
-
-
-				// CAMERA ZOOM CODE
-				if (isTethered()){  
-					cameraController.moveCameraTowards(closestTether.getPosition().cpy().scl(scale));
-					cameraController.zoomOut();
-				}
-				else{
-					cameraController.moveCameraTowards(koi.getPosition().cpy().scl(scale));
-					cameraController.zoomIn();
-				}
-
-				//burst code
-				koi.updateRestore();
-				if (input.fast) {
-					koi.burst();
-					cameraController.moveCameraTowards(koi.getPosition().cpy().scl(scale));
-				}
-
-				//ANIMATION CODE
-				stateTime += Gdx.graphics.getDeltaTime();           // #15
-				lilycurrentFrame = lilyAnimation.getKeyFrame(stateTime, true);
-				closedFlowercurrentFrame = closedFlowerAnimation.getKeyFrame(stateTime, true);
-				openFlowercurrentFrame = openFlowerAnimation.getKeyFrame(stateTime, true);
-				koiScurrentFrame = koiSAnimation.getKeyFrame(stateTime, true);
-				koiCcurrentFrame = koiCAnimation.getKeyFrame(stateTime, true);
-				KoiCcurrentFrameFlipped = koiCAnimationFlipped.getKeyFrame(stateTime, true);
-				goalCurrentFrame = goalAnimation.getKeyFrame(stateTime, true);
-
-				//System.out.println(relativeTime);
-				//koiCcurrentFrame.flip(koi.left(closestTether), false);
-				if (koi.isTethered()){
-					koi.setCurved(true);
-					if (koi.left(closestTether)){
-						koi.setTexture(koiCcurrentFrame);
-					}
-					else{
-						koi.setTexture(KoiCcurrentFrameFlipped);
-					}
-				}
-				else{
-					koi.setCurved(false);
-					koi.setTexture(koiScurrentFrame);
-				}
-				//koi.setTexture(koiCcurrentFrame);
-
-
-				//FSM to handle Lotus
-				goalTile.setTexture(goalCurrentFrame);
-				
-				
-				for (int i = 0; i < tethers.size(); i++){
-					if (collisionController.inRangeOf(tethers.get(i)) && tethers.get(i)==closestTether){
-						tethers.get(i).inrange = true;
-					}
-					else{
-						tethers.get(i).inrange = false;
-					}
-
-					if (tethers.get(i).getTetherType() == TetherType.Lilypad){
-						tethers.get(i).setTexture(lilycurrentFrame);
-					}
-					if (tethers.get(i).getTetherType() == TetherType.Lantern) {
-						//System.out.println("here");
-						if (tethers.get(i).getOpening() == 0){
-							tethers.get(i).setTexture(closedFlowercurrentFrame);
-							if (tethers.get(i).set){
-
-								tethers.get(i).setOpening(1);
-							}
-						}
-						if (tethers.get(i).getOpening() == 1){
-
-							if (!openingFlowerAnimation.isAnimationFinished(relativeTime))
-							{openingFlowercurrentFrame = openingFlowerAnimation.getKeyFrame(relativeTime, true);
-							relativeTime += Gdx.graphics.getDeltaTime();  
-							tethers.get(i).setTexture(openingFlowercurrentFrame);
-							if(!tethers.get(i).set){
-								//go to closing
-								//relativeTime = 0;
-								tethers.get(i).setOpening(3);
-							}
-							}
-							if (openingFlowerAnimation.isAnimationFinished(relativeTime)){
-								//								System.out.println("finished");
-								tethers.get(i).setOpening(2);
-								relativeTime = 0;
-							}
-
-						}
-
-					}
-					if (tethers.get(i).getOpening() == 2){
-						tethers.get(i).setTexture(openFlowercurrentFrame);
-						/*if (tethers.get(i).set){
-								tethers.get(i).setOpening(1);
-							}*/
-					}
-					if (tethers.get(i).getOpening() == 3){ 
-						if(!tethers.get(i).set){
-							if(!closingFlowerAnimation.isAnimationFinished(relativeTime)){
-								closingFlowercurrentFrame = closingFlowerAnimation.getKeyFrame(relativeTime, true);
-								relativeTime += Gdx.graphics.getDeltaTime();  
-								tethers.get(i).setTexture(closingFlowercurrentFrame);
-							}
-							if(closingFlowerAnimation.isAnimationFinished(relativeTime)){
-								tethers.get(i).setOpening(0);
-								relativeTime = 0;
-							}
-						}
-						if(tethers.get(i).set){
 							tethers.get(i).setOpening(1);
 						}
 					}
-					if(tethers.get(i).lit){
-						tethers.get(i).setTexture(openFlowercurrentFrame);
+					if (tethers.get(i).getOpening() == 1) {
+
+						if (!openingFlowerAnimation.isAnimationFinished(relativeTime)) {
+							openingFlowercurrentFrame = openingFlowerAnimation.getKeyFrame(relativeTime, true);
+							relativeTime += Gdx.graphics.getDeltaTime();
+							tethers.get(i).setTexture(openingFlowercurrentFrame);
+							if (!tethers.get(i).set) {
+								// go to closing
+								// relativeTime = 0;
+								tethers.get(i).setOpening(3);
+							}
+						}
+						if (openingFlowerAnimation.isAnimationFinished(relativeTime)) {
+							// System.out.println("finished");
+							tethers.get(i).setOpening(2);
+							relativeTime = 0;
+						}
+
+					}
+
+				}
+				if (tethers.get(i).getOpening() == 2) {
+					tethers.get(i).setTexture(openFlowercurrentFrame);
+					/*
+					 * if (tethers.get(i).set){ tethers.get(i).setOpening(1); }
+					 */
+				}
+				if (tethers.get(i).getOpening() == 3) {
+					if (!tethers.get(i).set) {
+						if (!closingFlowerAnimation.isAnimationFinished(relativeTime)) {
+							closingFlowercurrentFrame = closingFlowerAnimation.getKeyFrame(relativeTime, true);
+							relativeTime += Gdx.graphics.getDeltaTime();
+							tethers.get(i).setTexture(closingFlowercurrentFrame);
+						}
+						if (closingFlowerAnimation.isAnimationFinished(relativeTime)) {
+							tethers.get(i).setOpening(0);
+							relativeTime = 0;
+						}
+					}
+					if (tethers.get(i).set) {
+						tethers.get(i).setOpening(1);
 					}
 				}
+				if (tethers.get(i).lit) {
+					tethers.get(i).setTexture(openFlowercurrentFrame);
+				}
 			}
-			HUD.updateHUD(litlanterns.size(), koi.getEnergy());
-			cacheVel = koi.getLinearVelocity();
 		}
-
-
-
-
-
-
+		HUD.updateHUD(litlanterns.size(), koi.getEnergy());
+		cacheVel = koi.getLinearVelocity();
+	}
 
 
 	private void clearShadows(boolean b) {

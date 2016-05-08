@@ -348,33 +348,7 @@ public class LevelEditor extends WorldController {
 	}
 	
 	private void addWhirlpool(Vector2 click, boolean enter){
-		/*
-		if (enter && currentWhirlpool.size() != 2){
-			didEnter = false;
-			return;
-		}
-		if (!enter && currentWhirlpool.size()==2){
-			placingWhirlpool = false;
-			currentWhirlpool.clear();
-			currentWhirlpool.add(click.cpy().scl(scale));
-			return;
-		}
-		if (enter && currentWhirlpool.size() == 2) {
-			placingWhirlpool = false;
-			didEnter = false;
-			Vector2 v = currentWhirlpool.get(0);
-			Vector2 v2 = currentWhirlpool.get(1);
-			whirlpools.add(new Vector4(v.x, v.y, v2.x, v2.y));
-			currentWhirlpool.clear();
-			return;
-		}
-		if (placingWhirlpool){
-			currentWhirlpool.add(click.cpy().scl(scale));
-			return;
-		}
-		placingWhirlpool = true;
-		currentWhirlpool.add(click.cpy().scl(scale));
-		*/
+		
 		if(enter){
 			if(currentWhirlpool.size() != 2){
 				didEnter = false;
@@ -390,11 +364,11 @@ public class LevelEditor extends WorldController {
 		}
 		else if(currentWhirlpool.size() == 2){
 			currentWhirlpool.clear();
-			currentWhirlpool.add(click.cpy().scl(scale));
+			currentWhirlpool.add(click.cpy());
 			placingWhirlpool = false;
 		}
 		else{
-			currentWhirlpool.add(click.cpy().scl(scale));
+			currentWhirlpool.add(click.cpy());
 			placingWhirlpool = true;
 		}
 		
@@ -529,7 +503,7 @@ public class LevelEditor extends WorldController {
 			for(Vector4 pool: whirlpools){
 				Vector2 start = new Vector2(pool.x,pool.y);
 				Vector2 end = new Vector2(pool.z, pool.w);
-				canvas.drawLeadingLinePool(start, end, 3);
+				canvas.drawLeadingLinePool(start.cpy().scl(scale), end.cpy().scl(scale), 3);
 			}
 		}
 		
