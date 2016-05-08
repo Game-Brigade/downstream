@@ -53,7 +53,7 @@ public class WhirlpoolModel extends WheelObstacle {
 		canvas.draw(texture, Color.WHITE, texture.getRegionWidth()/2, 
 				texture.getRegionHeight()/2, this.getX()*drawScale.x, this.getY()*drawScale.x, (float)(Math.PI*rot*direction),0.4f, 0.4f);
 		rot+=0.02;
-		//canvas.drawLeadingLine(this.getPosition(), angle, 2);
+		//canvas.drawLeadingLinePool(this.getPosition(), this.angle, 3);
 		
 	}
 	
