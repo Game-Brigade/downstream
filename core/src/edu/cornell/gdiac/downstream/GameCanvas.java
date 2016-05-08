@@ -974,15 +974,15 @@ public class GameCanvas {
 			return;
 		}
     	
+    	spriteBatch.setColor(Color.WHITE);
     	float h = 100;
     	float w = 100;
     	spriteBatch.draw(lilypad, (getWidth() - w/2)/1.1f - 14, (getHeight() - h/2)/1.1f + offset + 10, w, h);
-    	
     	GlyphLayout layout = new GlyphLayout(font,text);
 		float x = (getWidth()  - layout.width) / 1.1f;
 		float y = (getHeight() + layout.height) / 1.12f;
-		font.setColor(Color.BLACK);
-		font.draw(spriteBatch, layout, x, y+offset);
+		font.setColor(Color.WHITE);
+		font.draw(spriteBatch, layout, x, y+offset + 5);
     }
     
     
@@ -1247,13 +1247,16 @@ public class GameCanvas {
 		start = start.cpy();
 		end = end.cpy();
 		Gdx.gl.glLineWidth(width);
+		Gdx.gl.glEnable(GL30.GL_BLEND);
+		Gdx.gl.glBlendFunc(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA);
         leadingLine.setProjectionMatrix(camera.combined);
         leadingLine.begin(ShapeRenderer.ShapeType.Line);
-        leadingLine.setColor(Color.BLACK);
+        leadingLine.setColor(new Color(0, 0, 0, .5f));
 //        local.applyTo(start);
 //        local.applyTo(end);
         leadingLine.line(start, end);
         leadingLine.end();
+        Gdx.gl.glDisable(GL30.GL_BLEND);
         Gdx.gl.glLineWidth(1);
     }
 	
@@ -1292,11 +1295,13 @@ public class GameCanvas {
 	public void drawOutline(Vector2 start, Vector2 end){
 		start = start.cpy();
 		end = end.cpy();
+		
 		leadingLine.setProjectionMatrix(camera.combined);
 		leadingLine.begin(ShapeRenderer.ShapeType.Filled);
 		leadingLine.rectLine(start, end, 50);
 		leadingLine.setColor(0, 0, 0, .5f);
 		leadingLine.end();
+		
 		
 	}
 	
@@ -1320,8 +1325,7 @@ public class GameCanvas {
 	
 	public void drawPath(ArrayList<Float> path) {
 		
-		Gdx.gl.glEnable(GL30.GL_BLEND);
-		Gdx.gl.glBlendFunc(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA);
+		
 		ArrayList<Vector2> vectorPath = new ArrayList<Vector2>();
 		for (int i = 0; i < path.size(); i+=2) {
 			vectorPath.add(new Vector2(path.get(i),path.get(i+1)));
@@ -1332,6 +1336,6 @@ public class GameCanvas {
 		}
 		drawLeadingLine(vectorPath.get(0), vectorPath.get(vectorPath.size()-1));
 		//drawOutline(vectorPath.get(0), vectorPath.get(vectorPath.size()-1));
-		Gdx.gl.glDisable(GL30.GL_BLEND);
+		
 	}
 }

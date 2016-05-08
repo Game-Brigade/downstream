@@ -148,8 +148,12 @@ public abstract class WorldController implements Screen {
 	/** Retro font for displaying messages */
 	private static String FONT_FILE = "loading/marathon.ttf";
 	private static int FONT_SIZE = 64;
+	/** Retro font for displaying messages */
+	private static String FONT_FILE2 = "loading/MarkerFelt.ttf";
+	private static int FONT_SIZE2 = 64;
 	/** The font for giving messages to the player */
 	protected BitmapFont displayFont;
+	protected BitmapFont secondFont;
 	/** The background image for the battle */
 	private static Texture backgroundN; 
 	private static Texture backgroundD;
@@ -306,6 +310,12 @@ public abstract class WorldController implements Screen {
 		size2Params.fontParameters.size = FONT_SIZE;
 		manager.load(FONT_FILE, BitmapFont.class, size2Params);
 		assets.add(FONT_FILE);
+		
+		FreetypeFontLoader.FreeTypeFontLoaderParameter size3Params = new FreetypeFontLoader.FreeTypeFontLoaderParameter();
+		size3Params.fontFileName = FONT_FILE2;
+		size3Params.fontParameters.size = FONT_SIZE2;
+		manager.load(FONT_FILE2, BitmapFont.class, size3Params);
+		assets.add(FONT_FILE2);
 	}
 
 	
@@ -418,8 +428,8 @@ public abstract class WorldController implements Screen {
 				koiCFramesFlipped[index++] = tmpkoiCFlipped[i][j];
 			}
 		}
-		koiCAnimation = new Animation(.05f, koiCFrames); 
-		koiCAnimationFlipped = new Animation(.05f, koiCFramesFlipped);
+		koiCAnimation = new Animation(.02f, koiCFrames); 
+		koiCAnimationFlipped = new Animation(.02f, koiCFramesFlipped);
 		koiCspriteBatch = new SpriteBatch(); 
 
 
@@ -475,6 +485,12 @@ public abstract class WorldController implements Screen {
 			displayFont = manager.get(FONT_FILE,BitmapFont.class);
 		} else {
 			displayFont = null;
+		}
+		
+		if (manager.isLoaded(FONT_FILE2)) {
+			secondFont = manager.get(FONT_FILE2,BitmapFont.class);
+		} else {
+			secondFont = null;
 		}
 
 		worldAssetState = AssetState.COMPLETE;

@@ -502,7 +502,7 @@ public class DownstreamController extends WorldController implements ContactList
 				(level.map.get(0).y + level.map.get(1).y)/2);
 		cameraController.zoomStart(levelCamWidth, levelCamHeight, center, koi.getPosition().cpy().scl(scale));
 
-		HUD = new HUDitems(lanterns.size(), UILotusTexture, energyBarTexture, displayFont);
+		HUD = new HUDitems(lanterns.size(), UILotusTexture, energyBarTexture, secondFont);
 		addHUD(HUD);
 
 
@@ -553,6 +553,9 @@ public class DownstreamController extends WorldController implements ContactList
 	public void update(float dt) {
 		if (collisionController.didWin()) {
 			setComplete(true);
+			deleteAll();
+			this.level = this.level + 1;
+			populateLevel();
 		}
 		if (koi.isDead()) {
 			deathSound.play();
@@ -629,9 +632,10 @@ public class DownstreamController extends WorldController implements ContactList
 
 			// KOI VEOLOCITY CODE
 			if (isTethered()) {
-				koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY * 1.5f * speed));
+
+				koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY * .7f * speed));
 			} else {
-				koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY * 2 * speed));
+				koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY * 2.7f * speed));
 			}
 
 			// LOTUS LIGHTING CODE
