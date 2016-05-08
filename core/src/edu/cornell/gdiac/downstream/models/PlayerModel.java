@@ -49,7 +49,7 @@ public class PlayerModel extends BoxObstacle {
 
 	private Vector2 force;
 	
-	public static final Vector2 NE = (new Vector2(1,1)).nor();
+	public static final Vector2 NE = (new Vector2(1,-1)).nor();
 	
 	private boolean isTethered;
 	
@@ -269,6 +269,15 @@ public class PlayerModel extends BoxObstacle {
 		Vector2 time = timeToIntersect(target);
 		//return time.x > -0.009 && time.y > -0.009;
 		return getLinearVelocity().isCollinear(target.sub(getPosition()), .09f);
+	}
+	
+	public boolean willIntersectTether(Vector2 tether, int tetherRange) {
+		Vector2 initialTangent = getInitialTangentPoint(tether);
+		Vector2 difference = new Vector2(tether.x - getX(), tether.y - getY());
+		boolean timeIsPositive = Math.signum(difference.x) == Math.signum(getVX()) && 
+								 Math.signum(difference.y) == Math.signum(getVY());
+		if (initialTangent.dst2(tether) > tetherRange*tetherRange || !timeIsPositive) return false;
+		return true;
 	}
 	
 	public boolean pastTangent(Vector2 target){

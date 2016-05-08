@@ -62,6 +62,7 @@ public class TetherModel extends WheelObstacle {
 	private float lightingScale = .4f;
 	private boolean lightingIncrease = false;
 	public boolean inrange = false;
+	public boolean inpath = false;
 	
 	public Circle lightCircle = new Circle(getX(),getY(), 0);
 
@@ -183,7 +184,7 @@ public class TetherModel extends WheelObstacle {
 			}
 			findCircle();
 			canvas.draw(lightingTexture,new Color(255, 255, 255, alpha), lightingTexture.getRegionWidth()/2, lightingTexture.getRegionHeight()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),sparkSize,sparkSize);
-			if (inrange){
+			if (inrange || inpath){
 				drawLight(canvas);
 			}
 		}

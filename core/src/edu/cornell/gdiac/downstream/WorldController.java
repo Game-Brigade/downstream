@@ -401,7 +401,9 @@ public abstract class WorldController implements Screen {
 
 		cols = 31;
 
-		koiCSheet = new Texture(Gdx.files.internal("koi/curved_koi.png"));
+		//remeber kiddies, animate both directions
+		koiCSheet = new Texture(Gdx.files.internal("koi/Curved_Koi.png"));
+
 		TextureRegion[][] tmpkoiC = TextureRegion.split(koiCSheet, koiCSheet.getWidth()/cols, koiCSheet.getHeight()/rows);              // #10
 		TextureRegion[][] tmpkoiCFlipped = TextureRegion.split(koiCSheet, koiCSheet.getWidth()/cols, koiCSheet.getHeight()/rows);              // #10
 
@@ -434,12 +436,18 @@ public abstract class WorldController implements Screen {
 		//goalTexture = createTexture(manager, GOAL_TEXTURE, false);
 		goalTexture = goalFrames[0];
 		UILotusTexture = createTexture(manager, UI_FLOWER, false);
-
+		
+		
 		earthTile = createTexture(manager,EARTH_FILE_N,true);
 		earthTileDay = createTexture(manager,EARTH_FILE_D, true);
 		earthTileNight = createTexture(manager,EARTH_FILE_N, true);
 		earthTileSunset = createTexture(manager,EARTH_FILE_S, true);
 
+		rockDay = createTexture(manager,ROCK_FILE_D, true);
+		rockNight = createTexture(manager,ROCK_FILE_N, true);
+		rockSunset = createTexture(manager,ROCK_FILE_S, true);
+		
+		
 		whirlpoolTexture = createTexture(manager,WHIRLPOOL_TEXTURE,false);
 		whirlpoolFlipTexture = createTexture(manager,WHIRLPOOL_FLIP_TEXTURE,false);
 		Arrow = createTexture(manager, ARROW, false);
