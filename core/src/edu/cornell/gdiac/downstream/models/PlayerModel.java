@@ -374,7 +374,7 @@ public class PlayerModel extends BoxObstacle {
 			if(isTethered()){
 
 				Vector2 farOff = new Vector2(getX(), getY());
-				farOff.add(this.getLinearVelocity().cpy().scl(.4f));
+				farOff.add(this.getLinearVelocity().cpy().nor().scl(.4f));
 
 				canvas.draw(ArrowTexture, Color.WHITE ,origin.x,origin.y,farOff.x*drawScale.x,farOff.y*drawScale.x,getAngle() + 2.2f, .6f, .6f);
 				//canvas.draw(texture, farOff.x, farOff.y);
