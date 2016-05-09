@@ -1247,12 +1247,13 @@ public class GameCanvas {
 	public void drawLeadingLine(Vector2 start, Vector2 end, int width) {
 		start = start.cpy();
 		end = end.cpy();
-		Gdx.gl.glLineWidth(50);
+		
 		Gdx.gl.glEnable(GL30.GL_BLEND);
 		Gdx.gl.glBlendFunc(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA);
+		Gdx.gl.glLineWidth(40);
 		leadingLine.setProjectionMatrix(camera.combined);
         leadingLine.begin(ShapeRenderer.ShapeType.Line);
-        leadingLine.setColor(new Color(0, 0, 0, .5f));
+        leadingLine.setColor(new Color(0, 0, 0, .8f));
         leadingLine.line(start, end);
         leadingLine.end();
         Gdx.gl.glDisable(GL30.GL_BLEND);
@@ -1294,11 +1295,14 @@ public class GameCanvas {
 	public void drawOutline(Vector2 start, Vector2 end){
 		start = start.cpy();
 		end = end.cpy();
-		
+		Gdx.gl.glEnable(GL20.GL_BLEND);
+		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 		leadingLine.setProjectionMatrix(camera.combined);
 		leadingLine.begin(ShapeRenderer.ShapeType.Filled);
-		leadingLine.rectLine(start, end, 50);
-		leadingLine.setColor(0, 0, 0, .8f);
+		leadingLine.rectLine(start, end, 80);
+		leadingLine.setColor(new Color(0, 0, 0, .2f));
+		//leadingLine.setColor(0, 0, 0, .2f);
+		Gdx.gl.glDisable(GL20.GL_BLEND);
 		leadingLine.end();
 		
 		
@@ -1329,10 +1333,10 @@ public class GameCanvas {
 		}
 		for (int i = 0; i < vectorPath.size()-1;i++) {
 			drawLeadingLine(vectorPath.get(i), vectorPath.get(i+1));
-		//drawOutline(vectorPath.get(i), vectorPath.get(i+1));
+			//drawOutline(vectorPath.get(i), vectorPath.get(i+1));
 		}
 		drawLeadingLine(vectorPath.get(0), vectorPath.get(vectorPath.size()-1));
-		//drawOutline(vectorPath.get(0), vectorPath.get(vectorPath.size()-1));
+			//drawOutline(vectorPath.get(0), vectorPath.get(vectorPath.size()-1));
 		
 	}
 }
