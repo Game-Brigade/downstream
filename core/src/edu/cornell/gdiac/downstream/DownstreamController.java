@@ -684,18 +684,23 @@ public class DownstreamController extends WorldController implements ContactList
 			HUD.setHelpTexture(helpTexture);
 			HUD.setTutorialStatus(true);
 		}
-		else if (this.level == 3){
+		else if (this.level == 6){
 			HUD.setTutorialTexture(tutorial3);
 			HUD.setHelpTexture(helpTexture);
 			HUD.setTutorialStatus(true);
 		}
-		else if (this.level == 5){
+		else if (this.level == 4){
 			HUD.setTutorialTexture(tutorial4);
 			HUD.setHelpTexture(helpTexture);
 			HUD.setTutorialStatus(true);
 		}
-		else if(this.level == 7){
+		else if(this.level == 8){
 			HUD.setTutorialTexture(tutorial6);
+			HUD.setHelpTexture(helpTexture);
+			HUD.setTutorialStatus(true);
+		}
+		else if(this.level == 7){
+			HUD.setTutorialTexture(tutorial5);
 			HUD.setHelpTexture(helpTexture);
 			HUD.setTutorialStatus(true);
 		}
