@@ -288,9 +288,7 @@ public class DownstreamController extends WorldController implements ContactList
 		} else {
 			level = LevelEditor.loadFromJson();
 		}
-		
-		
-		
+				
 		
 		// 0 is day 1 is sunset 2 is night
 		int staticNDS = dayNightBinary(this.level);
@@ -637,7 +635,7 @@ public class DownstreamController extends WorldController implements ContactList
 
 		//START KOI CODE
 		//koi on tether
-		boolean onTether = true;
+		boolean onTether = false;
 		if(onTether){
 			koi.initPos = checkpoint.getPosition().add(koi.NE.cpy().rotate90(1).nor().scl(TetherModel.TETHER_DEFAULT_ORBIT));
 			koi.setPosition(koi.initPos);
@@ -682,12 +680,12 @@ public class DownstreamController extends WorldController implements ContactList
 			HUD.setHelpTexture(helpTexture);
 			HUD.setTutorialStatus(true);
 		}
-		else if (this.level == 3){
+		/*else if (this.level == 3){
 			HUD.setTutorialTexture(tutorial3);
 			HUD.setHelpTexture(helpTexture);
 			HUD.setTutorialStatus(true);
-		}
-		else if (this.level == 4){
+		}*/
+		else if (this.level == 6){
 			HUD.setTutorialTexture(tutorial4);
 			HUD.setHelpTexture(helpTexture);
 			HUD.setTutorialStatus(true);
@@ -793,12 +791,11 @@ public class DownstreamController extends WorldController implements ContactList
 			deathSound.play();
 			koi.die();
 			koi.setLinearVelocity(new Vector2(0,0));
+			koi.setTethered(false);
 			for (TetherModel t : tethers) {
 				t.setTethered(false);
 			}
-			/*if (this.level == 8){
-				enemies.get(0);
-			}*/
+
 			respawn();
 		} else {
 			// ZOOM IN TO PLAYER AT START OF LEVEL
@@ -876,13 +873,14 @@ public class DownstreamController extends WorldController implements ContactList
 
 			// KOI VEOLOCITY CODE
 			if (isTethered()) {
-
 				koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY * 1.3f * speed));
+
 			} 
 			else if(isWhirled()){
 				koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY * 1.7f * speed));
 			}
 			else {
+
 				koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY * 2.5f * speed));
 			}
 
@@ -939,15 +937,13 @@ public class DownstreamController extends WorldController implements ContactList
 					koi.setWhirled(false);
 				}
 				
-				
-				
 			}
 
 			else{		
 				if(koi.isAttemptingTether()){
 
 					// HIT TANGENT
-					if (koi.getPosition().sub(initTeth).len2() < .01) {
+					if (koi.getPosition().sub(initTeth).len2() < .05) {
 						koi.setTethered(true);
 						koi.setWhirled(false);
 						koi.setAttemptingTether(false);
@@ -979,12 +975,6 @@ public class DownstreamController extends WorldController implements ContactList
 				cameraController.moveCameraTowards(closestTether.getPosition().cpy().scl(scale));
 				cameraController.zoomOut();
 			} 
-			/*
-			else if(isWhirled()){
-				cameraController.moveCameraTowards(closestWhirlpool.getPosition().cpy().scl(scale));
-				cameraController.zoomOut();
-			}
-			*/
 			else {
 				cameraController.moveCameraTowards(koi.getPosition().cpy().scl(scale));
 				cameraController.zoomIn();
@@ -1016,8 +1006,7 @@ public class DownstreamController extends WorldController implements ContactList
 			closedFlowercurrentFrame2 = closedFlowerAnimation2.getKeyFrame(stateTime, true);
 			openFlowercurrentFrame2 = openFlowerAnimation2.getKeyFrame(stateTime, true);
 
-			// System.out.println(relativeTime);
-			// koiCcurrentFrame.flip(koi.left(closestTether), false);
+	
 			if (isWhirled() || isTethered()) {
 				koi.setCurved(true);
 				if(isWhirled()){

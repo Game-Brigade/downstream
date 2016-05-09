@@ -158,7 +158,7 @@ public class PlayerModel extends BoxObstacle {
 		}
 		if(isTethered()){
 			// TRUE CIRCLE
-			if(getPosition().sub(dest).len2() < .01){
+			if(getPosition().sub(dest).len2() < .05){
 				pastTanTether = false;
 				attemptingTether = false;
 				dest = getPosition();
@@ -383,7 +383,7 @@ public class PlayerModel extends BoxObstacle {
 			if(isTethered()){
 				Vector2 farOff = new Vector2(getX(), getY());
 
-				farOff.add(this.getLinearVelocity().cpy().scl(.7f));
+				farOff.add(this.getLinearVelocity().cpy().nor().scl(4f));
 				canvas.draw(ArrowTexture, Color.WHITE , ArrowTexture.getRegionWidth()/2 *.6f , ArrowTexture.getRegionHeight()/2 *.6f,farOff.x*drawScale.x,farOff.y*drawScale.x, getAngle(), .6f, .6f);
 
 			}

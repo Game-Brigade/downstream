@@ -335,10 +335,12 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 			}
 			
 			if (b1() && listener != null) {
+				System.out.println(pageNumber);
 				if(pageNumber == 1){
 					listener.exitScreen(this, 1);
 				}
 				else{
+					System.out.println(9);
 					listener.exitScreen(this, 9);
 				}
 			}
