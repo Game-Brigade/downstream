@@ -35,8 +35,10 @@ import edu.cornell.gdiac.downstream.WorldController.AssetState;
 import edu.cornell.gdiac.downstream.models.EnemyModel;
 import edu.cornell.gdiac.downstream.models.PlayerModel;
 import edu.cornell.gdiac.downstream.models.RockModel;
+import edu.cornell.gdiac.downstream.models.ShadowModel;
 import edu.cornell.gdiac.downstream.models.TetherModel;
 import edu.cornell.gdiac.downstream.models.WhirlpoolModel;
+import edu.cornell.gdiac.downstream.obstacle.BoxObstacle;
 import edu.cornell.gdiac.downstream.obstacle.PolygonObstacle;
 import edu.cornell.gdiac.util.SoundController;
 
@@ -192,6 +194,8 @@ public class LevelEditor extends WorldController {
 	private ArrayList<Vector2> mapArea;
 	private ArrayList<Vector2> goal;
 	private PlayerModel koi;
+	private BoxObstacle goalTile;
+	private ShadowModel shadow;
 
 	private boolean settingEnemyPath = false;
 	private boolean settingWallPath = false;
@@ -514,13 +518,56 @@ public class LevelEditor extends WorldController {
 		case 0:
 		case 1:
 			goal.add(click.cpy());
-			return;
+			break;
 		case 2:
 		default:
 			goal.clear();
 			goal.add(click.cpy());
-			return;
+			break;
 		}
+		if(goal.size() >1){
+			objects.remove(shadow);
+			objects.remove(goalTile);
+			
+			
+		//Create goal tile
+		Vector2 goalPos = goal.get(0);
+		Vector2 shadowDest = goal.get(1);
+
+		Vector2 cache = shadowDest.cpy().sub(goalPos).nor().scl(2);
+		float dwidth  = goalTexture.getRegionWidth()/scale.x;
+		float dheight = goalTexture.getRegionHeight()/scale.y;
+		goalTexture.setRegionHeight(goalTexture.getRegionHeight());
+		goalTexture.setRegionWidth(goalTexture.getRegionWidth());
+		goalTile = new BoxObstacle(goalPos.x, goalPos.y, dwidth/2, dheight/2);
+		goalTile.setName("goal");
+		goalTile.setDrawScale(scale);
+		goalTile.setTexture(goalTexture);
+		goalTile.setDensity(BASIC_DENSITY);
+		goalTile.setFriction(BASIC_FRICTION);
+		goalTile.setRestitution(BASIC_RESTITUTION);
+		goalTile.setLinearVelocity(Vector2.Zero);
+		goalTile.setSensor(true);
+		goalTile.setAngle((float) Math.atan2(shadowDest.y-goalPos.y,shadowDest.x-goalPos.x));
+		addObject(goalTile);
+
+		//create shadow(s)
+		dwidth = shadowTexture.getRegionWidth()/scale.x*1.3f;
+		dheight = shadowTexture.getRegionHeight()/scale.y*1.3f;
+		shadow = new ShadowModel(goalPos.x, goalPos.y, dwidth, dheight, shadowDest);
+		shadow.setName("shadow");
+		shadow.setDrawScale(scale.cpy());
+		shadow.setTexture(shadowTexture);
+
+		shadow.setDensity(BASIC_DENSITY);
+		shadow.setFriction(BASIC_FRICTION);
+		shadow.setRestitution(BASIC_RESTITUTION);
+
+		shadow.setSensor(false);			
+		shadow.setAngle((float) Math.atan2(shadowDest.y-goalPos.y,shadowDest.x-goalPos.x));
+		addObject(shadow);
+		}
+
 	}
 
 	private void addShore(Vector2 click, boolean enter) {
