@@ -183,7 +183,8 @@ public class TetherModel extends WheelObstacle {
 				sparkSize = 0;
 			}
 			findCircle();
-			canvas.draw(lightingTexture,new Color(255, 255, 255, alpha), lightingTexture.getRegionWidth()/2, lightingTexture.getRegionHeight()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),sparkSize,sparkSize);
+			if (lightingTexture != null)
+				canvas.draw(lightingTexture,new Color(255, 255, 255, alpha), lightingTexture.getRegionWidth()/2, lightingTexture.getRegionHeight()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),sparkSize,sparkSize);
 			if (inrange || inpath){
 				drawLight(canvas);
 			}
@@ -194,6 +195,7 @@ public class TetherModel extends WheelObstacle {
 	private void findCircle(){
 //		System.out.println(lightCircle);
 //		System.out.println(lightingTexture);
+		if (lightingTexture == null) return;
 		lightCircle.setRadius((lightingTexture.getRegionWidth()/2 * sparkSize)/drawScale.x);
 	}
 	

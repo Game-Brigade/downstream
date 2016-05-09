@@ -378,7 +378,7 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 					listener.exitScreen(this, 13);
 				}
 			}
-			/*
+			
 			if (b6() && listener != null) {
 				if(pageNumber == 1){
 					listener.exitScreen(this, 6);
@@ -405,7 +405,7 @@ public class LevelSelectMode implements Screen, InputProcessor, ControllerListen
 					listener.exitScreen(this, 16);
 				}
 			}
-			*/
+			
 			
 			
 		}

@@ -468,6 +468,7 @@ public class LevelEditor extends WorldController {
 			walls.add(wallPath);
 			PolygonObstacle obj;
 			ArrayList<Float> wall = new ArrayList<Float>();
+			if (wallPath == null) wallPath = new ArrayList<Vector2>();
 			for (Vector2 v : wallPath) {
 				wall.add(v.x/scale.x);
 				wall.add(v.y/scale.y);
@@ -533,6 +534,7 @@ public class LevelEditor extends WorldController {
 			shores.add(shorePath);
 			PolygonObstacle obj;
 			ArrayList<Float> shore = new ArrayList<Float>();
+			if (shorePath == null) shorePath = new ArrayList<Vector2>();
 			for (Vector2 v : shorePath) {
 				shore.add(v.x/scale.x);
 				shore.add(v.y/scale.y);
@@ -595,6 +597,7 @@ public class LevelEditor extends WorldController {
 	}
 
 	private void drawPath(ArrayList<Vector2> path) {
+		if (path == null) return;
 		for (int i = 0; i < path.size() - 1; i++) {
 			canvas.drawLeadingLine(path.get(i), path.get(i+1));
 		}
@@ -604,7 +607,7 @@ public class LevelEditor extends WorldController {
 	private boolean updateClicks() {
 		Vector3 click3 = canvas.getCamera().unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
 		Vector2 temp = new Vector2(click3.x/scale.x, click3.y/scale.y);
-		if (temp.dst2(currentClick) > 0.5) {
+		if (temp.dst2(currentClick) > 1.0) {
 			newClick = true;
 			currentClick.x = temp.x; currentClick.y = temp.y;
 			return true;

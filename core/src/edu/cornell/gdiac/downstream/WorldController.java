@@ -214,7 +214,7 @@ public abstract class WorldController implements Screen {
 	protected TextureRegion goalCurrentFrame;
 	protected TextureRegion[] goalFrames;
 	
-	
+	protected ArrayList<ArrayList<Float>> walls = new ArrayList<ArrayList<Float>>();
 	
 
 	/**
@@ -412,7 +412,7 @@ public abstract class WorldController implements Screen {
 		cols = 31;
 
 		//remeber kiddies, animate both directions
-		koiCSheet = new Texture(Gdx.files.internal("koi/Curved_Koi.png"));
+		koiCSheet = new Texture(Gdx.files.internal("koi/curved_koi.png"));
 
 		TextureRegion[][] tmpkoiC = TextureRegion.split(koiCSheet, koiCSheet.getWidth()/cols, koiCSheet.getHeight()/rows);              // #10
 		TextureRegion[][] tmpkoiCFlipped = TextureRegion.split(koiCSheet, koiCSheet.getWidth()/cols, koiCSheet.getHeight()/rows);              // #10
@@ -977,6 +977,10 @@ public abstract class WorldController implements Screen {
 		}
 //		canvas.draw(background, Color.WHITE, 0, 0, canvas.getWidth(), canvas.getHeight());
 		//canvas.draw(rocks, Color.WHITE, 0, 0, canvas.getWidth(), canvas.getHeight());
+		
+		
+//		for (ArrayList<Float> wall : walls) canvas.drawPath(wall);
+		
 		for(Obstacle obj : objects) {
 			obj.draw(canvas);
 		}

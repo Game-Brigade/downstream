@@ -90,7 +90,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private ArrayList<WheelObstacle> rocks = new ArrayList<WheelObstacle>();
 	private ArrayList<EnemyModel> enemies = new ArrayList<EnemyModel>();
 	private ArrayList<WhirlpoolModel> wpools = new ArrayList<WhirlpoolModel>();
-	private ArrayList<ArrayList<Float>> walls = new ArrayList<ArrayList<Float>>();
+//	private ArrayList<ArrayList<Float>> walls = new ArrayList<ArrayList<Float>>();
 	private PlayerModel koi;
 	private BoxObstacle goalTile;
 	private EnemyModel eFish;
@@ -399,10 +399,10 @@ public class DownstreamController extends WorldController implements ContactList
 					obj.setTexture(earthTileDay);
 				}
 				if (NDS == 1){
-					obj.setTexture(earthTileNight);
+					obj.setTexture(earthTileDay);
 				}
 				if (NDS == 2){
-					obj.setTexture(earthTileSunset);
+					obj.setTexture(earthTileDay);
 				}
 				//obj.setTexture(earthTile);
 				obj.setName("shore");
@@ -437,14 +437,16 @@ public class DownstreamController extends WorldController implements ContactList
 			ArrayList<Float> scaledWall = new ArrayList<Float>();
 			for (Float f : wall) scaledWall.add(f*scale.x);
 			walls.add(scaledWall);
+			obj.drawnWall = scaledWall;
 			addObject(obj);
 		}
 		
 		if (level.rocks != null) {
 			for (Vector2 rock : level.rocks) {
 				WheelObstacle obj;
-				System.out.println(rockDay);
-				obj = new WheelObstacle(rock.x,rock.y,rockDay.getRegionWidth()/2);
+//				System.out.println(rockDay);
+				System.out.println("ROCK" + rockDay.getRegionWidth()/2/scale.x);
+				obj = new WheelObstacle(rock.x,rock.y,rockDay.getRegionWidth()/4/scale.x);
 				obj.setBodyType(BodyDef.BodyType.StaticBody);
 				obj.setSensor(true);
 				obj.setDrawScale(scale);
@@ -476,39 +478,41 @@ public class DownstreamController extends WorldController implements ContactList
 		koi.ArrowTexture = Arrow;
 		addObject(koi);
 
-
-		for (Vector2 lotus : level.lotuses) {
-			TetherModel lantern = new TetherModel(lotus.x, lotus.y, rad, true);
-			lantern.setBodyType(BodyDef.BodyType.StaticBody);
-			lantern.setName("lotus"+ 1);
-			lantern.setDensity(TETHER_DENSITY);
-			lantern.setFriction(TETHER_FRICTION);
-			lantern.setRestitution(TETHER_RESTITUTION);
-			lantern.setSensor(sensorTethers);
-			lantern.setDrawScale(scale);
-			lantern.setTexture(lanternTexture);
-			lantern.setlightingTexture(lightingTexture);
-			lantern.setRotation(0);
-			addObject(lantern);
-			tethers.add(lantern);
-			lanterns.add(lantern);
+		if (level.lotuses != null) {
+			for (Vector2 lotus : level.lotuses) {
+				TetherModel lantern = new TetherModel(lotus.x, lotus.y, rad, true);
+				lantern.setBodyType(BodyDef.BodyType.StaticBody);
+				lantern.setName("lotus"+ 1);
+				lantern.setDensity(TETHER_DENSITY);
+				lantern.setFriction(TETHER_FRICTION);
+				lantern.setRestitution(TETHER_RESTITUTION);
+				lantern.setSensor(sensorTethers);
+				lantern.setDrawScale(scale);
+				lantern.setTexture(lanternTexture);
+				lantern.setlightingTexture(lightingTexture);
+				lantern.setRotation(0);
+				addObject(lantern);
+				tethers.add(lantern);
+				lanterns.add(lantern);
+			}
 		}
-
-		for (Vector2 lilypad : level.lilypads) {
-			TetherModel lily = new TetherModel(lilypad.x, lilypad.y, rad);
-			lily.setBodyType(BodyDef.BodyType.StaticBody);
-			lily.setName("lily"+ 1);
-			lily.setDensity(TETHER_DENSITY);
-			lily.setFriction(TETHER_FRICTION);
-			lily.setRestitution(TETHER_RESTITUTION);
-			lily.setSensor(sensorTethers);
-			lily.setDrawScale(scale);
-			lily.setTexture(lilyTexture);
-			addObject(lily);
-			tethers.add(lily);
+		
+		if (level.lilypads != null) {
+			for (Vector2 lilypad : level.lilypads) {
+				TetherModel lily = new TetherModel(lilypad.x, lilypad.y, rad);
+				System.out.println("RAD" + rad);
+				lily.setBodyType(BodyDef.BodyType.StaticBody);
+				lily.setName("lily"+ 1);
+				lily.setDensity(TETHER_DENSITY);
+				lily.setFriction(TETHER_FRICTION);
+				lily.setRestitution(TETHER_RESTITUTION);
+				lily.setSensor(sensorTethers);
+				lily.setDrawScale(scale);
+				lily.setTexture(lilyTexture);
+				addObject(lily);
+				tethers.add(lily);
+			}
 		}
-
-
 
 		//Setup checkpoint and collision controller
 		collisionController = new CollisionController(koi);
@@ -531,7 +535,7 @@ public class DownstreamController extends WorldController implements ContactList
 		levelCamHeight = Math.abs(level.map.get(0).y - level.map.get(1).y);
 		center = new Vector2((level.map.get(0).x + level.map.get(1).x)/2,
 				(level.map.get(0).y + level.map.get(1).y)/2);
-		cameraController.zoomStart(levelCamWidth, levelCamHeight, center, koi.getPosition().cpy().scl(scale));
+		cameraController.zoomStart(levelCamWidth, levelCamHeight, center, checkpoint0.getPosition().cpy().scl(scale));
 
 		HUD = new HUDitems(lanterns.size(), UILotusTexture, energyBarTexture, secondFont);
 		addHUD(HUD);
@@ -582,6 +586,8 @@ public class DownstreamController extends WorldController implements ContactList
 	 */
 
 	public void update(float dt) {
+//		System.out.println("ASKLSDJFSDF  " + cameraController.getCameraPosition());
+		
 		if (collisionController.didWin()) {
 			setComplete(true);
 			tillNextLevel++;
