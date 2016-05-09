@@ -49,7 +49,7 @@ import edu.cornell.gdiac.downstream.obstacle.*;
  * place nicely with the static assets.
  */
 public abstract class WorldController implements Screen {
-	
+
 	/** 
 	 * Tracks the asset state.  Otherwise subclasses will try to load assets 
 	 */
@@ -66,7 +66,7 @@ public abstract class WorldController implements Screen {
 	protected AssetState worldAssetState = AssetState.EMPTY;
 	/** Track all loaded assets (for unloading purposes) */
 	protected Array<String> assets;	
-	
+
 	//References to shared shared textures//
 	/** The background image for the level */
 	protected static final String BACKGROUND_FILE_N = "terrain/Water_Night.jpg";
@@ -107,7 +107,11 @@ public abstract class WorldController implements Screen {
 	protected static final String UI_FLOWER = "MENUS/UI_lotus.png";
 	protected static final String OVERLAY = "terrain/texture.jpg";
 	protected static final String ARROW = "koi/arrow.png";
-	
+	protected static final String TUTORIAL_TEXTURE1 = "MENUS/text-box.png";
+	protected static final String TUTORIAL_TEXTURE2 = "MENUS/text-box.png";
+	protected static final String TUTORIAL_TEXTURE3 = "MENUS/text-box.png";
+	protected static final String TUTORIAL_TEXTURE4 = "MENUS/text-box.png";
+
 	// TextureRegions//
 	/** Texture assets for the koi */
 	protected TextureRegion koiTexture;
@@ -139,12 +143,16 @@ public abstract class WorldController implements Screen {
 	protected TextureRegion energyBarTexture;
 	protected TextureRegion UILotusTexture;
 	protected TextureRegion Arrow;
+	protected TextureRegion tutorial1;
+	protected TextureRegion tutorial2;
+	protected TextureRegion tutorial3;
+	protected TextureRegion tutorial4;
 	//Sounds//
 	protected static final String LIGHTING_SOUND = "SOUNDS/lighting_1.mp3";
 	protected Music deathSound;
-	
+
 	private static int dayTime = 0;
-	
+
 	/** Retro font for displaying messages */
 	private static String FONT_FILE = "loading/marathon.ttf";
 	private static int FONT_SIZE = 64;
@@ -160,7 +168,7 @@ public abstract class WorldController implements Screen {
 	private static Texture backgroundS;
 	private static Texture overlay;
 	private Color referenceC = Color.WHITE.cpy();
-	
+
 	//Animations//
 	protected Animation lilyAnimation; // This is the only one
 	
@@ -209,13 +217,27 @@ public abstract class WorldController implements Screen {
 	protected Animation koiCAnimationFlipped;
 	protected TextureRegion[]	koiCFramesFlipped;
 	protected TextureRegion KoiCcurrentFrameFlipped;
-	
+
 	protected Animation goalAnimation;
 	protected TextureRegion goalCurrentFrame;
 	protected TextureRegion[] goalFrames;
+	protected Color levelAlpha = new Color(255,255,255,.5f);
 	
 	protected ArrayList<ArrayList<Float>> walls = new ArrayList<ArrayList<Float>>();
 	
+	
+
+	protected Animation lilyAnimation2;
+	protected Animation openingFlowerAnimation2;
+	protected Animation closingFlowerAnimation2;
+	protected Animation closedFlowerAnimation2;
+	protected Animation openFlowerAnimation2;
+
+	protected TextureRegion lilycurrentFrame2;
+	protected TextureRegion closedFlowercurrentFrame2;
+	protected TextureRegion openFlowercurrentFrame2;
+	protected TextureRegion openingFlowercurrentFrame2;
+	protected TextureRegion closingFlowerCurrentFrame2;
 
 	/**
 	 * Preloads the assets for this controller.
@@ -231,9 +253,9 @@ public abstract class WorldController implements Screen {
 		if (worldAssetState != AssetState.EMPTY) {
 			return;
 		}
-		
+
 		worldAssetState = AssetState.LOADING;
-		
+
 		manager.load(KOI_TEXTURE, Texture.class);
 		assets.add(KOI_TEXTURE);
 
@@ -286,31 +308,41 @@ public abstract class WorldController implements Screen {
 
 		manager.load(OVERLAY, Texture.class);
 		assets.add(OVERLAY);
-		
+
 		manager.load(BACKGROUND_FILE_N, Texture.class);
 		assets.add(BACKGROUND_FILE_N);
-		
+
 		manager.load(BACKGROUND_FILE_D, Texture.class);
 		assets.add(BACKGROUND_FILE_D);
-		
+
 		manager.load(BACKGROUND_FILE_S, Texture.class);
 		assets.add(BACKGROUND_FILE_S);
-		
+
 		manager.load(OVERLAY_FILE, Texture.class);
 		assets.add(OVERLAY_FILE);
-		
+
 		manager.load(ARROW, Texture.class);
 		assets.add(ARROW);
 		
-		referenceC.a = .3f;
+		manager.load(TUTORIAL_TEXTURE1, Texture.class);
+		assets.add(TUTORIAL_TEXTURE1);
+		manager.load(TUTORIAL_TEXTURE2, Texture.class);
+		assets.add(TUTORIAL_TEXTURE2);
+		manager.load(TUTORIAL_TEXTURE3, Texture.class);
+		assets.add(TUTORIAL_TEXTURE3);
+		manager.load(TUTORIAL_TEXTURE4, Texture.class);
+		assets.add(TUTORIAL_TEXTURE4);
 		
+
+		referenceC.a = .3f;
+
 		// Load the font
 		FreetypeFontLoader.FreeTypeFontLoaderParameter size2Params = new FreetypeFontLoader.FreeTypeFontLoaderParameter();
 		size2Params.fontFileName = FONT_FILE;
 		size2Params.fontParameters.size = FONT_SIZE;
 		manager.load(FONT_FILE, BitmapFont.class, size2Params);
 		assets.add(FONT_FILE);
-		
+
 		FreetypeFontLoader.FreeTypeFontLoaderParameter size3Params = new FreetypeFontLoader.FreeTypeFontLoaderParameter();
 		size3Params.fontFileName = FONT_FILE2;
 		size3Params.fontParameters.size = FONT_SIZE2;
@@ -318,9 +350,9 @@ public abstract class WorldController implements Screen {
 		assets.add(FONT_FILE2);
 	}
 
-	
+
 	protected TextureRegion[] splice(int cols, int rows, String filePath){
-		
+
 		Texture sheet = new Texture(Gdx.files.internal(filePath));
 
 		TextureRegion[][] tmp = TextureRegion.split(sheet, sheet.getWidth()/cols, sheet.getHeight()/rows);
@@ -333,9 +365,9 @@ public abstract class WorldController implements Screen {
 		}
 		return Frames;
 	}	
-	
-	
-	
+
+
+
 	/**
 	 * Loads the assets for this controller.
 	 *
@@ -350,16 +382,16 @@ public abstract class WorldController implements Screen {
 		if (worldAssetState != AssetState.LOADING) {
 			return;
 		}
-		
+
 		deathSound = Gdx.audio.newMusic(Gdx.files.internal(LIGHTING_SOUND));
 		deathSound.setLooping(false);
-		
+
 		int cols = 11;
 		int rows = 1;
 
 		//animationDef
 		//load the animation content here
-		
+
 		lilyFrames = splice(11, 1, "tethers/lotus_strip.png");
 		//lilyFramesDay = splice(47, "tethers/Lily_Day.png");
 		lilyFramesNight = splice(47, 1, LILY_TEXTURE_N);
@@ -367,19 +399,19 @@ public abstract class WorldController implements Screen {
 		goalFrames = splice(4,20, GOAL_TEXTURE);
 		goalAnimation = new Animation(.01f, goalFrames);
 		//lilyAnimation = new Animation(.2f, lilyFrames);
-		
+
 
 		cols = 11;
 		rows = 1;
 
-		
+
 		closedFlowerFramesDay = splice(26, 1, "tethers/Floating_Closed_Day_small.png");
 		closedFlowerFramesNight = splice(26, 1, "tethers/Floating_Closed_Night_small.png");
 		closedFlowerFramesSunset = splice(26, 1, "tethers/Floating_Closed_Sunset_small.png");
 
-		
+
 		int index = 0;
-		
+
 		openFlowerFramesDay = splice(26, 1, "tethers/Floating_Open_Day_small.png");
 		openFlowerFramesNight = splice(26, 1, "tethers/Floating_Open_Night_small.png");
 		openFlowerFramesSunset = splice(26, 1, "tethers/Floating_Open_Sunset_small.png");
@@ -438,7 +470,7 @@ public abstract class WorldController implements Screen {
 		enemyTexture = createTexture(manager,ENEMY_TEXTURE,false);
 		koiTexture = koiSFrames[0];
 		//koiTexture = createTexture(manager, KOI_TEXTURE, false);
-		
+
 		//lilyTexture = lilyFramesNight[0];
 		lilyTexture = lilyFrames[0];
 		lanternTexture = closedFlowerFramesDay[0];
@@ -446,7 +478,9 @@ public abstract class WorldController implements Screen {
 		shadowTexture = createTexture(manager, SHADOW_TEXTURE, false);
 		//goalTexture = createTexture(manager, GOAL_TEXTURE, false);
 		goalTexture = goalFrames[0];
+
 		UILotusTexture = createTexture(manager, UI_FLOWER, false);	
+
 		earthTile = createTexture(manager,EARTH_FILE_N,true);
 		earthTileDay = createTexture(manager,EARTH_FILE_D, true);
 		earthTileNight = createTexture(manager,EARTH_FILE_N, true);
@@ -455,37 +489,42 @@ public abstract class WorldController implements Screen {
 		rockDay = createTexture(manager,ROCK_FILE_D, true);
 		rockNight = createTexture(manager,ROCK_FILE_N, true);
 		rockSunset = createTexture(manager,ROCK_FILE_S, true);
-		
-		
+
+
 		whirlpoolTexture = createTexture(manager,WHIRLPOOL_TEXTURE,false);
 		whirlpoolFlipTexture = createTexture(manager,WHIRLPOOL_FLIP_TEXTURE,false);
 		Arrow = createTexture(manager, ARROW, false);
 		
-		
-		
-		
+		tutorial1 = createTexture(manager, TUTORIAL_TEXTURE1, false);
+		tutorial2 = createTexture(manager, TUTORIAL_TEXTURE2, false);
+		tutorial3 = createTexture(manager, TUTORIAL_TEXTURE3, false);
+		tutorial4 = createTexture(manager, TUTORIAL_TEXTURE4, false);
+
+
+
+
 		// Allocate the tiles
 
-		
+
 		setBackground(manager.get(BACKGROUND_FILE_N, Texture.class), 1);
 		getBackground(1).setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
-		
+
 		setBackground(manager.get(BACKGROUND_FILE_D, Texture.class), 0);
 		getBackground(0).setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
-		
+
 		setBackground(manager.get(BACKGROUND_FILE_S, Texture.class), 2);
 		getBackground(2).setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
-		
+
 		overlay = manager.get(OVERLAY_FILE, Texture.class);
 		overlay.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
-		
+
 		// Allocate the font
 		if (manager.isLoaded(FONT_FILE)) {
 			displayFont = manager.get(FONT_FILE,BitmapFont.class);
 		} else {
 			displayFont = null;
 		}
-		
+
 		if (manager.isLoaded(FONT_FILE2)) {
 			secondFont = manager.get(FONT_FILE2,BitmapFont.class);
 		} else {
@@ -494,7 +533,7 @@ public abstract class WorldController implements Screen {
 
 		worldAssetState = AssetState.COMPLETE;
 	}
-	
+
 	/*private void backgroundCycle(AssetManager manager){
 		if (dayTime == 1){
 			setBackground(manager.get(BACKGROUND_FILE_N, Texture.class));
@@ -507,10 +546,10 @@ public abstract class WorldController implements Screen {
 		if(dayTime == 2){
 			setBackground(manager.get(BACKGROUND_FILE_S, Texture.class));
 			getBackground().setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
-			
+
 		}
 	}*/
-	
+
 	/**
 	 * Returns a newly loaded texture region for the given file.
 	 *
@@ -533,10 +572,17 @@ public abstract class WorldController implements Screen {
 			return region;
 		}
 		return null;
+	}	
+	
+	
+	public void setDayTime(int i, int fadeOut, int fadeIn){
+		dayTime = i;
+		this.fadeOut = fadeOut;
+		this.fadeIn = fadeIn;
 	}
 	
-	public void setDayTime(int i){
-		dayTime = i;
+	public void setLevelAlpha(float alpha){
+		levelAlpha.set(255, 255, 255, alpha);
 	}
 	
 	/**
@@ -561,7 +607,7 @@ public abstract class WorldController implements Screen {
 		}
 		return null;
 	}
-	
+
 	/** 
 	 * Unloads the assets for this game.
 	 * 
@@ -571,13 +617,13 @@ public abstract class WorldController implements Screen {
 	 * @param manager Reference to global asset manager.
 	 */
 	public void unloadContent(AssetManager manager) {
-    	for(String s : assets) {
-    		if (manager.isLoaded(s)) {
-    			manager.unload(s);
-    		}
-    	}
+		for(String s : assets) {
+			if (manager.isLoaded(s)) {
+				manager.unload(s);
+			}
+		}
 	}
-	
+
 	/** Exit code for quitting the game */
 	public static final int EXIT_QUIT = 0;
 	public static final int EXIT_MAIN = 9;
@@ -587,8 +633,8 @@ public abstract class WorldController implements Screen {
 	public static final int EXIT_OPTIONS = 13;
 	public static final int EXIT_NEXT = 14;
 	public static final int EXIT_PREV = 15;
-	
-    /** How many frames after winning/losing do we continue? */
+
+	/** How many frames after winning/losing do we continue? */
 	public static final int EXIT_COUNT = 120;
 
 	/** The amount of time for a physics engine step. */
@@ -597,14 +643,14 @@ public abstract class WorldController implements Screen {
 	public static final int WORLD_VELOC = 6;
 	/** Number of position iterations for the constrain solvers */
 	public static final int WORLD_POSIT = 2;
-	
+
 	/** Width of the game world in Box2d units */
 	protected static final float DEFAULT_WIDTH  = 32.0f;
 	/** Height of the game world in Box2d units */
 	protected static final float DEFAULT_HEIGHT = 18.0f;
 	/** The default value of gravity (going down) */
 	protected static final float DEFAULT_GRAVITY = -4.9f;
-	
+
 	/** Reference to the game canvas */
 	protected GameCanvas canvas;
 	/** All the objects in the world. */
@@ -613,7 +659,7 @@ public abstract class WorldController implements Screen {
 	protected PooledList<Obstacle> addQueue = new PooledList<Obstacle>();
 	/** Listener that will update the player mode when we are done */
 	protected ScreenListener listener;
-	
+
 	protected HUDitems HUD;
 
 	/** The Box2D world */
@@ -622,7 +668,7 @@ public abstract class WorldController implements Screen {
 	protected Rectangle bounds;
 	/** The world scale */
 	protected Vector2 scale;
-	
+
 	/** Whether or not this is an active controller */
 	public boolean active;
 	/** Whether we have completed this level */
@@ -633,6 +679,11 @@ public abstract class WorldController implements Screen {
 	private boolean debug;
 	/** Countdown active for winning or losing */
 	private int countdown;
+
+	private int cw;
+	private int ch;
+	protected int fadeIn;
+	protected int fadeOut;
 	
 
 	/**
@@ -680,7 +731,7 @@ public abstract class WorldController implements Screen {
 			countdown = EXIT_COUNT;
 		}
 		complete = value;
-//		if (value) waitSeconds(3);
+		//		if (value) waitSeconds(3);
 	}
 
 	/**
@@ -707,7 +758,7 @@ public abstract class WorldController implements Screen {
 		}
 		failed = value;
 	}
-	
+
 	/**
 	 * Returns true if this is the active screen
 	 *
@@ -727,7 +778,7 @@ public abstract class WorldController implements Screen {
 	public GameCanvas getCanvas() {
 		return canvas;
 	}
-	
+
 	/**
 	 * Sets the canvas associated with this controller
 	 *
@@ -741,7 +792,7 @@ public abstract class WorldController implements Screen {
 		this.scale.x = canvas.getWidth()/bounds.getWidth();
 		this.scale.y = canvas.getHeight()/bounds.getHeight();
 	}
-	
+
 	/**
 	 * Creates a new game world with the default values.
 	 *
@@ -751,7 +802,7 @@ public abstract class WorldController implements Screen {
 	 */
 	protected WorldController() {
 		this(new Rectangle(0,0,DEFAULT_WIDTH,DEFAULT_HEIGHT), 
-			 new Vector2(0,DEFAULT_GRAVITY));
+				new Vector2(0,DEFAULT_GRAVITY));
 	}
 
 	/**
@@ -790,7 +841,7 @@ public abstract class WorldController implements Screen {
 		active = false;
 		countdown = -1;
 	}
-	
+
 	/**
 	 * Dispose of all (non-static) resources allocated to this mode.
 	 */
@@ -833,13 +884,13 @@ public abstract class WorldController implements Screen {
 		objects.add(obj);
 		obj.activatePhysics(world);
 	}
-	
+
 	protected void removeObject(Obstacle obj) {
 		assert inBounds(obj) : "Object is not in bounds";
 		objects.remove(obj);
 		obj.deactivatePhysics(world);
 	}
-	
+
 	protected void addHUD(HUDitems h){
 		HUD = h;
 	}
@@ -858,14 +909,14 @@ public abstract class WorldController implements Screen {
 		boolean vert  = (bounds.y <= obj.getY() && obj.getY() <= bounds.y+bounds.height);
 		return horiz && vert;
 	}
-	
+
 	/**
 	 * Resets the status of the game so that we can play again.
 	 *
 	 * This method disposes of the world and creates a new one.
 	 */
 	public abstract void reset();
-	
+
 	/**
 	 * Returns whether to process the update loop
 	 *
@@ -888,12 +939,12 @@ public abstract class WorldController implements Screen {
 		if (input.didDebug()) {
 			debug = !debug;
 		}
-		
+
 		// Handle resets
 		if (input.didReset()) {
 			reset();
 		}
-		
+
 		// Now it is time to maybe switch screens.
 		if (input.didExit()) {
 			listener.exitScreen(this, EXIT_QUIT);
@@ -907,7 +958,7 @@ public abstract class WorldController implements Screen {
 		} 
 		return true;
 	}
-	
+
 	/**
 	 * The core gameplay loop of this world.
 	 *
@@ -919,7 +970,7 @@ public abstract class WorldController implements Screen {
 	 * @param delta Number of seconds since last animation frame
 	 */
 	public abstract void update(float dt);
-	
+
 	/**
 	 * Processes physics
 	 *
@@ -934,7 +985,7 @@ public abstract class WorldController implements Screen {
 		while (!addQueue.isEmpty()) {
 			addObject(addQueue.poll());
 		}
-		
+
 		// Turn the physics engine crank.
 		world.step(WORLD_STEP,WORLD_VELOC,WORLD_POSIT);
 
@@ -954,7 +1005,7 @@ public abstract class WorldController implements Screen {
 			}
 		}
 	}
-	
+
 	/**
 	 * Draw the physics objects to the canvas
 	 *
@@ -968,14 +1019,16 @@ public abstract class WorldController implements Screen {
 	public void draw(float delta) {
 		canvas.clear();
 		canvas.begin();
+		cw = canvas.getWidth();
+		ch = canvas.getHeight();
 		for (int i = -5; i < 5; i++) {
 			for (int j = -5; j < 5; j++) {
-
-				canvas.draw(getBackground(dayTime), Color.WHITE, canvas.getWidth()*i * 2, canvas.getHeight()*j * 2, 
-													 canvas.getWidth() * 2,   canvas.getHeight() * 2);
+				//canvas.draw(getBackground(dayTime), Color.WHITE, cw*i * 2, ch*j * 2, cw * 2,   ch * 2);
+				canvas.draw(getBackground(fadeOut), Color.WHITE, cw*i * 2, ch*j * 2, cw * 2,   ch * 2);
+				canvas.draw(getBackground(fadeIn), levelAlpha, cw*i * 2, ch*j * 2, cw * 2,   ch * 2);
 			}
 		}
-//		canvas.draw(background, Color.WHITE, 0, 0, canvas.getWidth(), canvas.getHeight());
+		//		canvas.draw(background, Color.WHITE, 0, 0, canvas.getWidth(), canvas.getHeight());
 		//canvas.draw(rocks, Color.WHITE, 0, 0, canvas.getWidth(), canvas.getHeight());
 		
 		
@@ -984,16 +1037,15 @@ public abstract class WorldController implements Screen {
 		for(Obstacle obj : objects) {
 			obj.draw(canvas);
 		}
-		
+
 		for (int i = -5; i < 5; i++) {
 			for (int j = -5; j < 5; j++) {
-				canvas.draw(overlay, referenceC, canvas.getWidth()*i, canvas.getHeight()*j, 
-						 canvas.getWidth(),   canvas.getHeight());
+				canvas.draw(overlay, referenceC, cw*i, ch*j, cw,   ch);
 			}
 		}
-		
+
 		canvas.end();
-		
+
 		if (debug) {
 			canvas.beginDebug();
 			for(Obstacle obj : objects) {
@@ -1001,9 +1053,9 @@ public abstract class WorldController implements Screen {
 			}
 			canvas.endDebug();
 		}
-		
-		
-		
+
+
+
 		// Final message
 		if (complete && !failed) {
 			displayFont.setColor(Color.YELLOW);
@@ -1018,7 +1070,7 @@ public abstract class WorldController implements Screen {
 			canvas.end();
 		}
 	}
-	
+
 	/**
 	 * Called when the Screen is resized. 
 	 *
@@ -1044,9 +1096,9 @@ public abstract class WorldController implements Screen {
 		InputController input = InputController.getInstance();
 		if (active) {
 			if (preUpdate(delta)) {
-					update(delta); // This is the one that must be defined.
-					postUpdate(delta);
-				
+				update(delta); // This is the one that must be defined.
+				postUpdate(delta);
+
 			}
 			draw(delta);
 		}
@@ -1070,7 +1122,7 @@ public abstract class WorldController implements Screen {
 	public void resume() {
 		// TODO Auto-generated method stub
 	}
-	
+
 	/**
 	 * Called when this screen becomes the current screen for a Game.
 	 */
@@ -1097,36 +1149,37 @@ public abstract class WorldController implements Screen {
 	}
 
 	public static Texture getBackground(int n) {
-		if (n == 1){
-			return backgroundN;
-		}
-		else if (n == 0){
+		if (n == 0){
 			return backgroundD;
 		}
-		else{
+		else if (n == 1){
 			return backgroundS;
 		}
+		else if (n == 2){
+			return backgroundN;
+		}
+		return backgroundD;
 	}
 
 	public static void setBackground(Texture background, int n) {
-		if (n == 1){
+		if (n == 2){
 			WorldController.backgroundN = background;
 		}
 		if (n == 0){
 			WorldController.backgroundD = background;
 		}
-		if (n == 2){
+		if (n == 1){
 			WorldController.backgroundS = background;
 		}
 	}
-	
+
 	public static void waitSeconds(int seconds) {
 		long start = System.currentTimeMillis();
 		while (System.currentTimeMillis() < start + seconds * 1000) {
 			continue;
 		}
 	}
-	
+
 	protected static Vector2 vectorOfString(String s) {
 		int comma = s.indexOf(",");
 		int openParens = s.indexOf("(");

@@ -44,7 +44,7 @@ public class PolygonObstacle extends SimpleObstacle {
 	protected PolygonShape[] shapes;
 	/** Texture information for this object */
 	protected PolygonRegion region;
-	
+
 	/** The polygon vertices, scaled for drawing */
 	private float[] scaled;
 	/** The triangle indices, used for drawing */
@@ -59,7 +59,17 @@ public class PolygonObstacle extends SimpleObstacle {
 	/** Cache of the polygon vertices (for resizing) */
 	private float[] vertices;
 	
-	public ArrayList<Float> drawnWall;
+	//Custom second texture for Downstream land fading
+	protected TextureRegion overlayTexture;
+	protected PolygonRegion overlayRegion;
+	private Color overlayFade;
+	
+	public void setOverlay(TextureRegion value, Color fade){
+		overlayTexture = value;
+		overlayRegion = new PolygonRegion(overlayTexture,scaled,tridx);
+		overlayFade = fade;
+	}
+
 	
 	/** 
 	 * Returns the dimensions of this box
@@ -235,6 +245,10 @@ public class PolygonObstacle extends SimpleObstacle {
 			// WARNING: PolygonRegion constructor by REFERENCE
 			region = new PolygonRegion(texture,scaled,tridx);
 		}
+		if (overlayTexture != null) {
+			// WARNING: PolygonRegion constructor by REFERENCE
+			overlayRegion = new PolygonRegion(overlayTexture,scaled,tridx);
+		}
 
 	}
 	
@@ -337,6 +351,9 @@ public class PolygonObstacle extends SimpleObstacle {
 		region = new PolygonRegion(texture,scaled,tridx);
 	}
 	
+	
+	
+	
     /**
      * Sets the drawing scale for this physics object
      *
@@ -362,6 +379,9 @@ public class PolygonObstacle extends SimpleObstacle {
 		if (texture != null) {
 			region = new PolygonRegion(texture,scaled,tridx);
 		}
+		if (texture != null) {
+			overlayRegion = new PolygonRegion(overlayTexture,scaled,tridx);
+		}
     	drawScale.set(x,y);
     }
 	
@@ -376,6 +396,9 @@ public class PolygonObstacle extends SimpleObstacle {
 //		canvas.drawPath(drawnWall);
 		if (region != null) {
 			canvas.draw(region,Color.WHITE,0,0,getX()*drawScale.x,getY()*drawScale.y,getAngle(),1,1);
+		}
+		if(overlayRegion != null){
+			canvas.draw(overlayRegion,overlayFade,0,0,getX()*drawScale.x,getY()*drawScale.y,getAngle(),1,1);
 		}
 	}
 

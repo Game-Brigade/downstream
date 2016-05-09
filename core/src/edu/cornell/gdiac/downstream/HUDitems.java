@@ -17,12 +17,31 @@ public class HUDitems extends Obstacle {
 	private TextureRegion EnergyTexture;
 	private TextureRegion Lilypad;
 	private BitmapFont font;
+	
+	private boolean tutorial = false;
+	private TextureRegion tutorialTexture;
 
 	public HUDitems(){
 		TotalLotus = 0;
 		LotusLit = 0;
 		Energy = 0;
 		font = new BitmapFont();
+	}
+
+	/***
+	 * sets to true if you are on a tutorial level. Should only be true if it is level 1, 2 or 3
+	 * @param b tutorial status
+	 */
+	public void setTutorialStatus(boolean b){
+		tutorial = b;
+	}
+	
+	/***
+	 * sets the image that will be displayed before the level as the tutorial
+	 * @param tr image of the tutorial
+	 */
+	public void setTutorialTexture(TextureRegion tr){
+		tutorialTexture = tr;
 	}
 
 	public HUDitems(int lotuses, TextureRegion lily, TextureRegion energy, BitmapFont displayFont){
@@ -66,7 +85,11 @@ public class HUDitems extends Obstacle {
 	@Override
 	public void draw(GameCanvas canvas) {
 		// TODO Auto-generated method stub
-		if (TotalLotus != 0 && EnergyTexture != null && Lilypad != null) {
+		if (tutorial && tutorialTexture != null){
+			canvas.draw(tutorialTexture, canvas.getWidth()/2 - tutorialTexture.getRegionWidth()/2, canvas.getHeight()/2 - tutorialTexture.getRegionHeight()/2);
+			
+		}
+		else if (TotalLotus != 0 && EnergyTexture != null && Lilypad != null) {
 			canvas.draw(EnergyTexture, new Color(0, 0, 0, .5f), canvas.getWidth()/1.1f - 450f - 40, canvas.getHeight()/1.1f - 20, energyLen(), 50);
 			canvas.draw(EnergyTexture, new Color(0, 0, 0, .2f), canvas.getWidth()/1.1f - 450f - 50 , canvas.getHeight()/1.1f - 30, 360, 70);
 			canvas.drawHUDText(TotalLotus - LotusLit  + "", font, -9, Lilypad);
