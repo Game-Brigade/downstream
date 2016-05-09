@@ -73,12 +73,12 @@ public class WhirlpoolModel extends WheelObstacle {
 		float angleSlope = Math.abs((this.angle.y - this.getPosition().y) / (this.angle.y - this.getPosition().x));
 		
 		//System.out.println(numOfRotations);
-		if(fishVec.isCollinear(angleVec, .11f) && numOfRotations >= 8){
+		if(fishVec.hasSameDirection(angleVec) && fishSlope < angleSlope + .01 && fishSlope > angleSlope - .01 && numOfRotations >= 8){
 			koi.burst();
 			koi.setExitingWhirlpool(true);
 			numOfRotations = -1;
 		}
-		else if(fishVec.isCollinear(angleVec, .11f)){
+		else if(fishVec.hasSameDirection(angleVec) && fishSlope < angleSlope + .01 && fishSlope > angleSlope - .01){
 			numOfRotations += 1;
 		}
 		else{}
