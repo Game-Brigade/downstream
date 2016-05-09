@@ -158,7 +158,7 @@ public class PlayerModel extends BoxObstacle {
 		}
 		if(isTethered()){
 			// TRUE CIRCLE
-			if(getPosition().sub(dest).len2() < .01){
+			if(getPosition().sub(dest).len2() < .05){
 				pastTanTether = false;
 				attemptingTether = false;
 				dest = getPosition();
