@@ -29,8 +29,9 @@ public class TetherModel extends WheelObstacle {
 	public static final int TETHER_DEFAULT_RANGE = 8;
 	
 	private static final String LIGHTTEXTURE = "tethers/lotusLight.png";
+	private static final String LIGHTTEXTURE2 = "tethers/lotusLight2.png";
 	private TextureRegion lotusLightTexture = new TextureRegion(new Texture(Gdx.files.internal(LIGHTTEXTURE)));
-	
+	private TextureRegion lotusLightTexture2 = new TextureRegion(new Texture(Gdx.files.internal(LIGHTTEXTURE2)));
 	
 	private static final BodyDef.BodyType TETHER_BODY_TYPE = BodyDef.BodyType.StaticBody;
 
@@ -47,6 +48,7 @@ public class TetherModel extends WheelObstacle {
 	public boolean set = false;
 
 	private static TextureRegion lightingTexture;
+	private static TextureRegion lightingTexture2;
 	
 	public boolean isTethered = false;
 	
@@ -155,6 +157,11 @@ public class TetherModel extends WheelObstacle {
 		setLightingScale();
 		canvas.draw(lotusLightTexture,new Color(255, 255, 255, .5f),texture.getRegionHeight()/2,texture.getRegionWidth()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),lightingScale,lightingScale);
 	}
+	
+	public void drawLight2(GameCanvas canvas){
+		//setLightingScale();
+		canvas.draw(lotusLightTexture2,new Color(255, 255, 255, .5f),texture.getRegionHeight()/2,texture.getRegionWidth()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),.6f,.6f);
+	}
 
 	public void setOverlay(TextureRegion tr){
 		overlayTexture = tr;
@@ -195,8 +202,11 @@ public class TetherModel extends WheelObstacle {
 			}
 			findCircle();
 			canvas.draw(lightingTexture,new Color(255, 255, 255, alpha), lightingTexture.getRegionWidth()/2, lightingTexture.getRegionHeight()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),sparkSize,sparkSize);
-			if (inrange || inpath){
+			if (inrange){
 				drawLight(canvas);
+			}
+			else if (inpath){
+				drawLight2(canvas);
 			}
 		}
 		/*if (overlayTexture != null){

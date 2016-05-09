@@ -93,6 +93,7 @@ public class InputController {
 	private boolean minusPressed;
 	private boolean minusPrevious;
 	private boolean tutorialPressed;
+	private boolean helpPressed;
 	
 	/** How much did we move horizontally? */
 	private float horizontal;
@@ -115,6 +116,7 @@ public class InputController {
 	public boolean fast;
 	public boolean kill;
 	public boolean tutorial;
+	public boolean help;
 	
 	public enum SelectionType {
 		Lilypad, 
@@ -501,6 +503,9 @@ public class InputController {
 		else{
 			tutorial = false;
 		}
+		if (Gdx.input.isKeyJustPressed(Input.Keys.H)){
+			helpPressed = !helpPressed;
+		}
 		
 		// Mouse results
         tertiaryPressed = Gdx.input.isButtonPressed(Input.Buttons.LEFT);
@@ -508,6 +513,13 @@ public class InputController {
 		crosshair.scl(1/scale.x,-1/scale.y);
 		crosshair.y += bounds.height;
 		clampPosition(bounds);
+	}
+	
+	public boolean helpPressed(){
+		return helpPressed;
+	}
+	public void setHelpPressed(boolean b){
+		helpPressed = b;
 	}
 	
 	/**

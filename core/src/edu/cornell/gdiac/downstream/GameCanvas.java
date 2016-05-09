@@ -975,11 +975,12 @@ public class GameCanvas {
 		}
     	
     	spriteBatch.setColor(Color.WHITE);
-    	float h = 100;
-    	float w = 100;
-    	spriteBatch.draw(lilypad, (getWidth() - w/2)/1.1f - 14, (getHeight() - h/2)/1.1f + offset + 10, w, h);
+    	float h = 70;
+    	float w = 70;
+    	float left = 70;
+    	spriteBatch.draw(lilypad, (getWidth() - w/2)/1.1f - 14 + left, (getHeight() - h/2)/1.1f + offset + 10, w, h);
     	GlyphLayout layout = new GlyphLayout(font,text);
-		float x = (getWidth()  - layout.width) / 1.1f;
+		float x = (getWidth()  - layout.width) / 1.1f + left;
 		float y = (getHeight() + layout.height) / 1.12f;
 		font.setColor(Color.WHITE);
 		font.draw(spriteBatch, layout, x, y+offset + 5);
@@ -1247,16 +1248,15 @@ public class GameCanvas {
 		start = start.cpy();
 		end = end.cpy();
 		Gdx.gl.glLineWidth(width);
-		Gdx.gl.glEnable(GL30.GL_BLEND);
+		/*Gdx.gl.glEnable(GL30.GL_BLEND);
 		Gdx.gl.glBlendFunc(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA);
-        leadingLine.setProjectionMatrix(camera.combined);
+        */
+		leadingLine.setProjectionMatrix(camera.combined);
         leadingLine.begin(ShapeRenderer.ShapeType.Line);
-        leadingLine.setColor(new Color(0, 0, 0, .75f));
-//        local.applyTo(start);
-//        local.applyTo(end);
+        leadingLine.setColor(Color.BLACK);
         leadingLine.line(start, end);
         leadingLine.end();
-        Gdx.gl.glDisable(GL30.GL_BLEND);
+        /*Gdx.gl.glDisable(GL30.GL_BLEND);*/
         Gdx.gl.glLineWidth(1);
     }
 	
@@ -1280,7 +1280,7 @@ public class GameCanvas {
 		Gdx.gl.glLineWidth(1);
         leadingLine.setProjectionMatrix(camera.combined);
         leadingLine.begin(ShapeRenderer.ShapeType.Line);
-        leadingLine.setColor(Color.BLACK);
+        leadingLine.setColor(Color.BLACK.cpy());
 //        local.applyTo(start);
 //        local.applyTo(end);
         leadingLine.line(start, end);
@@ -1331,11 +1331,11 @@ public class GameCanvas {
 			vectorPath.add(new Vector2(path.get(i),path.get(i+1)));
 		}
 		for (int i = 0; i < vectorPath.size()-1;i++) {
-			drawLeadingLine(vectorPath.get(i), vectorPath.get(i+1));
-//			drawOutline(vectorPath.get(i), vectorPath.get(i+1));
+			//drawLeadingLine(vectorPath.get(i), vectorPath.get(i+1));
+		drawOutline(vectorPath.get(i), vectorPath.get(i+1));
 		}
-		drawLeadingLine(vectorPath.get(0), vectorPath.get(vectorPath.size()-1));
-//		drawOutline(vectorPath.get(0), vectorPath.get(vectorPath.size()-1));
+		//drawLeadingLine(vectorPath.get(0), vectorPath.get(vectorPath.size()-1));
+		drawOutline(vectorPath.get(0), vectorPath.get(vectorPath.size()-1));
 		
 	}
 }

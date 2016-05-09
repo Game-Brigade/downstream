@@ -89,7 +89,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private ArrayList<WheelObstacle> rocks = new ArrayList<WheelObstacle>();
 	private ArrayList<EnemyModel> enemies = new ArrayList<EnemyModel>();
 	private ArrayList<WhirlpoolModel> wpools = new ArrayList<WhirlpoolModel>();
-	private ArrayList<ArrayList<Float>> walls = new ArrayList<ArrayList<Float>>();
+	
 	private PlayerModel koi;
 	private BoxObstacle goalTile;
 	private EnemyModel eFish;
@@ -401,8 +401,10 @@ public class DownstreamController extends WorldController implements ContactList
 			//			for (Vector2 vector : enemyPath) {vector.x /= scale.x; vector.y /= scale.y;}
 			//			System.out.println(enemyPath);
 			TextureRegion etexture = enemyTexture;
-			dwidth  = etexture.getRegionWidth()/scale.x;
-			dheight = etexture.getRegionHeight()/scale.y;
+			//dwidth  = etexture.getRegionWidth()/scale.x;
+			dwidth = 2.85f;
+			//dheight = etexture.getRegionHeight()/scale.y;
+			dheight = 1.675f;
 			eFish = new EnemyModel(enemyPos.x, enemyPos.y, dwidth, dheight, enemyPath);
 			eFish.setDensity(ENEMY_DENSITY);
 			eFish.setFriction(ENEMY_FRICTION);
@@ -614,13 +616,28 @@ public class DownstreamController extends WorldController implements ContactList
 		cameraController.zoomStart(levelCamWidth, levelCamHeight, center, koi.getPosition().cpy().scl(scale));
 
 		HUD = new HUDitems(lanterns.size(), UILotusTexture, energyBarTexture, secondFont);
-		HUD.setTutorialTexture(tutorial1);
-		addHUD(HUD);
-		
 		if (this.level == 1){
 			HUD.setTutorialTexture(tutorial1);
+			HUD.setHelpTexture(helpTexture);
 			HUD.setTutorialStatus(true);
 		}
+		else if (this.level == 2){
+			HUD.setTutorialTexture(tutorial2);
+			HUD.setHelpTexture(helpTexture);
+			HUD.setTutorialStatus(true);
+		}
+		else if (this.level == 3){
+			HUD.setTutorialTexture(tutorial3);
+			HUD.setHelpTexture(helpTexture);
+			HUD.setTutorialStatus(true);
+		}
+		else if (this.level == 4){
+			HUD.setTutorialTexture(tutorial4);
+			HUD.setHelpTexture(helpTexture);
+			HUD.setTutorialStatus(true);
+		}
+		addHUD(HUD);
+
 
 
 	}
@@ -669,9 +686,14 @@ public class DownstreamController extends WorldController implements ContactList
 
 	public void update(float dt) {
 		InputController input = InputController.getInstance();
-		if (input.tutorial == true){
+		if (input.tutorial){
 			HUD.setTutorialStatus(false);
+			input.setHelpPressed(false);
 		}
+		if (input.helpPressed()){
+			HUD.setTutorialStatus(true);
+		}
+		else
 		if (collisionController.didWin()) {
 			setComplete(true);
 			tillNextLevel++;
@@ -695,9 +717,13 @@ public class DownstreamController extends WorldController implements ContactList
 		if (koi.isDead()) {
 			deathSound.play();
 			koi.die();
+			koi.setLinearVelocity(new Vector2(0,0));
 			for (TetherModel t : tethers) {
 				t.setTethered(false);
 			}
+			/*if (this.level == 8){
+				enemies.get(0);
+			}*/
 			respawn();
 		} else {
 			// ZOOM IN TO PLAYER AT START OF LEVEL
@@ -858,8 +884,11 @@ public class DownstreamController extends WorldController implements ContactList
 			koiCcurrentFrame = koiCAnimation.getKeyFrame(stateTime, true);
 			KoiCcurrentFrameFlipped = koiCAnimationFlipped.getKeyFrame(stateTime, true);
 			goalCurrentFrame = goalAnimation.getKeyFrame(stateTime, true);
+			enemyCurrentFrame = enemyAnimation.getKeyFrame(stateTime, true);
 
-
+			for(int i = 0; i < enemies.size(); i++){
+				enemies.get(i).setTexture(enemyCurrentFrame);
+			}
 			//lilycurrentFrame2 = lilyAnimation2.getKeyFrame(stateTime, true);
 			closedFlowercurrentFrame2 = closedFlowerAnimation2.getKeyFrame(stateTime, true);
 			openFlowercurrentFrame2 = openFlowerAnimation2.getKeyFrame(stateTime, true);
