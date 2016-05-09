@@ -288,9 +288,7 @@ public class DownstreamController extends WorldController implements ContactList
 		} else {
 			level = LevelEditor.loadFromJson();
 		}
-		
-		
-		
+				
 		
 		// 0 is day 1 is sunset 2 is night
 		int staticNDS = dayNightBinary(this.level);
