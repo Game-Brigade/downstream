@@ -1,0 +1,18 @@
+{
+  "number": 1,
+  "goal": [],
+  "enemiesLevel": {},
+  "lilypads": [
+    {
+      "x": -34.764236,
+      "y": 14.957029
+    }
+  ],
+  "lotuses": [],
+  "walls": [],
+  "shores": [],
+  "whirlpools": [],
+  "map": [],
+  "rocks": []
+}
+Controllers: removed manager for application, 0 managers active
