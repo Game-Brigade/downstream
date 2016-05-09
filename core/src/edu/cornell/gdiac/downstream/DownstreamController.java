@@ -8,7 +8,6 @@
 package edu.cornell.gdiac.downstream;
 
 import java.util.ArrayList;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Random;
@@ -90,7 +89,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private ArrayList<WheelObstacle> rocks = new ArrayList<WheelObstacle>();
 	private ArrayList<EnemyModel> enemies = new ArrayList<EnemyModel>();
 	private ArrayList<WhirlpoolModel> wpools = new ArrayList<WhirlpoolModel>();
-	private ArrayList<ArrayList<Float>> walls = new ArrayList<ArrayList<Float>>();
+//	private ArrayList<ArrayList<Float>> walls = new ArrayList<ArrayList<Float>>();
 	private PlayerModel koi;
 	private BoxObstacle goalTile;
 	private EnemyModel eFish;
@@ -105,6 +104,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private static final float MAX_SPEED = 1.75f;
 	private int respawnTimer = RESPAWN_TIME;
 	private TetherModel checkpoint0;
+	private int tillNextLevel = 0;
 
 	/**
 	 * Preloads the assets for this controller.
@@ -124,7 +124,7 @@ public class DownstreamController extends WorldController implements ContactList
 
 		super.preLoadContent(manager);
 	}
-	
+
 
 
 	/**
@@ -170,7 +170,7 @@ public class DownstreamController extends WorldController implements ContactList
 		whirlpoolsOn = true;
 		world.setGravity(Vector2.Zero);
 		paused = false;
-		
+
 		speed = 1;
 	}
 
@@ -191,6 +191,7 @@ public class DownstreamController extends WorldController implements ContactList
 		lanterns.clear();
 		litlanterns.clear();
 		tethers.clear();
+		rocks.clear();
 		shadows.clear();
 		wpools.clear();
 		objects.clear();
@@ -200,15 +201,15 @@ public class DownstreamController extends WorldController implements ContactList
 
 		dead = false;
 		whirled = false;
-		
+
 		paused = false;
-		
+
 		pauseMenu = new PauseMenuMode(canvas);
 		world = new World(gravity,false);
 		world.setContactListener(this);
 		setComplete(false);
 		setFailure(false);
-		
+
 	}
 
 	/**
@@ -235,9 +236,9 @@ public class DownstreamController extends WorldController implements ContactList
 
 		dead = false;
 		whirled = false;
-		
+
 		paused = false;
-		
+
 		pauseMenu = new PauseMenuMode(canvas);
 		world = new World(gravity,false);
 		world.setContactListener(this);
@@ -246,51 +247,124 @@ public class DownstreamController extends WorldController implements ContactList
 		populateLevel();
 	}
 
+	private Color levelAlpha(int level){
+		return new Color(255, 255, 255, (float)(level % 8)/(15f));
+	}
+
+	private int NightDayDeterminer(int level){
+		int i;
+		if (level < 5){
+			i = 0;
+		}
+		else if (level < 10){
+			i = 1;
+		}
+		else{ i = 2;}
+		return i;
+	}
 	/**
 	 * Lays out the game geography.
 	 */
 	private void populateLevel() {
-
-		int NDS = new Random().nextInt(3);
-		System.out.println(NDS);
-
-		// 0 is day 1 is night 2 is sunset
-		setDayTime(NDS);
-
 		
-		//animation is a bitch
-		if (NDS == 0){
-			//day
-			lilyAnimation = new Animation(.1f, lilyFrames);
-			openingFlowerAnimation = new Animation(.2f, openingFlowerFramesDay);
-			closingFlowerAnimation = new Animation(.2f, closingFlowerFramesDay);
-			closedFlowerAnimation = new Animation(.2f, closedFlowerFramesDay);
-			openFlowerAnimation = new Animation(.2f, openFlowerFramesDay);
-		}
-		else if (NDS == 1){
-			//night
-			lilyAnimation = new Animation(.1f, lilyFrames);
-			openingFlowerAnimation = new Animation(.2f, openingFlowerFramesNight);
-			closingFlowerAnimation = new Animation(.2f, closingFlowerFramesNight);
-			closedFlowerAnimation = new Animation(.2f, closedFlowerFramesNight);
-			openFlowerAnimation = new Animation(.2f, openFlowerFramesNight);
-		}
-		else{
-			//sunset
-			lilyAnimation = new Animation(.1f, lilyFrames);
-			openingFlowerAnimation = new Animation(.2f, openingFlowerFramesSunset);
-			closingFlowerAnimation = new Animation(.2f, closingFlowerFramesSunset);
-			closedFlowerAnimation = new Animation(.2f, closedFlowerFramesSunset);
-			openFlowerAnimation = new Animation(.2f, openFlowerFramesNight);
-		}
-
 		LevelEditor.Level level;
 		if (this.level != -1) {
 			level = LevelEditor.loadFromJson(this.level);
 		} else {
 			level = LevelEditor.loadFromJson();
 		}
+		
+		
+		
+		
+		// 0 is day 1 is sunset 2 is night
+		int NDS = NightDayDeterminer(this.level);
 
+		//Set fade for water/background
+		if(this.level <= 7){
+			setDayTime(NDS,0,1);
+		} else if(this.level <= 15){
+			setDayTime(NDS,1,2);
+		}
+		
+		System.out.println(((this.level-1)%4)/4f);
+		setLevelAlpha(((this.level-1)%4)/4f);
+		
+		
+		System.out.println(this.level);
+		System.out.println(levelAlpha);
+		System.out.println(fadeOut);
+		System.out.println(fadeIn);
+		
+
+		//int NDS = new Random().nextInt(3);
+
+
+		tillNextLevel = 0;
+
+		//animation is a bitch
+		if (true){
+			lilyAnimation2 = new Animation(.1f, lilyFrames);
+			openingFlowerAnimation2 = new Animation(.2f, openingFlowerFramesSunset);
+			closingFlowerAnimation2 = new Animation(.2f, closingFlowerFramesSunset);
+			closedFlowerAnimation2 = new Animation(.2f, closedFlowerFramesSunset);
+			openFlowerAnimation2 = new Animation(.2f, openFlowerFramesSunset);
+			if (NDS == 1){
+				lilyAnimation = new Animation(.1f, lilyFrames);
+				openingFlowerAnimation = new Animation(.2f, openingFlowerFramesDay);
+				closingFlowerAnimation = new Animation(.2f, closingFlowerFramesDay);
+				closedFlowerAnimation = new Animation(.2f, closedFlowerFramesDay);
+				openFlowerAnimation = new Animation(.2f, openFlowerFramesDay);}
+			else if (NDS == 2){
+				lilyAnimation = new Animation(.1f, lilyFrames);
+				openingFlowerAnimation = new Animation(.2f, openingFlowerFramesSunset);
+				closingFlowerAnimation = new Animation(.2f, closingFlowerFramesSunset);
+				closedFlowerAnimation = new Animation(.2f, closedFlowerFramesSunset);
+				openFlowerAnimation = new Animation(.2f, openFlowerFramesSunset);
+			}
+			else{
+				lilyAnimation = new Animation(.1f, lilyFrames);
+				openingFlowerAnimation = new Animation(.2f, openingFlowerFramesNight);
+				closingFlowerAnimation = new Animation(.2f, closingFlowerFramesNight);
+				closedFlowerAnimation = new Animation(.2f, closedFlowerFramesNight);
+				openFlowerAnimation = new Animation(.2f, openFlowerFramesNight);
+			}
+		}
+		/*else{
+			if (NDS == 0){
+				//day
+				lilyAnimation = new Animation(.1f, lilyFrames);
+				openingFlowerAnimation = new Animation(.2f, openingFlowerFramesDay);
+				closingFlowerAnimation = new Animation(.2f, closingFlowerFramesDay);
+				closedFlowerAnimation = new Animation(.2f, closedFlowerFramesDay);
+				openFlowerAnimation = new Animation(.2f, openFlowerFramesDay);
+
+				lilyAnimation2 = new Animation(.1f, lilyFrames);
+				openingFlowerAnimation2 = new Animation(.2f, openingFlowerFramesSunset);
+				closingFlowerAnimation2 = new Animation(.2f, closingFlowerFramesSunset);
+				closedFlowerAnimation2 = new Animation(.2f, closedFlowerFramesSunset);
+				openFlowerAnimation2 = new Animation(.2f, openFlowerFramesSunset);
+			}
+			else{
+				//night
+				lilyAnimation = new Animation(.1f, lilyFrames);
+				openingFlowerAnimation = new Animation(.2f, openingFlowerFramesSunset);
+				closingFlowerAnimation = new Animation(.2f, closingFlowerFramesSunset);
+				closedFlowerAnimation = new Animation(.2f, closedFlowerFramesSunset);
+				openFlowerAnimation = new Animation(.2f, openFlowerFramesSunset);
+
+				lilyAnimation2 = new Animation(.1f, lilyFrames);
+				openingFlowerAnimation2 = new Animation(.2f, openingFlowerFramesNight);
+				closingFlowerAnimation2 = new Animation(.2f, closingFlowerFramesNight);
+				closedFlowerAnimation2 = new Animation(.2f, closedFlowerFramesNight);
+				openFlowerAnimation2 = new Animation(.2f, openFlowerFramesNight);
+			}
+		}*/
+
+
+		
+		
+		
 		cameraController = new CameraController(canvas.getCamera());
 
 		float dwidth;
@@ -299,7 +373,7 @@ public class DownstreamController extends WorldController implements ContactList
 
 		boolean sensorTethers = true;
 		boolean sensorPools = true;
-		
+
 
 		if (level.whirlpools != null) {
 			for (LevelEditor.Vector4 whirlpool: level.whirlpools) {
@@ -364,26 +438,53 @@ public class DownstreamController extends WorldController implements ContactList
 		addObject(goalTile);
 
 		//create shadow(s)
-		if(level.lilypads.size() + level.lilypads.size() > 0){
+		if(level.lotuses.size() > 0){
 			dwidth = shadowTexture.getRegionWidth()/scale.x*.85f;
 			dheight = shadowTexture.getRegionHeight()/scale.y*.85f;
 			ShadowModel shadow = new ShadowModel(goalPos.x, goalPos.y, dwidth, dheight, shadowDest);
 			shadow.setName("shadow");
 			shadow.setDrawScale(scale);
 			shadow.setTexture(shadowTexture);
-			
+
 			shadow.setDensity(BASIC_DENSITY);
 			shadow.setFriction(BASIC_FRICTION);
 			shadow.setRestitution(BASIC_RESTITUTION);
-			
+
 			shadow.setSensor(false);			
 			shadow.setAngle((float) Math.atan2(shadowDest.y-goalPos.y,shadowDest.x-goalPos.x));
 			shadows.add(shadow);
 			addObject(shadow);
 		}
 		
-		
-		
+		if (level.shores != null) {
+			for (ArrayList<Float> shore : level.shores) {
+				PolygonObstacle obj;
+				float[] shoreFloat = new float[shore.size()];
+				for (int i = 0; i < shore.size(); i++) shoreFloat[i] = shore.get(i);
+				obj = new PolygonObstacle(shoreFloat, 0, 0);
+				obj.setBodyType(BodyDef.BodyType.StaticBody);
+				obj.setDensity(BASIC_DENSITY);
+				obj.setFriction(BASIC_FRICTION);
+				obj.setRestitution(BASIC_RESTITUTION);
+				obj.setDrawScale(scale);
+				if (NDS == 0){
+					obj.setTexture(earthTileDay);
+				}
+				if (NDS == 1){
+					obj.setTexture(earthTileDay);
+				}
+				if (NDS == 2){
+					obj.setTexture(earthTileDay);
+				}
+				//obj.setTexture(earthTile);
+				obj.setName("shore");
+				ArrayList<Float> scaledShore = new ArrayList<Float>();
+				for (Float f : shore) scaledShore.add(f*scale.x);
+				walls.add(scaledShore);
+				addObject(obj);
+			}
+		}
+
 		for (ArrayList<Float> wall : level.walls) {
 			PolygonObstacle obj;
 			float[] wallFloat = new float[wall.size()];
@@ -394,49 +495,59 @@ public class DownstreamController extends WorldController implements ContactList
 			obj.setFriction(BASIC_FRICTION);
 			obj.setRestitution(BASIC_RESTITUTION);
 			obj.setDrawScale(scale);
-			if (NDS == 0){
+			if (fadeOut == 0){
 				obj.setTexture(earthTileDay);
 			}
-			if (NDS == 1){
-				obj.setTexture(earthTileNight);
-			}
-			if (NDS == 2){
+			if (fadeOut == 1){
 				obj.setTexture(earthTileSunset);
 			}
+
+			if (fadeIn == 1){
+				obj.setOverlay(earthTileSunset,levelAlpha);
+			}
+			if (fadeIn == 2){
+				obj.setOverlay(earthTileNight,levelAlpha);
+			}
+			
 			//obj.setTexture(earthTile);
 			obj.setName("wall1");
 			ArrayList<Float> scaledWall = new ArrayList<Float>();
 			for (Float f : wall) scaledWall.add(f*scale.x);
 			walls.add(scaledWall);
+//			obj.drawnWall = scaledWall;
 			addObject(obj);
 		}
 		
-		/*
-		for (Vector2 rock : level.rocks) {
-			WheelObstacle obj;
-			obj = new WheelObstacle(rock.x,rock.y,rockDay.getRegionWidth()/2);
-			obj.setBodyType(BodyDef.BodyType.StaticBody);
-			obj.setSensor(true);
-			obj.setDrawScale(scale);
-			if (NDS == 0){
-				obj.setTexture(rockDay);
+
+		if (level.rocks != null) {
+			for (Vector2 rock : level.rocks) {
+				WheelObstacle obj;
+//				System.out.println(rockDay);
+				System.out.println("ROCK" + rockDay.getRegionWidth()/2/scale.x);
+				obj = new WheelObstacle(rock.x,rock.y,rockDay.getRegionWidth()/4/scale.x);
+				obj.setBodyType(BodyDef.BodyType.StaticBody);
+				obj.setSensor(true);
+				obj.setDrawScale(scale);
+				if (NDS == 0){
+					obj.setTexture(rockDay);
+				}
+				if (NDS == 1){
+					obj.setTexture(rockNight);
+				}
+				if (NDS == 2){
+					obj.setTexture(rockSunset);
+				}
+				obj.setName("rock");
+				rocks.add(obj);
+				addObject(obj);
 			}
-			if (NDS == 1){
-				obj.setTexture(rockNight);
-			}
-			if (NDS == 2){
-				obj.setTexture(rockSunset);
-			}
-			obj.setName("rock");
-			rocks.add(obj);
-			addObject(obj);
-		}
-		*/
+		}	
 
 		// Create the fish avatar
 		dwidth  = koiTexture.getRegionWidth()/scale.x;
 		dheight = koiTexture.getRegionHeight()/scale.y;
-		koi = new PlayerModel(level.player.x, level.player.y, dwidth, dheight);
+		System.out.println(dwidth + " " + dheight);
+		koi = new PlayerModel(level.player.x, level.player.y, 2.5f, 0.925f);
 		koi.setDrawScale(scale);
 		koi.setName("koi");
 		koi.setTexture(koiTexture);
@@ -445,6 +556,42 @@ public class DownstreamController extends WorldController implements ContactList
 		koi.ArrowTexture = Arrow;
 		addObject(koi);
 
+//<<<<<<< HEAD
+//		if (level.lotuses != null) {
+//			for (Vector2 lotus : level.lotuses) {
+//				TetherModel lantern = new TetherModel(lotus.x, lotus.y, rad, true);
+//				lantern.setBodyType(BodyDef.BodyType.StaticBody);
+//				lantern.setName("lotus"+ 1);
+//				lantern.setDensity(TETHER_DENSITY);
+//				lantern.setFriction(TETHER_FRICTION);
+//				lantern.setRestitution(TETHER_RESTITUTION);
+//				lantern.setSensor(sensorTethers);
+//				lantern.setDrawScale(scale);
+//				lantern.setTexture(lanternTexture);
+//				lantern.setlightingTexture(lightingTexture);
+//				lantern.setRotation(0);
+//				addObject(lantern);
+//				tethers.add(lantern);
+//				lanterns.add(lantern);
+//			}
+//		}
+//		
+//		if (level.lilypads != null) {
+//			for (Vector2 lilypad : level.lilypads) {
+//				TetherModel lily = new TetherModel(lilypad.x, lilypad.y, rad);
+//				System.out.println("RAD" + rad);
+//				lily.setBodyType(BodyDef.BodyType.StaticBody);
+//				lily.setName("lily"+ 1);
+//				lily.setDensity(TETHER_DENSITY);
+//				lily.setFriction(TETHER_FRICTION);
+//				lily.setRestitution(TETHER_RESTITUTION);
+//				lily.setSensor(sensorTethers);
+//				lily.setDrawScale(scale);
+//				lily.setTexture(lilyTexture);
+//				addObject(lily);
+//				tethers.add(lily);
+//			}
+//=======
 
 		for (Vector2 lotus : level.lotuses) {
 			TetherModel lantern = new TetherModel(lotus.x, lotus.y, rad, true);
@@ -458,11 +605,13 @@ public class DownstreamController extends WorldController implements ContactList
 			lantern.setTexture(lanternTexture);
 			lantern.setlightingTexture(lightingTexture);
 			lantern.setRotation(0);
+			//lantern.setC2(levelAlpha(7));
 			addObject(lantern);
 			tethers.add(lantern);
 			lanterns.add(lantern);
 		}
 
+//		System.out.println(levelAlpha(this.level).a);
 		for (Vector2 lilypad : level.lilypads) {
 			TetherModel lily = new TetherModel(lilypad.x, lilypad.y, rad);
 			lily.setBodyType(BodyDef.BodyType.StaticBody);
@@ -475,35 +624,40 @@ public class DownstreamController extends WorldController implements ContactList
 			lily.setTexture(lilyTexture);
 			addObject(lily);
 			tethers.add(lily);
+//>>>>>>> aeb599925532d05b4afaf458a259c8335970c37d
 		}
-
-
 
 		//Setup checkpoint and collision controller
 		collisionController = new CollisionController(koi);
 		checkpoint0 = getClosestTetherTo(koi.initPos);
 		checkpoint = checkpoint0;
-		
+
 		//Start tethered to first tether
 		//koi.initPos = checkpoint.getPosition().add(koi.NE.cpy().rotate90(1).nor().scl(TetherModel.TETHER_DEFAULT_ORBIT));
 		//koi.setPosition(koi.initPos);
 		//koi.setTethered(true);
 		//cacheVel = koi.NE;
-		
-		
+
+
 		cacheVel = checkpoint0.getPosition().cpy().sub(koi.initPos.cpy()).nor();
 		koi.setLinearVelocity(Vector2.Zero);
 
-		
-		
+
+
 		levelCamWidth = Math.abs(level.map.get(0).x - level.map.get(1).x);
 		levelCamHeight = Math.abs(level.map.get(0).y - level.map.get(1).y);
 		center = new Vector2((level.map.get(0).x + level.map.get(1).x)/2,
 				(level.map.get(0).y + level.map.get(1).y)/2);
-		cameraController.zoomStart(levelCamWidth, levelCamHeight, center, koi.getPosition().cpy().scl(scale));
+		cameraController.zoomStart(levelCamWidth, levelCamHeight, center, checkpoint0.getPosition().cpy().scl(scale));
 
 		HUD = new HUDitems(lanterns.size(), UILotusTexture, energyBarTexture, secondFont);
+		HUD.setTutorialTexture(tutorial1);
 		addHUD(HUD);
+		
+		if (this.level == 1){
+			HUD.setTutorialTexture(tutorial1);
+			HUD.setTutorialStatus(true);
+		}
 
 
 	}
@@ -551,14 +705,34 @@ public class DownstreamController extends WorldController implements ContactList
 	 */
 
 	public void update(float dt) {
+		InputController input = InputController.getInstance();
+		if (input.tutorial == true){
+			HUD.setTutorialStatus(false);
+		}
+
 		if (collisionController.didWin()) {
 			setComplete(true);
+			tillNextLevel++;
+			if (tillNextLevel > 100){
+				deleteAll();
+				this.level = this.level + 1;
+				populateLevel();
+			}
+		}
+		if(input.didAdvance()){
 			deleteAll();
 			this.level = this.level + 1;
 			populateLevel();
 		}
+		else if(input.didRetreat() && this.level > 1){
+			deleteAll();
+			this.level = this.level - 1;
+			populateLevel();
+		}
+		
 		if (koi.isDead()) {
 			deathSound.play();
+			koi.die();
 			for (TetherModel t : tethers) {
 				t.setTethered(false);
 			}
@@ -607,8 +781,8 @@ public class DownstreamController extends WorldController implements ContactList
 				closestWhirlpool = getClosestWhirlpoolTo(koi.getPosition());
 			}
 			// INPUT CODE
-			InputController input = InputController.getInstance();
-			if (!isWhirled() && input.didTether() && !koi.bursting) {
+
+			if (input.didTether() && !isWhirled() && !koi.bursting) {
 				if ((koi.isTethered() || koi.isAttemptingTether())) {
 					koi.setTethered(false);
 					koi.setAttemptingTether(false);
@@ -635,7 +809,6 @@ public class DownstreamController extends WorldController implements ContactList
 
 			// KOI VEOLOCITY CODE
 			if (isTethered()) {
-
 				koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY * 1.3f * speed));
 			} 
 			else if(isWhirled()){
@@ -643,11 +816,22 @@ public class DownstreamController extends WorldController implements ContactList
 			}
 			else {
 				koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY * 1.5f * speed));
+
 			}
 
 			// LOTUS LIGHTING CODE
 			closestTether.setTethered(
 					isTethered() && closestTether.isLotus() && collisionController.inRangeOf(closestTether));
+
+
+			//TETHER IN PATH
+			for (TetherModel tether : tethers) {
+				tether.inpath = false;
+				if (koi.willIntersectTether(tether.getPosition(), TetherModel.TETHER_DEFAULT_RANGE)) {
+					tether.inpath = true;
+				}
+			}
+
 			
 			// TETHER FORCE CODE
 			Vector2 closeTeth = getClosestTether().getPosition();
@@ -684,6 +868,7 @@ public class DownstreamController extends WorldController implements ContactList
 				
 				
 			}
+
 			else{
 				if (closeTeth.dst(koi.getPosition()) > TetherModel.TETHER_DEFAULT_RANGE * 1.3) {
 					koi.setAttemptingTether(false);
@@ -703,6 +888,7 @@ public class DownstreamController extends WorldController implements ContactList
 				} else {
 				}
 				koi.applyTetherForce(closeTeth, closestTether.getOrbitRadius());
+
 			}
 			
 
@@ -741,6 +927,11 @@ public class DownstreamController extends WorldController implements ContactList
 			koiCcurrentFrame = koiCAnimation.getKeyFrame(stateTime, true);
 			KoiCcurrentFrameFlipped = koiCAnimationFlipped.getKeyFrame(stateTime, true);
 			goalCurrentFrame = goalAnimation.getKeyFrame(stateTime, true);
+
+
+			//lilycurrentFrame2 = lilyAnimation2.getKeyFrame(stateTime, true);
+			closedFlowercurrentFrame2 = closedFlowerAnimation2.getKeyFrame(stateTime, true);
+			openFlowercurrentFrame2 = openFlowerAnimation2.getKeyFrame(stateTime, true);
 
 			// System.out.println(relativeTime);
 			// koiCcurrentFrame.flip(koi.left(closestTether), false);
@@ -783,13 +974,14 @@ public class DownstreamController extends WorldController implements ContactList
 
 				if (tethers.get(i).getTetherType() == TetherType.Lilypad) {
 					tethers.get(i).setTexture(lilycurrentFrame);
+					//tethers.get(i).setOverlay(lilycurrentFrame2);
 				}
 				if (tethers.get(i).getTetherType() == TetherType.Lantern) {
 					// System.out.println("here");
 					if (tethers.get(i).getOpening() == 0) {
 						tethers.get(i).setTexture(closedFlowercurrentFrame);
+						tethers.get(i).setOverlay(closedFlowercurrentFrame2);
 						if (tethers.get(i).set) {
-
 							tethers.get(i).setOpening(1);
 						}
 					}
@@ -797,8 +989,10 @@ public class DownstreamController extends WorldController implements ContactList
 
 						if (!openingFlowerAnimation.isAnimationFinished(relativeTime)) {
 							openingFlowercurrentFrame = openingFlowerAnimation.getKeyFrame(relativeTime, true);
+							openingFlowercurrentFrame2 = openingFlowerAnimation2.getKeyFrame(relativeTime, true);
 							relativeTime += Gdx.graphics.getDeltaTime();
 							tethers.get(i).setTexture(openingFlowercurrentFrame);
+							tethers.get(i).setOverlay(openingFlowercurrentFrame2);
 							if (!tethers.get(i).set) {
 								// go to closing
 								// relativeTime = 0;
@@ -816,16 +1010,17 @@ public class DownstreamController extends WorldController implements ContactList
 				}
 				if (tethers.get(i).getOpening() == 2) {
 					tethers.get(i).setTexture(openFlowercurrentFrame);
-					/*
-					 * if (tethers.get(i).set){ tethers.get(i).setOpening(1); }
-					 */
+					tethers.get(i).setOverlay(openFlowercurrentFrame2);
+
 				}
 				if (tethers.get(i).getOpening() == 3) {
 					if (!tethers.get(i).set) {
 						if (!closingFlowerAnimation.isAnimationFinished(relativeTime)) {
 							closingFlowercurrentFrame = closingFlowerAnimation.getKeyFrame(relativeTime, true);
+							closingFlowerCurrentFrame2 = closingFlowerAnimation2.getKeyFrame(relativeTime, true);
 							relativeTime += Gdx.graphics.getDeltaTime();
 							tethers.get(i).setTexture(closingFlowercurrentFrame);
+							tethers.get(i).setOverlay(closingFlowerCurrentFrame2);
 						}
 						if (closingFlowerAnimation.isAnimationFinished(relativeTime)) {
 							tethers.get(i).setOpening(0);
@@ -838,6 +1033,7 @@ public class DownstreamController extends WorldController implements ContactList
 				}
 				if (tethers.get(i).lit) {
 					tethers.get(i).setTexture(openFlowercurrentFrame);
+					tethers.get(i).setOverlay(openFlowercurrentFrame2);
 				}
 			}
 		}
@@ -890,7 +1086,7 @@ public class DownstreamController extends WorldController implements ContactList
 		}
 		return closestTether;
 	}
-	
+
 	private boolean isWhirled(){
 		return whirlpoolsOn && koi.isWhirled();
 	}
@@ -914,7 +1110,7 @@ public class DownstreamController extends WorldController implements ContactList
 		}
 		return closestPool;
 	}
-	
+
 	private WhirlpoolModel getClosestWhirlpoolTo(Vector2 v){
 		WhirlpoolModel closestWhirlpool = wpools.get(0);
 		float closestDistance = wpools.get(0).getPosition().sub(v).len();
@@ -929,7 +1125,7 @@ public class DownstreamController extends WorldController implements ContactList
 	}
 
 	public void draw(float delta) {
-		
+
 		if (paused){
 			cameraController.zoomStart(levelCamWidth, levelCamHeight, center, koi.getPosition().cpy().scl(scale));
 			super.draw(delta);
@@ -937,7 +1133,7 @@ public class DownstreamController extends WorldController implements ContactList
 		}
 		else {
 			super.draw(delta);
-			for (ArrayList<Float> wall : walls) canvas.drawPath(wall);
+//			for (ArrayList<Float> wall : walls) canvas.drawPath(wall);
 			canvas.beginHUD();
 			HUD.draw(canvas);
 			canvas.end();
@@ -979,7 +1175,7 @@ public class DownstreamController extends WorldController implements ContactList
 				restartState = 0;
 				optionsState = 0;
 				backState = 0;
-			
+
 				paused = false;
 			}
 

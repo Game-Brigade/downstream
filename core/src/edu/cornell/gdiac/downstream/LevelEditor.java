@@ -34,6 +34,7 @@ import edu.cornell.gdiac.downstream.InputController.SelectionType;
 import edu.cornell.gdiac.downstream.WorldController.AssetState;
 import edu.cornell.gdiac.downstream.models.EnemyModel;
 import edu.cornell.gdiac.downstream.models.PlayerModel;
+import edu.cornell.gdiac.downstream.models.RockModel;
 import edu.cornell.gdiac.downstream.models.TetherModel;
 import edu.cornell.gdiac.downstream.models.WhirlpoolModel;
 import edu.cornell.gdiac.downstream.obstacle.PolygonObstacle;
@@ -41,39 +42,39 @@ import edu.cornell.gdiac.util.SoundController;
 
 public class LevelEditor extends WorldController {
 
-	/** Reference to the fish texture */
-	private static final String KOI_TEXTURE = "koi/koi.png";
-	/** The reference for the tether textures  */
-	private static final String LILY_TEXTURE = "terrain/lilypad1_scaled.png";
-	/** Reference to the enemy image assets */
-	private static final String ENEMY_TEXTURE = "enemy/enemy.png";
-	/** Reference to the Lantern asset image*/
-	private static final String LANTERN_TEXTURE = "tethers/notlit.png";
-	/** Reference to the Lighting Texture image */
-	private static final String LIGHTING_TEXTURE = "tethers/aura.png";
-	/** Reference to the land texture */
-	private static final String EARTH_FILE = "terrain/swirl_grass.png";
-	/** Reference to the whirlpool texture */
-	private static final String WHIRLPOOL_TEXTURE = "terrain/whirlpool.png";
-	/** Reference to the flipped whirlpool texture */
-	private static final String WHIRLPOOL_FLIP_TEXTURE = "terrain/whirlpool_flip.png";
+	//	/** Reference to the fish texture */
+	//	private static final String KOI_TEXTURE = "koi/koi.png";
+	//	/** The reference for the tether textures  */
+	//	private static final String LILY_TEXTURE = "terrain/lilypad1_scaled.png";
+	//	/** Reference to the enemy image assets */
+	//	private static final String ENEMY_TEXTURE = "enemy/enemy.png";
+	//	/** Reference to the Lantern asset image*/
+	//	private static final String LANTERN_TEXTURE = "tethers/notlit.png";
+	//	/** Reference to the Lighting Texture image */
+	//	private static final String LIGHTING_TEXTURE = "tethers/aura.png";
+	//	/** Reference to the land texture */
+	//	private static final String EARTH_FILE = "terrain/swirl_grass.png";
+	//	/** Reference to the whirlpool texture */
+	//	private static final String WHIRLPOOL_TEXTURE = "terrain/whirlpool.png";
+	//	/** Reference to the flipped whirlpool texture */
+	//	private static final String WHIRLPOOL_FLIP_TEXTURE = "terrain/whirlpool_flip.png";
+	//
+	//	/** Texture assets for the koi */
+	//	private TextureRegion koiTexture;
+	//	/** Texture assets for the lilypads */
+	//	private TextureRegion lilyTexture;
+	//	/** Texture assets for the enemy fish */
+	//	private TextureRegion enemyTexture;
+	//	/** Texture assets for lantern */
+	//	private TextureRegion lanternTexture;
+	//	/** Texture assets for light */
+	//	private TextureRegion lightingTexture;
+	//	/** Texture assets for the land */
+	//	private TextureRegion earthTile;
+	//	/** Texture assets for the whirlpools */
+	//	private TextureRegion whirlpoolTexture;
+	//	private TextureRegion whirlpoolFlipTexture;
 
-	/** Texture assets for the koi */
-	private TextureRegion koiTexture;
-	/** Texture assets for the lilypads */
-	private TextureRegion lilyTexture;
-	/** Texture assets for the enemy fish */
-	private TextureRegion enemyTexture;
-	/** Texture assets for lantern */
-	private TextureRegion lanternTexture;
-	/** Texture assets for light */
-	private TextureRegion lightingTexture;
-	/** Texture assets for the land */
-	private TextureRegion earthTile;
-	/** Texture assets for the whirlpools */
-	private TextureRegion whirlpoolTexture;
-	private TextureRegion whirlpoolFlipTexture;
-	
 
 
 	/** Track asset loading from all instances and subclasses */
@@ -113,12 +114,11 @@ public class LevelEditor extends WorldController {
 
 		manager.load(EARTH_FILE,Texture.class);
 		assets.add(EARTH_FILE);
-		
+
 		manager.load(WHIRLPOOL_TEXTURE, Texture.class);
 		assets.add(WHIRLPOOL_TEXTURE);
+
 		
-		manager.load(WHIRLPOOL_FLIP_TEXTURE, Texture.class);
-		assets.add(WHIRLPOOL_FLIP_TEXTURE);
 
 		super.preLoadContent(manager);
 	}
@@ -145,12 +145,12 @@ public class LevelEditor extends WorldController {
 		lightingTexture = createTexture(manager, LIGHTING_TEXTURE, false);
 		earthTile = createTexture(manager,EARTH_FILE,true);
 		whirlpoolTexture = createTexture(manager, WHIRLPOOL_TEXTURE, false);
-		whirlpoolFlipTexture = createTexture(manager, WHIRLPOOL_FLIP_TEXTURE, false);
+		
 
 		super.loadContent(manager);
 		fishAssetState = AssetState.COMPLETE;
 	}
-	
+
 	// Physics constants for initialization
 	/** Density of non-enemy objects */
 	private static final float BASIC_DENSITY   = 0.0f;
@@ -188,32 +188,34 @@ public class LevelEditor extends WorldController {
 	private HashMap<String,ArrayList<Vector2>> enemies;
 	private Vector2 player;
 	private ArrayList<ArrayList<Vector2>> walls;
+	private ArrayList<ArrayList<Vector2>> shores;
 	private ArrayList<Vector2> mapArea;
 	private ArrayList<Vector2> goal;
 	private PlayerModel koi;
-	
+
 	private boolean settingEnemyPath = false;
 	private boolean settingWallPath = false;
-	private boolean placingWhirlpool = false;
+	private boolean settingShorePath = false;
 	private boolean didEnter = false;
 	private Vector2 currentEnemy;
 	private ArrayList<Vector2> currentWhirlpool;
 	private ArrayList<Vector2> enemyPath;
 	private ArrayList<Vector2> wallPath;
+	private ArrayList<Vector2> shorePath;
 	private boolean newClick;
 	private Vector2 currentClick;
-	
+
 	private static String filename = null;
 	private boolean buildingLevel = false;
-	
+
 	private CameraController cameraController;
-	
+
 	public LevelEditor() {
 		setDebug(false);
 		setComplete(false);
 		setFailure(false);
 	}
-	
+
 	private void populateLevel() {
 		cameraController = new CameraController(canvas.getCamera());
 		goal = new ArrayList<Vector2>();
@@ -222,35 +224,45 @@ public class LevelEditor extends WorldController {
 		enemies = new HashMap<String,ArrayList<Vector2>>();
 		enemyPath = new ArrayList<Vector2>();
 		walls = new ArrayList<ArrayList<Vector2>>();
+		shores = new ArrayList<ArrayList<Vector2>>();
 		whirlpools = new ArrayList<Vector4>();
 		currentWhirlpool = new ArrayList<Vector2>();
 		newClick = false;
 		currentClick = new Vector2(0,0);
 		mapArea = new ArrayList<Vector2>();
-		
+		rocks = new ArrayList<Vector2>();
+
 		boolean loadFile = true;
 		buildingLevel = loadFile;
 		if (loadFile) {
 			loadPartialLevel();
 		}
 		buildingLevel = false;
-		
+
 	}
-	
+
 	@Override
 	public void reset() {
 		// TODO Auto-generated method stub
-//		saveToJson();
-		
+		//		saveToJson();
+
 		populateLevel();
 	}
 
 	@Override
 	public void update(float dt) {
-		
+
 		InputController input = InputController.getInstance();
-		
+
 		didEnter = input.didEnter() || didEnter;
+
+
+		if (input.didEnter() && settingEnemyPath) addEnemy(null,true);
+		if (input.didEnter() && settingWallPath) addWall(null,true);
+		if (input.didEnter() && settingShorePath) addShore(null,true);
+
+		if (input.isZoomIn()) 		cameraController.zoomInBoundless();
+		else if (input.isZoomOut()) cameraController.zoomOutBoundless();
 		
 		if (input.didEnter() && settingEnemyPath){
 			addEnemy(null,true);
@@ -268,51 +280,64 @@ public class LevelEditor extends WorldController {
 		else if (input.isZoomOut()){
 			cameraController.zoomOutBoundless();
 		}
+
 		cameraController.handleArrowKeys(input.getUp(), input.getDown(), input.getLeft(), input.getRight());
-		
+
 		handleClick: if (input.getClick() != null) {
 			if (input.getSelection() == null) break handleClick;	
 			updateClicks();
 			switch (input.getSelection()) {
-				case Lilypad: 
-					addLilypad(currentClick);
-					return;
-				case Lantern:
-					addLantern(currentClick);
-					return;
-				case Enemy:
-					addEnemy(currentClick,didEnter);
-					return;
-				case Player:
-					addPlayer(currentClick);
-					return;
-				case Wall:
-					addWall(currentClick,didEnter);
-					return;
-				case MapArea:
-					addMapArea(currentClick);
-					return;
-				case Goal:
-					addGoal(currentClick);
-					return;
-				case Whirlpool:
-					addWhirlpool(currentClick,input.didEnter());
-					return;
-				case Save:
-					this.saveToJson();
-					return;
+			case Lilypad: 
+				addLilypad(currentClick);
+				return;
+			case Lantern:
+				addLantern(currentClick);
+				return;
+			case Enemy:
+				addEnemy(currentClick,didEnter);
+				return;
+			case Player:
+				addPlayer(currentClick);
+				return;
+			case Wall:
+				addWall(currentClick,didEnter);
+				return;
+			case Shore:
+//				System.out.println(didEnter);
+				addShore(currentClick,didEnter);
+				return;
+			case MapArea:
+				addMapArea(currentClick);
+				return;
+			case Goal:
+				addGoal(currentClick);
+				return;
+			case Rock:
+				addRock(currentClick);
+				return;
+			case Whirlpool:
+				addWhirlpool(currentClick, didEnter);
+				return;
+			case Save:
+				this.saveToJson();
+				return;
 			}
 		}
-//		System.out.println("please");
+		//		System.out.println("please");
 		// we can create walls by holding and dragging
 		if (input.leftClickHeldDown() && 
-			input.getSelection() != null && 
-			input.getSelection() == SelectionType.Wall) {
+				input.getSelection() != null && 
+				input.getSelection() == SelectionType.Wall) {
 			updateClicks();
 			addWall(currentClick,didEnter);
+		} else if (input.leftClickHeldDown() &&
+				input.getSelection() != null &&
+				input.getSelection() == SelectionType.Shore) {
+			updateClicks();
+			addShore(currentClick,didEnter);
 		}
 	}
-	
+
 	private void addLilypad(Vector2 click) {
 		lilypads.add(click.cpy());
 		float rad = lilyTexture.getRegionWidth()/scale.x/2;
@@ -328,7 +353,48 @@ public class LevelEditor extends WorldController {
 		lily.setTexture(lilyTexture);
 		addObject(lily);
 	}
-	
+
+	private void addRock(Vector2 click) {
+		rocks.add(click.cpy());
+		float rad = lilyTexture.getRegionWidth()/scale.x/2;
+		RockModel rock = new RockModel(click.x, click.y, rad);
+		rock.setBodyType(BodyDef.BodyType.StaticBody);
+		rock.setName("lily"+ 1);
+		rock.setDensity(TETHER_DENSITY);
+		rock.setFriction(TETHER_FRICTION);
+		rock.setRestitution(TETHER_RESTITUTION);
+		rock.setSensor(false);
+		rock.setDrawScale(scale);
+		rock.setTexture(lilyTexture);
+		addObject(rock);
+	}
+
+
+	private void addWhirlpool(Vector2 click, boolean enter){
+		
+		if(enter){
+			if(currentWhirlpool.size() != 2){
+				didEnter = false;
+			}
+			else{
+				
+				didEnter = false;
+				Vector2 v = currentWhirlpool.get(0);
+				Vector2 v2 = currentWhirlpool.get(1);
+				whirlpools.add(new Vector4(v.x, v.y, v2.x, v2.y));
+				currentWhirlpool.clear();
+			}
+		}
+		else if(currentWhirlpool.size() == 2){
+			currentWhirlpool.clear();
+			currentWhirlpool.add(click.cpy());
+			
+		}
+		else{
+			currentWhirlpool.add(click.cpy());
+		}
+		
+	}
 
 	private void addLantern(Vector2 click) {
 		lanterns.add(click.cpy());
@@ -346,34 +412,7 @@ public class LevelEditor extends WorldController {
 		lantern.setRotation(0);
 		addObject(lantern);
 	}
-	
-	private void addWhirlpool(Vector2 click, boolean enter){
-		
-		if(enter){
-			if(currentWhirlpool.size() != 2){
-				didEnter = false;
-			}
-			else{
-				placingWhirlpool = false;
-				didEnter = false;
-				Vector2 v = currentWhirlpool.get(0);
-				Vector2 v2 = currentWhirlpool.get(1);
-				whirlpools.add(new Vector4(v.x, v.y, v2.x, v2.y));
-				currentWhirlpool.clear();
-			}
-		}
-		else if(currentWhirlpool.size() == 2){
-			currentWhirlpool.clear();
-			currentWhirlpool.add(click.cpy());
-			placingWhirlpool = false;
-		}
-		else{
-			currentWhirlpool.add(click.cpy());
-			placingWhirlpool = true;
-		}
-		
-	}
-	
+
 	private void addEnemy(Vector2 click, boolean enter) {
 		if (enter) {
 			settingEnemyPath = false;
@@ -404,7 +443,7 @@ public class LevelEditor extends WorldController {
 		eFish.setGoal(0, 0);
 		addObject(eFish);
 	}
-	
+
 	private void addPlayer(Vector2 click) {
 		player = click.cpy();
 		if (koi != null) removeObject(koi);
@@ -413,11 +452,11 @@ public class LevelEditor extends WorldController {
 		koi = new PlayerModel(click.x, click.y, dwidth, dheight);
 		koi.setDrawScale(scale);
 		koi.setName("koi");
-		koi.setTexture(koiTexture);
+		koi.setTexture(enemyTexture);
 		koi.setTethered(false);
 		addObject(koi);
 	}
-	
+
 	private void addWall(Vector2 click, boolean enter) {
 		if (enter) {
 			settingWallPath = false;
@@ -425,6 +464,7 @@ public class LevelEditor extends WorldController {
 			walls.add(wallPath);
 			PolygonObstacle obj;
 			ArrayList<Float> wall = new ArrayList<Float>();
+			if (wallPath == null) wallPath = new ArrayList<Vector2>();
 			for (Vector2 v : wallPath) {
 				wall.add(v.x/scale.x);
 				wall.add(v.y/scale.y);
@@ -432,20 +472,19 @@ public class LevelEditor extends WorldController {
 			float[] wallFloat = new float[wall.size()];
 			for (int i = 0; i < wall.size(); i++) wallFloat[i] = wall.get(i);
 			if (wallFloat.length == 0) return;
-//			System.out.println(Arrays.toString(wallFloat));
 			obj = new PolygonObstacle(wallFloat, 0, 0);
 			obj.setBodyType(BodyDef.BodyType.StaticBody);
 			obj.setDensity(BASIC_DENSITY);
 			obj.setFriction(BASIC_FRICTION);
 			obj.setRestitution(BASIC_RESTITUTION);
 			obj.setDrawScale(scale);
-			obj.setTexture(earthTile);
+			obj.setTexture(earthTileDay);
 			obj.setName("wall1");
 			addObject(obj);
 			return;
 		}
-//		System.out.println("Not building leveL: " + !buildingLevel);
-//		System.out.println("Not new click: " + !newClick);
+		//		System.out.println("Not building leveL: " + !buildingLevel);
+		//		System.out.println("Not new click: " + !newClick);
 		if (!newClick && !buildingLevel) return;
 		if (settingWallPath) {
 			if (wallPath.get(wallPath.size()-1) != click) wallPath.add(click.cpy().scl(scale));
@@ -455,18 +494,18 @@ public class LevelEditor extends WorldController {
 		wallPath = new ArrayList<Vector2>();
 		wallPath.add(click.cpy().scl(scale));
 	}
-	
+
 	private void addMapArea(Vector2 click) {
 		switch (mapArea.size()) {
-			case 0:
-			case 1:
-				mapArea.add(click.cpy().scl(scale));
-				return;
-			case 2:
-			default:
-				mapArea.clear();
-				mapArea.add(click.cpy().scl(scale));
-				return;
+		case 0:
+		case 1:
+			mapArea.add(click.cpy().scl(scale));
+			return;
+		case 2:
+		default:
+			mapArea.clear();
+			mapArea.add(click.cpy().scl(scale));
+			return;
 		}
 	}
 
@@ -483,17 +522,60 @@ public class LevelEditor extends WorldController {
 			return;
 		}
 	}
-	
+
+	private void addShore(Vector2 click, boolean enter) {
+		if (enter) {
+			settingShorePath = false;
+			didEnter = false;
+			shores.add(shorePath);
+			PolygonObstacle obj;
+			ArrayList<Float> shore = new ArrayList<Float>();
+			if (shorePath == null) shorePath = new ArrayList<Vector2>();
+			for (Vector2 v : shorePath) {
+				shore.add(v.x/scale.x);
+				shore.add(v.y/scale.y);
+			}
+			float[] shoreFloat = new float[shore.size()];
+			for (int i = 0; i < shore.size(); i++) shoreFloat[i] = shore.get(i);
+			if (shoreFloat.length == 0) return;
+			System.out.println(Arrays.toString(shoreFloat));
+			obj = new PolygonObstacle(shoreFloat, 0, 0);
+			obj.setBodyType(BodyDef.BodyType.StaticBody);
+			obj.setDensity(BASIC_DENSITY);
+			obj.setFriction(BASIC_FRICTION);
+			obj.setRestitution(BASIC_RESTITUTION);
+			obj.setDrawScale(scale);
+			obj.setTexture(earthTile);
+			obj.setName("shore");
+			addObject(obj);
+			return;
+		}
+		//		System.out.println("Not building leveL: " + !buildingLevel);
+		//		System.out.println("Not new click: " + !newClick);
+		if (!newClick && !buildingLevel) return;
+		if (settingShorePath) {
+			if (shorePath.get(shorePath.size()-1) != click) shorePath.add(click.cpy().scl(scale));
+			return;
+		}
+		settingShorePath = true;
+		shorePath = new ArrayList<Vector2>();
+		shorePath.add(click.cpy().scl(scale));
+	}
+
 	private void drawPaths() {
 		if (settingEnemyPath) drawPath(enemyPath);
 		if (settingWallPath) drawPath(wallPath);
-		
+		if (settingShorePath) drawPath(shorePath);
+
 		for (ArrayList<Vector2> path : enemies.values()) {
 			drawPath(path);
 		}
 		for (ArrayList<Vector2> path : walls) {
 			drawPath(path);
 		}
+//		for (ArrayList<Vector2> path : shores) {
+//			drawPath(path);
+//		}
 		if (mapArea.size() == 2) canvas.drawRectangle(mapArea.get(0), mapArea.get(1));
 		if (goal.size() == 2){
 			canvas.drawLeadingLine(goal.get(0).cpy().scl(scale), goal.get(1).cpy().scl(scale));
@@ -509,18 +591,19 @@ public class LevelEditor extends WorldController {
 		
 				
 	}
-	
+
 	private void drawPath(ArrayList<Vector2> path) {
+		if (path == null) return;
 		for (int i = 0; i < path.size() - 1; i++) {
 			canvas.drawLeadingLine(path.get(i), path.get(i+1));
 		}
 		canvas.drawLeadingLine(path.get(0), path.get(path.size()-1));
 	}
-	
+
 	private boolean updateClicks() {
 		Vector3 click3 = canvas.getCamera().unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
 		Vector2 temp = new Vector2(click3.x/scale.x, click3.y/scale.y);
-		if (temp.dst2(currentClick) > 0.5) {
+		if (temp.dst2(currentClick) > 1.0) {
 			newClick = true;
 			currentClick.x = temp.x; currentClick.y = temp.y;
 			return true;
@@ -528,7 +611,7 @@ public class LevelEditor extends WorldController {
 		newClick = false;
 		return false;
 	}
-	
+
 	private void saveToJson() {
 		int n = 1;
 		Vector2 p = player;
@@ -537,53 +620,53 @@ public class LevelEditor extends WorldController {
 		ArrayList<Vector2> li = lilypads;
 		ArrayList<Vector2> lo = lanterns;
 		ArrayList<ArrayList<Vector2>> w = walls;
+		ArrayList<ArrayList<Vector2>> s = shores;
 		ArrayList<Vector4> wp = whirlpools;
 		ArrayList<Vector2> m = mapArea;
-		
-		Level level = new Level(n,p,g,e,li,lo,w,wp,m);
+		ArrayList<Vector2> r = rocks;
+		Level level = new Level(n,p,g,e,li,lo,w, s,wp, r ,m);
 		try {
 			Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		    System.setOut(new PrintStream(new FileOutputStream(filename)));
-		    System.out.println(gson.toJson(level));
+			System.setOut(new PrintStream(new FileOutputStream(filename)));
+			System.out.println(gson.toJson(level));
 		} catch (Exception e1) {
 			// haha please no
 			e1.printStackTrace();
 		}
 	}
-	
-	  protected static Level loadFromJson() {
-//	    return defaultLevel();
-	    Gson gson = new Gson();
-	    try {
-	      if (filename == null) filename = getFileName();
-	      JsonReader reader = new JsonReader(new FileReader(filename));
-//	      JsonReader reader = new JsonReader(new InputStreamReader(LevelEditor.class.getResourceAsStream("/json/"+filename)));
-	      Level level = gson.fromJson(reader, Level.class);
-//	      System.out.println(level);
-	      return level;
-	    } catch (Exception e){
-	      System.out.println(e);
-	      //pls no
-	      return null;
-	    }
-	  }
-	  
-	  public static Level loadFromJson(int lvl) {
-//	    return defaultLevel();
-	    Gson gson = new Gson();
-	    try {
-	      filename = lvl + ".json";
-//	      JsonReader reader = new JsonReader(new FileReader(filename));
-//	      System.out.println(System.getProperty("user.dir"));
-	      JsonReader reader = new JsonReader(new InputStreamReader(new FileInputStream(filename)));
-	      Level level = gson.fromJson(reader, Level.class);
-	      return level;
-	    } catch (Exception e) {
-	      System.out.println(e);
-	      return defaultLevel();
-	    }
-	  }
-	
+
+	protected static Level loadFromJson() {
+		//	    return defaultLevel();
+		Gson gson = new Gson();
+		try {
+			if (filename == null) filename = getFileName();
+			JsonReader reader = new JsonReader(new FileReader(filename));
+			//	      JsonReader reader = new JsonReader(new InputStreamReader(LevelEditor.class.getResourceAsStream("/json/"+filename)));
+			Level level = gson.fromJson(reader, Level.class);
+			//	      System.out.println(level);
+			return level;
+		} catch (Exception e){
+			System.out.println(e);
+			//pls no
+			return null;
+		}
+	}
+
+	public static Level loadFromJson(int lvl) {
+		//	    return defaultLevel();
+		Gson gson = new Gson();
+		try {
+			filename = lvl + ".json";
+			JsonReader reader = new JsonReader(new InputStreamReader(new FileInputStream(filename)));
+			Level level = gson.fromJson(reader, Level.class);
+//			System.out.println(level.rocks);
+			return level;
+		} catch (Exception e) {
+			System.out.println(e);
+			return defaultLevel();
+		}
+	}
+
 	private static Level defaultLevel() {
 	    int number = 1;
 	    Vector2 player = new Vector2(-4.537486f,16.284998f);
@@ -621,7 +704,9 @@ public class LevelEditor extends WorldController {
 	            27.754993f})));
 	    LevelEditor le = new LevelEditor();
 	    ArrayList<ArrayList<Vector2>> w = new ArrayList<ArrayList<Vector2>>();
-	    Level defaultLevel =  le.new Level(number, player, goal, enemiesLevel, lilypads, lotuses, w, wpools, map);
+	    ArrayList<ArrayList<Vector2>> s = new ArrayList<ArrayList<Vector2>>();
+	    ArrayList<Vector2> r = new ArrayList<Vector2>();
+	    Level defaultLevel =  le.new Level(number, player, goal, enemiesLevel, lilypads, lotuses, w, s, wpools, r, map);
 	    defaultLevel.walls = walls;
 	    return defaultLevel;
 	  }
@@ -630,9 +715,8 @@ public class LevelEditor extends WorldController {
 		super.draw(delta);
 		drawPaths();
 	}
-	
-	private void loadPartialLevel() {
 
+	private void loadPartialLevel() {
 	    buildingLevel = true;
 	    Level level = loadFromJson();
 	    System.out.println(level);
@@ -690,24 +774,22 @@ public class LevelEditor extends WorldController {
 	    buildingLevel = false;
 	  }
 
-
-	
 	private static String getFileName() throws IOException {
-	    JFileChooser fileChooser = new JFileChooser();
-	    fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
-	    int result = fileChooser.showOpenDialog(new JFrame());
-	    if (result == JFileChooser.APPROVE_OPTION) {
-	      File selectedFile = fileChooser.getSelectedFile();
-	      
-	      String abs = selectedFile.getAbsolutePath();
-	      int lfs = abs.lastIndexOf("/") + 1;
-	      return abs.substring(lfs);
-	    }
-	    return null;
+		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
+		int result = fileChooser.showOpenDialog(new JFrame());
+		if (result == JFileChooser.APPROVE_OPTION) {
+			File selectedFile = fileChooser.getSelectedFile();
+
+			String abs = selectedFile.getAbsolutePath();
+			int lfs = abs.lastIndexOf("/") + 1;
+			return abs.substring(lfs);
+		}
+		return null;
 	}
-	
-	
-	
+
+
+
 	class Level {
 		int number;
 		Vector2 player;
@@ -716,19 +798,22 @@ public class LevelEditor extends WorldController {
 		ArrayList<Vector2> lilypads;
 		ArrayList<Vector2> lotuses;
 		ArrayList<ArrayList<Float>> walls;
-
+		ArrayList<ArrayList<Float>> shores;
 		ArrayList<Vector4> whirlpools;
-
 		ArrayList<Vector2> map;
 		ArrayList<Vector2> rocks;
-		
-		private Level(int n, Vector2 p, 
-					  ArrayList<Vector2> g, 
-					  HashMap<String,ArrayList<Vector2>> e,
-					  ArrayList<Vector2> li,
-					  ArrayList<Vector2> lo,
-					  ArrayList<ArrayList<Vector2>> w, ArrayList<Vector4> wp, ArrayList<Vector2> m) {
-//			System.out.println(e.values());
+
+		private Level(int n, 
+				Vector2 p, 
+				ArrayList<Vector2> g, 
+				HashMap<String,ArrayList<Vector2>> e,
+				ArrayList<Vector2> li,
+				ArrayList<Vector2> lo,
+				ArrayList<ArrayList<Vector2>> w, 
+				ArrayList<ArrayList<Vector2>> s, 
+				ArrayList<Vector4> wp,
+				ArrayList<Vector2> r,
+				ArrayList<Vector2> m) {
 
 
 			number = n;
@@ -739,7 +824,7 @@ public class LevelEditor extends WorldController {
 				ArrayList<Vector2> enemyPath = new ArrayList<Vector2>();
 				for (Vector2 v : e.get(enemy)) enemyPath.add(v.cpy().scl(1/scale.x,1/scale.y));
 				enemiesLevel.put(enemy, enemyPath);
-				
+
 			}
 			lilypads = li;
 			lotuses = lo;
@@ -754,13 +839,23 @@ public class LevelEditor extends WorldController {
 				}
 				walls.add(floatList);
 			}
+			shores = new ArrayList<ArrayList<Float>>();
+			for (ArrayList<Vector2> vectorList : s) {
+				ArrayList<Float> floatList = new ArrayList<Float>();
+				for (Vector2 vector : vectorList) {
+					floatList.add(vector.x/scale.x);
+					floatList.add(vector.y/scale.y);
+				}
+				shores.add(floatList);
+			}
+			rocks = r;
 			map = m;
 		}
-		
-		
+
+
 	}
-	
-	
+
+
 }
 
 

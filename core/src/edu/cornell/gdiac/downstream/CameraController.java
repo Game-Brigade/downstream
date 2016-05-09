@@ -14,7 +14,7 @@ public class CameraController {
 	private static float currentVelocity = MIN_VELOCITY;
 	private static final float MAX_ZOOM_OUT = 2.0f;
 	private static final float MIN_ZOOM_IN = 2.0f;
-	private static float numSteps = 200;
+	private static float numSteps = 500;
 	private Vector2 playerPosition;
 	private float mapWidth;
 	private float mapHeight;
@@ -24,6 +24,7 @@ public class CameraController {
 	private boolean isZooming;
 	private OrthographicCamera saveCamera;
 	private float speed;
+	private int initialPause;
 	
 	public CameraController(OrthographicCamera cam) {
 		camera = cam;
@@ -76,9 +77,10 @@ public class CameraController {
 		mapCenter = center;
 		playerPosition.x = player.x; playerPosition.y = player.y;
 //		System.out.println("PLAYERPOSITION START: " + playerPosition);
-		numSteps = (center.cpy().sub(player).len()) / MAX_VELOCITY;
+		numSteps = (center.cpy().sub(player).len()) / MIN_VELOCITY;
 		stepMove.x = (player.x - center.x) / numSteps;
 		stepMove.y = (player.y - center.y) / numSteps;
+		initialPause = 150;
 		
 		camera.position.x = center.x; camera.position.y = center.y;
 		camera.zoom = width / Gdx.graphics.getWidth() * .95f;
@@ -88,7 +90,10 @@ public class CameraController {
 	}
 	
 	public void zoomToPlayer() {
-		camera.zoom -= stepZoom;
+		initialPause--;
+		if (initialPause > 0) return;
+		if (camera.zoom-stepZoom*2 > MAX_ZOOM_OUT) 
+			camera.zoom -= stepZoom*2;
 //		System.out.println(stepZoom);
 //		System.out.println(camera.zoom);
 //		System.out.println(playerPosition);

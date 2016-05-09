@@ -92,6 +92,7 @@ public class InputController {
 	private boolean plusPrevious;
 	private boolean minusPressed;
 	private boolean minusPrevious;
+	private boolean tutorialPressed;
 	
 	/** How much did we move horizontally? */
 	private float horizontal;
@@ -113,9 +114,20 @@ public class InputController {
 	public boolean slow;
 	public boolean fast;
 	public boolean kill;
+	public boolean tutorial;
 	
 	public enum SelectionType {
-		Lilypad, Lantern, Enemy, Player, Wall, MapArea, Goal, Whirlpool, Save;
+		Lilypad, 
+		Lantern, 
+		Enemy, 
+		Player, 
+		Wall,
+		Shore,
+		MapArea, 
+		Goal, 
+		Whirlpool,
+		Rock,
+		Save;
 	} 
 	
 	private SelectionType currentSelection;
@@ -411,7 +423,7 @@ public class InputController {
 		debugPressed = (secondary && debugPressed) || (Gdx.input.isKeyPressed(Input.Keys.D));
 		primePressed = (secondary && primePressed) || (Gdx.input.isKeyPressed(Input.Keys.UP));
 		secondPressed = (secondary && secondPressed) || (Gdx.input.isKeyPressed(Input.Keys.SPACE));
-		prevPressed = (secondary && prevPressed) || (Gdx.input.isKeyPressed(Input.Keys.Z));
+		prevPressed = (secondary && prevPressed) || (Gdx.input.isKeyPressed(Input.Keys.B));
 		nextPressed = (secondary && nextPressed) || (Gdx.input.isKeyPressed(Input.Keys.N));
 		exitPressed  = (secondary && exitPressed) || (Gdx.input.isKeyPressed(Input.Keys.ESCAPE));
 		tetherPressed  = (secondary && tetherPressed) || (Gdx.input.isKeyPressed(Input.Keys.SPACE));
@@ -419,22 +431,23 @@ public class InputController {
 		plusPressed = (secondary && pausePressed) || (Gdx.input.isKeyPressed(Input.Keys.EQUALS));
 		minusPressed = (secondary && pausePressed) || (Gdx.input.isKeyPressed(Input.Keys.MINUS));
 		leftClick = (secondary && leftClick) || (Gdx.input.isButtonPressed(Input.Buttons.LEFT));
-		
+		tutorial = (secondary && tutorialPressed) || (Gdx.input.isButtonPressed(Input.Keys.Q));
 		// level editor commands
 		upPressed    = Gdx.input.isKeyPressed(Input.Keys.UP);
 		downPressed  = Gdx.input.isKeyPressed(Input.Keys.DOWN);
 		leftPressed  = Gdx.input.isKeyPressed(Input.Keys.LEFT);
 		rightPressed = Gdx.input.isKeyPressed(Input.Keys.RIGHT);
-		if (Gdx.input.isKeyPressed(Input.Keys.NUM_0)) currentSelection = SelectionType.Save;
+		if (Gdx.input.isKeyPressed(Input.Keys.S)) currentSelection = SelectionType.Save;
 		if (Gdx.input.isKeyPressed(Input.Keys.NUM_1)) currentSelection = SelectionType.Lilypad;
 		if (Gdx.input.isKeyPressed(Input.Keys.NUM_2)) currentSelection = SelectionType.Lantern;
 		if (Gdx.input.isKeyPressed(Input.Keys.NUM_3)) currentSelection = SelectionType.Enemy;
 		if (Gdx.input.isKeyPressed(Input.Keys.NUM_4)) currentSelection = SelectionType.Player;
 		if (Gdx.input.isKeyPressed(Input.Keys.NUM_5)) currentSelection = SelectionType.Wall;
-		if (Gdx.input.isKeyPressed(Input.Keys.NUM_6)) currentSelection = SelectionType.MapArea;
-		if (Gdx.input.isKeyPressed(Input.Keys.NUM_7)) currentSelection = SelectionType.Goal;
-		if (Gdx.input.isKeyPressed(Input.Keys.NUM_8)) currentSelection = SelectionType.Whirlpool;
-	
+		if (Gdx.input.isKeyPressed(Input.Keys.NUM_6)) currentSelection = SelectionType.Shore;
+		if (Gdx.input.isKeyPressed(Input.Keys.NUM_7)) currentSelection = SelectionType.MapArea;
+		if (Gdx.input.isKeyPressed(Input.Keys.NUM_8)) currentSelection = SelectionType.Goal;
+		if (Gdx.input.isKeyPressed(Input.Keys.NUM_9)) currentSelection = SelectionType.Whirlpool;
+		if (Gdx.input.isKeyPressed(Input.Keys.NUM_0)) currentSelection = SelectionType.Rock;
 		
 		fast = (Gdx.input.isKeyPressed(Input.Keys.F));
 		
@@ -480,6 +493,13 @@ public class InputController {
 			accel = true;
 		} else {
 			accel = false;
+		}
+		
+		if (Gdx.input.isKeyPressed(Input.Keys.Q)){
+			tutorial = true;
+		}
+		else{
+			tutorial = false;
 		}
 		
 		// Mouse results

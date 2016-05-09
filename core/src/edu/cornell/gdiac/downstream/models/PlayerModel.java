@@ -93,7 +93,9 @@ public class PlayerModel extends BoxObstacle {
 		attemptingTether = true;
 		isWhirled = false;
 		isExitingWhirlpool = false;
-		setLinearVelocity(NE);
+
+		setLinearVelocity(Vector2.Zero);
+
 		speed = 1;
 		pull = Vector2.Zero;
 		cent = Vector2.Zero;
@@ -381,10 +383,9 @@ public class PlayerModel extends BoxObstacle {
 			if(isTethered()){
 
 				Vector2 farOff = new Vector2(getX(), getY());
-				farOff.add(this.getLinearVelocity().cpy().scl(.4f));
+				farOff.add(this.getLinearVelocity().cpy().nor().scl(1.5f));
+				canvas.draw(ArrowTexture, Color.WHITE ,0 , 0,farOff.x*drawScale.x,farOff.y*drawScale.x, getAngle(), .6f, .6f);
 
-				canvas.draw(ArrowTexture, Color.WHITE ,origin.x,origin.y,farOff.x*drawScale.x,farOff.y*drawScale.x,getAngle() + 2.2f, .6f, .6f);
-				//canvas.draw(texture, farOff.x, farOff.y);
 			}
 		}
 		if(!dead || true){
@@ -548,12 +549,13 @@ public class PlayerModel extends BoxObstacle {
 	
 	
 	public void updateRestore(){
+		this.restoreAlpha();
 		if (energy < 2 && !bursting){
 			energy = energy + .02f;
 		}
 		else if (bursting && energy >= 0){
 			this.setLinearVelocity(this.getLinearVelocity().setLength(4f*9*speed));
-			energy = energy - .07f;
+			energy = energy - .2f;
 		}
 		else if (energy <= 0){
 			bursting = false;
