@@ -123,6 +123,9 @@ public class LoadingMode implements Screen, InputProcessor, ControllerListener {
 	private int   startButton;
 	/** Whether or not this player mode is still active */
 	private boolean active;
+	
+	/** Waiting time to go to main menu */
+	private int wait = 0;
 
 	/**
 	 * Returns the budget for the asset loader.
@@ -250,6 +253,7 @@ public class LoadingMode implements Screen, InputProcessor, ControllerListener {
 	 * @param delta Number of seconds since last animation frame
 	 */
 	private void update(float delta) {
+		wait++;
 		if (playButton == null) {
 			manager.update(budget);
 			this.progress = manager.getProgress();
@@ -272,13 +276,9 @@ public class LoadingMode implements Screen, InputProcessor, ControllerListener {
 		canvas.begin();
 		canvas.draw(background, Color.WHITE, background.getWidth()/2, background.getHeight()/2, 
 				canvas.getWidth()/2, canvas.getHeight()/2, 0, scale, scale);
-		if (playButton == null) {
-			drawProgress(canvas);
-		} else {
-			Color tint = (pressState == 1 ? Color.GRAY: Color.WHITE);
-			canvas.draw(playButton, tint, playButton.getWidth()/2, playButton.getHeight()/2, 
-						centerX, centerY, 0, BUTTON_SCALE*scale, BUTTON_SCALE*scale);
-		}
+		drawProgress(canvas);
+			
+		
 		canvas.end();
 	}
 	
@@ -321,7 +321,7 @@ public class LoadingMode implements Screen, InputProcessor, ControllerListener {
 			draw();
 
 			// We are are ready, notify our listener
-			if (isReady() && listener != null) {
+			if (wait == 200 && listener != null) {
 				listener.exitScreen(this, -1);
 			}
 		}

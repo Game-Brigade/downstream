@@ -109,10 +109,12 @@ public abstract class WorldController implements Screen {
 	protected static final String UI_FLOWER = "MENUS/UI_lotus.png";
 	protected static final String OVERLAY = "terrain/texture.jpg";
 	protected static final String ARROW = "koi/arrow.png";
-	protected static final String TUTORIAL_TEXTURE1 = "MENUS/text-box.png";
-	protected static final String TUTORIAL_TEXTURE2 = "MENUS/text-box.png";
-	protected static final String TUTORIAL_TEXTURE3 = "MENUS/text-box.png";
-	protected static final String TUTORIAL_TEXTURE4 = "MENUS/text-box.png";
+	protected static final String TUTORIAL_TEXTURE1 = "MENUS/tutorial1.png";
+	protected static final String TUTORIAL_TEXTURE2 = "MENUS/tutorial2.png";
+	protected static final String TUTORIAL_TEXTURE3 = "MENUS/tutorial3.png";
+	protected static final String TUTORIAL_TEXTURE4 = "MENUS/tutorial4.png";
+	protected static final String HELP_TEXTURE = "MENUS/help_button.png";
+	protected static final String ENEMY_TEXTUREA = "enemy/enemy_fish.png";
 
 	// TextureRegions//
 	/** Texture assets for the koi */
@@ -148,8 +150,9 @@ public abstract class WorldController implements Screen {
 	protected TextureRegion tutorial2;
 	protected TextureRegion tutorial3;
 	protected TextureRegion tutorial4;
+	protected TextureRegion helpTexture;
 	//Sounds//
-	protected static final String LIGHTING_SOUND = "SOUNDS/lighting_1.mp3";
+	protected static final String LIGHTING_SOUND = "SOUNDS/fish_death.mp3";
 	protected Music deathSound;
 
 	private static int dayTime = 0;
@@ -159,7 +162,7 @@ public abstract class WorldController implements Screen {
 	private static int FONT_SIZE = 64;
 	/** Retro font for displaying messages */
 	private static String FONT_FILE2 = "loading/MarkerFelt.ttf";
-	private static int FONT_SIZE2 = 64;
+	private static int FONT_SIZE2 = 57;
 	/** The font for giving messages to the player */
 	protected BitmapFont displayFont;
 	protected BitmapFont secondFont;
@@ -169,6 +172,8 @@ public abstract class WorldController implements Screen {
 	private static Texture backgroundS;
 	private static Texture overlay;
 	private Color referenceC = Color.WHITE.cpy();
+	
+	protected ArrayList<ArrayList<Float>> walls = new ArrayList<ArrayList<Float>>();
 
 	//Animations//
 	protected Animation lilyAnimation; // This is the only one
@@ -218,13 +223,16 @@ public abstract class WorldController implements Screen {
 	protected Animation koiCAnimationFlipped;
 	protected TextureRegion[]	koiCFramesFlipped;
 	protected TextureRegion KoiCcurrentFrameFlipped;
+	
+	protected Animation enemyAnimation;
+	protected TextureRegion[] enemyFrames;
+	protected TextureRegion enemyCurrentFrame;
 
 	protected Animation goalAnimation;
 	protected TextureRegion goalCurrentFrame;
 	protected TextureRegion[] goalFrames;
 	protected Color levelAlpha = new Color(255,255,255,.5f);
-	
-	protected ArrayList<ArrayList<Float>> walls = new ArrayList<ArrayList<Float>>();
+
 	
 	
 
@@ -331,6 +339,9 @@ public abstract class WorldController implements Screen {
 		manager.load(TUTORIAL_TEXTURE4, Texture.class);
 		assets.add(TUTORIAL_TEXTURE4);
 		
+		manager.load(HELP_TEXTURE, Texture.class);
+		assets.add(HELP_TEXTURE);
+		
 
 		referenceC.a = .3f;
 
@@ -363,6 +374,23 @@ public abstract class WorldController implements Screen {
 		}
 		return Frames;
 	}	
+	
+	protected TextureRegion[] splice(int cols, int rows, int images, String filePath){
+
+		Texture sheet = new Texture(Gdx.files.internal(filePath));
+
+		TextureRegion[][] tmp = TextureRegion.split(sheet, sheet.getWidth()/cols, sheet.getHeight()/rows);
+		TextureRegion[] Frames = new TextureRegion[images];
+		int index = 0;
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				if (index < images){
+					Frames[index++] = tmp[i][j];
+				}
+			}
+		}
+		return Frames;
+	}
 
 
 
@@ -397,6 +425,9 @@ public abstract class WorldController implements Screen {
 		goalFrames = splice(4,20, GOAL_TEXTURE);
 		goalAnimation = new Animation(.01f, goalFrames);
 		//lilyAnimation = new Animation(.2f, lilyFrames);
+		
+		enemyFrames = splice(4, 10, 39, ENEMY_TEXTUREA);
+		enemyAnimation = new Animation(.02f, enemyFrames);
 
 
 		cols = 11;
@@ -465,7 +496,8 @@ public abstract class WorldController implements Screen {
 
 
 		energyBarTexture = createTexture(manager, ENERGYBAR_TEXTURE, false);
-		enemyTexture = createTexture(manager,ENEMY_TEXTURE,false);
+		//enemyTexture = createTexture(manager,ENEMY_TEXTURE,false);
+		enemyTexture = enemyFrames[0];
 		koiTexture = koiSFrames[0];
 		//koiTexture = createTexture(manager, KOI_TEXTURE, false);
 
@@ -498,21 +530,19 @@ public abstract class WorldController implements Screen {
 		tutorial2 = createTexture(manager, TUTORIAL_TEXTURE2, false);
 		tutorial3 = createTexture(manager, TUTORIAL_TEXTURE3, false);
 		tutorial4 = createTexture(manager, TUTORIAL_TEXTURE4, false);
-
-
-
+		helpTexture = createTexture(manager, HELP_TEXTURE, false);
 
 		// Allocate the tiles
 
 
-		setBackground(manager.get(BACKGROUND_FILE_N, Texture.class), 1);
-		getBackground(1).setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
+		setBackground(manager.get(BACKGROUND_FILE_N, Texture.class), 2);
+		getBackground(2).setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
 
 		setBackground(manager.get(BACKGROUND_FILE_D, Texture.class), 0);
 		getBackground(0).setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
 
-		setBackground(manager.get(BACKGROUND_FILE_S, Texture.class), 2);
-		getBackground(2).setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
+		setBackground(manager.get(BACKGROUND_FILE_S, Texture.class), 1);
+		getBackground(1).setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
 
 		overlay = manager.get(OVERLAY_FILE, Texture.class);
 		overlay.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
@@ -574,14 +604,14 @@ public abstract class WorldController implements Screen {
 	}	
 	
 	
-	public void setDayTime(int i, int fadeOut, int fadeIn){
+	public void setDayTime(int i){
 		dayTime = i;
 		this.fadeOut = fadeOut;
 		this.fadeIn = fadeIn;
 	}
 	
-	public void setLevelAlpha(float alpha){
-		levelAlpha.set(255, 255, 255, alpha);
+	public void setLevelAlpha(Color color){
+		levelAlpha = color;
 	}
 	
 	/**
@@ -675,7 +705,7 @@ public abstract class WorldController implements Screen {
 	/** Whether we have failed at this world (and need a reset) */
 	private boolean failed;
 	/** Whether or not debug mode is active */
-	private boolean debug;
+	protected boolean debug;
 	/** Countdown active for winning or losing */
 	private int countdown;
 
@@ -1022,11 +1052,17 @@ public abstract class WorldController implements Screen {
 		ch = canvas.getHeight();
 		for (int i = -5; i < 5; i++) {
 			for (int j = -5; j < 5; j++) {
-				//canvas.draw(getBackground(dayTime), Color.WHITE, cw*i * 2, ch*j * 2, cw * 2,   ch * 2);
-				canvas.draw(getBackground(fadeOut), Color.WHITE, cw*i * 2, ch*j * 2, cw * 2,   ch * 2);
-				canvas.draw(getBackground(fadeIn), levelAlpha, cw*i * 2, ch*j * 2, cw * 2,   ch * 2);
+				canvas.draw(getBackground(dayTime), Color.WHITE, cw*i * 2, ch*j * 2, cw * 2,   ch * 2);
+				if(dayTime == 0 || dayTime == 1){
+					canvas.draw(getBackground(dayTime + 1), levelAlpha, cw*i * 2, ch*j * 2, cw * 2,   ch * 2);
+				}
 			}
 		}
+		canvas.end();
+		if (walls.size() > 0){ 
+			for (ArrayList<Float> wall : walls) canvas.drawPath(wall);
+		}
+		canvas.begin();
 		//		canvas.draw(background, Color.WHITE, 0, 0, canvas.getWidth(), canvas.getHeight());
 		//canvas.draw(rocks, Color.WHITE, 0, 0, canvas.getWidth(), canvas.getHeight());
 		
@@ -1036,6 +1072,7 @@ public abstract class WorldController implements Screen {
 		for(Obstacle obj : objects) {
 			obj.draw(canvas);
 		}
+		
 
 		for (int i = -5; i < 5; i++) {
 			for (int j = -5; j < 5; j++) {
@@ -1057,7 +1094,7 @@ public abstract class WorldController implements Screen {
 
 		// Final message
 		if (complete && !failed) {
-			displayFont.setColor(Color.YELLOW);
+			displayFont.setColor(Color.BLACK);
 			canvas.begin(); // DO NOT SCALE
 			canvas.drawTextCentered("VICTORY!", displayFont, 0.0f);
 			canvas.end();
@@ -1154,21 +1191,20 @@ public abstract class WorldController implements Screen {
 		else if (n == 1){
 			return backgroundS;
 		}
-		else if (n == 2){
+		else{
 			return backgroundN;
 		}
-		return backgroundD;
 	}
 
 	public static void setBackground(Texture background, int n) {
-		if (n == 2){
-			WorldController.backgroundN = background;
-		}
 		if (n == 0){
 			WorldController.backgroundD = background;
 		}
-		if (n == 1){
+		else if (n == 1){
 			WorldController.backgroundS = background;
+		}
+		else {
+			WorldController.backgroundN = background;
 		}
 	}
 
