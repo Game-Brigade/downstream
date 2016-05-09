@@ -288,9 +288,7 @@ public class DownstreamController extends WorldController implements ContactList
 		} else {
 			level = LevelEditor.loadFromJson();
 		}
-		
-		
-		
+				
 		
 		// 0 is day 1 is sunset 2 is night
 		int staticNDS = dayNightBinary(this.level);
@@ -304,17 +302,6 @@ public class DownstreamController extends WorldController implements ContactList
 		}
 		
 		setLevelAlpha(levelAlpha(this.level));
-		
-		
-		System.out.println("NEXT LEVEL");
-		System.out.println("LEVEL: " + this.level);
-		System.out.println("OVERLAY ALPHA: " + levelAlpha);
-		System.out.println("staticNDS: " + staticNDS);
-		System.out.println("animationNDS: " + animationNDS);
-		
-
-		//int NDS = new Random().nextInt(3);
-
 
 		tillNextLevel = 0;
 		tetherFade = false;
@@ -503,34 +490,35 @@ public class DownstreamController extends WorldController implements ContactList
 			addObject(shadow);
 		}
 		
-		if (level.shores != null) {
-			for (ArrayList<Float> shore : level.shores) {
-				PolygonObstacle obj;
-				float[] shoreFloat = new float[shore.size()];
-				for (int i = 0; i < shore.size(); i++) shoreFloat[i] = shore.get(i);
-				obj = new PolygonObstacle(shoreFloat, 0, 0);
-				obj.setBodyType(BodyDef.BodyType.StaticBody);
-				obj.setDensity(BASIC_DENSITY);
-				obj.setFriction(BASIC_FRICTION);
-				obj.setRestitution(BASIC_RESTITUTION);
-				obj.setDrawScale(scale);
-				if (staticNDS == 0){
-					obj.setTexture(earthTileDay);
-				}
-				if (staticNDS == 1){
-					obj.setTexture(earthTileNight);
-				}
-				if (staticNDS == 2){
-					obj.setTexture(earthTileSunset);
-				}
-				//obj.setTexture(earthTile);
-				obj.setName("shore");
-				ArrayList<Float> scaledShore = new ArrayList<Float>();
-				for (Float f : shore) scaledShore.add(f*scale.x);
-				walls.add(scaledShore);
-				addObject(obj);
-			}
-		}
+
+//		if (level.shores != null) {
+//			for (ArrayList<Float> shore : level.shores) {
+//				PolygonObstacle obj;
+//				float[] shoreFloat = new float[shore.size()];
+//				for (int i = 0; i < shore.size(); i++) shoreFloat[i] = shore.get(i);
+//				obj = new PolygonObstacle(shoreFloat, 0, 0);
+//				obj.setBodyType(BodyDef.BodyType.StaticBody);
+//				obj.setDensity(BASIC_DENSITY);
+//				obj.setFriction(BASIC_FRICTION);
+//				obj.setRestitution(BASIC_RESTITUTION);
+//				obj.setDrawScale(scale);
+//				if (NDS == 0){
+//					obj.setTexture(earthTileDay);
+//				}
+//				if (NDS == 1){
+//					obj.setTexture(earthTileDay);
+//				}
+//				if (NDS == 2){
+//					obj.setTexture(earthTileDay);
+//				}
+//				//obj.setTexture(earthTile);
+//				obj.setName("shore");
+//				ArrayList<Float> scaledShore = new ArrayList<Float>();
+//				for (Float f : shore) scaledShore.add(f*scale.x);
+//				walls.add(scaledShore);
+//				addObject(obj);
+//			}
+//		}
 
 		for (ArrayList<Float> wall : level.walls) {
 			PolygonObstacle obj;
@@ -570,7 +558,7 @@ public class DownstreamController extends WorldController implements ContactList
 			for (Vector2 rock : level.rocks) {
 				WheelObstacle obj;
 //				System.out.println(rockDay);
-				System.out.println("ROCK" + rockDay.getRegionWidth()/2/scale.x);
+//				System.out.println("ROCK" + rockDay.getRegionWidth()/2/scale.x);
 				obj = new WheelObstacle(rock.x,rock.y,rockDay.getRegionWidth()/4/scale.x);
 				obj.setBodyType(BodyDef.BodyType.StaticBody);
 				obj.setSensor(true);
@@ -597,7 +585,7 @@ public class DownstreamController extends WorldController implements ContactList
 		// Create the fish avatar
 		dwidth  = koiTexture.getRegionWidth()/scale.x;
 		dheight = koiTexture.getRegionHeight()/scale.y;
-		System.out.println(dwidth + " " + dheight);
+//		System.out.println(dwidth + " " + dheight);
 		koi = new PlayerModel(level.player.x, level.player.y, 2.5f, 0.925f);
 		koi.setDrawScale(scale);
 		koi.setName("koi");
@@ -647,12 +635,13 @@ public class DownstreamController extends WorldController implements ContactList
 
 		//START KOI CODE
 		//koi on tether
-		boolean onTether = false;
+		boolean onTether = true;
 		if(onTether){
 			koi.initPos = checkpoint.getPosition().add(koi.NE.cpy().rotate90(1).nor().scl(TetherModel.TETHER_DEFAULT_ORBIT));
 			koi.setPosition(koi.initPos);
 			koi.setAttemptingTether(true);
 			koi.setTethered(true);
+			collisionController.initStart(checkpoint0);
 			cacheVel = koi.NE;
 			koi.setLinearVelocity(cacheVel);
 			koi.resolveDirection();
@@ -660,7 +649,10 @@ public class DownstreamController extends WorldController implements ContactList
 		}
 		//koi approaching tether
 		else{
+			koi.setTethered(false);
 			koi.setAttemptingTether(true);
+			collisionController.initStart(checkpoint0);
+
 			Vector2 initVel = checkpoint0.getPosition().cpy().sub(koi.initPos.cpy()).nor();
 			Vector2 initTan = checkpoint0.getPosition().add(initVel.cpy().rotate90(1).nor().scl(TetherModel.TETHER_DEFAULT_ORBIT));
 			cacheVel = initTan.cpy().sub(koi.initPos.cpy()).nor();
@@ -688,12 +680,12 @@ public class DownstreamController extends WorldController implements ContactList
 			HUD.setHelpTexture(helpTexture);
 			HUD.setTutorialStatus(true);
 		}
-		else if (this.level == 3){
+		/*else if (this.level == 3){
 			HUD.setTutorialTexture(tutorial3);
 			HUD.setHelpTexture(helpTexture);
 			HUD.setTutorialStatus(true);
-		}
-		else if (this.level == 4){
+		}*/
+		else if (this.level == 6){
 			HUD.setTutorialTexture(tutorial4);
 			HUD.setHelpTexture(helpTexture);
 			HUD.setTutorialStatus(true);
@@ -738,12 +730,12 @@ public class DownstreamController extends WorldController implements ContactList
 	public void debugPrint(){
 		System.out.println();
 		System.out.println("BEGIN DEBUG");
-		System.out.println("POSITION: "+koi.getPosition());
-		System.out.println("VELOCITY: "+koi.getLinearVelocity());
-		System.out.println("FORCE: "+koi.getForce());
-		System.out.println("Pull: "+koi.pull);
-		System.out.println("Cent: "+koi.cent);
-		System.out.println("Dest: "+koi.dest);
+		System.out.println("POSITION: "+koi.getPosition().cpy());
+		System.out.println("VELOCITY: "+koi.getLinearVelocity().cpy());
+		System.out.println("FORCE: "+koi.getForce().cpy());
+		System.out.println("Pull: "+koi.pull.cpy());
+		System.out.println("Cent: "+koi.cent.cpy());
+		System.out.println("Dest: "+koi.dest.cpy());
 		System.out.println("IS TETHERED: "+koi.isTethered());
 		System.out.println("IS ATTEMPTING TETHER: "+koi.isAttemptingTether());
 		System.out.println("END DEBUG");
@@ -763,7 +755,7 @@ public class DownstreamController extends WorldController implements ContactList
 	 */
 
 	public void update(float dt) {
-		if(debug && false){
+		if(debug){
 			debugPrint();
 		}
 		InputController input = InputController.getInstance();
@@ -799,12 +791,11 @@ public class DownstreamController extends WorldController implements ContactList
 			deathSound.play();
 			koi.die();
 			koi.setLinearVelocity(new Vector2(0,0));
+			koi.setTethered(false);
 			for (TetherModel t : tethers) {
 				t.setTethered(false);
 			}
-			/*if (this.level == 8){
-				enemies.get(0);
-			}*/
+
 			respawn();
 		} else {
 			// ZOOM IN TO PLAYER AT START OF LEVEL
@@ -882,14 +873,15 @@ public class DownstreamController extends WorldController implements ContactList
 
 			// KOI VEOLOCITY CODE
 			if (isTethered()) {
-
 				koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY * 1.3f * speed));
+
 			} 
 			else if(isWhirled()){
 				koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY * 1.7f * speed));
 			}
 			else {
-				koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY * 1.5f * speed));
+
+				koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY * 2.5f * speed));
 			}
 
 			// LOTUS LIGHTING CODE

@@ -101,10 +101,8 @@ public class HUDitems extends Obstacle {
 			canvas.draw(EnergyTexture, new Color(0, 0, 0, .5f), canvas.getWidth()/1.1f - 450f + 120, canvas.getHeight()/1.1f - 20, energyLen(), 50);
 			canvas.draw(EnergyTexture, new Color(0, 0, 0, .2f), canvas.getWidth()/1.1f - 450f + 110 , canvas.getHeight()/1.1f - 30, 360, 70);
 			canvas.drawHUDText(TotalLotus - LotusLit  + "", font, -9, Lilypad);
-			
 		}
-		
-		if(helpTexture != null){
+		if (helpTexture != null){
 			canvas.draw(helpTexture, 40, 40);
 		}
 	}

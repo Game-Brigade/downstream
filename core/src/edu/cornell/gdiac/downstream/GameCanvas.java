@@ -1247,16 +1247,15 @@ public class GameCanvas {
 	public void drawLeadingLine(Vector2 start, Vector2 end, int width) {
 		start = start.cpy();
 		end = end.cpy();
-		Gdx.gl.glLineWidth(width);
-		/*Gdx.gl.glEnable(GL30.GL_BLEND);
+		Gdx.gl.glLineWidth(50);
+		Gdx.gl.glEnable(GL30.GL_BLEND);
 		Gdx.gl.glBlendFunc(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA);
-        */
 		leadingLine.setProjectionMatrix(camera.combined);
         leadingLine.begin(ShapeRenderer.ShapeType.Line);
-        leadingLine.setColor(Color.BLACK);
+        leadingLine.setColor(new Color(0, 0, 0, .5f));
         leadingLine.line(start, end);
         leadingLine.end();
-        /*Gdx.gl.glDisable(GL30.GL_BLEND);*/
+        Gdx.gl.glDisable(GL30.GL_BLEND);
         Gdx.gl.glLineWidth(1);
     }
 	
@@ -1329,11 +1328,11 @@ public class GameCanvas {
 			vectorPath.add(new Vector2(path.get(i),path.get(i+1)));
 		}
 		for (int i = 0; i < vectorPath.size()-1;i++) {
-			//drawLeadingLine(vectorPath.get(i), vectorPath.get(i+1));
-		drawOutline(vectorPath.get(i), vectorPath.get(i+1));
+			drawLeadingLine(vectorPath.get(i), vectorPath.get(i+1));
+		//drawOutline(vectorPath.get(i), vectorPath.get(i+1));
 		}
-		//drawLeadingLine(vectorPath.get(0), vectorPath.get(vectorPath.size()-1));
-		drawOutline(vectorPath.get(0), vectorPath.get(vectorPath.size()-1));
+		drawLeadingLine(vectorPath.get(0), vectorPath.get(vectorPath.size()-1));
+		//drawOutline(vectorPath.get(0), vectorPath.get(vectorPath.size()-1));
 		
 	}
 }

@@ -98,7 +98,7 @@ public class PlayerModel extends BoxObstacle {
 
 		setLinearVelocity(Vector2.Zero);
 
-		speed = 1;
+		speed = 1.0f;
 		pull = Vector2.Zero;
 		cent = Vector2.Zero;
 		dest = Vector2.Zero;
@@ -383,7 +383,7 @@ public class PlayerModel extends BoxObstacle {
 			if(isTethered()){
 				Vector2 farOff = new Vector2(getX(), getY());
 
-				farOff.add(this.getLinearVelocity().cpy().scl(.7f));
+				farOff.add(this.getLinearVelocity().cpy().nor().scl(4f));
 				canvas.draw(ArrowTexture, Color.WHITE , ArrowTexture.getRegionWidth()/2 *.6f , ArrowTexture.getRegionHeight()/2 *.6f,farOff.x*drawScale.x,farOff.y*drawScale.x, getAngle(), .6f, .6f);
 
 			}
@@ -572,7 +572,7 @@ public class PlayerModel extends BoxObstacle {
 		if (isTethered()) {
 			setLinearVelocity(getLinearVelocity().setLength(v*1.5f*speed));
 		} else{
-			setLinearVelocity(getLinearVelocity().setLength(v*2*speed));
+			setLinearVelocity(getLinearVelocity().setLength(v*3*speed));
 		}
 		}
 	}

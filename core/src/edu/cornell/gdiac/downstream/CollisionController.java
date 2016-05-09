@@ -10,7 +10,7 @@ import edu.cornell.gdiac.downstream.obstacle.Obstacle;
 
 public class CollisionController {
 
-	private static final boolean LETHAL_WALLS  = false;
+	private static final boolean LETHAL_WALLS  = true;
 	private static final boolean LETHAL_ROCKS  = true;
 	private static final boolean LETHAL_ENEMIES  = true;
 	private static final boolean LETHAL_WHIRLPOOLS  = false;
