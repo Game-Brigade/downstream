@@ -238,6 +238,7 @@ public class DownstreamController extends WorldController implements ContactList
 		dead = false;
 		whirled = false;
 
+		started = false;
 		paused = false;
 
 		pauseMenu = new PauseMenuMode(canvas);
