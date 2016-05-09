@@ -460,7 +460,7 @@ public class DownstreamController extends WorldController implements ContactList
 		dheight = goalTexture.getRegionHeight()/scale.y;
 		goalTexture.setRegionHeight(goalTexture.getRegionHeight());
 		goalTexture.setRegionWidth(goalTexture.getRegionWidth());
-		goalTile = new BoxObstacle(goalPos.x+cache.x, goalPos.y+cache.y, dwidth/2, dheight/2);
+		goalTile = new BoxObstacle(goalPos.x, goalPos.y, dwidth/2, dheight/2);
 		goalTile.setName("goal");
 		goalTile.setDrawScale(scale);
 		goalTile.setTexture(goalTexture);
@@ -471,13 +471,25 @@ public class DownstreamController extends WorldController implements ContactList
 		goalTile.setAngle((float) Math.atan2(shadowDest.y-goalPos.y,shadowDest.x-goalPos.x));
 		addObject(goalTile);
 
+		// Create the fish avatar
+		dwidth  = koiTexture.getRegionWidth()/scale.x;
+		dheight = koiTexture.getRegionHeight()/scale.y;
+//		System.out.println(dwidth + " " + dheight);
+		koi = new PlayerModel(level.player.x, level.player.y, 2.5f, 0.925f);
+		koi.setDrawScale(scale);
+		koi.setName("koi");
+		koi.setTexture(koiTexture);
+		koi.setWhirled(false);
+		koi.ArrowTexture = Arrow;
+		addObject(koi);
+		
 		//create shadow(s)
 		if(level.lotuses.size() > 0){
-			dwidth = shadowTexture.getRegionWidth()/scale.x*.85f;
-			dheight = shadowTexture.getRegionHeight()/scale.y*.85f;
+			dwidth = shadowTexture.getRegionWidth()/scale.x*1.3f;
+			dheight = shadowTexture.getRegionHeight()/scale.y*1.3f;
 			ShadowModel shadow = new ShadowModel(goalPos.x, goalPos.y, dwidth, dheight, shadowDest);
 			shadow.setName("shadow");
-			shadow.setDrawScale(scale);
+			shadow.setDrawScale(scale.cpy());
 			shadow.setTexture(shadowTexture);
 
 			shadow.setDensity(BASIC_DENSITY);
@@ -582,17 +594,7 @@ public class DownstreamController extends WorldController implements ContactList
 			}
 		}	
 
-		// Create the fish avatar
-		dwidth  = koiTexture.getRegionWidth()/scale.x;
-		dheight = koiTexture.getRegionHeight()/scale.y;
-//		System.out.println(dwidth + " " + dheight);
-		koi = new PlayerModel(level.player.x, level.player.y, 2.5f, 0.925f);
-		koi.setDrawScale(scale);
-		koi.setName("koi");
-		koi.setTexture(koiTexture);
-		koi.setWhirled(false);
-		koi.ArrowTexture = Arrow;
-		addObject(koi);
+
 
 		for (Vector2 lotus : level.lotuses) {
 			TetherModel lantern = new TetherModel(lotus.x, lotus.y, rad, true);
@@ -651,8 +653,6 @@ public class DownstreamController extends WorldController implements ContactList
 		else{
 			koi.setTethered(false);
 			koi.setAttemptingTether(true);
-			collisionController.initStart(checkpoint0);
-
 			Vector2 initVel = checkpoint0.getPosition().cpy().sub(koi.initPos.cpy()).nor();
 			Vector2 initTan = checkpoint0.getPosition().add(initVel.cpy().rotate90(1).nor().scl(TetherModel.TETHER_DEFAULT_ORBIT));
 			cacheVel = initTan.cpy().sub(koi.initPos.cpy()).nor();
@@ -680,13 +680,18 @@ public class DownstreamController extends WorldController implements ContactList
 			HUD.setHelpTexture(helpTexture);
 			HUD.setTutorialStatus(true);
 		}
-		/*else if (this.level == 3){
+		else if (this.level == 3){
 			HUD.setTutorialTexture(tutorial3);
 			HUD.setHelpTexture(helpTexture);
 			HUD.setTutorialStatus(true);
-		}*/
-		else if (this.level == 6){
+		}
+		else if (this.level == 5){
 			HUD.setTutorialTexture(tutorial4);
+			HUD.setHelpTexture(helpTexture);
+			HUD.setTutorialStatus(true);
+		}
+		else if(this.level == 7){
+			HUD.setTutorialTexture(tutorial6);
 			HUD.setHelpTexture(helpTexture);
 			HUD.setTutorialStatus(true);
 		}
@@ -790,7 +795,7 @@ public class DownstreamController extends WorldController implements ContactList
 		if (koi.isDead()) {
 			deathSound.play();
 			koi.die();
-			koi.setLinearVelocity(new Vector2(0,0));
+			koi.setLinearVelocity(Vector2.Zero);
 			koi.setTethered(false);
 			for (TetherModel t : tethers) {
 				t.setTethered(false);
@@ -805,8 +810,11 @@ public class DownstreamController extends WorldController implements ContactList
 			}
 			if(!started){
 				System.out.println("STARTED");
-				started = true;
-				koi.arrowOn = true;
+				if(collisionController.inRangeOf(checkpoint0)){
+					started = true;
+					koi.setAttemptingTether(true);
+					koi.arrowOn = true;
+				}
 			}
 			koi.setLinearVelocity(cacheVel);
 

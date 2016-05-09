@@ -38,5 +38,8 @@ public class ShadowModel extends BoxObstacle {
 		}
 	}
 	
+	public void draw(GameCanvas canvas){
+		canvas.draw(texture, Color.WHITE,origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.y, getAngle(), 2f, 2f);
+	}
 	
 }
