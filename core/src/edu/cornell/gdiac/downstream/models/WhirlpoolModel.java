@@ -1,6 +1,9 @@
 package edu.cornell.gdiac.downstream.models;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 
@@ -13,10 +16,10 @@ public class WhirlpoolModel extends WheelObstacle {
 	private static final int WHIRL_DEFAULT_RADIUS = 1;
 
 	/** The radius at which the player spins around a whirlpool */
-	public static final float WHIRL_DEFAULT_ORBIT = 1.8f;  
+	public static final float WHIRL_DEFAULT_ORBIT = 4f;  
 
 	/** The range at which the player gets pulled into a whirlpool */
-	public static final float WHIRL_DEFAULT_RANGE = 7;
+	public static final float WHIRL_DEFAULT_RANGE = 6;
 	
 	/** The direction the pool spins; 1 is ccw, -1 is cw */
 	private float direction;
@@ -50,10 +53,11 @@ public class WhirlpoolModel extends WheelObstacle {
 	}
 	
 	public void draw(GameCanvas canvas){
+		
 		canvas.draw(texture, Color.WHITE, texture.getRegionWidth()/2, 
 				texture.getRegionHeight()/2, this.getX()*drawScale.x, this.getY()*drawScale.x, (float)(Math.PI*rot*direction),0.4f, 0.4f);
 		rot+=0.02;
-		//canvas.drawLeadingLinePool(this.getPosition(), this.angle, 3);
+		
 		
 	}
 	
@@ -62,12 +66,51 @@ public class WhirlpoolModel extends WheelObstacle {
 	}
 	
 	public void rotationPass(PlayerModel koi){
-		if(numOfRotations == 5){
-			//koi.setDead(true);
+		Vector2 fishVec = koi.getPosition().cpy().sub(this.getPosition()).nor();
+		Vector2 angleVec = this.angle.cpy().sub(this.getPosition()).nor();
+		
+		float fishSlope = Math.abs((koi.getPosition().y - this.getPosition().y) / (koi.getPosition().x - this.getPosition().x));
+		float angleSlope = Math.abs((this.angle.y - this.getPosition().y) / (this.angle.y - this.getPosition().x));
+		
+		System.out.println(numOfRotations);
+		if(fishSlope < angleSlope + .01 && fishSlope > angleSlope - .01 && numOfRotations >= 8){
+			koi.burst();
+			koi.setExitingWhirlpool(true);
+			numOfRotations = -1;
+		}
+		else if(fishSlope < angleSlope + .11 && fishSlope > angleSlope - .11){
+			numOfRotations += 0.25;
+		}
+		else{}
+		
+		/*
+		if(fishVec.isOnLine(angleVec, .1f) && numOfRotations >= 6){
+			System.out.println(numOfRotations);
+			koi.burst();
+			//koi.setWhirled(false);
+			numOfRotations = -1;
+		}
+		else if(fishVec.isOnLine(angleVec, .1f)){
+			numOfRotations += 0.5;
+		}
+		else{}
+	*/
+		
+		/*
+		if(numOfRotations >= 5 && fishVec.angleRad(angleVec) < .01){
+			koi.burst();
+			System.out.println("BURST");
+			numOfRotations = -1;
 		}
 		else{
-			//if(koi.get)
+			if(fishVec.angleRad(angleVec) < .01){
+				System.out.println("ROTATION");
+				numOfRotations += 0.5;
+			}
+			System.out.println("Angle: " + fishVec.angleRad(angleVec));
 		}
+		*/
+		
 	}
 	
 

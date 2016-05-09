@@ -1,6 +1,6 @@
 /*
  *
- * A tether object. A player enters it's radius and begins orbitting
+ * A tether object. A player enters it's radius and begins orbiting
  *
  * Author: Dashiell Brown
  * LibGDX version, 2/6/2015

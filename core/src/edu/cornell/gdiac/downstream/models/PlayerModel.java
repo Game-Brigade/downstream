@@ -42,45 +42,37 @@ public class PlayerModel extends BoxObstacle {
 	public Vector2 rghtOrigin = new Vector2();
 	
 	public Vector2 initPos;
-
 	private Vector2 cachedPos = new Vector2(0, 0);
+	private boolean left;
+	private boolean cachedLeft = false;
 	
 	private int health;
-
 	private Vector2 force;
+	public boolean bursting;	
+	private float energy;
+	private boolean curved;
+	private boolean dead;
+	private float speed;
 	
 	public static final Vector2 NE = (new Vector2(1,-1)).nor();
 	
 	private boolean isTethered;
-	
 	private boolean isWhirled;
-
-	public Vector2 pull;
+	private boolean isExitingWhirlpool;
+	private boolean attemptingTether;
+	private boolean pastTanTether;
 
 	private float fishAlpha = .7f;
 	private Color fishColor = new Color(255, 255, 255, 1);
 	
+	public Vector2 pull;
 	public Vector2 cent;
-
 	private Vector2 dest;
 
-	private boolean attemptingTether;
-
-	public boolean bursting;
+	private Vector2 pullW;
+	private Vector2 centW;
+	private Vector2 destW;
 	
-	private float energy;
-	
-	private boolean curved;
-	
-	private boolean left;
-	
-	private boolean cachedLeft = false;
-
-	private boolean pastTanTether;
-	
-	private boolean dead;
-
-	private float speed;
 	
 	public TextureRegion ArrowTexture;
 
@@ -100,11 +92,15 @@ public class PlayerModel extends BoxObstacle {
 		isTethered = false;
 		attemptingTether = true;
 		isWhirled = false;
+		isExitingWhirlpool = false;
 		setLinearVelocity(NE);
 		speed = 1;
 		pull = Vector2.Zero;
 		cent = Vector2.Zero;
 		dest = Vector2.Zero;
+		pullW = Vector2.Zero;
+		centW = Vector2.Zero;
+		destW = Vector2.Zero;
 	}
 	
 
@@ -130,6 +126,9 @@ public class PlayerModel extends BoxObstacle {
 	}
 	
 
+	public boolean getCurved(){
+		return curved;
+	}
 	public void setCurved(boolean b){
 		curved = b;
 	}
@@ -143,10 +142,10 @@ public class PlayerModel extends BoxObstacle {
 	}
 	
 	public void refreshWhirlForce(Vector2 whirlPos, float rad){
-		pull = whirlPos.cpy().sub(getPosition());
-		pull.setLength(pull.len() + rad);
-		dest = getPosition().cpy().add(pull);
-		cent = getPosition().cpy().add(pull.cpy().scl(0.5f));
+		pullW = whirlPos.cpy().sub(getPosition());
+		pullW.setLength(pullW.len() + rad);
+		destW = getPosition().cpy().add(pullW);
+		centW = getPosition().cpy().add(pullW.cpy().scl(0.5f));
 	}
 	
 	public Vector2 calculateTetherForce(Vector2 tetherPos, float rad){
@@ -186,28 +185,28 @@ public class PlayerModel extends BoxObstacle {
 
 	
 	public Vector2 calculateWhirlForce(Vector2 whirlPos, float rad){
-		if(cent.isZero() || dest.isZero() || pull.isZero()){
-			return cent;
+		if(centW.isZero() || destW.isZero() || pullW.isZero()){
+			return centW;
 		}
 		if(isWhirled()){
 			// TRUE CIRCLE
-			if(getPosition().sub(dest).len2() < .01){
+			if(getPosition().sub(destW).len2() < .01){
 				//pastTanTether = false;
 				//attemptingTether = false;
-				dest = getPosition();
+				destW = getPosition();
 				
 				// set force direction
-				pull = whirlPos.sub(getPosition());
+				pullW = whirlPos.sub(getPosition());
 				
 				// set force magnitude
-			    float forceMagnitude = (float) (1.9*getMass() * getLinearVelocity().len2() / rad);
-			    return pull.setLength(forceMagnitude);
+			    float forceMagnitude = (float) (3*getMass() * getLinearVelocity().len2() / rad);
+			    return pullW.setLength(forceMagnitude);
 			} 
 			
 			// CORRECTIVE CIRCLE
 			else{
-			    float forceMagnitude = (float) (1.9*getMass() * getLinearVelocity().len2() / (pull.len()/2));
-			    return cent.cpy().sub(getPosition()).setLength(forceMagnitude);			
+			    float forceMagnitude = (float) (3*getMass() * getLinearVelocity().len2() / (pullW.len()/2));
+			    return centW.cpy().sub(getPosition()).setLength(forceMagnitude);			
 			}
 		}
 		return Vector2.Zero;
@@ -230,11 +229,11 @@ public class PlayerModel extends BoxObstacle {
 	public void passAdjustWhirl(Vector2 whirlPos){
 		Vector2 perp = whirlPos.cpy().sub(getInitialTangentPoint(whirlPos)).scl(.5f);
 		float rad = perp.len();
-		cent = getPosition().add(getLinearVelocity().setLength(rad/2)).add(perp);
+		centW = getPosition().add(getLinearVelocity().setLength(rad/2)).add(perp);
 		
-		dest = getPosition().add(perp.cpy().scl(2)).add(getLinearVelocity().setLength(rad));
-		pull = dest.cpy().sub(getPosition());
-		cent = getPosition().cpy().add(pull.cpy().scl(0.5f));
+		destW = getPosition().add(perp.cpy().scl(2)).add(getLinearVelocity().setLength(rad));
+		pullW = destW.cpy().sub(getPosition());
+		centW = getPosition().cpy().add(pullW.cpy().scl(0.5f));
 		
 		
 	}
@@ -299,6 +298,14 @@ public class PlayerModel extends BoxObstacle {
 	
 	public void setWhirled(boolean newState){
 		isWhirled = newState;
+	}
+	
+	public boolean isExitingWhirlpool(){
+		return this.isExitingWhirlpool;
+	}
+	
+	public void setExitingWhirlpool(boolean newState){
+		this.isExitingWhirlpool = newState;
 	}
 	
 	public boolean left(TetherModel t){

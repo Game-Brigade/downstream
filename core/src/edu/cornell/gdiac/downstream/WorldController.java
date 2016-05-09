@@ -98,10 +98,12 @@ public abstract class WorldController implements Screen {
 	protected static final String LILY_TEXTURE_S = "tethers/Lily_Sunset.png";
 	protected static final String LILY_TEXTURE_N = "tethers/Lily_Night.png";
 	protected static final String LILY_TEXTURE_D = "tethers/Lily_Day.png";
-	/** Reference to the whirlpool texture */
-	protected static final String WHIRLPOOL_TEXTURE = "terrain/whirlpool.png";
-	/** Reference to the flipped whirlpool texture */
-	protected static final String WHIRLPOOL_FLIP_TEXTURE = "terrain/whirlpool_flip.png";
+	/** References to the whirlpool textures */
+	protected static final String WHIRLPOOL_TEXTURE = "Final_Assets/Beta_Art_Assets/Objects(PNGs)/whirlpool.png";
+	protected static final String WHIRLPOOL_TEXTURE_N = "Final_Assets/Beta Art Assets/Objects(PNGs)/whirlpool_night.png";
+	protected static final String WHIRLPOOL_TEXTURE_D = "Final_Assets/Beta Art Assets/Objects(PNGs)/whirlpool_day.png";
+	protected static final String WHIRLPOOL_TEXTURE_S = "Final_Assets/Beta Art Assets/Objects(PNGs)/whirlpool_sunset.png";
+	
 	/** HUD textures */
 	protected static final String ENERGYBAR_TEXTURE = "MENUS/UI_bar.png";
 	protected static final String UI_FLOWER = "MENUS/UI_lotus.png";
@@ -134,7 +136,6 @@ public abstract class WorldController implements Screen {
 	protected TextureRegion rockSunset;
 	/** Texture assets for whirlpools */
 	protected TextureRegion whirlpoolTexture;
-	protected TextureRegion whirlpoolFlipTexture;
 	/** Texture assets for HUD */
 	protected TextureRegion energyBarTexture;
 	protected TextureRegion UILotusTexture;
@@ -274,10 +275,7 @@ public abstract class WorldController implements Screen {
 
 		manager.load(WHIRLPOOL_TEXTURE, Texture.class);
 		assets.add(WHIRLPOOL_TEXTURE);
-
-		manager.load(WHIRLPOOL_FLIP_TEXTURE, Texture.class);
-		assets.add(WHIRLPOOL_FLIP_TEXTURE);
-
+		
 		manager.load(ENERGYBAR_TEXTURE, Texture.class);
 		assets.add(ENERGYBAR_TEXTURE);
 
@@ -458,8 +456,7 @@ public abstract class WorldController implements Screen {
 		rockSunset = createTexture(manager,ROCK_FILE_S, true);
 		
 		
-		whirlpoolTexture = createTexture(manager,WHIRLPOOL_TEXTURE,false);
-		whirlpoolFlipTexture = createTexture(manager,WHIRLPOOL_FLIP_TEXTURE,false);
+		whirlpoolTexture = createTexture(manager, WHIRLPOOL_TEXTURE, true);
 		Arrow = createTexture(manager, ARROW, false);
 		
 		
