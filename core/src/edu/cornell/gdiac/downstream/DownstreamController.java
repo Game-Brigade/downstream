@@ -963,7 +963,7 @@ public class DownstreamController extends WorldController implements ContactList
 
 			// System.out.println(relativeTime);
 			// koiCcurrentFrame.flip(koi.left(closestTether), false);
-			System.out.println(isWhirled());
+			//System.out.println(isWhirled());
 			if (isWhirled() || isTethered()) {
 				koi.setCurved(true);
 				if(isWhirled()){
