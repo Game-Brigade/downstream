@@ -20,6 +20,8 @@ public class HUDitems extends Obstacle {
 	
 	private boolean tutorial = false;
 	private TextureRegion tutorialTexture;
+	private boolean help = false;
+	private TextureRegion helpTexture;
 
 	public HUDitems(){
 		TotalLotus = 0;
@@ -78,7 +80,13 @@ public class HUDitems extends Obstacle {
 		}
 		c.a = .6f;
 		return new Color(0, 0, 0, .2f);
-
+	}
+	
+	public void setHelp(boolean b){
+		help = b;
+	}
+	public void setHelpTexture(TextureRegion tr){
+		helpTexture = tr;
 	}
 
 
@@ -90,9 +98,10 @@ public class HUDitems extends Obstacle {
 			
 		}
 		else if (TotalLotus != 0 && EnergyTexture != null && Lilypad != null) {
-			canvas.draw(EnergyTexture, new Color(0, 0, 0, .5f), canvas.getWidth()/1.1f - 450f - 40, canvas.getHeight()/1.1f - 20, energyLen(), 50);
-			canvas.draw(EnergyTexture, new Color(0, 0, 0, .2f), canvas.getWidth()/1.1f - 450f - 50 , canvas.getHeight()/1.1f - 30, 360, 70);
+			canvas.draw(EnergyTexture, new Color(0, 0, 0, .5f), canvas.getWidth()/1.1f - 450f + 120, canvas.getHeight()/1.1f - 20, energyLen(), 50);
+			canvas.draw(EnergyTexture, new Color(0, 0, 0, .2f), canvas.getWidth()/1.1f - 450f + 110 , canvas.getHeight()/1.1f - 30, 360, 70);
 			canvas.drawHUDText(TotalLotus - LotusLit  + "", font, -9, Lilypad);
+			canvas.draw(helpTexture, 40, 40);
 		}
 	}
 
