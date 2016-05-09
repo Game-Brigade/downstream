@@ -252,7 +252,7 @@ public class DownstreamController extends WorldController implements ContactList
 	}
 
 	private Color levelAlpha(int level){
-		return new Color(255, 255, 255, (float)((level-1) % 7)/(7f));
+		return new Color(255, 255, 255, (float)((level-1) % 5)/(5f));
 	}
 
 	private int NightDayDeterminer(int level){
@@ -268,10 +268,10 @@ public class DownstreamController extends WorldController implements ContactList
 	}
 
 	private int dayNightBinary(int level){
-		if (level <= 7){
+		if (level <= 5){
 			return 0;
 		}
-		else if (level < 15){
+		else if (level < 10){
 			return 1;
 		}
 		else{
@@ -451,7 +451,7 @@ public class DownstreamController extends WorldController implements ContactList
 			eFish.setGoal(0, 0);
 			addObject(eFish);
 			enemies.add(eFish);
-			if (this.level == 8){
+			if (this.level == 12){
 				enemyPos8 = enemyPos;
 				enemyPath8 = enemyPath;
 			}
@@ -699,11 +699,11 @@ public class DownstreamController extends WorldController implements ContactList
 			HUD.setHelpTexture(helpTexture);
 			HUD.setTutorialStatus(true);
 		}
-		else if(this.level == 7){
+		/*else if(this.level == 7){
 			HUD.setTutorialTexture(tutorial5);
 			HUD.setHelpTexture(helpTexture);
 			HUD.setTutorialStatus(true);
-		}
+		}*/
 		addHUD(HUD);
 
 
@@ -814,7 +814,7 @@ public class DownstreamController extends WorldController implements ContactList
 			for (TetherModel t : tethers) {
 				t.setTethered(false);
 			}
-			if (this.level == 8){
+			if (this.level == 12){
 				level8Fish(enemies.get(0));
 			}
 			respawn();
