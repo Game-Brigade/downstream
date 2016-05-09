@@ -89,11 +89,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private ArrayList<WheelObstacle> rocks = new ArrayList<WheelObstacle>();
 	private ArrayList<EnemyModel> enemies = new ArrayList<EnemyModel>();
 	private ArrayList<WhirlpoolModel> wpools = new ArrayList<WhirlpoolModel>();
-<<<<<<< HEAD
-	
-=======
-//	private ArrayList<ArrayList<Float>> walls = new ArrayList<ArrayList<Float>>();
->>>>>>> aa9247af291b8c8482dbdbf48715b10dc233d952
+
 	private PlayerModel koi;
 	private BoxObstacle goalTile;
 	private EnemyModel eFish;
@@ -731,14 +727,10 @@ public class DownstreamController extends WorldController implements ContactList
 			HUD.setTutorialStatus(false);
 			input.setHelpPressed(false);
 		}
-<<<<<<< HEAD
+
 		if (input.helpPressed()){
 			HUD.setTutorialStatus(true);
 		}
-		else
-=======
-
->>>>>>> aa9247af291b8c8482dbdbf48715b10dc233d952
 		if (collisionController.didWin()) {
 			setComplete(true);
 			tillNextLevel++;

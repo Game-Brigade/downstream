@@ -232,8 +232,7 @@ public abstract class WorldController implements Screen {
 	protected TextureRegion goalCurrentFrame;
 	protected TextureRegion[] goalFrames;
 	protected Color levelAlpha = new Color(255,255,255,.5f);
-	
-	protected ArrayList<ArrayList<Float>> walls = new ArrayList<ArrayList<Float>>();
+
 	
 	
 
