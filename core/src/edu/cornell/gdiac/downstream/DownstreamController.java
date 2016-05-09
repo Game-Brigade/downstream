@@ -709,6 +709,7 @@ public class DownstreamController extends WorldController implements ContactList
 			collisionController.initStart(checkpoint);
 			koi.setPosition(checkpoint.getPosition().add(koi.NE.cpy().rotate90(1).nor().scl(TetherModel.TETHER_DEFAULT_ORBIT)));
 			koi.setAttemptingTether(true);
+			koi.setTethered(true);
 			cacheAttempt = checkpoint;
 			koi.setLinearVelocity(koi.NE);
 			koi.setDead(false);
