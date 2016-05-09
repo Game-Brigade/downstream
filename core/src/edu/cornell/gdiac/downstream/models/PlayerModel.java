@@ -54,7 +54,7 @@ public class PlayerModel extends BoxObstacle {
 	private boolean dead;
 	private float speed;
 	
-	public static final Vector2 NE = (new Vector2(1,-1)).nor();
+	public static final Vector2 NE = (new Vector2(1,1)).nor();
 	
 	private boolean isTethered;
 	private boolean isWhirled;
@@ -67,7 +67,7 @@ public class PlayerModel extends BoxObstacle {
 	
 	public Vector2 pull;
 	public Vector2 cent;
-	private Vector2 dest;
+	public Vector2 dest;
 
 	private Vector2 pullW;
 	private Vector2 centW;
@@ -75,6 +75,8 @@ public class PlayerModel extends BoxObstacle {
 	
 	
 	public TextureRegion ArrowTexture;
+
+	public boolean arrowOn = false;
 
 	/** Create a new player at x,y. */
 	public PlayerModel(float x, float y, float width, float height) {
@@ -90,7 +92,7 @@ public class PlayerModel extends BoxObstacle {
 		force = new Vector2();
 		health = 1;
 		isTethered = false;
-		attemptingTether = true;
+		attemptingTether = false;
 		isWhirled = false;
 		isExitingWhirlpool = false;
 
@@ -166,19 +168,19 @@ public class PlayerModel extends BoxObstacle {
 				
 				// set force magnitude
 			    float forceMagnitude = (float) (getMass() * getLinearVelocity().len2() / rad);
-			    return pull.setLength(forceMagnitude);
+			    return pull.setLength(Math.abs(forceMagnitude));
 			} 
 			
 			// CORRECTIVE CIRCLE
 			else{
 			    float forceMagnitude = (float) (getMass() * getLinearVelocity().len2() / (pull.len()/2));
-			    return cent.cpy().sub(getPosition()).setLength(forceMagnitude);			
+			    return cent.cpy().sub(getPosition()).setLength(Math.abs(forceMagnitude));			
 			}
 		}
 		else{
 			if(isAttemptingTether()){
 			    float forceMagnitude = (float) (getMass() * getLinearVelocity().len2() / (pull.len()/2));
-			    return cent.cpy().sub(getPosition()).setLength(forceMagnitude);			
+			    return cent.cpy().sub(getPosition()).setLength(Math.abs(forceMagnitude));			
 			}
 			return Vector2.Zero;
 		}
@@ -204,7 +206,6 @@ public class PlayerModel extends BoxObstacle {
 			    float forceMagnitude = (float) (3*getMass() * getLinearVelocity().len2() / rad);
 			    return pullW.setLength(forceMagnitude);
 			} 
-			
 			// CORRECTIVE CIRCLE
 			else{
 			    float forceMagnitude = (float) (3*getMass() * getLinearVelocity().len2() / (pullW.len()/2));
@@ -212,7 +213,6 @@ public class PlayerModel extends BoxObstacle {
 			}
 		}
 		return Vector2.Zero;
-		
 	}
 	
 	public void passAdjust(Vector2 tetherPos){
@@ -268,8 +268,8 @@ public class PlayerModel extends BoxObstacle {
 	
 	public boolean willIntersect(Vector2 target) {
 		Vector2 time = timeToIntersect(target);
-		//return time.x > -0.009 && time.y > -0.009;
-		return getLinearVelocity().isCollinear(target.sub(getPosition()), .09f);
+		return time.x > -0.009 && time.y > -0.009;
+		//return getLinearVelocity().isCollinear(target.sub(getPosition()), .09f);
 	}
 	
 	public boolean willIntersectTether(Vector2 tether, int tetherRange) {
@@ -379,10 +379,10 @@ public class PlayerModel extends BoxObstacle {
 	 */
 	public void draw(GameCanvas canvas) {
 		//		canvas.drawLeadingLine(body.getPosition(), new Vector2(0,0));
-		if (true){
+		if (arrowOn ){
 			if(isTethered()){
-
 				Vector2 farOff = new Vector2(getX(), getY());
+
 				farOff.add(this.getLinearVelocity().cpy().scl(.7f));
 				canvas.draw(ArrowTexture, Color.WHITE , ArrowTexture.getRegionWidth()/2 *.6f , ArrowTexture.getRegionHeight()/2 *.6f,farOff.x*drawScale.x,farOff.y*drawScale.x, getAngle(), .6f, .6f);
 

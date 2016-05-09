@@ -535,14 +535,14 @@ public abstract class WorldController implements Screen {
 		// Allocate the tiles
 
 
-		setBackground(manager.get(BACKGROUND_FILE_N, Texture.class), 1);
-		getBackground(1).setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
+		setBackground(manager.get(BACKGROUND_FILE_N, Texture.class), 2);
+		getBackground(2).setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
 
 		setBackground(manager.get(BACKGROUND_FILE_D, Texture.class), 0);
 		getBackground(0).setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
 
-		setBackground(manager.get(BACKGROUND_FILE_S, Texture.class), 2);
-		getBackground(2).setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
+		setBackground(manager.get(BACKGROUND_FILE_S, Texture.class), 1);
+		getBackground(1).setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
 
 		overlay = manager.get(OVERLAY_FILE, Texture.class);
 		overlay.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
@@ -604,14 +604,14 @@ public abstract class WorldController implements Screen {
 	}	
 	
 	
-	public void setDayTime(int i, int fadeOut, int fadeIn){
+	public void setDayTime(int i){
 		dayTime = i;
 		this.fadeOut = fadeOut;
 		this.fadeIn = fadeIn;
 	}
 	
-	public void setLevelAlpha(float alpha){
-		levelAlpha.set(255, 255, 255, alpha);
+	public void setLevelAlpha(Color color){
+		levelAlpha = color;
 	}
 	
 	/**
@@ -705,7 +705,7 @@ public abstract class WorldController implements Screen {
 	/** Whether we have failed at this world (and need a reset) */
 	private boolean failed;
 	/** Whether or not debug mode is active */
-	private boolean debug;
+	protected boolean debug;
 	/** Countdown active for winning or losing */
 	private int countdown;
 
@@ -1052,9 +1052,10 @@ public abstract class WorldController implements Screen {
 		ch = canvas.getHeight();
 		for (int i = -5; i < 5; i++) {
 			for (int j = -5; j < 5; j++) {
-				//canvas.draw(getBackground(dayTime), Color.WHITE, cw*i * 2, ch*j * 2, cw * 2,   ch * 2);
-				canvas.draw(getBackground(fadeOut), Color.WHITE, cw*i * 2, ch*j * 2, cw * 2,   ch * 2);
-				canvas.draw(getBackground(fadeIn), levelAlpha, cw*i * 2, ch*j * 2, cw * 2,   ch * 2);
+				canvas.draw(getBackground(dayTime), Color.WHITE, cw*i * 2, ch*j * 2, cw * 2,   ch * 2);
+				if(dayTime == 0 || dayTime == 1){
+					canvas.draw(getBackground(dayTime + 1), levelAlpha, cw*i * 2, ch*j * 2, cw * 2,   ch * 2);
+				}
 			}
 		}
 		canvas.end();
@@ -1190,21 +1191,20 @@ public abstract class WorldController implements Screen {
 		else if (n == 1){
 			return backgroundS;
 		}
-		else if (n == 2){
+		else{
 			return backgroundN;
 		}
-		return backgroundD;
 	}
 
 	public static void setBackground(Texture background, int n) {
-		if (n == 2){
-			WorldController.backgroundN = background;
-		}
 		if (n == 0){
 			WorldController.backgroundD = background;
 		}
-		if (n == 1){
+		else if (n == 1){
 			WorldController.backgroundS = background;
+		}
+		else {
+			WorldController.backgroundN = background;
 		}
 	}
 
