@@ -47,7 +47,7 @@ import edu.cornell.gdiac.util.*;
 public class LoadingMode implements Screen, InputProcessor, ControllerListener {
 	// Textures necessary to support the loading screen 
 	private static final String BACKGROUND_FILE = "loading/GameBrigade2.png";
-	private static final String PROGRESS_FILE = "loading/progressbar.png";
+	private static final String PROGRESS_FILE = "Final_Assets/Menus/progressbar.png";
 	private static final String PLAY_BTN_FILE = "loading/startgame.png";
 	
 	/** Background texture for start-up */
@@ -123,6 +123,9 @@ public class LoadingMode implements Screen, InputProcessor, ControllerListener {
 	private int   startButton;
 	/** Whether or not this player mode is still active */
 	private boolean active;
+	
+	/** Waiting time to go to main menu */
+	private int wait = 0;
 
 	/**
 	 * Returns the budget for the asset loader.
@@ -250,6 +253,7 @@ public class LoadingMode implements Screen, InputProcessor, ControllerListener {
 	 * @param delta Number of seconds since last animation frame
 	 */
 	private void update(float delta) {
+		wait++;
 		if (playButton == null) {
 			manager.update(budget);
 			this.progress = manager.getProgress();
@@ -272,13 +276,9 @@ public class LoadingMode implements Screen, InputProcessor, ControllerListener {
 		canvas.begin();
 		canvas.draw(background, Color.WHITE, background.getWidth()/2, background.getHeight()/2, 
 				canvas.getWidth()/2, canvas.getHeight()/2, 0, scale, scale);
-		if (playButton == null) {
-			drawProgress(canvas);
-		} else {
-			Color tint = (pressState == 1 ? Color.GRAY: Color.WHITE);
-			canvas.draw(playButton, tint, playButton.getWidth()/2, playButton.getHeight()/2, 
-						centerX, centerY, 0, BUTTON_SCALE*scale, BUTTON_SCALE*scale);
-		}
+		drawProgress(canvas);
+			
+		
 		canvas.end();
 	}
 	
@@ -292,17 +292,17 @@ public class LoadingMode implements Screen, InputProcessor, ControllerListener {
 	 * @param canvas The drawing context
 	 */	
 	private void drawProgress(GameCanvas canvas) {	
-		canvas.draw(statusBkgLeft,   Color.BLACK, centerX-width/2, centerY, scale*PROGRESS_CAP, scale*PROGRESS_HEIGHT);
-		canvas.draw(statusBkgRight,  Color.BLACK, centerX+width/2-scale*PROGRESS_CAP, centerY, scale*PROGRESS_CAP, scale*PROGRESS_HEIGHT);
-		canvas.draw(statusBkgMiddle, Color.BLACK, centerX-width/2+scale*PROGRESS_CAP, centerY, width-2*scale*PROGRESS_CAP, scale*PROGRESS_HEIGHT);
+		canvas.draw(statusBkgLeft,   Color.WHITE, centerX-width/2, centerY, scale*PROGRESS_CAP, scale*PROGRESS_HEIGHT);
+		canvas.draw(statusBkgRight,  Color.WHITE, centerX+width/2-scale*PROGRESS_CAP, centerY, scale*PROGRESS_CAP, scale*PROGRESS_HEIGHT);
+		canvas.draw(statusBkgMiddle, Color.WHITE, centerX-width/2+scale*PROGRESS_CAP, centerY, width-2*scale*PROGRESS_CAP, scale*PROGRESS_HEIGHT);
 
-		canvas.draw(statusFrgLeft,   Color.OLIVE, centerX-width/2, centerY, scale*PROGRESS_CAP, scale*PROGRESS_HEIGHT);
+		canvas.draw(statusFrgLeft,   Color.WHITE, centerX-width/2, centerY, scale*PROGRESS_CAP, scale*PROGRESS_HEIGHT);
 		if (progress > 0) {
 			float span = progress*(width-2*scale*PROGRESS_CAP)/2.0f;
-			canvas.draw(statusFrgRight,  Color.OLIVE, centerX-width/2+scale*PROGRESS_CAP+span, centerY, scale*PROGRESS_CAP, scale*PROGRESS_HEIGHT);
-			canvas.draw(statusFrgMiddle, Color.OLIVE, centerX-width/2+scale*PROGRESS_CAP, centerY, span, scale*PROGRESS_HEIGHT);
+			canvas.draw(statusFrgRight,  Color.WHITE, centerX-width/2+scale*PROGRESS_CAP+span, centerY, scale*PROGRESS_CAP, scale*PROGRESS_HEIGHT);
+			canvas.draw(statusFrgMiddle, Color.WHITE, centerX-width/2+scale*PROGRESS_CAP, centerY, span, scale*PROGRESS_HEIGHT);
 		} else {
-			canvas.draw(statusFrgRight,  Color.OLIVE, centerX-width/2+scale*PROGRESS_CAP, centerY, scale*PROGRESS_CAP, scale*PROGRESS_HEIGHT);
+			canvas.draw(statusFrgRight,  Color.WHITE, centerX-width/2+scale*PROGRESS_CAP, centerY, scale*PROGRESS_CAP, scale*PROGRESS_HEIGHT);
 		}
 	}
 
@@ -321,7 +321,7 @@ public class LoadingMode implements Screen, InputProcessor, ControllerListener {
 			draw();
 
 			// We are are ready, notify our listener
-			if (isReady() && listener != null) {
+			if (wait == 200 && listener != null) {
 				listener.exitScreen(this, -1);
 			}
 		}

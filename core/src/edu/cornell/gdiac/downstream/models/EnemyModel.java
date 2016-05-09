@@ -56,7 +56,7 @@ public class EnemyModel extends SimpleObstacle {
 	
 	private boolean flee = false;
 	
-	private float alpha = 1;
+	private float alpha = .8f;
 	
 	private Color c = new Color(255, 255, 255, alpha);
 	
@@ -352,7 +352,7 @@ public class EnemyModel extends SimpleObstacle {
 	 public void draw(GameCanvas canvas){
 		 if (texture != null) {
 			 fade();
-			 canvas.draw(texture, c ,origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x,getAngle(),1,1);
+			 canvas.draw(texture, c ,origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x,getAngle() + 3.1415f,.35f,.3f);
 			}
 	 }
 	/*public void applyForce() {
