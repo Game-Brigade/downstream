@@ -276,6 +276,7 @@ public class DownstreamController extends WorldController implements ContactList
 		
 		
 		
+		
 		// 0 is day 1 is sunset 2 is night
 		int NDS = NightDayDeterminer(this.level);
 
@@ -613,7 +614,13 @@ public class DownstreamController extends WorldController implements ContactList
 		cameraController.zoomStart(levelCamWidth, levelCamHeight, center, koi.getPosition().cpy().scl(scale));
 
 		HUD = new HUDitems(lanterns.size(), UILotusTexture, energyBarTexture, secondFont);
+		HUD.setTutorialTexture(tutorial1);
 		addHUD(HUD);
+		
+		if (this.level == 1){
+			HUD.setTutorialTexture(tutorial1);
+			HUD.setTutorialStatus(true);
+		}
 
 
 	}
@@ -662,6 +669,9 @@ public class DownstreamController extends WorldController implements ContactList
 
 	public void update(float dt) {
 		InputController input = InputController.getInstance();
+		if (input.tutorial == true){
+			HUD.setTutorialStatus(false);
+		}
 		if (collisionController.didWin()) {
 			setComplete(true);
 			tillNextLevel++;

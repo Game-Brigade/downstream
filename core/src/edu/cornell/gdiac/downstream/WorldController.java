@@ -107,6 +107,10 @@ public abstract class WorldController implements Screen {
 	protected static final String UI_FLOWER = "MENUS/UI_lotus.png";
 	protected static final String OVERLAY = "terrain/texture.jpg";
 	protected static final String ARROW = "koi/arrow.png";
+	protected static final String TUTORIAL_TEXTURE1 = "MENUS/text-box.png";
+	protected static final String TUTORIAL_TEXTURE2 = "MENUS/text-box.png";
+	protected static final String TUTORIAL_TEXTURE3 = "MENUS/text-box.png";
+	protected static final String TUTORIAL_TEXTURE4 = "MENUS/text-box.png";
 
 	// TextureRegions//
 	/** Texture assets for the koi */
@@ -139,6 +143,10 @@ public abstract class WorldController implements Screen {
 	protected TextureRegion energyBarTexture;
 	protected TextureRegion UILotusTexture;
 	protected TextureRegion Arrow;
+	protected TextureRegion tutorial1;
+	protected TextureRegion tutorial2;
+	protected TextureRegion tutorial3;
+	protected TextureRegion tutorial4;
 	//Sounds//
 	protected static final String LIGHTING_SOUND = "SOUNDS/lighting_1.mp3";
 	protected Music deathSound;
@@ -313,6 +321,16 @@ public abstract class WorldController implements Screen {
 
 		manager.load(ARROW, Texture.class);
 		assets.add(ARROW);
+		
+		manager.load(TUTORIAL_TEXTURE1, Texture.class);
+		assets.add(TUTORIAL_TEXTURE1);
+		manager.load(TUTORIAL_TEXTURE2, Texture.class);
+		assets.add(TUTORIAL_TEXTURE2);
+		manager.load(TUTORIAL_TEXTURE3, Texture.class);
+		assets.add(TUTORIAL_TEXTURE3);
+		manager.load(TUTORIAL_TEXTURE4, Texture.class);
+		assets.add(TUTORIAL_TEXTURE4);
+		
 
 		referenceC.a = .3f;
 
@@ -474,6 +492,11 @@ public abstract class WorldController implements Screen {
 		whirlpoolTexture = createTexture(manager,WHIRLPOOL_TEXTURE,false);
 		whirlpoolFlipTexture = createTexture(manager,WHIRLPOOL_FLIP_TEXTURE,false);
 		Arrow = createTexture(manager, ARROW, false);
+		
+		tutorial1 = createTexture(manager, TUTORIAL_TEXTURE1, false);
+		tutorial2 = createTexture(manager, TUTORIAL_TEXTURE2, false);
+		tutorial3 = createTexture(manager, TUTORIAL_TEXTURE3, false);
+		tutorial4 = createTexture(manager, TUTORIAL_TEXTURE4, false);
 
 
 

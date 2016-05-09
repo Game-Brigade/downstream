@@ -92,6 +92,7 @@ public class InputController {
 	private boolean plusPrevious;
 	private boolean minusPressed;
 	private boolean minusPrevious;
+	private boolean tutorialPressed;
 	
 	/** How much did we move horizontally? */
 	private float horizontal;
@@ -113,6 +114,7 @@ public class InputController {
 	public boolean slow;
 	public boolean fast;
 	public boolean kill;
+	public boolean tutorial;
 	
 	public enum SelectionType {
 		Lilypad, 
@@ -429,7 +431,7 @@ public class InputController {
 		plusPressed = (secondary && pausePressed) || (Gdx.input.isKeyPressed(Input.Keys.EQUALS));
 		minusPressed = (secondary && pausePressed) || (Gdx.input.isKeyPressed(Input.Keys.MINUS));
 		leftClick = (secondary && leftClick) || (Gdx.input.isButtonPressed(Input.Buttons.LEFT));
-		
+		tutorial = (secondary && tutorialPressed) || (Gdx.input.isButtonPressed(Input.Keys.Q));
 		// level editor commands
 		upPressed    = Gdx.input.isKeyPressed(Input.Keys.UP);
 		downPressed  = Gdx.input.isKeyPressed(Input.Keys.DOWN);
@@ -491,6 +493,13 @@ public class InputController {
 			accel = true;
 		} else {
 			accel = false;
+		}
+		
+		if (Gdx.input.isKeyPressed(Input.Keys.Q)){
+			tutorial = true;
+		}
+		else{
+			tutorial = false;
 		}
 		
 		// Mouse results
