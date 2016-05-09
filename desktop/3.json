@@ -170,6 +170,15 @@
       "y": -566.6393
     }
   ],
-  "rocks": []
+  "rocks": [
+    {
+      "x": 3.8095055,
+      "y": 9.773999
+    },
+    {
+      "x": 23.933498,
+      "y": 13.127996
+    }
+  ]
 }
 Controllers: removed manager for application, 0 managers active

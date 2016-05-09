@@ -129,6 +129,7 @@ public class GDXRoot extends Game implements ScreenListener {
 	 * @param exitCode The state of the screen upon exit
 	 */
 	public void exitScreen(Screen screen, int exitCode) {
+		
 		if (screen == loading) {
 			loading.dispose();
 			loading = null;
@@ -183,6 +184,7 @@ public class GDXRoot extends Game implements ScreenListener {
 			levelSelect = null;
 		}
 		else if (screen == levelSelect){
+			
 			playGame = new DownstreamController(exitCode);
 			playGame.preLoadContent(manager);
 			playGame.loadContent(manager);

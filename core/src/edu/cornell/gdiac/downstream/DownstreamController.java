@@ -635,7 +635,7 @@ public class DownstreamController extends WorldController implements ContactList
 
 		//START KOI CODE
 		//koi on tether
-		boolean onTether = true;
+		boolean onTether = false;
 		if(onTether){
 			koi.initPos = checkpoint.getPosition().add(koi.NE.cpy().rotate90(1).nor().scl(TetherModel.TETHER_DEFAULT_ORBIT));
 			koi.setPosition(koi.initPos);
@@ -937,15 +937,13 @@ public class DownstreamController extends WorldController implements ContactList
 					koi.setWhirled(false);
 				}
 				
-				
-				
 			}
 
 			else{		
 				if(koi.isAttemptingTether()){
 
 					// HIT TANGENT
-					if (koi.getPosition().sub(initTeth).len2() < .01) {
+					if (koi.getPosition().sub(initTeth).len2() < .05) {
 						koi.setTethered(true);
 						koi.setWhirled(false);
 						koi.setAttemptingTether(false);
@@ -977,12 +975,6 @@ public class DownstreamController extends WorldController implements ContactList
 				cameraController.moveCameraTowards(closestTether.getPosition().cpy().scl(scale));
 				cameraController.zoomOut();
 			} 
-			/*
-			else if(isWhirled()){
-				cameraController.moveCameraTowards(closestWhirlpool.getPosition().cpy().scl(scale));
-				cameraController.zoomOut();
-			}
-			*/
 			else {
 				cameraController.moveCameraTowards(koi.getPosition().cpy().scl(scale));
 				cameraController.zoomIn();
@@ -1014,8 +1006,7 @@ public class DownstreamController extends WorldController implements ContactList
 			closedFlowercurrentFrame2 = closedFlowerAnimation2.getKeyFrame(stateTime, true);
 			openFlowercurrentFrame2 = openFlowerAnimation2.getKeyFrame(stateTime, true);
 
-			// System.out.println(relativeTime);
-			// koiCcurrentFrame.flip(koi.left(closestTether), false);
+	
 			if (isWhirled() || isTethered()) {
 				koi.setCurved(true);
 				if(isWhirled()){

@@ -666,13 +666,13 @@ public abstract class WorldController implements Screen {
 
 	/** Exit code for quitting the game */
 	public static final int EXIT_QUIT = 0;
-	public static final int EXIT_MAIN = 9;
-	public static final int EXIT_SELECT = 10;
-	public static final int EXIT_PAUSE = 11;
-	public static final int EXIT_EDIT = 12;
-	public static final int EXIT_OPTIONS = 13;
-	public static final int EXIT_NEXT = 14;
-	public static final int EXIT_PREV = 15;
+	public static final int EXIT_MAIN = 17;
+	public static final int EXIT_SELECT = 18;
+	public static final int EXIT_PAUSE = 19;
+	public static final int EXIT_EDIT = 20;
+	public static final int EXIT_OPTIONS = 21;
+	public static final int EXIT_NEXT = 22;
+	public static final int EXIT_PREV = 23;
 
 	/** How many frames after winning/losing do we continue? */
 	public static final int EXIT_COUNT = 120;
