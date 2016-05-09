@@ -287,14 +287,14 @@ public class DownstreamController extends WorldController implements ContactList
 			setDayTime(NDS,1,2);
 		}
 		
-		System.out.println(((this.level-1)%4)/4f);
+//		System.out.println(((this.level-1)%4)/4f);
 		setLevelAlpha(((this.level-1)%4)/4f);
 		
 		
-		System.out.println(this.level);
-		System.out.println(levelAlpha);
-		System.out.println(fadeOut);
-		System.out.println(fadeIn);
+//		System.out.println(this.level);
+//		System.out.println(levelAlpha);
+//		System.out.println(fadeOut);
+//		System.out.println(fadeIn);
 		
 
 		//int NDS = new Random().nextInt(3);
@@ -456,34 +456,34 @@ public class DownstreamController extends WorldController implements ContactList
 			addObject(shadow);
 		}
 		
-		if (level.shores != null) {
-			for (ArrayList<Float> shore : level.shores) {
-				PolygonObstacle obj;
-				float[] shoreFloat = new float[shore.size()];
-				for (int i = 0; i < shore.size(); i++) shoreFloat[i] = shore.get(i);
-				obj = new PolygonObstacle(shoreFloat, 0, 0);
-				obj.setBodyType(BodyDef.BodyType.StaticBody);
-				obj.setDensity(BASIC_DENSITY);
-				obj.setFriction(BASIC_FRICTION);
-				obj.setRestitution(BASIC_RESTITUTION);
-				obj.setDrawScale(scale);
-				if (NDS == 0){
-					obj.setTexture(earthTileDay);
-				}
-				if (NDS == 1){
-					obj.setTexture(earthTileDay);
-				}
-				if (NDS == 2){
-					obj.setTexture(earthTileDay);
-				}
-				//obj.setTexture(earthTile);
-				obj.setName("shore");
-				ArrayList<Float> scaledShore = new ArrayList<Float>();
-				for (Float f : shore) scaledShore.add(f*scale.x);
-				walls.add(scaledShore);
-				addObject(obj);
-			}
-		}
+//		if (level.shores != null) {
+//			for (ArrayList<Float> shore : level.shores) {
+//				PolygonObstacle obj;
+//				float[] shoreFloat = new float[shore.size()];
+//				for (int i = 0; i < shore.size(); i++) shoreFloat[i] = shore.get(i);
+//				obj = new PolygonObstacle(shoreFloat, 0, 0);
+//				obj.setBodyType(BodyDef.BodyType.StaticBody);
+//				obj.setDensity(BASIC_DENSITY);
+//				obj.setFriction(BASIC_FRICTION);
+//				obj.setRestitution(BASIC_RESTITUTION);
+//				obj.setDrawScale(scale);
+//				if (NDS == 0){
+//					obj.setTexture(earthTileDay);
+//				}
+//				if (NDS == 1){
+//					obj.setTexture(earthTileDay);
+//				}
+//				if (NDS == 2){
+//					obj.setTexture(earthTileDay);
+//				}
+//				//obj.setTexture(earthTile);
+//				obj.setName("shore");
+//				ArrayList<Float> scaledShore = new ArrayList<Float>();
+//				for (Float f : shore) scaledShore.add(f*scale.x);
+//				walls.add(scaledShore);
+//				addObject(obj);
+//			}
+//		}
 
 		for (ArrayList<Float> wall : level.walls) {
 			PolygonObstacle obj;
@@ -523,7 +523,7 @@ public class DownstreamController extends WorldController implements ContactList
 			for (Vector2 rock : level.rocks) {
 				WheelObstacle obj;
 //				System.out.println(rockDay);
-				System.out.println("ROCK" + rockDay.getRegionWidth()/2/scale.x);
+//				System.out.println("ROCK" + rockDay.getRegionWidth()/2/scale.x);
 				obj = new WheelObstacle(rock.x,rock.y,rockDay.getRegionWidth()/4/scale.x);
 				obj.setBodyType(BodyDef.BodyType.StaticBody);
 				obj.setSensor(true);
@@ -546,7 +546,7 @@ public class DownstreamController extends WorldController implements ContactList
 		// Create the fish avatar
 		dwidth  = koiTexture.getRegionWidth()/scale.x;
 		dheight = koiTexture.getRegionHeight()/scale.y;
-		System.out.println(dwidth + " " + dheight);
+//		System.out.println(dwidth + " " + dheight);
 		koi = new PlayerModel(level.player.x, level.player.y, 2.5f, 0.925f);
 		koi.setDrawScale(scale);
 		koi.setName("koi");
@@ -815,7 +815,7 @@ public class DownstreamController extends WorldController implements ContactList
 				koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY * 1.7f * speed));
 			}
 			else {
-				koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY * 1.5f * speed));
+				koi.setLinearVelocity(koi.getLinearVelocity().setLength(PLAYER_LINEAR_VELOCITY * 2.5f * speed));
 
 			}
 
@@ -935,7 +935,7 @@ public class DownstreamController extends WorldController implements ContactList
 
 			// System.out.println(relativeTime);
 			// koiCcurrentFrame.flip(koi.left(closestTether), false);
-			System.out.println(isWhirled());
+//			System.out.println(isWhirled());
 			if (isWhirled() || isTethered()) {
 				koi.setCurved(true);
 				if(isWhirled()){
