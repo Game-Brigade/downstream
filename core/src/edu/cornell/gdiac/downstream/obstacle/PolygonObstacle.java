@@ -15,6 +15,11 @@
  */
 package edu.cornell.gdiac.downstream.obstacle;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.graphics.*;
@@ -54,7 +59,6 @@ public class PolygonObstacle extends SimpleObstacle {
 	/** Cache of the polygon vertices (for resizing) */
 	private float[] vertices;
 	
-	
 	//Custom second texture for Downstream land fading
 	protected TextureRegion overlayTexture;
 	protected PolygonRegion overlayRegion;
@@ -65,11 +69,7 @@ public class PolygonObstacle extends SimpleObstacle {
 		overlayRegion = new PolygonRegion(overlayTexture,scaled,tridx);
 		overlayFade = fade;
 	}
-	
-	
-	
-	
-	
+
 	
 	/** 
 	 * Returns the dimensions of this box
@@ -391,6 +391,9 @@ public class PolygonObstacle extends SimpleObstacle {
 	 * @param canvas Drawing context
 	 */
 	public void draw(GameCanvas canvas) {
+//		ArrayList<Float> verts = new ArrayList<Float>();
+//		for (float f : vertices) verts.add(f);
+//		canvas.drawPath(drawnWall);
 		if (region != null) {
 			canvas.draw(region,Color.WHITE,0,0,getX()*drawScale.x,getY()*drawScale.y,getAngle(),1,1);
 		}

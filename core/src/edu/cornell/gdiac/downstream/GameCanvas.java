@@ -1324,8 +1324,6 @@ public class GameCanvas {
 	}
 	
 	public void drawPath(ArrayList<Float> path) {
-		
-		
 		ArrayList<Vector2> vectorPath = new ArrayList<Vector2>();
 		for (int i = 0; i < path.size(); i+=2) {
 			vectorPath.add(new Vector2(path.get(i),path.get(i+1)));

@@ -1,6 +1,6 @@
 /*
  *
- * A tether object. A player enters it's radius and begins orbitting
+ * A tether object. A player enters it's radius and begins orbiting
  *
  * Author: Dashiell Brown
  * LibGDX version, 2/6/2015
@@ -201,8 +201,14 @@ public class TetherModel extends WheelObstacle {
 				sparkSize = 0;
 			}
 			findCircle();
+<<<<<<< HEAD
 			canvas.draw(lightingTexture,new Color(255, 255, 255, alpha), lightingTexture.getRegionWidth()/2, lightingTexture.getRegionHeight()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),sparkSize,sparkSize);
 			if (inrange){
+=======
+			if (lightingTexture != null)
+				canvas.draw(lightingTexture,new Color(255, 255, 255, alpha), lightingTexture.getRegionWidth()/2, lightingTexture.getRegionHeight()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),sparkSize,sparkSize);
+			if (inrange || inpath){
+>>>>>>> aa9247af291b8c8482dbdbf48715b10dc233d952
 				drawLight(canvas);
 			}
 			else if (inpath){
@@ -217,6 +223,7 @@ public class TetherModel extends WheelObstacle {
 	
 	
 	private void findCircle(){
+		if (lightingTexture == null) return;
 		lightCircle.setRadius((lightingTexture.getRegionWidth()/2 * sparkSize)/drawScale.x);
 	}
 	

@@ -118,8 +118,7 @@ public class LevelEditor extends WorldController {
 		manager.load(WHIRLPOOL_TEXTURE, Texture.class);
 		assets.add(WHIRLPOOL_TEXTURE);
 
-		manager.load(WHIRLPOOL_FLIP_TEXTURE, Texture.class);
-		assets.add(WHIRLPOOL_FLIP_TEXTURE);
+		
 
 		super.preLoadContent(manager);
 	}
@@ -146,7 +145,7 @@ public class LevelEditor extends WorldController {
 		lightingTexture = createTexture(manager, LIGHTING_TEXTURE, false);
 		earthTile = createTexture(manager,EARTH_FILE,true);
 		whirlpoolTexture = createTexture(manager, WHIRLPOOL_TEXTURE, false);
-		whirlpoolFlipTexture = createTexture(manager, WHIRLPOOL_FLIP_TEXTURE, false);
+		
 
 		super.loadContent(manager);
 		fishAssetState = AssetState.COMPLETE;
@@ -197,8 +196,6 @@ public class LevelEditor extends WorldController {
 	private boolean settingEnemyPath = false;
 	private boolean settingWallPath = false;
 	private boolean settingShorePath = false;
-	private boolean settingWhirlDir = false;
-	private boolean placingWhirlpool = false;
 	private boolean didEnter = false;
 	private Vector2 currentEnemy;
 	private ArrayList<Vector2> currentWhirlpool;
@@ -380,7 +377,7 @@ public class LevelEditor extends WorldController {
 				didEnter = false;
 			}
 			else{
-				placingWhirlpool = false;
+				
 				didEnter = false;
 				Vector2 v = currentWhirlpool.get(0);
 				Vector2 v2 = currentWhirlpool.get(1);
@@ -391,11 +388,10 @@ public class LevelEditor extends WorldController {
 		else if(currentWhirlpool.size() == 2){
 			currentWhirlpool.clear();
 			currentWhirlpool.add(click.cpy());
-			placingWhirlpool = false;
+			
 		}
 		else{
 			currentWhirlpool.add(click.cpy());
-			placingWhirlpool = true;
 		}
 		
 	}
@@ -468,6 +464,7 @@ public class LevelEditor extends WorldController {
 			walls.add(wallPath);
 			PolygonObstacle obj;
 			ArrayList<Float> wall = new ArrayList<Float>();
+			if (wallPath == null) wallPath = new ArrayList<Vector2>();
 			for (Vector2 v : wallPath) {
 				wall.add(v.x/scale.x);
 				wall.add(v.y/scale.y);
@@ -533,6 +530,7 @@ public class LevelEditor extends WorldController {
 			shores.add(shorePath);
 			PolygonObstacle obj;
 			ArrayList<Float> shore = new ArrayList<Float>();
+			if (shorePath == null) shorePath = new ArrayList<Vector2>();
 			for (Vector2 v : shorePath) {
 				shore.add(v.x/scale.x);
 				shore.add(v.y/scale.y);
@@ -595,6 +593,7 @@ public class LevelEditor extends WorldController {
 	}
 
 	private void drawPath(ArrayList<Vector2> path) {
+		if (path == null) return;
 		for (int i = 0; i < path.size() - 1; i++) {
 			canvas.drawLeadingLine(path.get(i), path.get(i+1));
 		}
@@ -604,7 +603,7 @@ public class LevelEditor extends WorldController {
 	private boolean updateClicks() {
 		Vector3 click3 = canvas.getCamera().unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
 		Vector2 temp = new Vector2(click3.x/scale.x, click3.y/scale.y);
-		if (temp.dst2(currentClick) > 0.5) {
+		if (temp.dst2(currentClick) > 1.0) {
 			newClick = true;
 			currentClick.x = temp.x; currentClick.y = temp.y;
 			return true;

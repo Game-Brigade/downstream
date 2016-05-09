@@ -98,10 +98,12 @@ public abstract class WorldController implements Screen {
 	protected static final String LILY_TEXTURE_S = "tethers/Lily_Sunset.png";
 	protected static final String LILY_TEXTURE_N = "tethers/Lily_Night.png";
 	protected static final String LILY_TEXTURE_D = "tethers/Lily_Day.png";
-	/** Reference to the whirlpool texture */
-	protected static final String WHIRLPOOL_TEXTURE = "terrain/whirlpool.png";
-	/** Reference to the flipped whirlpool texture */
-	protected static final String WHIRLPOOL_FLIP_TEXTURE = "terrain/whirlpool_flip.png";
+	/** References to the whirlpool textures */
+	protected static final String WHIRLPOOL_TEXTURE = "Final_Assets/Beta_Art_Assets/Objects(PNGs)/whirlpool.png";
+	protected static final String WHIRLPOOL_TEXTURE_N = "Final_Assets/Beta Art Assets/Objects(PNGs)/whirlpool_night.png";
+	protected static final String WHIRLPOOL_TEXTURE_D = "Final_Assets/Beta Art Assets/Objects(PNGs)/whirlpool_day.png";
+	protected static final String WHIRLPOOL_TEXTURE_S = "Final_Assets/Beta Art Assets/Objects(PNGs)/whirlpool_sunset.png";
+	
 	/** HUD textures */
 	protected static final String ENERGYBAR_TEXTURE = "MENUS/UI_bar.png";
 	protected static final String UI_FLOWER = "MENUS/UI_lotus.png";
@@ -140,7 +142,6 @@ public abstract class WorldController implements Screen {
 	protected TextureRegion rockSunset;
 	/** Texture assets for whirlpools */
 	protected TextureRegion whirlpoolTexture;
-	protected TextureRegion whirlpoolFlipTexture;
 	/** Texture assets for HUD */
 	protected TextureRegion energyBarTexture;
 	protected TextureRegion UILotusTexture;
@@ -232,6 +233,8 @@ public abstract class WorldController implements Screen {
 	protected TextureRegion[] goalFrames;
 	protected Color levelAlpha = new Color(255,255,255,.5f);
 	
+	protected ArrayList<ArrayList<Float>> walls = new ArrayList<ArrayList<Float>>();
+	
 	
 
 	protected Animation lilyAnimation2;
@@ -303,10 +306,7 @@ public abstract class WorldController implements Screen {
 
 		manager.load(WHIRLPOOL_TEXTURE, Texture.class);
 		assets.add(WHIRLPOOL_TEXTURE);
-
-		manager.load(WHIRLPOOL_FLIP_TEXTURE, Texture.class);
-		assets.add(WHIRLPOOL_FLIP_TEXTURE);
-
+		
 		manager.load(ENERGYBAR_TEXTURE, Texture.class);
 		assets.add(ENERGYBAR_TEXTURE);
 
@@ -474,7 +474,7 @@ public abstract class WorldController implements Screen {
 		cols = 31;
 
 		//remeber kiddies, animate both directions
-		koiCSheet = new Texture(Gdx.files.internal("koi/Curved_Koi.png"));
+		koiCSheet = new Texture(Gdx.files.internal("koi/curved_koi.png"));
 
 		TextureRegion[][] tmpkoiC = TextureRegion.split(koiCSheet, koiCSheet.getWidth()/cols, koiCSheet.getHeight()/rows);              // #10
 		TextureRegion[][] tmpkoiCFlipped = TextureRegion.split(koiCSheet, koiCSheet.getWidth()/cols, koiCSheet.getHeight()/rows);              // #10
@@ -521,9 +521,10 @@ public abstract class WorldController implements Screen {
 		rockNight = createTexture(manager,ROCK_FILE_N, true);
 		rockSunset = createTexture(manager,ROCK_FILE_S, true);
 
+		
+		
+		whirlpoolTexture = createTexture(manager, WHIRLPOOL_TEXTURE, true);
 
-		whirlpoolTexture = createTexture(manager,WHIRLPOOL_TEXTURE,false);
-		whirlpoolFlipTexture = createTexture(manager,WHIRLPOOL_FLIP_TEXTURE,false);
 		Arrow = createTexture(manager, ARROW, false);
 		
 		tutorial1 = createTexture(manager, TUTORIAL_TEXTURE1, false);
@@ -1064,6 +1065,10 @@ public abstract class WorldController implements Screen {
 		canvas.begin();
 		//		canvas.draw(background, Color.WHITE, 0, 0, canvas.getWidth(), canvas.getHeight());
 		//canvas.draw(rocks, Color.WHITE, 0, 0, canvas.getWidth(), canvas.getHeight());
+		
+		
+//		for (ArrayList<Float> wall : walls) canvas.drawPath(wall);
+		
 		for(Obstacle obj : objects) {
 			obj.draw(canvas);
 		}
