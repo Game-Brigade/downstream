@@ -98,7 +98,7 @@ public class PlayerModel extends BoxObstacle {
 
 		setLinearVelocity(Vector2.Zero);
 
-		speed = 1;
+		speed = 1.0f;
 		pull = Vector2.Zero;
 		cent = Vector2.Zero;
 		dest = Vector2.Zero;
@@ -572,7 +572,7 @@ public class PlayerModel extends BoxObstacle {
 		if (isTethered()) {
 			setLinearVelocity(getLinearVelocity().setLength(v*1.5f*speed));
 		} else{
-			setLinearVelocity(getLinearVelocity().setLength(v*2*speed));
+			setLinearVelocity(getLinearVelocity().setLength(v*3*speed));
 		}
 		}
 	}
