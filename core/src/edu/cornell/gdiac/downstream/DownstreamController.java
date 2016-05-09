@@ -945,8 +945,6 @@ public class DownstreamController extends WorldController implements ContactList
 					koi.setWhirled(false);
 				}
 				
-				
-				
 			}
 
 			else{		
@@ -985,12 +983,6 @@ public class DownstreamController extends WorldController implements ContactList
 				cameraController.moveCameraTowards(closestTether.getPosition().cpy().scl(scale));
 				cameraController.zoomOut();
 			} 
-			/*
-			else if(isWhirled()){
-				cameraController.moveCameraTowards(closestWhirlpool.getPosition().cpy().scl(scale));
-				cameraController.zoomOut();
-			}
-			*/
 			else {
 				cameraController.moveCameraTowards(koi.getPosition().cpy().scl(scale));
 				cameraController.zoomIn();
