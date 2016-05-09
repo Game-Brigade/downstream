@@ -113,6 +113,8 @@ public abstract class WorldController implements Screen {
 	protected static final String TUTORIAL_TEXTURE2 = "MENUS/tutorial2.png";
 	protected static final String TUTORIAL_TEXTURE3 = "MENUS/tutorial3.png";
 	protected static final String TUTORIAL_TEXTURE4 = "MENUS/tutorial4.png";
+	protected static final String TUTORIAL_TEXTURE5 = "MENUS/tutorial5.png";
+	protected static final String TUTORIAL_TEXTURE6 = "MENUS/tutorial6.png";
 	protected static final String HELP_TEXTURE = "MENUS/help_button.png";
 	protected static final String ENEMY_TEXTUREA = "enemy/enemy_fish.png";
 
@@ -150,6 +152,8 @@ public abstract class WorldController implements Screen {
 	protected TextureRegion tutorial2;
 	protected TextureRegion tutorial3;
 	protected TextureRegion tutorial4;
+	protected TextureRegion tutorial5;
+	protected TextureRegion tutorial6;
 	protected TextureRegion helpTexture;
 	//Sounds//
 	protected static final String LIGHTING_SOUND = "SOUNDS/fish_death.mp3";
@@ -338,6 +342,10 @@ public abstract class WorldController implements Screen {
 		assets.add(TUTORIAL_TEXTURE3);
 		manager.load(TUTORIAL_TEXTURE4, Texture.class);
 		assets.add(TUTORIAL_TEXTURE4);
+		manager.load(TUTORIAL_TEXTURE5, Texture.class);
+		assets.add(TUTORIAL_TEXTURE5);
+		manager.load(TUTORIAL_TEXTURE6, Texture.class);
+		assets.add(TUTORIAL_TEXTURE6);
 		
 		manager.load(HELP_TEXTURE, Texture.class);
 		assets.add(HELP_TEXTURE);
@@ -530,6 +538,9 @@ public abstract class WorldController implements Screen {
 		tutorial2 = createTexture(manager, TUTORIAL_TEXTURE2, false);
 		tutorial3 = createTexture(manager, TUTORIAL_TEXTURE3, false);
 		tutorial4 = createTexture(manager, TUTORIAL_TEXTURE4, false);
+		tutorial5 = createTexture(manager, TUTORIAL_TEXTURE5, false);
+		tutorial6 = createTexture(manager, TUTORIAL_TEXTURE6, false);
+		
 		helpTexture = createTexture(manager, HELP_TEXTURE, false);
 
 		// Allocate the tiles
