@@ -156,8 +156,8 @@ public class TetherModel extends WheelObstacle {
 		canvas.draw(lotusLightTexture,new Color(255, 255, 255, .5f),texture.getRegionHeight()/2,texture.getRegionWidth()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),lightingScale,lightingScale);
 	}
 
-	public void setOverlay(TextureRegion tr){
-		overlayTexture = tr;
+	public void setOverlay(TextureRegion value){
+		overlayTexture = value;
 	}
 	
 	public void setC2(Color colo){
@@ -199,10 +199,15 @@ public class TetherModel extends WheelObstacle {
 				drawLight(canvas);
 			}
 		}
-		/*if (overlayTexture != null){
+		if (overlayTexture != null){
 			canvas.draw(overlayTexture,c2,overlayTexture.getRegionHeight()/2,overlayTexture.getRegionWidth()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),.35f,.35f);
-		}*/
-		
+			if (type == TetherType.Lilypad){
+				canvas.draw(texture,c2,texture.getRegionHeight()/2,texture.getRegionWidth()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),.4f,.4f);
+			}
+			if (type == TetherType.Lantern || type == TetherType.Lotus){
+				canvas.draw(texture,c2,texture.getRegionHeight()/2,texture.getRegionWidth()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),.35f,.35f);
+			}
+		}
 	}
 	
 	

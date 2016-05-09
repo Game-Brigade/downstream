@@ -12,6 +12,8 @@
 package edu.cornell.gdiac.downstream.obstacle;
 
 import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.g2d.PolygonRegion;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.physics.box2d.*;
 
 import edu.cornell.gdiac.downstream.*;  // For GameCanvas
@@ -26,6 +28,10 @@ public class WheelObstacle extends SimpleObstacle {
 	protected CircleShape shape;
 	/** A cache value for the fixture (for resizing) */
 	private Fixture geometry;
+	
+	protected TextureRegion overlayTexture;
+	private Color overlayFade = Color.WHITE;	
+	
 	
 	/**
 	 * Returns the radius of this circle
@@ -105,6 +111,19 @@ public class WheelObstacle extends SimpleObstacle {
 	        geometry = null;
 	    }
 	}
+	
+	public void setOverlay(TextureRegion value, Color fade){
+		overlayTexture = value;
+		overlayFade = fade;
+	}
+	
+	public void draw(GameCanvas canvas){
+		super.draw(canvas);
+		if (overlayTexture != null) {
+			canvas.draw(overlayTexture, overlayFade,origin.x,origin.y,getX()*drawScale.x,getY()*drawScale.x,getAngle(),1,1);
+		}
+	}
+	
 	
 	/**
 	 * Draws the outline of the physics body.
