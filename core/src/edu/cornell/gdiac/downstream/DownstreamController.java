@@ -848,12 +848,12 @@ public class DownstreamController extends WorldController implements ContactList
 			for (TetherModel t : tethers) {
 				t.setTethered(false);
 			}
-			if (this.level == 12 || this.level == 10){
+			/*if (this.level == 12 || this.level == 10){
 				for(int i = 0; i < enemies.size(); i++){
 					level8Fish(enemies.get(i), i);
 				}
 
-			}
+			}*/
 			respawn();
 		} else {
 			// ZOOM IN TO PLAYER AT START OF LEVEL
