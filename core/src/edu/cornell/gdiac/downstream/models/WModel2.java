@@ -64,7 +64,7 @@ public class WModel2 extends WheelObstacle {
 				texture.getRegionHeight()/2, this.getX()*drawScale.x, this.getY()*drawScale.x, (float)(Math.PI*rot*direction),0.4f, 0.4f);
 		rot-=0.02;
 
-		
+		/*
 		if (koi != null){
 			//code for debugging
 			for (float i = 0; i < 1; i = i + .001f){
@@ -88,7 +88,8 @@ public class WModel2 extends WheelObstacle {
 				canvas.draw(this.texture, Color.PURPLE, 0, 0, second.x * drawScale.x, second.y * drawScale.x, 0, .1f, .1f);
 				canvas.draw(this.texture, new Color (255, 255, 255, .01f), 0, 0, CalculateBezierPoint(i, first, farOffk, last, second).x * drawScale.x, CalculateBezierPoint(i, first, farOffk, last, second).y * drawScale.x, 0, .4f, .4f);
 			}
-		}
+			
+		}*/
 	}
 
 	/***
@@ -101,7 +102,7 @@ public class WModel2 extends WheelObstacle {
 		if (t <= 1){
 			setK(k);
 			moveBezier(k);
-			t = t + .001f;
+			t = t + .05f;
 			k.wped = true;
 		}
 		else if (radius > 2 || !(angle > degreesAim - 10 && angle < degreesAim + 10)){

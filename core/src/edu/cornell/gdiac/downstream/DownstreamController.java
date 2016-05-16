@@ -313,7 +313,7 @@ public class DownstreamController extends WorldController implements ContactList
 		//animation is a bitch
 		if (!tetherFade){
 			if (animationNDS == 0){
-				lilyAnimation = new Animation(.1f, lilyFrames);
+				lilyAnimation = new Animation(.05f, lilyFrames);
 				openingFlowerAnimation = new Animation(.2f, openingFlowerFramesDay);
 				closingFlowerAnimation = new Animation(.2f, closingFlowerFramesDay);
 				closedFlowerAnimation = new Animation(.2f, closedFlowerFramesDay);
@@ -326,7 +326,7 @@ public class DownstreamController extends WorldController implements ContactList
 				openFlowerAnimation2 = new Animation(.2f, openFlowerFramesDay);
 			}
 			else if (animationNDS == 1){
-				lilyAnimation = new Animation(.1f, lilyFrames);
+				lilyAnimation = new Animation(.05f, lilyFrames);
 				openingFlowerAnimation = new Animation(.2f, openingFlowerFramesSunset);
 				closingFlowerAnimation = new Animation(.2f, closingFlowerFramesSunset);
 				closedFlowerAnimation = new Animation(.2f, closedFlowerFramesSunset);
@@ -339,7 +339,7 @@ public class DownstreamController extends WorldController implements ContactList
 				openFlowerAnimation2 = new Animation(.2f, openFlowerFramesSunset);
 			}
 			else{
-				lilyAnimation = new Animation(.1f, lilyFrames);
+				lilyAnimation = new Animation(.05f, lilyFrames);
 				openingFlowerAnimation = new Animation(.2f, openingFlowerFramesNight);
 				closingFlowerAnimation = new Animation(.2f, closingFlowerFramesNight);
 				closedFlowerAnimation = new Animation(.2f, closedFlowerFramesNight);

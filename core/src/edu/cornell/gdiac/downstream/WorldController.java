@@ -94,7 +94,7 @@ public abstract class WorldController implements Screen {
 	protected static final String ROCK_FILE_D = "terrain/Rock_Day.png";
 	protected static final String ROCK_FILE_S = "terrain/Rock_Sunset.png";
 	/** References to the lilypad textures */
-	protected static final String LILY_TEXTURE = "tethers/lilypad.png";
+	protected static final String LILY_TEXTURE = "tethers/Lily_Day_2.png";
 	protected static final String LILY_TEXTURE_S = "tethers/Lily_Sunset.png";
 	protected static final String LILY_TEXTURE_N = "tethers/Lily_Night.png";
 	protected static final String LILY_TEXTURE_D = "tethers/Lily_Day.png";
@@ -426,7 +426,7 @@ public abstract class WorldController implements Screen {
 		//animationDef
 		//load the animation content here
 
-		lilyFrames = splice(11, 1, "tethers/lotus_strip.png");
+		lilyFrames = splice(4, 12, 47, LILY_TEXTURE);
 		//lilyFramesDay = splice(47, "tethers/Lily_Day.png");
 		lilyFramesNight = splice(47, 1, LILY_TEXTURE_N);
 		//lilyFramesSunset = splice(47, LILY_TEXTURE_S);
