@@ -16,7 +16,7 @@ public class HUDitems extends Obstacle {
 
 	private TextureRegion EnergyTexture;
 	private TextureRegion Lilypad;
-	private BitmapFont font;
+	private BitmapFont font = new BitmapFont();
 	
 	private boolean tutorial = false;
 	private TextureRegion tutorialTexture;
@@ -50,7 +50,7 @@ public class HUDitems extends Obstacle {
 		TotalLotus = lotuses;
 		LotusLit = 0;
 		Energy = 2f;
-		font = displayFont;
+		//font = displayFont;
 		//font = new BitmapFont();
 		//font.setColor(Color.WHITE);
 		Lilypad = lily;

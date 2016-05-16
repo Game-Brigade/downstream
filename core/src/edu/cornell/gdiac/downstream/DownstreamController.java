@@ -89,6 +89,7 @@ public class DownstreamController extends WorldController implements ContactList
 	private ArrayList<WheelObstacle> rocks = new ArrayList<WheelObstacle>();
 	private ArrayList<EnemyModel> enemies = new ArrayList<EnemyModel>();
 	private ArrayList<WhirlpoolModel> wpools = new ArrayList<WhirlpoolModel>();
+	private ArrayList<WModel2> wps = new ArrayList<WModel2>();
 
 	private PlayerModel koi;
 	private BoxObstacle goalTile;
@@ -105,8 +106,8 @@ public class DownstreamController extends WorldController implements ContactList
 	private int respawnTimer = RESPAWN_TIME;
 	private TetherModel checkpoint0;
 	private int tillNextLevel = 0;
-	private Vector2 enemyPos8;
-	private ArrayList<Vector2> enemyPath8;
+	private ArrayList<Vector2> enemyPos8;
+	private ArrayList<ArrayList<Vector2>> enemyPath8;
 
 	/**
 	 * Preloads the assets for this controller.
@@ -201,6 +202,7 @@ public class DownstreamController extends WorldController implements ContactList
 		addQueue.clear();
 		world.dispose();
 		walls.clear();
+		wps.clear();
 
 		dead = false;
 		whirled = false;
@@ -236,6 +238,7 @@ public class DownstreamController extends WorldController implements ContactList
 		addQueue.clear();
 		world.dispose();
 		walls.clear();
+		wps.clear();
 
 		dead = false;
 		whirled = false;
@@ -411,7 +414,21 @@ public class DownstreamController extends WorldController implements ContactList
 
 		if (level.whirlpools != null) {
 			for (LevelEditor.Vector4 whirlpool: level.whirlpools) {
-				Vector2 poolPos = new Vector2(whirlpool.x, whirlpool.y);
+
+				Vector2 ang = new Vector2(whirlpool.z, whirlpool.w);
+				WModel2 wp = new WModel2(whirlpool.x, whirlpool.y, 5, ang);
+				wp.setBodyType(BodyDef.BodyType.StaticBody);
+				wp.setName("whirlpool"+ 1);
+				wp.setDensity(TETHER_DENSITY);
+				wp.setFriction(TETHER_FRICTION);
+				wp.setRestitution(TETHER_RESTITUTION);
+				wp.setSensor(sensorTethers);
+				wp.setDrawScale(scale);
+				wp.setTexture(whirlpoolTexture);
+				addObject(wp);
+				wps.add(wp);
+
+				/*Vector2 poolPos = new Vector2(whirlpool.x, whirlpool.y);
 				Vector2 ang = new Vector2(whirlpool.z, whirlpool.w);
 				WhirlpoolModel pool = new WhirlpoolModel(poolPos.x, poolPos.y, -1, ang);
 				pool.setBodyType(BodyDef.BodyType.StaticBody);
@@ -423,7 +440,7 @@ public class DownstreamController extends WorldController implements ContactList
 				pool.setDrawScale(scale);
 				pool.setTexture(whirlpoolTexture);
 				addObject(pool);
-				wpools.add(pool);
+				wpools.add(pool);*/
 			}
 		}
 
@@ -451,9 +468,9 @@ public class DownstreamController extends WorldController implements ContactList
 			eFish.setGoal(0, 0);
 			addObject(eFish);
 			enemies.add(eFish);
-			if (this.level == 12){
-				enemyPos8 = enemyPos;
-				enemyPath8 = enemyPath;
+			if (this.level == 12 || this.level == 10){
+				enemyPos8.add(enemyPos);
+				enemyPath8.add(enemyPath);
 			}
 		}
 
@@ -480,7 +497,7 @@ public class DownstreamController extends WorldController implements ContactList
 		// Create the fish avatar
 		dwidth  = koiTexture.getRegionWidth()/scale.x;
 		dheight = koiTexture.getRegionHeight()/scale.y;
-//		System.out.println(dwidth + " " + dheight);
+		//		System.out.println(dwidth + " " + dheight);
 		koi = new PlayerModel(level.player.x, level.player.y, 2.5f, 0.925f);
 		koi.setDrawScale(scale);
 		koi.setName("koi");
@@ -488,7 +505,7 @@ public class DownstreamController extends WorldController implements ContactList
 		koi.setWhirled(false);
 		koi.ArrowTexture = Arrow;
 		addObject(koi);
-		
+
 		//create shadow(s)
 		if(level.lotuses.size() > 0){
 			dwidth = shadowTexture.getRegionWidth()/scale.x*1.3f;
@@ -634,6 +651,9 @@ public class DownstreamController extends WorldController implements ContactList
 			tethers.add(lily);
 		}
 
+
+		//tethers.add(wp);
+
 		//Setup checkpoint and collision controller
 		collisionController = new CollisionController(koi);
 		checkpoint0 = getClosestTetherTo(koi.initPos);
@@ -665,6 +685,18 @@ public class DownstreamController extends WorldController implements ContactList
 			koi.setLinearVelocity(Vector2.Zero);
 		}
 
+		Vector2 ang = new Vector2(30, 10);
+		WModel2 wp = new WModel2(40, 9, 5, ang);
+		wp.setBodyType(BodyDef.BodyType.StaticBody);
+		wp.setName("whirlpool"+ 1);
+		wp.setDensity(TETHER_DENSITY);
+		wp.setFriction(TETHER_FRICTION);
+		wp.setRestitution(TETHER_RESTITUTION);
+		wp.setSensor(sensorTethers);
+		wp.setDrawScale(scale);
+		wp.setTexture(whirlpoolTexture);
+		addObject(wp);
+		wps.add(wp);
 
 		levelCamWidth = Math.abs(level.map.get(0).x - level.map.get(1).x);
 		levelCamHeight = Math.abs(level.map.get(0).y - level.map.get(1).y);
@@ -741,9 +773,10 @@ public class DownstreamController extends WorldController implements ContactList
 		respawnTimer--;
 	}
 
-	private void level8Fish(EnemyModel e){
-		e.setPosition(enemyPos8);
-		e.patrol(enemyPath8);
+	private void level8Fish(EnemyModel e, int q){
+		e.setPosition(enemyPos8.get(q));
+		e.patrol(enemyPath8.get(q));
+
 	}
 
 	public void debugPrint(){
@@ -814,8 +847,11 @@ public class DownstreamController extends WorldController implements ContactList
 			for (TetherModel t : tethers) {
 				t.setTethered(false);
 			}
-			if (this.level == 12){
-				level8Fish(enemies.get(0));
+			if (this.level == 12 || this.level == 10){
+				for(int i = 0; i < enemies.size(); i++){
+					level8Fish(enemies.get(i), i);
+				}
+
 			}
 			respawn();
 		} else {
@@ -833,6 +869,7 @@ public class DownstreamController extends WorldController implements ContactList
 				}
 			}
 			koi.setLinearVelocity(cacheVel);
+
 
 			// CHECKPOINT CODE
 			checkpoint = checkpoint0;
@@ -991,8 +1028,24 @@ public class DownstreamController extends WorldController implements ContactList
 
 
 
-			// RESOLVE FISH IMG
-			koi.resolveDirection();
+			//WHIRLPOOL 2
+			if (wps.size() >= 1){
+				for (WModel2 w : wps){
+					if (w.shouldTether(koi)){
+						w.circulate(koi);
+					}
+					else{
+						w.nullK();
+					}
+					if (!koi.wped){
+						koi.resolveDirection();
+					}
+				}
+			}
+			else{
+				koi.resolveDirection();
+				}
+
 
 			// CAMERA ZOOM CODE
 			if (isTethered()) {
