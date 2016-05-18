@@ -382,10 +382,10 @@ public class PlayerModel extends BoxObstacle {
 		//		canvas.drawLeadingLine(body.getPosition(), new Vector2(0,0));
 		if (arrowOn ){
 			if(isTethered()){
-				Vector2 farOff = new Vector2(getX(), getY());
+				Vector2 farOff = getPosition().cpy();
 
 				farOff.add(this.getLinearVelocity().cpy().nor().scl(4f));
-				canvas.draw(ArrowTexture, Color.WHITE , ArrowTexture.getRegionWidth()/2 *.6f , ArrowTexture.getRegionHeight()/2 *.6f,farOff.x*drawScale.x,farOff.y*drawScale.x, getAngle(), .6f, .6f);
+				canvas.draw(ArrowTexture, fishColor , ArrowTexture.getRegionWidth()/2 *.6f , ArrowTexture.getRegionHeight()/2 *.6f,farOff.x*drawScale.x,farOff.y*drawScale.x, (float)Math.atan2(getLinearVelocity().y, getLinearVelocity().x)-90, .6f, .6f);
 
 			}
 		}
@@ -620,6 +620,11 @@ public class PlayerModel extends BoxObstacle {
 
 	public void scaleSpeed(float s){
 		speed = s;
+	}
+
+
+	public void setArrowTexture(TextureRegion koiArrow) {
+		ArrowTexture = koiArrow;		
 	}
 
 }
