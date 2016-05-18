@@ -108,7 +108,8 @@ public abstract class WorldController implements Screen {
 	protected static final String ENERGYBAR_TEXTURE = "MENUS/UI_bar.png";
 	protected static final String UI_FLOWER = "MENUS/UI_lotus.png";
 	protected static final String OVERLAY = "terrain/texture.jpg";
-	protected static final String ARROW = "koi/arrow.png";
+	protected static final String KOI_ARROW = "koi/koi_arrow.png";
+	protected static final String WHIRL_ARROW = "terrain/whirl_arrow.png";
 	protected static final String TUTORIAL_TEXTURE1 = "MENUS/tutorial1.png";
 	protected static final String TUTORIAL_TEXTURE2 = "MENUS/tutorial2.png";
 	protected static final String TUTORIAL_TEXTURE3 = "MENUS/tutorial3.png";
@@ -147,7 +148,8 @@ public abstract class WorldController implements Screen {
 	/** Texture assets for HUD */
 	protected TextureRegion energyBarTexture;
 	protected TextureRegion UILotusTexture;
-	protected TextureRegion Arrow;
+	protected TextureRegion koiArrow;
+	protected TextureRegion whirlArrow;
 	protected TextureRegion tutorial1;
 	protected TextureRegion tutorial2;
 	protected TextureRegion tutorial3;
@@ -331,8 +333,10 @@ public abstract class WorldController implements Screen {
 		manager.load(OVERLAY_FILE, Texture.class);
 		assets.add(OVERLAY_FILE);
 
-		manager.load(ARROW, Texture.class);
-		assets.add(ARROW);
+		manager.load(KOI_ARROW, Texture.class);
+		assets.add(KOI_ARROW);
+		manager.load(WHIRL_ARROW, Texture.class);
+		assets.add(WHIRL_ARROW);
 		
 		manager.load(TUTORIAL_TEXTURE1, Texture.class);
 		assets.add(TUTORIAL_TEXTURE1);
@@ -532,7 +536,8 @@ public abstract class WorldController implements Screen {
 		
 		whirlpoolTexture = createTexture(manager, WHIRLPOOL_TEXTURE, true);
 
-		Arrow = createTexture(manager, ARROW, false);
+		koiArrow = createTexture(manager, KOI_ARROW, false);
+		whirlArrow = createTexture(manager, WHIRL_ARROW, false);
 		
 		tutorial1 = createTexture(manager, TUTORIAL_TEXTURE1, false);
 		tutorial2 = createTexture(manager, TUTORIAL_TEXTURE2, false);

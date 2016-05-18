@@ -425,6 +425,7 @@ public class DownstreamController extends WorldController implements ContactList
 				wp.setSensor(sensorTethers);
 				wp.setDrawScale(scale);
 				wp.setTexture(whirlpoolTexture);
+				wp.setArrowTexture(whirlArrow);
 				addObject(wp);
 				wps.add(wp);
 
@@ -504,7 +505,7 @@ public class DownstreamController extends WorldController implements ContactList
 		koi.setName("koi");
 		koi.setTexture(koiTexture);
 		koi.setWhirled(false);
-		koi.ArrowTexture = Arrow;
+		koi.setArrowTexture(koiArrow);
 		addObject(koi);
 
 		//create shadow(s)
@@ -696,6 +697,7 @@ public class DownstreamController extends WorldController implements ContactList
 		wp.setSensor(sensorTethers);
 		wp.setDrawScale(scale);
 		wp.setTexture(whirlpoolTexture);
+		wp.setArrowTexture(whirlArrow);
 		addObject(wp);
 		wps.add(wp);
 

@@ -26,6 +26,7 @@ public class WModel2 extends WheelObstacle {
 	private float rot = 0;
 	private float radius = 4;
 	public float degreesAim;
+	public Vector2 aim;
 
 	/** The direction the pool spins; 1 is ccw, -1 is cw */
 	private float direction = 1;
@@ -34,6 +35,7 @@ public class WModel2 extends WheelObstacle {
 	private Vector2 farOffk;
 
 	private PlayerModel koi;
+	private TextureRegion ArrowTexture;
 
 	/***
 	 * constructor method
@@ -44,12 +46,13 @@ public class WModel2 extends WheelObstacle {
 	public WModel2(float x, float y, float radius, float degrees) {
 		super(x, y, radius);
 		degreesAim = degrees;
-		degreesAim = 200;
+		aim = new Vector2((float)Math.cos(degrees),(float)Math.sin(degrees));
 
 	}
 	
 	public WModel2(float x, float y, float r, Vector2 aim){
 		super(x, y, r);
+		this.aim = aim;
 		degreesAim = aim.angle(getPosition());
 		
 	}
@@ -63,6 +66,8 @@ public class WModel2 extends WheelObstacle {
 		canvas.draw(texture, Color.WHITE, texture.getRegionWidth()/2, 
 				texture.getRegionHeight()/2, this.getX()*drawScale.x, this.getY()*drawScale.x, (float)(Math.PI*rot*direction),0.4f, 0.4f);
 		rot-=0.02;
+		canvas.draw(ArrowTexture, Color.WHITE, ArrowTexture.getRegionWidth()/2, 
+				ArrowTexture.getRegionHeight()/2, (this.getX()+aim.nor().scl(2).x)*drawScale.x, (this.getY()+aim.nor().scl(2).x)*drawScale.x, aim.angle(),0.4f, 0.4f);
 
 		/*
 		if (koi != null){
@@ -256,6 +261,11 @@ public class WModel2 extends WheelObstacle {
 		float angle = (float) Math.toDegrees(Math.atan2(target.y - t2.y, target.x - t2.x));
 		angle = angle - 180;
 		return (float) Math.toRadians(angle);
+	}
+
+	public void setArrowTexture(TextureRegion whirlArrow) {
+		ArrowTexture = whirlArrow;
+		
 	}
 
 }
