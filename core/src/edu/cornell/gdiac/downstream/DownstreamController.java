@@ -468,10 +468,11 @@ public class DownstreamController extends WorldController implements ContactList
 			eFish.setGoal(0, 0);
 			addObject(eFish);
 			enemies.add(eFish);
+			/*
 			if (this.level == 12 || this.level == 10){
 				enemyPos8.add(enemyPos);
 				enemyPath8.add(enemyPath);
-			}
+			}*/
 		}
 
 		//Create goal tile

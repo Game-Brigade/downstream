@@ -391,7 +391,7 @@ public class PlayerModel extends BoxObstacle {
 		}
 		if(!dead || true){
 			//super.draw(canvas);  
-			//		canvas.drawLeadingLine(body.getPosition(), new Vector2(0,0));
+			//canvas.drawLeadingLine(body.getPosition(), new Vector2(0,0));
 			if (texture != null) {
 				fishColor.set(255, 255, 255, fishAlpha);
 				//DO NOT USE COLORS DIRECTRLY!!!!!!!!
