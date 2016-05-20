@@ -171,6 +171,7 @@ public class WModel2 extends WheelObstacle {
 
 			k.setLinearVelocity(aim.cpy().scl(2));
 			k.wped = false;
+			k.setWhirled(false);
 		}
 
 	}
