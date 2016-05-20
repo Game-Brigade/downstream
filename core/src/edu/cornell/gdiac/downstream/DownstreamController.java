@@ -415,8 +415,8 @@ public class DownstreamController extends WorldController implements ContactList
 		if (level.whirlpools != null) {
 			for (LevelEditor.Vector4 whirlpool: level.whirlpools) {
 
-				Vector2 ang = new Vector2(whirlpool.z, whirlpool.w);
-				WModel2 wp = new WModel2(whirlpool.x, whirlpool.y, 5, ang);
+				Vector2 ang = new Vector2(whirlpool.z-whirlpool.x, whirlpool.w-whirlpool.y);
+				WModel2 wp = new WModel2(whirlpool.x, whirlpool.y, ang);
 				wp.setBodyType(BodyDef.BodyType.StaticBody);
 				wp.setName("whirlpool"+ 1);
 				wp.setDensity(TETHER_DENSITY);
@@ -428,20 +428,6 @@ public class DownstreamController extends WorldController implements ContactList
 				wp.setArrowTexture(whirlArrow);
 				addObject(wp);
 				wps.add(wp);
-
-				/*Vector2 poolPos = new Vector2(whirlpool.x, whirlpool.y);
-				Vector2 ang = new Vector2(whirlpool.z, whirlpool.w);
-				WhirlpoolModel pool = new WhirlpoolModel(poolPos.x, poolPos.y, -1, ang);
-				pool.setBodyType(BodyDef.BodyType.StaticBody);
-				pool.setName("whirlpool");
-				pool.setDensity(TETHER_DENSITY);
-				pool.setFriction(TETHER_FRICTION);
-				pool.setRestitution(TETHER_RESTITUTION);
-				pool.setSensor(sensorPools);
-				pool.setDrawScale(scale);
-				pool.setTexture(whirlpoolTexture);
-				addObject(pool);
-				wpools.add(pool);*/
 			}
 		}
 
@@ -687,20 +673,6 @@ public class DownstreamController extends WorldController implements ContactList
 			koi.setLinearVelocity(Vector2.Zero);
 		}
 
-		Vector2 ang = new Vector2(30, 10);
-		WModel2 wp = new WModel2(40, 9, 5, ang);
-		wp.setBodyType(BodyDef.BodyType.StaticBody);
-		wp.setName("whirlpool"+ 1);
-		wp.setDensity(TETHER_DENSITY);
-		wp.setFriction(TETHER_FRICTION);
-		wp.setRestitution(TETHER_RESTITUTION);
-		wp.setSensor(sensorTethers);
-		wp.setDrawScale(scale);
-		wp.setTexture(whirlpoolTexture);
-		wp.setArrowTexture(whirlArrow);
-		addObject(wp);
-		wps.add(wp);
-
 		levelCamWidth = Math.abs(level.map.get(0).x - level.map.get(1).x);
 		levelCamHeight = Math.abs(level.map.get(0).y - level.map.get(1).y);
 		center = new Vector2((level.map.get(0).x + level.map.get(1).x)/2,
@@ -710,9 +682,9 @@ public class DownstreamController extends WorldController implements ContactList
 		//TUTORIAL CODE
 		HUD = new HUDitems(lanterns.size(), UILotusTexture, energyBarTexture, secondFont);
 		if (this.level == 1){
-			HUD.setTutorialTexture(tutorial1);
-			HUD.setHelpTexture(helpTexture);
-			HUD.setTutorialStatus(true);
+			//HUD.setTutorialTexture(tutorial1);
+			//HUD.setHelpTexture(helpTexture);
+			//HUD.setTutorialStatus(true);
 		}
 		else if (this.level == 2){
 			HUD.setTutorialTexture(tutorial2);
@@ -1036,20 +1008,15 @@ public class DownstreamController extends WorldController implements ContactList
 			if (wps.size() >= 1){
 				for (WModel2 w : wps){
 					if (w.shouldTether(koi)){
+						koi.free();
 						w.circulate(koi);
 					}
 					else{
 						w.nullK();
 					}
-					if (!koi.wped){
-						koi.resolveDirection();
-					}
 				}
 			}
-			else{
-				koi.resolveDirection();
-				}
-
+			koi.resolveDirection();
 
 			// CAMERA ZOOM CODE
 			if (isTethered()) {
@@ -1285,7 +1252,7 @@ public class DownstreamController extends WorldController implements ContactList
 		}
 		else {
 			super.draw(delta);
-			//			for (ArrayList<Float> wall : walls) canvas.drawPath(wall);
+			//for (ArrayList<Float> wall : walls) canvas.drawPath(wall);
 			canvas.beginHUD();
 			HUD.draw(canvas);
 			canvas.end();
