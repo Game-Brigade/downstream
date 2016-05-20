@@ -521,7 +521,7 @@ public abstract class WorldController implements Screen {
 		cols = 31;
 
 		//remeber kiddies, animate both directions
-		koiCSheet = new Texture(Gdx.files.internal("koi/curved_koi.png"));
+		koiCSheet = new Texture(Gdx.files.internal("koi/curve_koi.png"));
 
 		TextureRegion[][] tmpkoiC = TextureRegion.split(koiCSheet, koiCSheet.getWidth()/cols, koiCSheet.getHeight()/rows);              // #10
 		TextureRegion[][] tmpkoiCFlipped = TextureRegion.split(koiCSheet, koiCSheet.getWidth()/cols, koiCSheet.getHeight()/rows);              // #10
