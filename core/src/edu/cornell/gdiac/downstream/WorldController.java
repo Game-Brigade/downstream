@@ -118,7 +118,7 @@ public abstract class WorldController implements Screen {
 	protected static final String TUTORIAL_TEXTURE5 = "MENUS/tip_5.png";
 	protected static final String TUTORIAL_TEXTURE6 = "MENUS/tip_6.png";
 	protected static final String HELP_TEXTURE = "MENUS/help_button.png";
-	protected static final String ENEMY_TEXTUREA = "enemy/enemy_fish.png";
+	protected static final String ENEMY_TEXTUREA = "enemy/enemy_fish_sheet.png";
 
 	// TextureRegions//
 	/** Texture assets for the koi */
