@@ -344,7 +344,7 @@ public class PlayerModel extends BoxObstacle {
 
 	public boolean left(WhirlpoolModel t){
 		boolean b;
-
+		if(t == null) return false;
 		if (cachedPos.x - .5 > t.getX()){
 			if (this.getPosition().x > t.getX() && this.getPosition().y > cachedPos.y){
 				b = true;
