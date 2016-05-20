@@ -110,12 +110,12 @@ public abstract class WorldController implements Screen {
 	protected static final String OVERLAY = "terrain/texture.jpg";
 	protected static final String KOI_ARROW = "koi/koi_arrow.png";
 	protected static final String WHIRL_ARROW = "terrain/whirl_arrow.png";
-	protected static final String TUTORIAL_TEXTURE1 = "MENUS/tutorial1x.png";
-	protected static final String TUTORIAL_TEXTURE2 = "MENUS/tutorial2.png";
-	protected static final String TUTORIAL_TEXTURE3 = "MENUS/tutorial3.png";
-	protected static final String TUTORIAL_TEXTURE4 = "MENUS/tutorial4.png";
-	protected static final String TUTORIAL_TEXTURE5 = "MENUS/tutorial5.png";
-	protected static final String TUTORIAL_TEXTURE6 = "MENUS/tutorial6.png";
+	protected static final String TUTORIAL_TEXTURE1 = "MENUS/tip_1.png";
+	protected static final String TUTORIAL_TEXTURE2 = "MENUS/tip_2.png";
+	protected static final String TUTORIAL_TEXTURE3 = "MENUS/tip_3.png";
+	protected static final String TUTORIAL_TEXTURE4 = "MENUS/tip_4.png";
+	protected static final String TUTORIAL_TEXTURE5 = "MENUS/tip_5.png";
+	protected static final String TUTORIAL_TEXTURE6 = "MENUS/tip_6.png";
 	protected static final String HELP_TEXTURE = "MENUS/help_button.png";
 	protected static final String ENEMY_TEXTUREA = "enemy/enemy_fish.png";
 
@@ -568,13 +568,13 @@ public abstract class WorldController implements Screen {
 
 		
 		//setBackground(manager.get(BACKGROUND_FILE_N, Texture.class), 2);
-		setBackground(createTexture(manager, BACKGROUND_FILE_N, true).getTexture(), 2);
+		setBackground(createTexture(manager, BACKGROUND_FILE_N, false).getTexture(), 2);
 		getBackground(2).setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
 
-		setBackground(createTexture(manager, BACKGROUND_FILE_D, true).getTexture(), 0);
+		setBackground(createTexture(manager, BACKGROUND_FILE_D, false).getTexture(), 0);
 		getBackground(0).setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
 
-		setBackground(createTexture(manager, BACKGROUND_FILE_N, true).getTexture(), 1);
+		setBackground(createTexture(manager, BACKGROUND_FILE_N, false).getTexture(), 1);
 		getBackground(1).setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
 
 		overlay = createTexture(manager, BACKGROUND_FILE_N, true).getTexture();

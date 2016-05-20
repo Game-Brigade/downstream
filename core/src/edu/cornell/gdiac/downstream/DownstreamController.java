@@ -699,7 +699,7 @@ public class DownstreamController extends WorldController implements ContactList
 			/*HUD.setTutorialTexture(tutorial1);
 			HUD.setHelpTexture(helpTexture);
 			HUD.setTutorialStatus(true);*/
-			TutorialItems t1 = new TutorialItems(10, 10, tutorial1.getRegionHeight(), tutorial1.getRegionWidth());
+			TutorialItems t1 = new TutorialItems(20, 2, tutorial1.getRegionHeight(), tutorial1.getRegionWidth());
 			t1.setBodyType(BodyDef.BodyType.StaticBody);
 			t1.setName("tutorial"+ 1);
 			t1.setDensity(TETHER_DENSITY);
@@ -711,9 +711,19 @@ public class DownstreamController extends WorldController implements ContactList
 			objects.add(t1);
 		}
 		else if (this.level == 2){
-			HUD.setTutorialTexture(tutorial2);
+			/*HUD.setTutorialTexture(tutorial2);
 			HUD.setHelpTexture(helpTexture);
-			HUD.setTutorialStatus(true);
+			HUD.setTutorialStatus(true);*/
+			TutorialItems t1 = new TutorialItems(18, 15, tutorial2.getRegionHeight(), tutorial1.getRegionWidth());
+			t1.setBodyType(BodyDef.BodyType.StaticBody);
+			t1.setName("tutorial"+ 1);
+			t1.setDensity(TETHER_DENSITY);
+			t1.setFriction(TETHER_FRICTION);
+			t1.setRestitution(TETHER_RESTITUTION);
+			t1.setSensor(sensorTethers);
+			t1.setDrawScale(scale);
+			t1.setTexture(tutorial1);
+			objects.add(t1);
 		}
 		else if (this.level == 6){
 			HUD.setTutorialTexture(tutorial3);
@@ -740,30 +750,7 @@ public class DownstreamController extends WorldController implements ContactList
 
 
 	}
-	
-	private Vector2 determineTutorialplacement(int level){
-		Vector2 placement = new Vector2(0, 0);
-		if (level == 1){
-			placement.set(1, 1);
-		}
-		return placement;
-	}
-	
-	private boolean determineIfTutorial(int level){
-		boolean b = false;
-		if (level == 1){
-			b = true;
-		}
-		return b;
-	}
-	
-	private TextureRegion determineTutorialTexture(int level){
-		TextureRegion tr = null;
-		if (level == 1){
-			tr = null;
-		}
-		return tr;
-	}
+
 
 	// Respawns fish once it collides with a lethal object. 
 	// The player is transported to the last checkpoint or initial start state if no lotuses have been lit
@@ -782,7 +769,7 @@ public class DownstreamController extends WorldController implements ContactList
 			//cameraController.zoomStart(levelCamWidth, levelCamHeight, center, koi.getPosition().cpy().scl(scale));
 			return;
 		} 
-		else if(respawnTimer <= RESPAWN_TIME/2){
+		else if(respawnTimer <= RESPAWN_TIME/2 && !collisionController.didWin()){
 			cameraController.moveCameraTowards(checkpoint.getPosition().scl(scale));
 			cameraController.resetCameraVelocity(); 
 		}
