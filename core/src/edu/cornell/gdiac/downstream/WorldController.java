@@ -356,6 +356,8 @@ public abstract class WorldController implements Screen {
 
 		manager.load(BACKGROUND_FILE_S, Texture.class);
 		assets.add(BACKGROUND_FILE_S);
+		
+		
 
 		manager.load(OVERLAY_FILE, Texture.class);
 		assets.add(OVERLAY_FILE);
@@ -396,6 +398,8 @@ public abstract class WorldController implements Screen {
 		size3Params.fontParameters.size = FONT_SIZE2;
 		manager.load(FONT_FILE2, BitmapFont.class, size3Params);
 		assets.add(FONT_FILE2);
+		
+		
 	}
 
 
@@ -447,7 +451,7 @@ public abstract class WorldController implements Screen {
 		if (worldAssetState != AssetState.LOADING) {
 			return;
 		}
-		
+		manager.finishLoading();
 		
 
 		int cols = 11;
