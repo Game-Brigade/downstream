@@ -1250,7 +1250,7 @@ public class GameCanvas {
 		
 		Gdx.gl.glEnable(GL30.GL_BLEND);
 		Gdx.gl.glBlendFunc(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA);
-		Gdx.gl.glLineWidth(40);
+		Gdx.gl.glLineWidth(4);
 		leadingLine.setProjectionMatrix(camera.combined);
         leadingLine.begin(ShapeRenderer.ShapeType.Line);
         leadingLine.setColor(new Color(0, 0, 0, .8f));

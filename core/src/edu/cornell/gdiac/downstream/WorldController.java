@@ -83,7 +83,7 @@ public abstract class WorldController implements Screen {
 	protected static final String LIGHTING_TEXTURE = "tethers/aura.png";
 	/** References to shadow and goal textures */
 	protected static final String SHADOW_TEXTURE = "terrain/shadow.png";
-	protected static final String GOAL_TEXTURE = "koi/Goal State small.png";
+	protected static final String GOAL_TEXTURE = "koi/Goal_State_small.png";
 	/** References to the repeating land textures */
 	protected static final String EARTH_FILE = "terrain/repeat tile.png";
 	protected static final String EARTH_FILE_N = "terrain/Grass_Night.jpg";

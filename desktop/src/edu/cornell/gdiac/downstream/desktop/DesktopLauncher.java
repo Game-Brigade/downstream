@@ -26,7 +26,7 @@ public class DesktopLauncher {
 	
 	/**
 	 * Classic main method that all Java programmers know.
-	 * 
+	
 	 * This method simply exists to start a new LwjglApplication.  For desktop games,
 	 * LibGDX is built on top of LWJGL (this is not the case for Android).
 	 * 
