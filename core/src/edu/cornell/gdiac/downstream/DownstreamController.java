@@ -105,8 +105,8 @@ public class DownstreamController extends WorldController implements ContactList
 	private int respawnTimer = RESPAWN_TIME;
 	private TetherModel checkpoint0;
 	private int tillNextLevel = 0;
-	private ArrayList<Vector2> enemyPos8;
-	private ArrayList<ArrayList<Vector2>> enemyPath8;
+	private Vector2 enemyPos8;
+	private ArrayList<Vector2> enemyPath8;
 
 	/**
 	 * Preloads the assets for this controller.
@@ -455,11 +455,11 @@ public class DownstreamController extends WorldController implements ContactList
 			eFish.setGoal(0, 0);
 			addObject(eFish);
 			enemies.add(eFish);
-			/*
-			if (this.level == 12 || this.level == 10){
-				enemyPos8.add(enemyPos);
-				enemyPath8.add(enemyPath);
-			}*/
+			
+			if (this.level == 12){
+				enemyPos8 = enemyPos;
+				enemyPath8 =enemyPath;
+			}
 		}
 
 		//Create goal tile
@@ -831,9 +831,9 @@ public class DownstreamController extends WorldController implements ContactList
 		respawnTimer--;
 	}
 
-	private void level8Fish(EnemyModel e, int q){
-		e.setPosition(enemyPos8.get(q));
-		e.patrol(enemyPath8.get(q));
+	private void level8Fish(EnemyModel e){
+		e.setPosition(enemyPos8);
+		e.patrol(enemyPath8);
 
 	}
 
@@ -910,12 +910,9 @@ public class DownstreamController extends WorldController implements ContactList
 			for (TetherModel t : tethers) {
 				t.setTethered(false);
 			}
-			/*if (this.level == 12 || this.level == 10){
-				for(int i = 0; i < enemies.size(); i++){
-					level8Fish(enemies.get(i), i);
-				}
-
-			}*/
+			if (this.level == 12){
+					level8Fish(enemies.get(0));
+			}
 			respawn();
 		} else {
 			// ZOOM IN TO PLAYER AT START OF LEVEL
