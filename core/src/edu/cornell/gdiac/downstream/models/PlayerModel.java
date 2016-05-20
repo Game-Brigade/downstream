@@ -385,7 +385,7 @@ public class PlayerModel extends BoxObstacle {
 				Vector2 farOff = getPosition().cpy();
 
 				farOff.add(this.getLinearVelocity().cpy().nor().scl(4f));
-				canvas.draw(ArrowTexture, fishColor , ArrowTexture.getRegionWidth()/2 *.6f , ArrowTexture.getRegionHeight()/2 *.6f,farOff.x*drawScale.x,farOff.y*drawScale.x, (float)Math.atan2(getLinearVelocity().y, getLinearVelocity().x)-90, .6f, .6f);
+				canvas.draw(ArrowTexture, fishColor , ArrowTexture.getRegionWidth()/2 *.6f , ArrowTexture.getRegionHeight()/2 *.6f,farOff.x*drawScale.x,farOff.y*drawScale.x, (float)Math.atan2(getLinearVelocity().y, getLinearVelocity().x), .6f, .6f);
 
 			}
 		}
@@ -535,7 +535,9 @@ public class PlayerModel extends BoxObstacle {
 	}
 
 	public void resolveDirection() {
-		setAngle((float) Math.atan2(getVY(),getVX()));
+		if(!getLinearVelocity().isZero()){
+			setAngle((float) Math.atan2(getVY(),getVX()));
+		}
 
 	}
 
