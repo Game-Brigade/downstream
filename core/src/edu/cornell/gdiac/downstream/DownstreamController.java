@@ -53,7 +53,6 @@ public class DownstreamController extends WorldController implements ContactList
 	private int backState;
 	private int resumeState;
 	private int restartState;
-	private int optionsState;
 	private boolean paused;
 	/** Player states */
 	private boolean dead;
@@ -165,6 +164,7 @@ public class DownstreamController extends WorldController implements ContactList
 	 * The game has no  gravity and default settings
 	 */
 	public DownstreamController() {
+		
 		setDebug(false);
 		setComplete(false);
 		setFailure(false);
@@ -831,12 +831,15 @@ public class DownstreamController extends WorldController implements ContactList
 			HUD.setTutorialStatus(true);
 		}
 		if (collisionController.didWin()) {
+			listener.exitScreen(this, WorldController.EXIT_WIN);
+			
 			setComplete(true);
 			tillNextLevel++;
-			if (tillNextLevel > 100){
+			if (tillNextLevel > 210){
 				deleteAll();
 				this.level = this.level + 1;
 				populateLevel();
+				listener.exitScreen(this, WorldController.EXIT_WIN_DONE);
 			}
 		}
 		if(input.didAdvance()){
@@ -851,7 +854,8 @@ public class DownstreamController extends WorldController implements ContactList
 		}
 
 		if (koi.isDead()) {
-			deathSound.play();
+			failSound.setVolume(.3f);
+			failSound.play();
 			koi.die();
 			koi.setLinearVelocity(Vector2.Zero);
 			koi.setTethered(false);
@@ -887,6 +891,8 @@ public class DownstreamController extends WorldController implements ContactList
 			for (TetherModel t : lanterns) {
 				if (t.lit) {
 					if (!litlanterns.contains(t)) {
+						lightingSound.setVolume(.5f);
+						lightingSound.play();
 						litlanterns.push(t);
 					}
 				} else {
@@ -1323,21 +1329,20 @@ public class DownstreamController extends WorldController implements ContactList
 				postUpdate(delta);
 			}
 			this.draw(delta);
-			if (goOptions() && listener != null) {
-				//listener.exitScreen(this, WorldController.EXIT_OPTIONS);
-			}
+			
 			if (goBack() && listener != null) {
+				clickSound.play();
 				listener.exitScreen(this, WorldController.EXIT_MAIN);
 			}
 			if (restartLevel() && listener != null) {
+				clickSound.play();
 				listener.exitScreen(this, this.level);
 			}
 			if (resumePlay() && listener != null) {
+				clickSound.play();
 				resumeState = 0;
 				restartState = 0;
-				optionsState = 0;
 				backState = 0;
-
 				paused = false;
 			}
 
@@ -1361,6 +1366,7 @@ public class DownstreamController extends WorldController implements ContactList
 		scale  = null;
 		world  = null;
 		canvas = null;
+		clickSound.dispose();
 	}
 
 
@@ -1433,10 +1439,6 @@ public class DownstreamController extends WorldController implements ContactList
 		return resumeState == 2;
 	}
 
-	public boolean goOptions(){
-		return optionsState == 2;
-	}
-
 	public boolean restartLevel(){
 		return restartState == 2;
 	}
@@ -1487,13 +1489,6 @@ public class DownstreamController extends WorldController implements ContactList
 				restartState = 1;
 			}
 
-			dx = Math.abs(screenX - PauseMenuMode.optionsPos.x);
-			dy = Math.abs(screenY - PauseMenuMode.optionsPos.y);
-
-			if (dx < pauseMenu.scale * pauseMenu.options.getWidth() / 2
-					&& dy < pauseMenu.scale * pauseMenu.options.getHeight() / 2) {
-				optionsState = 1;
-			}
 		}
 		return false;
 	}
@@ -1526,10 +1521,7 @@ public class DownstreamController extends WorldController implements ContactList
 				restartState = 2;
 				return false;
 			}
-			if (optionsState == 1) {
-				optionsState = 2;
-				return false;
-			}
+			
 		}
 		return true;
 	}
@@ -1560,7 +1552,44 @@ public class DownstreamController extends WorldController implements ContactList
 
 	@Override
 	public boolean mouseMoved(int screenX, int screenY) {
-		// TODO Auto-generated method stub
+		if (paused) {
+
+			// Flip to match graphics coordinates
+			screenY = canvas.getHeight() - screenY;
+			float dx = Math.abs(screenX - PauseMenuMode.backPos.x);
+			float dy = Math.abs(screenY - PauseMenuMode.backPos.y);
+
+			if (dx < pauseMenu.scale * pauseMenu.back.getWidth() / 2
+					&& dy < pauseMenu.scale * pauseMenu.back.getHeight() / 2) {
+				pauseMenu.setBackHover(true);
+			}
+			else{
+				pauseMenu.setBackHover(false);
+			}
+			
+			dx = Math.abs(screenX - PauseMenuMode.resumePos.x);
+			dy = Math.abs(screenY - PauseMenuMode.resumePos.y);
+
+			if (dx < pauseMenu.scale * pauseMenu.resume.getWidth() / 2
+					&& dy < pauseMenu.scale * pauseMenu.resume.getHeight() / 2) {
+				pauseMenu.setResumeHover(true);
+			}
+			else{
+				pauseMenu.setResumeHover(false);
+			}
+
+			dx = Math.abs(screenX - PauseMenuMode.restartPos.x);
+			dy = Math.abs(screenY - PauseMenuMode.restartPos.y);
+
+			if (dx < pauseMenu.scale * pauseMenu.restart.getWidth() / 2
+					&& dy < pauseMenu.scale * pauseMenu.restart.getHeight() / 2) {
+				pauseMenu.setRestartHover(true);
+			}
+			else{
+				pauseMenu.setRestartHover(false);
+			}
+
+		}
 		return false;
 	}
 

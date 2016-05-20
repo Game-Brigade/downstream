@@ -158,8 +158,13 @@ public abstract class WorldController implements Screen {
 	protected TextureRegion tutorial6;
 	protected TextureRegion helpTexture;
 	//Sounds//
-	protected static final String LIGHTING_SOUND = "SOUNDS/fish_death.mp3";
-	protected Music deathSound;
+	protected static final String LIGHTING_SOUND = "Final_Assets/Sounds/lotus_light.mp3";
+	protected static final String MENU_CLICK_SOUND = "Final_Assets/Sounds/menu_click.mp3";
+	protected static final String FAIL_SOUND = "Final_Assets/Sounds/fail_level.mp3";
+	
+	protected Music lightingSound;
+	protected Music clickSound;
+	protected Music failSound;
 
 	private static int dayTime = 0;
 
@@ -433,9 +438,8 @@ public abstract class WorldController implements Screen {
 		if (worldAssetState != AssetState.LOADING) {
 			return;
 		}
-
-		deathSound = Gdx.audio.newMusic(Gdx.files.internal(LIGHTING_SOUND));
-		deathSound.setLooping(false);
+		
+		
 
 		int cols = 11;
 		int rows = 1;
@@ -592,7 +596,16 @@ public abstract class WorldController implements Screen {
 		} else {
 			secondFont = null;
 		}
-
+		
+		lightingSound = Gdx.audio.newMusic(Gdx.files.internal(LIGHTING_SOUND));
+		lightingSound.setLooping(false);
+		
+		clickSound = Gdx.audio.newMusic(Gdx.files.internal(MENU_CLICK_SOUND));
+		clickSound.setLooping(false);
+		
+		failSound = Gdx.audio.newMusic(Gdx.files.internal(FAIL_SOUND));
+		failSound.setLooping(false);
+		
 		worldAssetState = AssetState.COMPLETE;
 	}
 
@@ -695,6 +708,8 @@ public abstract class WorldController implements Screen {
 	public static final int EXIT_OPTIONS = 21;
 	public static final int EXIT_NEXT = 22;
 	public static final int EXIT_PREV = 23;
+	public static final int EXIT_WIN = 24;
+	public static final int EXIT_WIN_DONE = 25;
 
 	/** How many frames after winning/losing do we continue? */
 	public static final int EXIT_COUNT = 120;
@@ -920,6 +935,11 @@ public abstract class WorldController implements Screen {
 		scale  = null;
 		world  = null;
 		canvas = null;
+		
+		clickSound.dispose();
+		
+		lightingSound.dispose();
+		
 	}
 
 	/**
@@ -1125,19 +1145,19 @@ public abstract class WorldController implements Screen {
 
 
 
-		// Final message
-		if (complete && !failed) {
-			displayFont.setColor(Color.BLACK);
-			canvas.begin(); // DO NOT SCALE
-			canvas.drawTextCentered("VICTORY!", displayFont, 0.0f);
-			canvas.end();
-			displayFont.setColor(Color.BLACK);
-		} else if (failed) {
-			//displayFont.setColor(Color.RED);
-			canvas.begin(); // DO NOT SCALE
-			canvas.drawTextCentered("FAILURE!", displayFont, 0.0f);
-			canvas.end();
-		}
+//		// Final message
+//		if (complete && !failed) {
+//			displayFont.setColor(Color.BLACK);
+//			canvas.begin(); // DO NOT SCALE
+//			canvas.drawTextCentered("VICTORY!", displayFont, 0.0f);
+//			canvas.end();
+//			displayFont.setColor(Color.BLACK);
+//		} else if (failed) {
+//			displayFont.setColor(Color.RED);
+//			canvas.begin(); // DO NOT SCALE
+//			canvas.drawTextCentered("FAILURE!", displayFont, 0.0f);
+//			canvas.end();
+//		}
 	}
 
 	/**
