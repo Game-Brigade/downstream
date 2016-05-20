@@ -29,7 +29,7 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 	private static final String SELECT_FILE = "Final_Assets/Menus/level_button.png";
 	private static final String SELECT_HOVER_FILE = "Final_Assets/Menus/level_button_gold.png";
 	//private static final String LOAD_FILE = "Final_Assets/Menus/now_loading.jpg";
-	//private static final String EDIT_FILE = "Final_Assets/Menus/levelbuild.png";
+	private static final String EDIT_FILE = "Final_Assets/Menus/levelbuild.png";
 	
 	private static final String MENU_CLICK_SOUND = "Final_Assets/Sounds/menu_click.mp3";
 	private Music clickSound;
@@ -43,7 +43,7 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 	private Texture select;
 	private Texture selectHover;
 	/** Edit texture */
-	//private Texture edit;
+	private Texture edit;
 	//private Texture load;
 	
 	
@@ -66,6 +66,7 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 	private int editState;
 	/** Scaling factor for when the student changes the resolution. */
 	private float scale;
+	private boolean editor = true;
 	
 	/** Standard window size (for scaling) */
 	private static int STANDARD_WIDTH  = 800;
@@ -75,7 +76,7 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 	/** Positions of buttons */
 	
 	private static Vector2 playPos = new Vector2();
-	//private static Vector2 editPos = new Vector2();
+	private static Vector2 editPos = new Vector2();
 	private static Vector2 selectPos = new Vector2();
 	private static Vector2 bgPos = new Vector2();
 	//private static Vector2 loadPos = new Vector2();
@@ -100,7 +101,7 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 		// Load images immediately.
 		play = new Texture(PLAY_FILE);
 		playHover = new Texture(PLAY_HOVER_FILE);
-		//edit = new Texture(EDIT_FILE);
+		if(editor){edit = new Texture(EDIT_FILE);}
 		select = new Texture(SELECT_FILE);
 		selectHover = new Texture(SELECT_HOVER_FILE);
 		background = new Texture(BACKGROUND_FILE);
@@ -109,7 +110,7 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 		bgPos.set(new Vector2((float)canvas.getWidth()/2,(float)canvas.getHeight()/2));
 		playPos.set(new Vector2((float)canvas.getWidth()/7*5 - 82,(float)canvas.getHeight()/5+45));
 		selectPos.set(new Vector2((float)canvas.getWidth()/7*5,(float)canvas.getHeight()/9 + 30));
-		//editPos.set(new Vector2((float)canvas.getWidth()/8*7,(float)canvas.getHeight()/8*7));
+		if(editor){editPos.set(new Vector2((float)canvas.getWidth()/8*7,(float)canvas.getHeight()/8*7));}
 		//loadPos.set(new Vector2((float)canvas.getWidth()/2,(float)canvas.getHeight()/2));
 		
 		clickSound = Gdx.audio.newMusic(Gdx.files.internal(MENU_CLICK_SOUND));
@@ -131,7 +132,7 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 	 */
 	public void dispose() {
 		
-		//edit.dispose();
+		if(editor){edit.dispose();}
 		select.dispose();
 		selectHover.dispose();
 		play.dispose();
@@ -174,7 +175,7 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 		
 		
 		
-		//canvas.draw(edit, Color.WHITE, edit.getWidth()/2, edit.getHeight()/2, editPos.x, editPos.y, 0, scale*0.9f, scale*0.9f);
+		if(editor){canvas.draw(edit, Color.WHITE, edit.getWidth()/2, edit.getHeight()/2, editPos.x, editPos.y, 0, scale*0.9f, scale*0.9f);}
 		canvas.end();
 	}
 
@@ -323,7 +324,13 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 			selectState = 1;
 		}
 		
-		
+		if(editor){
+			dx = Math.abs(screenX - editPos.x);
+			dy = Math.abs(screenY - editPos.y);
+			if (dx < scale*edit.getWidth()/2 && dy < scale*edit.getHeight()/2) {
+				editState = 1;
+			}
+		}
 		
 		return false;
 	}
