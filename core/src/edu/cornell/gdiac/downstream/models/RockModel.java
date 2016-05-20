@@ -34,7 +34,6 @@ public class RockModel extends WheelObstacle {
 		super(x,y,r);
 		setBodyType(BodyDef.BodyType.StaticBody);
 		setSensor(true);
-		setType();
 		setName("rock");
 	}
 	
