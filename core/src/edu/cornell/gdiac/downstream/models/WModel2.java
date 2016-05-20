@@ -17,7 +17,7 @@ public class WModel2 extends WheelObstacle {
 	private static TextureRegion whirpoolImage;
 	/**do not change. this is the angle and will update automatically**/
 	//TODO change to private
-	public float angle = 90;
+	private float angle = 90;
 	/** circle for checking if its within whirlpool range**/
 	private Circle checkingCircle = new Circle(getX(),getY(), 5);
 	/** t is used in the bezier curve**/
@@ -27,7 +27,7 @@ public class WModel2 extends WheelObstacle {
 	private float radius = 4;
 	public float degreesAim;
 	public Vector2 aim;
-
+	private static final int WHIRLPOOL_RANGE = 4;
 	/** The direction the pool spins; 1 is ccw, -1 is cw */
 	private float direction = 1;
 
@@ -36,7 +36,13 @@ public class WModel2 extends WheelObstacle {
 
 	private PlayerModel koi;
 	private TextureRegion ArrowTexture;
-
+	private Vector2 bez3;
+	private Vector2 bez4;
+	
+	Color c = new Color(255, 255, 255, .5f);
+	private boolean debug;
+	private Vector2 pull;
+	
 	/***
 	 * constructor method
 	 * @param x position of x in game coordinate
@@ -44,17 +50,29 @@ public class WModel2 extends WheelObstacle {
 	 * @param radius this is not really relevant. It will show up in debug mode
 	 */
 	public WModel2(float x, float y, float radius, float degrees) {
-		super(x, y, radius);
+		super(x, y, WHIRLPOOL_RANGE);
+		checkingCircle.radius = WHIRLPOOL_RANGE;
 		degreesAim = degrees;
 		aim = new Vector2((float)Math.cos(degrees),(float)Math.sin(degrees));
 
 	}
 	
 	public WModel2(float x, float y, float r, Vector2 aim){
-		super(x, y, r);
+		super(x, y, WHIRLPOOL_RANGE);
+		checkingCircle.radius = WHIRLPOOL_RANGE;
 		this.aim = aim;
-		degreesAim = aim.angle(getPosition());
-		
+		degreesAim = (float) (Math.atan2(aim.y, aim.x)%(Math.PI*2));
+		degreesAim += (Math.PI*2);
+		degreesAim %= (Math.PI*2);
+	}
+	
+	public WModel2(float x, float y, Vector2 aim){
+		super(x, y, WHIRLPOOL_RANGE);
+		checkingCircle.radius = WHIRLPOOL_RANGE;
+		this.aim = aim;
+		degreesAim = (float) (Math.atan2(aim.y, aim.x));
+		degreesAim += (Math.PI*2);
+		degreesAim %= (Math.PI*2);
 	}
 
 	/***
@@ -62,39 +80,43 @@ public class WModel2 extends WheelObstacle {
 	 * 
 	 */
 	public void draw(GameCanvas canvas){
-		//super.draw(canvas);
-		canvas.draw(texture, Color.WHITE, texture.getRegionWidth()/2, 
-				texture.getRegionHeight()/2, this.getX()*drawScale.x, this.getY()*drawScale.x, (float)(Math.PI*rot*direction),0.4f, 0.4f);
+//		for (float i = 0; i < 1; i = i + .001f){
+//			float x = (float) (i*2*Math.PI);
+//			Vector2 r = new Vector2();
+//			r.set((float)Math.cos(x),(float)Math.sin(x));
+//			Vector2 p = getPosition().cpy().sub(r.scl(3));
+//			canvas.draw(this.texture, Color.WHITE, 
+//					texture.getRegionWidth()/2, texture.getRegionHeight()/2, 
+//					p.x * drawScale.x, p.y * drawScale.y, 
+//					0, .4f, .4f);
+//		}
+		canvas.draw(texture, c, 
+				texture.getRegionWidth()/2, texture.getRegionHeight()/2, 
+				this.getX()*drawScale.x, this.getY()*drawScale.y, 
+				(float)(Math.PI*rot*direction),0.4f, 0.4f);
 		rot-=0.02;
-		canvas.draw(ArrowTexture, Color.WHITE, ArrowTexture.getRegionWidth()/2, 
-				ArrowTexture.getRegionHeight()/2, (this.getX()+aim.nor().scl(2).x)*drawScale.x, (this.getY()+aim.nor().scl(2).x)*drawScale.x, aim.angle(),0.4f, 0.4f);
+		canvas.draw(ArrowTexture, c , 
+				ArrowTexture.getRegionWidth()/2 *.6f , ArrowTexture.getRegionHeight()/2 *.6f,
+				(this.getX()+aim.cpy().nor().scl(3).x)*drawScale.x, (this.getY()+aim.cpy().nor().scl(3).y)*drawScale.y, 
+				degreesAim, .6f, .6f);
 
-		/*
-		if (koi != null){
-			//code for debugging
-			for (float i = 0; i < 1; i = i + .001f){
+		
 
-				float sX = startK.x;
-				float sY = startK.y;
-				Vector2 first = new Vector2(sX, sY);
+		//code for debugging
+		if (koi != null && false){
+			if(startK != null){
 
-				float eX = this.getX();
-				float eY = this.getY() + 4;
-				Vector2 second = new Vector2(eX, eY);
-
-				float bezierXend = eX - 4;
-				float bezierYend = eY;
-				Vector2 last = new Vector2(bezierXend, bezierYend);
-
-
-				canvas.draw(this.texture, Color.RED, 0, 0, first.x * drawScale.x, first.y * drawScale.x, 0, .1f, .1f);
-				canvas.draw(this.texture, Color.WHITE, 0, 0, farOffk.x * drawScale.x, farOffk.y * drawScale.x, 0, .1f, .1f);
-				canvas.draw(this.texture, Color.BLACK, 0, 0, last.x * drawScale.x, last.y * drawScale.x, 0, .1f, .1f);
-				canvas.draw(this.texture, Color.PURPLE, 0, 0, second.x * drawScale.x, second.y * drawScale.x, 0, .1f, .1f);
-				canvas.draw(this.texture, new Color (255, 255, 255, .01f), 0, 0, CalculateBezierPoint(i, first, farOffk, last, second).x * drawScale.x, CalculateBezierPoint(i, first, farOffk, last, second).y * drawScale.x, 0, .4f, .4f);
+				canvas.draw(this.texture, Color.RED, 0, 0, startK.x * drawScale.x, startK.y * drawScale.x, 0, .1f, .1f);
+				canvas.draw(this.texture, Color.GREEN, 0, 0, farOffk.x * drawScale.x, farOffk.y * drawScale.x, 0, .1f, .1f);
+				canvas.draw(this.texture, Color.BLACK, 0, 0, bez3.x * drawScale.x, bez3.y * drawScale.x, 0, .1f, .1f);
+				canvas.draw(this.texture, Color.PURPLE, 0, 0, bez4.x * drawScale.x, bez4.y * drawScale.x, 0, .1f, .1f);
+				for (float i = 0; i < 1; i = i + .001f){
+					Vector2 bez = CalculateBezierPoint(i, startK, farOffk, bez3, bez4);
+					canvas.draw(this.texture, new Color (255, 255, 255, .01f), 0, 0, bez.x * drawScale.x, bez.y * drawScale.y, 0, .4f, .4f);
+				}
 			}
-			
-		}*/
+
+		}
 	}
 
 	/***
@@ -103,25 +125,52 @@ public class WModel2 extends WheelObstacle {
 	 */
 	public void circulate(PlayerModel k){
 		koi = k;
-		float radians = angle*MathUtils.degreesToRadians;
+		setK(k);
+		k.setLinearVelocity(Vector2.Zero);
+		angle += 360;
+		angle %= 360;
+		double radians = Math.toRadians(angle);
+		radians += (Math.PI*2);
+		radians %= (Math.PI*2);
+
+		double lo = ((Math.toDegrees(degreesAim- Math.PI*1.5f)-4)+360)%360;
+		double hi = ((Math.toDegrees(degreesAim- Math.PI*1.5f)+4)+360)%360;
+		
+		//Moving on bezier
 		if (t <= 1){
-			setK(k);
-			moveBezier(k);
 			t = t + .05f;
+			moveBezier(k);
 			k.wped = true;
-		}
-		else if (radius > 2 || !(angle > degreesAim - 10 && angle < degreesAim + 10)){
-			float ox = this.getX();
-			float oy = this.getY();
 			
-			k.setX((float) (Math.cos(radians)*radius + ox));
-			k.setY((float) (Math.sin(radians)*radius + oy));
-			k.setAngle(radians + 1.578f + 3.1415f);
+			pull = k.getPosition().cpy().sub(getPosition());
+			radius = pull.len();
+		}
+		//circling whirlpool
+		else if (radius > .5){
+
+			pull = k.getPosition().cpy().sub(getPosition());
+			angle = pull.angle();
 			incrementAngle();
+
+			radians = Math.toRadians(angle);
+
+			k.setPosition(getPosition().cpy().add((float)Math.cos(radians)*radius,(float)Math.sin(radians)*radius));
+
+			k.setAngle((float) (radians + Math.PI*1.5f));
 			decreaseRadius();
 		}
+		else if(radius <= .5 &&
+					((lo < hi && (angle < lo || angle > hi )) ||
+					(lo > hi && (angle > lo || angle < hi )))
+
+					
+			){
+				k.setAngle( (float) (radians + Math.PI*1.5f));
+				angle -= 4;
+		}
 		else{
-			k.setLinearVelocity(k.getLinearVelocity().setAngleRad(radians + 1.578f + 3.1415f));
+
+			k.setLinearVelocity(aim.cpy().scl(2));
 			k.wped = false;
 		}
 
@@ -151,7 +200,7 @@ public class WModel2 extends WheelObstacle {
 	}
 	
 	private void decreaseRadius(){
-		radius -= .05f;
+		radius -= .1f;
 	}
 
 	/**
@@ -164,27 +213,16 @@ public class WModel2 extends WheelObstacle {
 	}
 
 	/**
-	 * pay no attention to variable names, they are not helpful
 	 * @param k fish dammit
 	 */
 	public void moveBezier(PlayerModel k){
+		Vector2 bez = CalculateBezierPoint(t, startK, farOffk, bez3, bez4);
+		Vector2 bezNext = CalculateBezierPoint(t+.01f, startK, farOffk, bez3, bez4);
+		
+		//System.out.println(bez.angle(bezNext));
+		k.setAngle(findA(bez, bezNext));
 
-		float sX = startK.x;
-		float sY = startK.y;
-		Vector2 first = new Vector2(sX, sY);
-
-		float eX = this.getX();
-		float eY = this.getY() + 4;
-		Vector2 second = new Vector2(eX, eY);
-
-		float bezierXend = eX - 4;
-		float bezierYend = eY;
-		Vector2 last = new Vector2(bezierXend, bezierYend);
-
-		//System.out.println(CalculateBezierPoint(t, first, farOffk, last, second).angle(CalculateBezierPoint(t+ .04f, first, farOffk, last, second)));
-		k.setAngle(findA(CalculateBezierPoint(t, first, farOffk, last, second), CalculateBezierPoint(t+ .04f, first, farOffk, last, second)));
-
-		k.setPosition(CalculateBezierPoint(t, first, farOffk, last, second));
+		k.setPosition(bez);
 	}
 
 	/**
@@ -206,15 +244,15 @@ public class WModel2 extends WheelObstacle {
 		float uuu = uu*u;
 		float ttt = tt*t1;
 
-		bezierPoint.x = uuu * p0.x;
-		bezierPoint.x = bezierPoint.x + (3 * uu * t1 * p1.x);
-		bezierPoint.x = bezierPoint.x + (3 * u * tt * p2.x);
-		bezierPoint.x = bezierPoint.x + (ttt * p3.x);
+		bezierPoint.x = uuu * p0.x
+				+ (3 * uu * t1 * p1.x)
+				+ (3 * u * tt * p2.x)
+				+ (ttt * p3.x);
 
-		bezierPoint.y = uuu * p0.y;
-		bezierPoint.y = bezierPoint.y + (3 * uu * t1 * p1.y);
-		bezierPoint.y = bezierPoint.y + (3 * u * tt * p2.y);
-		bezierPoint.y = bezierPoint.y + (ttt * p3.y);
+		bezierPoint.y = uuu * p0.y
+				+ (3 * uu * t1 * p1.y)
+				+ (3 * u * tt * p2.y)
+				+ (ttt * p3.y);
 
 		return bezierPoint;
 	}
@@ -227,8 +265,11 @@ public class WModel2 extends WheelObstacle {
 	private void setK(PlayerModel k){
 		if(startK == null){
 			startK = k.getPosition().cpy();
-			farOffk = startK.cpy();
-			farOffk.add(k.getLinearVelocity().cpy().nor().scl(4f));
+			pull = getPosition().cpy().sub(startK.cpy());
+			//farOffk = startK.cpy().add(k.getLinearVelocity().cpy().nor().scl(4f));
+			farOffk = startK.cpy().add(pull.cpy().rotate90(1).nor().scl(WHIRLPOOL_RANGE*.75f));;
+			bez4 = getPosition().cpy().add(pull.nor().scl(WHIRLPOOL_RANGE*.75f));
+			bez3 = bez4.cpy().add(pull.cpy().rotate90(1).nor().scl(WHIRLPOOL_RANGE*.75f));			
 		}
 	}
 	
@@ -241,6 +282,8 @@ public class WModel2 extends WheelObstacle {
 		if (startK != null){
 			startK = null;
 			farOffk = null;
+			bez3 = null;
+			bez4 = null;
 			radius = 4;
 			t = 0;
 			angle = 90;
@@ -258,9 +301,9 @@ public class WModel2 extends WheelObstacle {
 	 * @return
 	 */
 	public float findA(Vector2 target, Vector2 t2) {
-		float angle = (float) Math.toDegrees(Math.atan2(target.y - t2.y, target.x - t2.x));
-		angle = angle - 180;
-		return (float) Math.toRadians(angle);
+		float ang = (float) Math.toDegrees(Math.atan2(target.y - t2.y, target.x - t2.x));
+		ang = ang - 180;
+		return (float) Math.toRadians(ang);
 	}
 
 	public void setArrowTexture(TextureRegion whirlArrow) {

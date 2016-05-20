@@ -61,6 +61,7 @@ public class CollisionController {
 		else if(sCollide.startsWith("rock")){return LETHAL_ROCKS;}
 		else if(sCollide.startsWith("shadow")){return LETHAL_SHADOWS;}
 		else if(sCollide.startsWith("enemy")){return LETHAL_ENEMIES;}
+		else if(sCollide.startsWith("shore")){return false;}
 		else if(sCollide.startsWith("wall")){
 			koi.setTethered(false);
 			koi.setAttemptingTether(false);
@@ -100,9 +101,7 @@ public class CollisionController {
 				else if(sCollide.startsWith("rock")){}
 				else if(sCollide.startsWith("shadow")){}
 				else if(sCollide.startsWith("enemy")){}
-				else if(sCollide.startsWith("wall")){}
-//				else { System.out.println("COLLISION ERROR: "+sCollide);}
-				
+				else if(sCollide.startsWith("wall")){}				
 	}
 		
 	

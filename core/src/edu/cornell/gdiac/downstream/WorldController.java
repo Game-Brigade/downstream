@@ -377,7 +377,7 @@ public abstract class WorldController implements Screen {
 		assets.add(HELP_TEXTURE);
 		
 
-		referenceC.a = .3f;
+		referenceC.a = 0f;
 
 		// Load the font
 		FreetypeFontLoader.FreeTypeFontLoaderParameter size2Params = new FreetypeFontLoader.FreeTypeFontLoaderParameter();
@@ -586,7 +586,7 @@ public abstract class WorldController implements Screen {
 		setBackground(createTexture(manager, BACKGROUND_FILE_N, false).getTexture(), 1);
 		getBackground(1).setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
 
-		overlay = createTexture(manager, BACKGROUND_FILE_N, true).getTexture();
+		overlay = createTexture(manager, OVERLAY_FILE, true).getTexture();
 		overlay.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
 
 		// Allocate the font

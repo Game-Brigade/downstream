@@ -535,7 +535,9 @@ public class PlayerModel extends BoxObstacle {
 	}
 
 	public void resolveDirection() {
-		setAngle((float) Math.atan2(getVY(),getVX()));
+		if(!getLinearVelocity().isZero()){
+			setAngle((float) Math.atan2(getVY(),getVX()));
+		}
 
 	}
 
