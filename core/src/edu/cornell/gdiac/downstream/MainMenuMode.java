@@ -73,7 +73,7 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 	private int editState;
 	/** Scaling factor for when the student changes the resolution. */
 	private float scale;
-	private boolean editor = true;
+	private boolean editor = false;
 	
 	/** Standard window size (for scaling) */
 	private static int STANDARD_WIDTH  = 800;
@@ -127,7 +127,7 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 		//loadPos.set(new Vector2((float)canvas.getWidth()/2,(float)canvas.getHeight()/2));
 		
 		//animation
-		koiCSheet = new Texture(Gdx.files.internal("koi/curved_koi.png"));
+		koiCSheet = new Texture(Gdx.files.internal("koi/curve_koi.png"));
 		int cols = 31;
 		int rows = 1;
 		TextureRegion[][] tmpkoiC = TextureRegion.split(koiCSheet, koiCSheet.getWidth()/cols, koiCSheet.getHeight()/rows); 
