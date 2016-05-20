@@ -110,7 +110,7 @@ public abstract class WorldController implements Screen {
 	protected static final String OVERLAY = "terrain/texture.jpg";
 	protected static final String KOI_ARROW = "koi/koi_arrow.png";
 	protected static final String WHIRL_ARROW = "terrain/whirl_arrow.png";
-	protected static final String TUTORIAL_TEXTURE1 = "MENUS/tutorial1.png";
+	protected static final String TUTORIAL_TEXTURE1 = "MENUS/tutorial1x.png";
 	protected static final String TUTORIAL_TEXTURE2 = "MENUS/tutorial2.png";
 	protected static final String TUTORIAL_TEXTURE3 = "MENUS/tutorial3.png";
 	protected static final String TUTORIAL_TEXTURE4 = "MENUS/tutorial4.png";
@@ -550,17 +550,18 @@ public abstract class WorldController implements Screen {
 
 		// Allocate the tiles
 
-
-		setBackground(manager.get(BACKGROUND_FILE_N, Texture.class), 2);
+		
+		//setBackground(manager.get(BACKGROUND_FILE_N, Texture.class), 2);
+		setBackground(createTexture(manager, BACKGROUND_FILE_N, true).getTexture(), 2);
 		getBackground(2).setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
 
-		setBackground(manager.get(BACKGROUND_FILE_D, Texture.class), 0);
+		setBackground(createTexture(manager, BACKGROUND_FILE_D, true).getTexture(), 0);
 		getBackground(0).setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
 
-		setBackground(manager.get(BACKGROUND_FILE_S, Texture.class), 1);
+		setBackground(createTexture(manager, BACKGROUND_FILE_N, true).getTexture(), 1);
 		getBackground(1).setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
 
-		overlay = manager.get(OVERLAY_FILE, Texture.class);
+		overlay = createTexture(manager, BACKGROUND_FILE_N, true).getTexture();
 		overlay.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
 
 		// Allocate the font

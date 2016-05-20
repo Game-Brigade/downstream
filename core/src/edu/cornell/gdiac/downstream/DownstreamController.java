@@ -687,20 +687,6 @@ public class DownstreamController extends WorldController implements ContactList
 			koi.setLinearVelocity(Vector2.Zero);
 		}
 
-		Vector2 ang = new Vector2(30, 10);
-		WModel2 wp = new WModel2(40, 9, 5, ang);
-		wp.setBodyType(BodyDef.BodyType.StaticBody);
-		wp.setName("whirlpool"+ 1);
-		wp.setDensity(TETHER_DENSITY);
-		wp.setFriction(TETHER_FRICTION);
-		wp.setRestitution(TETHER_RESTITUTION);
-		wp.setSensor(sensorTethers);
-		wp.setDrawScale(scale);
-		wp.setTexture(whirlpoolTexture);
-		wp.setArrowTexture(whirlArrow);
-		addObject(wp);
-		wps.add(wp);
-
 		levelCamWidth = Math.abs(level.map.get(0).x - level.map.get(1).x);
 		levelCamHeight = Math.abs(level.map.get(0).y - level.map.get(1).y);
 		center = new Vector2((level.map.get(0).x + level.map.get(1).x)/2,
@@ -710,9 +696,19 @@ public class DownstreamController extends WorldController implements ContactList
 		//TUTORIAL CODE
 		HUD = new HUDitems(lanterns.size(), UILotusTexture, energyBarTexture, secondFont);
 		if (this.level == 1){
-			HUD.setTutorialTexture(tutorial1);
+			/*HUD.setTutorialTexture(tutorial1);
 			HUD.setHelpTexture(helpTexture);
-			HUD.setTutorialStatus(true);
+			HUD.setTutorialStatus(true);*/
+			TutorialItems t1 = new TutorialItems(10, 10, tutorial1.getRegionHeight(), tutorial1.getRegionWidth());
+			t1.setBodyType(BodyDef.BodyType.StaticBody);
+			t1.setName("tutorial"+ 1);
+			t1.setDensity(TETHER_DENSITY);
+			t1.setFriction(TETHER_FRICTION);
+			t1.setRestitution(TETHER_RESTITUTION);
+			t1.setSensor(sensorTethers);
+			t1.setDrawScale(scale);
+			t1.setTexture(tutorial1);
+			objects.add(t1);
 		}
 		else if (this.level == 2){
 			HUD.setTutorialTexture(tutorial2);
@@ -743,6 +739,30 @@ public class DownstreamController extends WorldController implements ContactList
 
 
 
+	}
+	
+	private Vector2 determineTutorialplacement(int level){
+		Vector2 placement = new Vector2(0, 0);
+		if (level == 1){
+			placement.set(1, 1);
+		}
+		return placement;
+	}
+	
+	private boolean determineIfTutorial(int level){
+		boolean b = false;
+		if (level == 1){
+			b = true;
+		}
+		return b;
+	}
+	
+	private TextureRegion determineTutorialTexture(int level){
+		TextureRegion tr = null;
+		if (level == 1){
+			tr = null;
+		}
+		return tr;
 	}
 
 	// Respawns fish once it collides with a lethal object. 
