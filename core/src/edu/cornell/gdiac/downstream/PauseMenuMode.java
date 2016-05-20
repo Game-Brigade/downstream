@@ -18,25 +18,31 @@ public class PauseMenuMode{
 	
 	/** Textures for buttons */
 	private static final String PAUSE_HEADER = "MENUS/Paused/paused-H.png";
-	private static final String RESUME_BUTTON = "MENUS/Paused/resume-b.png";
-	private static final String RESTART_BUTTON = "MENUS/Paused/restart-b.png";
-	private static final String OPTIONS_BUTTON = "MENUS/Paused/options-b.png";
-	private static final String BACK_BUTTON = "MENUS/back to main-b.png";
+	private static final String RESUME_BUTTON = "Final_Assets/Menus/resume.png";
+	private static final String RESUME_HOVER_BUTTON = "Final_Assets/Menus/resume_h.png";
+	private static final String RESTART_BUTTON = "Final_Assets/Menus/restart.png";
+	private static final String RESTART_HOVER_BUTTON = "Final_Assets/Menus/restart_h.png";
+	private static final String BACK_BUTTON = "Final_Assets/Menus/back.png";
+	private static final String BACK_HOVER_BUTTON = "Final_Assets/Menus/back_h.png";
 	private static final String BACKGROUND_FILE = "MENUS/general_background_new.png";
 	
 	public Texture pauseHeader;
 	public Texture resume;
+	public Texture resumeHoverButton;
 	public Texture restart;
-	public Texture options;
+	public Texture restartHoverButton;
 	public Texture back;
+	public Texture backHoverButton;
 	public Texture background;
 	
 	private Color alphaSet = new Color(255, 255, 255, .1f);
 
-	
+	private boolean resumeHover;
+	private boolean restartHover;
+	private boolean backHover;
 	
 	/** Reference to GameCanvas created by the root */
-	private GameCanvas canvas;
+	public GameCanvas canvas;
 	
 	/** Scaling factor for when the student changes the resolution. */
 	public float scale;
@@ -50,7 +56,6 @@ public class PauseMenuMode{
 	public static Vector2 headerPos = new Vector2();
 	public static Vector2 resumePos = new Vector2();
 	public static Vector2 restartPos = new Vector2();
-	public static Vector2 optionsPos = new Vector2();
 	public static Vector2 backPos = new Vector2();
 	public static Vector2 backgroundPos = new Vector2();
 
@@ -70,18 +75,23 @@ public class PauseMenuMode{
 		headerPos.set(new Vector2(canvas.getWidth()/2, canvas.getHeight()/18*15));
 		resumePos.set(new Vector2(canvas.getWidth()/2, canvas.getHeight()/18*11));
 		restartPos.set(new Vector2(canvas.getWidth()/2, canvas.getHeight()/18*8));
-		optionsPos.set(new Vector2(canvas.getWidth()/2, canvas.getHeight()/18*5));
-		backPos.set(new Vector2(canvas.getWidth()/2, canvas.getHeight()/18*2));
+		backPos.set(new Vector2(canvas.getWidth()/2, canvas.getHeight()/18*5));
 		backgroundPos.set(new Vector2(canvas.getWidth()/2, canvas.getHeight()/2));
 		
 
 		// Load images immediately.
 		pauseHeader = new Texture(PAUSE_HEADER);
 		resume = new Texture(RESUME_BUTTON);
+		resumeHoverButton = new Texture(RESUME_HOVER_BUTTON);
 		restart = new Texture(RESTART_BUTTON);
-		options = new Texture(OPTIONS_BUTTON);
+		restartHoverButton = new Texture(RESTART_HOVER_BUTTON);
 		back = new Texture(BACK_BUTTON);
+		backHoverButton = new Texture(BACK_HOVER_BUTTON);
 		background = new Texture(BACKGROUND_FILE);
+		
+		resumeHover = false;
+		restartHover = false;
+		backHover = false;
 
 	}
 	
@@ -92,9 +102,11 @@ public class PauseMenuMode{
 	public void dispose() {
 		pauseHeader.dispose();
 		resume.dispose();
+		resumeHoverButton.dispose();
 		restart.dispose();
-		options.dispose();
+		restartHoverButton.dispose();
 		back.dispose();
+		backHoverButton.dispose();
 		background.dispose();
 	}
 
@@ -113,13 +125,33 @@ public class PauseMenuMode{
 				backgroundPos.x, backgroundPos.y, 0, scale, scale);
 		canvas.draw(pauseHeader, Color.WHITE, pauseHeader.getWidth()/2, pauseHeader.getHeight()/2, 
 				headerPos.x, headerPos.y, 0, scale, scale);
-		canvas.draw(resume, Color.WHITE, resume.getWidth()/2, resume.getHeight()/2, 
-				resumePos.x, resumePos.y, 0, scale, scale);
-		canvas.draw(restart, Color.WHITE, restart.getWidth()/2, restart.getHeight()/2, 
-				restartPos.x, restartPos.y, 0, scale, scale);
-		canvas.draw(options, Color.WHITE, options.getWidth()/2, options.getHeight()/2, 
-				optionsPos.x, optionsPos.y, 0, scale, scale);
-		canvas.draw(back, Color.WHITE, back.getWidth()/2, back.getHeight()/2, backPos.x, backPos.y, 0, scale, scale);	
+		
+		if(resumeHover == true){
+			canvas.draw(resumeHoverButton, Color.WHITE, resumeHoverButton.getWidth()/2, resumeHoverButton.getHeight()/2, 
+					resumePos.x, resumePos.y, 0, scale, scale);
+		}
+		else{
+			canvas.draw(resume, Color.WHITE, resume.getWidth()/2, resume.getHeight()/2, 
+					resumePos.x, resumePos.y, 0, scale, scale);
+		}
+		
+		if(restartHover == true){
+			canvas.draw(restartHoverButton, Color.WHITE, restartHoverButton.getWidth()/2, restartHoverButton.getHeight()/2, 
+					restartPos.x, restartPos.y, 0, scale, scale);
+		}
+		else{
+			canvas.draw(restart, Color.WHITE, restart.getWidth()/2, restart.getHeight()/2, 
+					restartPos.x, restartPos.y, 0, scale, scale);
+		}
+		
+		if(backHover == true){
+			canvas.draw(backHoverButton, Color.WHITE, backHoverButton.getWidth()/2, backHoverButton.getHeight()/2, 
+					backPos.x, backPos.y, 0, scale, scale);
+		}
+		else{
+			canvas.draw(back, Color.WHITE, back.getWidth()/2, back.getHeight()/2, backPos.x, backPos.y, 0, scale, scale);
+		}
+			
 		canvas.end();
 	}
 	
@@ -142,5 +174,19 @@ public class PauseMenuMode{
 		float sy = ((float) height) / STANDARD_HEIGHT;
 		scale = (sx < sy ? sx : sy);
 	}
+	
+	public void setResumeHover(boolean val){
+		this.resumeHover = val;
+	}
+	
+	public void setBackHover(boolean val){
+		this.backHover = val;
+	}
+	
+	public void setRestartHover(boolean val){
+		this.restartHover = val;
+	}
+	
+	
 		
 }

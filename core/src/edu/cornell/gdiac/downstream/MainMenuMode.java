@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.Controllers;
@@ -22,22 +23,27 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 	
 	
 	/** Textures necessary to support the main menu screen */
-	private static final String LOGO_FILE = "Final_Assets/downstream_logo.png";
-	private static final String PLAY_FILE = "Final_Assets/Menus/play.png";
-	private static final String SELECT_FILE = "Final_Assets/Menus/levelselect.png";
-	private static final String EDIT_FILE = "Final_Assets/Menus/levelbuild.png";
-	private static final String BACKGROUND_FILE = "Final_Assets/Menus/background.jpg";
+	private static final String BACKGROUND_FILE = "Final_Assets/Menus/title_screen_final.jpg";
+	private static final String PLAY_FILE = "Final_Assets/Menus/play_button.png";
+	private static final String PLAY_HOVER_FILE = "Final_Assets/Menus/play_button_gold.png";
+	private static final String SELECT_FILE = "Final_Assets/Menus/level_button.png";
+	private static final String SELECT_HOVER_FILE = "Final_Assets/Menus/level_button_gold.png";
+	//private static final String EDIT_FILE = "Final_Assets/Menus/levelbuild.png";
 	
-	/** Logo texture */
-	private Texture logo;
-	/** Play button */
-	private Texture play;
-	/** Select texture */
-	private Texture select;
-	/** Edit texture */
-	private Texture edit;
+	private static final String MENU_CLICK_SOUND = "Final_Assets/Sounds/menu_click.mp3";
+	private Music clickSound;
+	
 	/** Background texture */
 	private Texture background;
+	/** Play button */
+	private Texture play;
+	private Texture playHover;
+	/** Select texture */
+	private Texture select;
+	private Texture selectHover;
+	/** Edit texture */
+	//private Texture edit;
+	
 	
 	
 	/** AssetManager to be loading in the background */
@@ -51,8 +57,10 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 	private boolean active;
 	/** The current state of the play button */
 	private int playState;
+	private boolean playHovered;
 	/** The current state of the select button */
 	private int selectState;
+	private boolean selectHovered;
 	/** The current state of the edit button */
 	private int editState;
 	/** Scaling factor for when the student changes the resolution. */
@@ -64,11 +72,11 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 	private static int STANDARD_HEIGHT = 700;
 	
 	/** Positions of buttons */
-	private static Vector2 logoPos = new Vector2();
+	
 	private static Vector2 playPos = new Vector2();
-	private static Vector2 editPos = new Vector2();
+	//private static Vector2 editPos = new Vector2();
 	private static Vector2 selectPos = new Vector2();
-	private static Vector2 backPos = new Vector2();
+	private static Vector2 bgPos = new Vector2();
 	
 	
 	
@@ -86,26 +94,32 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 		// Compute the dimensions from the canvas
 		resize(canvas.getWidth(),canvas.getHeight());
 		
-		logoPos.set(new Vector2((float)canvas.getWidth()/2,(float)canvas.getHeight()/2+50));
-		playPos.set(new Vector2((float)canvas.getWidth()/3-70,(float)canvas.getHeight()/5-20));
-		selectPos.set(new Vector2((float)canvas.getWidth()/3*2+70,(float)canvas.getHeight()/5-20));
-		editPos.set(new Vector2((float)canvas.getWidth()/8*7,(float)canvas.getHeight()/8*7));
-		backPos.set(new Vector2((float)canvas.getWidth()/2,(float)canvas.getHeight()/2));
+	
+		
 
 		// Load images immediately.
-		logo = new Texture(LOGO_FILE);
 		play = new Texture(PLAY_FILE);
-		edit = new Texture(EDIT_FILE);
+		playHover = new Texture(PLAY_HOVER_FILE);
+		//edit = new Texture(EDIT_FILE);
 		select = new Texture(SELECT_FILE);
+		selectHover = new Texture(SELECT_HOVER_FILE);
 		background = new Texture(BACKGROUND_FILE);
+		
+		bgPos.set(new Vector2((float)canvas.getWidth()/2,(float)canvas.getHeight()/2));
+		playPos.set(new Vector2((float)canvas.getWidth()/7*5 - 82,(float)canvas.getHeight()/5+45));
+		selectPos.set(new Vector2((float)canvas.getWidth()/7*5,(float)canvas.getHeight()/9 + 30));
+		//editPos.set(new Vector2((float)canvas.getWidth()/8*7,(float)canvas.getHeight()/8*7));
+		
+		clickSound = Gdx.audio.newMusic(Gdx.files.internal(MENU_CLICK_SOUND));
+		clickSound.setLooping(false);
 			
 		// No progress so far.
 		playState = 0;
+		playHovered = false;
 		selectState = 0;
+		selectHovered = false;
 		editState = 0;
-		active = false;
 		
-
 		active = true;
 	}
 	
@@ -114,11 +128,14 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 	 * Called when this screen should release all resources.
 	 */
 	public void dispose() {
-		logo.dispose();
-		edit.dispose();
+		
+		//edit.dispose();
 		select.dispose();
+		selectHover.dispose();
 		play.dispose();
+		playHover.dispose();
 		background.dispose();
+		clickSound.dispose();
 	}
 
 
@@ -132,11 +149,23 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 	private void draw() {
 		canvas.beginMENU();
 		canvas.clear();
-		canvas.draw(background, Color.WHITE, background.getWidth()/2, background.getHeight()/2, backPos.x, backPos.y, 0, scale, scale);
-		//canvas.draw(logo, Color.WHITE, logo.getWidth()/2, logo.getHeight()/2, logoPos.x, logoPos.y, 0, scale*0.8f, scale*0.8f);
-		canvas.draw(play, Color.WHITE, play.getWidth()/2, play.getHeight()/2, playPos.x, playPos.y, 0, scale, scale);
-		canvas.draw(select, Color.WHITE, select.getWidth()/2, select.getHeight()/2, selectPos.x, selectPos.y, 0, scale, scale);
-		canvas.draw(edit, Color.WHITE, edit.getWidth()/2, edit.getHeight()/2, editPos.x, editPos.y, 0, scale*0.9f, scale*0.9f);
+		canvas.draw(background, Color.WHITE, background.getWidth()/2, background.getHeight()/2, bgPos.x, bgPos.y, 0, scale*.98f, scale*.98f);
+		
+		if(playHovered == true){
+			canvas.draw(playHover, Color.WHITE, playHover.getWidth()/2, playHover.getHeight()/2, playPos.x, playPos.y, 0, scale*.6f, scale*.6f);
+		}
+		else{
+			canvas.draw(play, Color.WHITE, play.getWidth()/2, play.getHeight()/2, playPos.x, playPos.y, 0, scale*.6f, scale*.6f);
+		}
+		
+		if(selectHovered == true){
+			canvas.draw(selectHover, Color.WHITE, selectHover.getWidth()/2, selectHover.getHeight()/2, selectPos.x, selectPos.y, 0, scale*.6f, scale*.6f);
+		}
+		else{
+			canvas.draw(select, Color.WHITE, select.getWidth()/2, select.getHeight()/2, selectPos.x, selectPos.y, 0, scale*.6f, scale*.6f);
+		}
+		
+		//canvas.draw(edit, Color.WHITE, edit.getWidth()/2, edit.getHeight()/2, editPos.x, editPos.y, 0, scale*0.9f, scale*0.9f);
 		canvas.end();
 	}
 
@@ -156,12 +185,15 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 			
 			// We are are ready, notify our listener
 			if (startPlay() && listener != null) {
+				clickSound.play();
 				listener.exitScreen(this, 1);
 			}
 			if (startSelect() && listener != null){
+				clickSound.play();
 				listener.exitScreen(this, WorldController.EXIT_SELECT);
 			}
 			if (startEdit() && listener != null){
+				clickSound.play();
 				listener.exitScreen(this, WorldController.EXIT_EDIT);
 			}
 		}
@@ -272,21 +304,17 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 		float dx = Math.abs(screenX - playPos.x);
 		float dy = Math.abs(screenY - playPos.y);
 		
-		if (dx < scale*play.getWidth()/2 && dy < scale*play.getHeight()/2) {
+		if (dx < .3f*scale*play.getWidth()/2 && dy < .5f*scale*play.getHeight()/2) {
 			playState = 1;
 		}
 		
 		dx = Math.abs(screenX - selectPos.x);
 		dy = Math.abs(screenY - selectPos.y);
-		if (dx < scale*select.getWidth()/2 && dy < scale*select.getHeight()/2) {
+		if (dx < .7f*scale*select.getWidth()/2 && dy < .5f*scale*select.getHeight()/2) {
 			selectState = 1;
 		}
 		
-		dx = Math.abs(screenX - editPos.x);
-		dy = Math.abs(screenY - editPos.y);
-		if (dx < scale*edit.getWidth()/2 && dy < scale*edit.getHeight()/2) {
-			editState = 1;
-		}
+		
 		
 		return false;
 	}
@@ -421,6 +449,29 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 	 * @return whether to hand the event to other listeners.
 	 */
 	public boolean mouseMoved(int screenX, int screenY) {
+		// Flip to match graphics coordinates
+		screenY = canvas.getHeight()-screenY;
+		
+		float dx = Math.abs(screenX - playPos.x);
+		float dy = Math.abs(screenY - playPos.y);
+		
+		if (dx < .3f*scale*play.getWidth()/2 && dy < .5f*scale*play.getHeight()/2) {
+			playHovered = true;
+		}
+		else{
+			playHovered = false;
+		}
+		
+		dx = Math.abs(screenX - selectPos.x);
+		dy = Math.abs(screenY - selectPos.y);
+		
+		if (dx < .7f*scale*select.getWidth()/2 && dy < .5f*scale*select.getHeight()/2) {
+			selectHovered = true;
+		}
+		else{
+			selectHovered = false;
+		}
+		
 		return true;
 	}
 

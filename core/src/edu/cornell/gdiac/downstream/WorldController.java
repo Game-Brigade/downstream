@@ -95,7 +95,7 @@ public abstract class WorldController implements Screen {
 	protected static final String ROCK_FILE_D = "terrain/Rock_Day.png";
 	protected static final String ROCK_FILE_S = "terrain/Rock_Sunset.png";
 	/** References to the lilypad textures */
-	protected static final String LILY_TEXTURE = "tethers/lilypad.png";
+	protected static final String LILY_TEXTURE = "tethers/Lily_Day_2.png";
 	protected static final String LILY_TEXTURE_S = "tethers/Lily_Sunset.png";
 	protected static final String LILY_TEXTURE_N = "tethers/Lily_Night.png";
 	protected static final String LILY_TEXTURE_D = "tethers/Lily_Day.png";
@@ -109,13 +109,14 @@ public abstract class WorldController implements Screen {
 	protected static final String ENERGYBAR_TEXTURE = "MENUS/UI_bar.png";
 	protected static final String UI_FLOWER = "MENUS/UI_lotus.png";
 	protected static final String OVERLAY = "terrain/texture.jpg";
-	protected static final String ARROW = "koi/arrow.png";
-	protected static final String TUTORIAL_TEXTURE1 = "MENUS/tutorial1.png";
-	protected static final String TUTORIAL_TEXTURE2 = "MENUS/tutorial2.png";
-	protected static final String TUTORIAL_TEXTURE3 = "MENUS/tutorial3.png";
-	protected static final String TUTORIAL_TEXTURE4 = "MENUS/tutorial4.png";
-	protected static final String TUTORIAL_TEXTURE5 = "MENUS/tutorial5.png";
-	protected static final String TUTORIAL_TEXTURE6 = "MENUS/tutorial6.png";
+	protected static final String KOI_ARROW = "koi/koi_arrow.png";
+	protected static final String WHIRL_ARROW = "terrain/whirl_arrow.png";
+	protected static final String TUTORIAL_TEXTURE1 = "MENUS/tip_1.png";
+	protected static final String TUTORIAL_TEXTURE2 = "MENUS/tip_2.png";
+	protected static final String TUTORIAL_TEXTURE3 = "MENUS/tip_3.png";
+	protected static final String TUTORIAL_TEXTURE4 = "MENUS/tip_4.png";
+	protected static final String TUTORIAL_TEXTURE5 = "MENUS/tip_5.png";
+	protected static final String TUTORIAL_TEXTURE6 = "MENUS/tip_6.png";
 	protected static final String HELP_TEXTURE = "MENUS/help_button.png";
 	protected static final String ENEMY_TEXTUREA = "enemy/enemy_fish.png";
 
@@ -149,7 +150,8 @@ public abstract class WorldController implements Screen {
 	/** Texture assets for HUD */
 	protected TextureRegion energyBarTexture;
 	protected TextureRegion UILotusTexture;
-	protected TextureRegion Arrow;
+	protected TextureRegion koiArrow;
+	protected TextureRegion whirlArrow;
 	protected TextureRegion tutorial1;
 	protected TextureRegion tutorial2;
 	protected TextureRegion tutorial3;
@@ -158,8 +160,13 @@ public abstract class WorldController implements Screen {
 	protected TextureRegion tutorial6;
 	protected TextureRegion helpTexture;
 	//Sounds//
-	protected static final String LIGHTING_SOUND = "SOUNDS/fish_death.mp3";
-	protected Music deathSound;
+	protected static final String LIGHTING_SOUND = "Final_Assets/Sounds/lotus_light.mp3";
+	protected static final String MENU_CLICK_SOUND = "Final_Assets/Sounds/menu_click.mp3";
+	protected static final String FAIL_SOUND = "Final_Assets/Sounds/fail_level.mp3";
+	
+	protected Music lightingSound;
+	protected Music clickSound;
+	protected Music failSound;
 
 	private static int dayTime = 0;
 
@@ -213,6 +220,19 @@ public abstract class WorldController implements Screen {
 	protected TextureRegion[] closingFlowerFramesNight; // #5
 	protected TextureRegion[] closingFlowerFramesSunset; // #5
 	protected TextureRegion closingFlowercurrentFrame; // #7
+	
+	protected Animation closingFlowerAnimationT; // #3
+	protected Animation openingFlowerAnimationT; // #3
+	protected Animation openFlowerAnimationT; // #3
+	protected Animation closedFlowerAnimationT; // #3
+	protected TextureRegion[] openingFlowerFramesT; // #5
+	protected TextureRegion[] closingFlowerFramesT; // #5
+	protected TextureRegion[] openFlowerFramesT; // #5
+	protected TextureRegion[] closedFlowerFramesT; // #5
+	protected TextureRegion openingFlowercurrentFrameT; // #7
+	protected TextureRegion closingFlowercurrentFrameT; // #7
+	protected TextureRegion openFlowercurrentFrameT; // #7
+	protected TextureRegion closedFlowercurrentFrameT; // #7
 
 	protected Animation koiSAnimation; // #3
 	protected Texture koiSSheet; // #4
@@ -335,8 +355,10 @@ public abstract class WorldController implements Screen {
 		manager.load(OVERLAY_FILE, Texture.class);
 		assets.add(OVERLAY_FILE);
 
-		manager.load(ARROW, Texture.class);
-		assets.add(ARROW);
+		manager.load(KOI_ARROW, Texture.class);
+		assets.add(KOI_ARROW);
+		manager.load(WHIRL_ARROW, Texture.class);
+		assets.add(WHIRL_ARROW);
 		
 		manager.load(TUTORIAL_TEXTURE1, Texture.class);
 		assets.add(TUTORIAL_TEXTURE1);
@@ -420,9 +442,8 @@ public abstract class WorldController implements Screen {
 		if (worldAssetState != AssetState.LOADING) {
 			return;
 		}
-
-		deathSound = Gdx.audio.newMusic(Gdx.files.internal(LIGHTING_SOUND));
-		deathSound.setLooping(false);
+		
+		
 
 		int cols = 11;
 		int rows = 1;
@@ -430,7 +451,7 @@ public abstract class WorldController implements Screen {
 		//animationDef
 		//load the animation content here
 
-		lilyFrames = splice(11, 1, "tethers/lotus_strip.png");
+		lilyFrames = splice(4, 12, 47, LILY_TEXTURE);
 		//lilyFramesDay = splice(47, "tethers/Lily_Day.png");
 		lilyFramesNight = splice(47, 1, LILY_TEXTURE_N);
 		//lilyFramesSunset = splice(47, LILY_TEXTURE_S);
@@ -449,6 +470,7 @@ public abstract class WorldController implements Screen {
 		closedFlowerFramesDay = splice(26, 1, "tethers/Floating_Closed_Day_small.png");
 		closedFlowerFramesNight = splice(26, 1, "tethers/Floating_Closed_Night_small.png");
 		closedFlowerFramesSunset = splice(26, 1, "tethers/Floating_Closed_Sunset_small.png");
+		closedFlowerFramesT = splice(23, 1, "tethers/Floating_Closed_Sunset2.png");
 
 
 		int index = 0;
@@ -456,6 +478,7 @@ public abstract class WorldController implements Screen {
 		openFlowerFramesDay = splice(26, 1, "tethers/Floating_Open_Day_small.png");
 		openFlowerFramesNight = splice(26, 1, "tethers/Floating_Open_Night_small.png");
 		openFlowerFramesSunset = splice(26, 1, "tethers/Floating_Open_Sunset_small.png");
+		openFlowerFramesT = splice(23, 1, "tethers/Floating_Open_Sunset2.png");
 
 
 		cols = 8; 
@@ -463,11 +486,12 @@ public abstract class WorldController implements Screen {
 		openingFlowerFramesDay = splice(26, 1, "tethers/Opening_Flower_Day_small.png" );
 		openingFlowerFramesNight = splice(26, 1, "tethers/Opening_Flower_Night_small.png");
 		openingFlowerFramesSunset = splice(26, 1, "tethers/Opening_Flower_Sunset_small.png");
+		openingFlowerFramesT = splice(26, 1, "tethers/Opening_Flower_Sunset2.png");
 
 		closingFlowerFramesDay = splice(26, 1, "tethers/Closing_Flower_Day_small.png");
 		closingFlowerFramesNight = splice(26, 1, "tethers/Closing_Flower_Night_small.png");
 		closingFlowerFramesSunset = splice(26, 1, "tethers/Closing_Flower_Sunset_small.png");
-
+		closingFlowerFramesT = splice(26, 1, "tethers/Opening_Flower_Sunset2.png");
 
 		cols = 12;
 		koiSSheet = new Texture(Gdx.files.internal("koi/Straight_Koi.png"));
@@ -537,7 +561,8 @@ public abstract class WorldController implements Screen {
 		
 		whirlpoolTexture = createTexture(manager, WHIRLPOOL_TEXTURE, true);
 
-		Arrow = createTexture(manager, ARROW, false);
+		koiArrow = createTexture(manager, KOI_ARROW, false);
+		whirlArrow = createTexture(manager, WHIRL_ARROW, false);
 		
 		tutorial1 = createTexture(manager, TUTORIAL_TEXTURE1, false);
 		tutorial2 = createTexture(manager, TUTORIAL_TEXTURE2, false);
@@ -550,17 +575,18 @@ public abstract class WorldController implements Screen {
 
 		// Allocate the tiles
 
-
-		setBackground(manager.get(BACKGROUND_FILE_N, Texture.class), 2);
+		
+		//setBackground(manager.get(BACKGROUND_FILE_N, Texture.class), 2);
+		setBackground(createTexture(manager, BACKGROUND_FILE_N, false).getTexture(), 2);
 		getBackground(2).setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
 
-		setBackground(manager.get(BACKGROUND_FILE_D, Texture.class), 0);
+		setBackground(createTexture(manager, BACKGROUND_FILE_D, false).getTexture(), 0);
 		getBackground(0).setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
 
-		setBackground(manager.get(BACKGROUND_FILE_S, Texture.class), 1);
+		setBackground(createTexture(manager, BACKGROUND_FILE_N, false).getTexture(), 1);
 		getBackground(1).setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
 
-		overlay = manager.get(OVERLAY_FILE, Texture.class);
+		overlay = createTexture(manager, BACKGROUND_FILE_N, true).getTexture();
 		overlay.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
 
 		// Allocate the font
@@ -575,7 +601,16 @@ public abstract class WorldController implements Screen {
 		} else {
 			secondFont = null;
 		}
-
+		
+		lightingSound = Gdx.audio.newMusic(Gdx.files.internal(LIGHTING_SOUND));
+		lightingSound.setLooping(false);
+		
+		clickSound = Gdx.audio.newMusic(Gdx.files.internal(MENU_CLICK_SOUND));
+		clickSound.setLooping(false);
+		
+		failSound = Gdx.audio.newMusic(Gdx.files.internal(FAIL_SOUND));
+		failSound.setLooping(false);
+		
 		worldAssetState = AssetState.COMPLETE;
 	}
 
@@ -678,6 +713,8 @@ public abstract class WorldController implements Screen {
 	public static final int EXIT_OPTIONS = 21;
 	public static final int EXIT_NEXT = 22;
 	public static final int EXIT_PREV = 23;
+	public static final int EXIT_WIN = 24;
+	public static final int EXIT_WIN_DONE = 25;
 
 	/** How many frames after winning/losing do we continue? */
 	public static final int EXIT_COUNT = 120;
@@ -903,6 +940,11 @@ public abstract class WorldController implements Screen {
 		scale  = null;
 		world  = null;
 		canvas = null;
+		
+		clickSound.dispose();
+		
+		lightingSound.dispose();
+		
 	}
 
 	/**
@@ -1108,19 +1150,19 @@ public abstract class WorldController implements Screen {
 
 
 
-		// Final message
-		if (complete && !failed) {
-			displayFont.setColor(Color.BLACK);
-			canvas.begin(); // DO NOT SCALE
-			canvas.drawTextCentered("VICTORY!", displayFont, 0.0f);
-			canvas.end();
-			displayFont.setColor(Color.BLACK);
-		} else if (failed) {
-			//displayFont.setColor(Color.RED);
-			canvas.begin(); // DO NOT SCALE
-			canvas.drawTextCentered("FAILURE!", displayFont, 0.0f);
-			canvas.end();
-		}
+//		// Final message
+//		if (complete && !failed) {
+//			displayFont.setColor(Color.BLACK);
+//			canvas.begin(); // DO NOT SCALE
+//			canvas.drawTextCentered("VICTORY!", displayFont, 0.0f);
+//			canvas.end();
+//			displayFont.setColor(Color.BLACK);
+//		} else if (failed) {
+//			displayFont.setColor(Color.RED);
+//			canvas.begin(); // DO NOT SCALE
+//			canvas.drawTextCentered("FAILURE!", displayFont, 0.0f);
+//			canvas.end();
+//		}
 	}
 
 	/**
