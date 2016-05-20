@@ -98,7 +98,7 @@ public abstract class WorldController implements Screen {
 	protected static final String LILY_TEXTURE = "tethers/Lily_Day_2.png";
 	protected static final String LILY_TEXTURE_S = "tethers/Lily_Sunset.png";
 	protected static final String LILY_TEXTURE_N = "tethers/Lily_Night.png";
-	protected static final String LILY_TEXTURE_D = "tethers/Lily_Day.png";
+	protected static final String LILY_TEXTURE_D = "tethers/Lily_Day_2.png";
 	/** References to the whirlpool textures */
 	protected static final String WHIRLPOOL_TEXTURE = "Final_Assets/Beta_Art_Assets/Objects(PNGs)/whirlpool.png";
 	protected static final String WHIRLPOOL_TEXTURE_N = "Final_Assets/Beta Art Assets/Objects(PNGs)/whirlpool_night.png";
@@ -298,6 +298,12 @@ public abstract class WorldController implements Screen {
 
 		manager.load(LILY_TEXTURE, Texture.class);
 		assets.add(LILY_TEXTURE);
+		
+		manager.load(LILY_TEXTURE_N, Texture.class);
+		assets.add(LILY_TEXTURE_N);
+		
+		manager.load(LILY_TEXTURE_S, Texture.class);
+		assets.add(LILY_TEXTURE_S);
 
 		manager.load(LANTERN_TEXTURE, Texture.class);
 		assets.add(LANTERN_TEXTURE);
@@ -451,9 +457,12 @@ public abstract class WorldController implements Screen {
 		//load the animation content here
 
 		lilyFrames = splice(4, 12, 47, LILY_TEXTURE);
-		//lilyFramesDay = splice(47, "tethers/Lily_Day.png");
-		lilyFramesNight = splice(47, 1, LILY_TEXTURE_N);
-		//lilyFramesSunset = splice(47, LILY_TEXTURE_S);
+
+		lilyFramesDay = splice(4, 12, 47, LILY_TEXTURE);
+		lilyFramesNight = splice(24, 2, 47, LILY_TEXTURE_N);
+		lilyFramesSunset = splice(24, 2, 47, LILY_TEXTURE_S);
+
+
 		goalFrames = splice(4,20, GOAL_TEXTURE);
 		goalAnimation = new Animation(.01f, goalFrames);
 		//lilyAnimation = new Animation(.2f, lilyFrames);
