@@ -28,6 +28,7 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 	private static final String PLAY_HOVER_FILE = "Final_Assets/Menus/play_button_gold.png";
 	private static final String SELECT_FILE = "Final_Assets/Menus/level_button.png";
 	private static final String SELECT_HOVER_FILE = "Final_Assets/Menus/level_button_gold.png";
+	//private static final String LOAD_FILE = "Final_Assets/Menus/now_loading.jpg";
 	//private static final String EDIT_FILE = "Final_Assets/Menus/levelbuild.png";
 	
 	private static final String MENU_CLICK_SOUND = "Final_Assets/Sounds/menu_click.mp3";
@@ -43,7 +44,7 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 	private Texture selectHover;
 	/** Edit texture */
 	//private Texture edit;
-	
+	//private Texture load;
 	
 	
 	/** AssetManager to be loading in the background */
@@ -77,6 +78,7 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 	//private static Vector2 editPos = new Vector2();
 	private static Vector2 selectPos = new Vector2();
 	private static Vector2 bgPos = new Vector2();
+	//private static Vector2 loadPos = new Vector2();
 	
 	
 	
@@ -94,8 +96,6 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 		// Compute the dimensions from the canvas
 		resize(canvas.getWidth(),canvas.getHeight());
 		
-	
-		
 
 		// Load images immediately.
 		play = new Texture(PLAY_FILE);
@@ -104,11 +104,13 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 		select = new Texture(SELECT_FILE);
 		selectHover = new Texture(SELECT_HOVER_FILE);
 		background = new Texture(BACKGROUND_FILE);
+		//load = new Texture(LOAD_FILE);
 		
 		bgPos.set(new Vector2((float)canvas.getWidth()/2,(float)canvas.getHeight()/2));
 		playPos.set(new Vector2((float)canvas.getWidth()/7*5 - 82,(float)canvas.getHeight()/5+45));
 		selectPos.set(new Vector2((float)canvas.getWidth()/7*5,(float)canvas.getHeight()/9 + 30));
 		//editPos.set(new Vector2((float)canvas.getWidth()/8*7,(float)canvas.getHeight()/8*7));
+		//loadPos.set(new Vector2((float)canvas.getWidth()/2,(float)canvas.getHeight()/2));
 		
 		clickSound = Gdx.audio.newMusic(Gdx.files.internal(MENU_CLICK_SOUND));
 		clickSound.setLooping(false);
@@ -133,6 +135,7 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 		select.dispose();
 		selectHover.dispose();
 		play.dispose();
+		//load.dispose();
 		playHover.dispose();
 		background.dispose();
 		clickSound.dispose();
@@ -149,21 +152,27 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 	private void draw() {
 		canvas.beginMENU();
 		canvas.clear();
-		canvas.draw(background, Color.WHITE, background.getWidth()/2, background.getHeight()/2, bgPos.x, bgPos.y, 0, scale*.98f, scale*.98f);
 		
-		if(playHovered == true){
-			canvas.draw(playHover, Color.WHITE, playHover.getWidth()/2, playHover.getHeight()/2, playPos.x, playPos.y, 0, scale*.6f, scale*.6f);
+		canvas.draw(background, Color.WHITE, background.getWidth() / 2, background.getHeight() / 2, bgPos.x, bgPos.y, 0,
+				scale * .98f, scale * .98f);
+
+		if (playHovered == true) {
+			canvas.draw(playHover, Color.WHITE, playHover.getWidth() / 2, playHover.getHeight() / 2, playPos.x,
+					playPos.y, 0, scale * .6f, scale * .6f);
+		} else {
+			canvas.draw(play, Color.WHITE, play.getWidth() / 2, play.getHeight() / 2, playPos.x, playPos.y, 0,
+					scale * .6f, scale * .6f);
 		}
-		else{
-			canvas.draw(play, Color.WHITE, play.getWidth()/2, play.getHeight()/2, playPos.x, playPos.y, 0, scale*.6f, scale*.6f);
+
+		if (selectHovered == true) {
+			canvas.draw(selectHover, Color.WHITE, selectHover.getWidth() / 2, selectHover.getHeight() / 2, selectPos.x,
+					selectPos.y, 0, scale * .6f, scale * .6f);
+		} else {
+			canvas.draw(select, Color.WHITE, select.getWidth() / 2, select.getHeight() / 2, selectPos.x, selectPos.y, 0,
+					scale * .6f, scale * .6f);
 		}
 		
-		if(selectHovered == true){
-			canvas.draw(selectHover, Color.WHITE, selectHover.getWidth()/2, selectHover.getHeight()/2, selectPos.x, selectPos.y, 0, scale*.6f, scale*.6f);
-		}
-		else{
-			canvas.draw(select, Color.WHITE, select.getWidth()/2, select.getHeight()/2, selectPos.x, selectPos.y, 0, scale*.6f, scale*.6f);
-		}
+		
 		
 		//canvas.draw(edit, Color.WHITE, edit.getWidth()/2, edit.getHeight()/2, editPos.x, editPos.y, 0, scale*0.9f, scale*0.9f);
 		canvas.end();
