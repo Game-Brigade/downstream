@@ -121,6 +121,7 @@ public class InputController {
 	public enum SelectionType {
 		Lilypad, 
 		Lantern, 
+		Lotus,
 		Enemy, 
 		Player, 
 		Wall,
@@ -442,6 +443,7 @@ public class InputController {
 		if (Gdx.input.isKeyPressed(Input.Keys.S)) currentSelection = SelectionType.Save;
 		if (Gdx.input.isKeyPressed(Input.Keys.NUM_1)) currentSelection = SelectionType.Lilypad;
 		if (Gdx.input.isKeyPressed(Input.Keys.NUM_2)) currentSelection = SelectionType.Lantern;
+		if (Gdx.input.isKeyPressed(Input.Keys.Q    )) currentSelection = SelectionType.Lotus;
 		if (Gdx.input.isKeyPressed(Input.Keys.NUM_3)) currentSelection = SelectionType.Enemy;
 		if (Gdx.input.isKeyPressed(Input.Keys.NUM_4)) currentSelection = SelectionType.Player;
 		if (Gdx.input.isKeyPressed(Input.Keys.NUM_5)) currentSelection = SelectionType.Wall;

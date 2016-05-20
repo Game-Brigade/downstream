@@ -272,7 +272,7 @@ public class PlayerModel extends BoxObstacle {
 		//return getLinearVelocity().isCollinear(target.sub(getPosition()), .09f);
 	}
 	
-	public boolean willIntersectTether(Vector2 tether, int tetherRange) {
+	public boolean willIntersectTether(Vector2 tether, float tetherRange) {
 		Vector2 initialTangent = getInitialTangentPoint(tether);
 		Vector2 difference = new Vector2(tether.x - getX(), tether.y - getY());
 		boolean timeIsPositive = Math.signum(difference.x) == Math.signum(getVX()) && 
@@ -382,8 +382,9 @@ public class PlayerModel extends BoxObstacle {
 		if (arrowOn ){
 			if(isTethered()){
 				Vector2 farOff = new Vector2(getX(), getY());
-
+//				getLinearVelocity();
 				farOff.add(this.getLinearVelocity().cpy().nor().scl(4f));
+//				System.out.println(getLinearVelocity());
 				canvas.draw(ArrowTexture, Color.WHITE , ArrowTexture.getRegionWidth()/2 *.6f , ArrowTexture.getRegionHeight()/2 *.6f,farOff.x*drawScale.x,farOff.y*drawScale.x, getAngle(), .6f, .6f);
 
 			}

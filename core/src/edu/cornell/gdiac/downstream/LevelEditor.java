@@ -184,6 +184,7 @@ public class LevelEditor extends WorldController {
 	}
 	
 	private ArrayList<Vector2> lilypads;
+	private ArrayList<Vector2> lotuses;
 	private ArrayList<Vector2> lanterns;
 	private ArrayList<Vector4> whirlpools;
 	private ArrayList<Vector2> rocks;
@@ -225,6 +226,7 @@ public class LevelEditor extends WorldController {
 		goal = new ArrayList<Vector2>();
 		lilypads = new ArrayList<Vector2>();
 		lanterns = new ArrayList<Vector2>();
+		lotuses = new ArrayList<Vector2>();
 		enemies = new HashMap<String,ArrayList<Vector2>>();
 		enemyPath = new ArrayList<Vector2>();
 		walls = new ArrayList<ArrayList<Vector2>>();
@@ -297,6 +299,9 @@ public class LevelEditor extends WorldController {
 			case Lantern:
 				addLantern(currentClick);
 				return;
+			case Lotus:
+				addLotus(currentClick);
+				return;
 			case Enemy:
 				addEnemy(currentClick,didEnter);
 				return;
@@ -344,6 +349,22 @@ public class LevelEditor extends WorldController {
 
 	private void addLilypad(Vector2 click) {
 		lilypads.add(click.cpy());
+		float rad = lilyTexture.getRegionWidth()/scale.x/2;
+		TetherModel lily = new TetherModel(click.x, click.y, rad);
+		lily.setBodyType(BodyDef.BodyType.StaticBody);
+		lily.setName("lily");
+		lily.setDensity(TETHER_DENSITY);
+		lily.setFriction(TETHER_FRICTION);
+		lily.setRestitution(TETHER_RESTITUTION);
+		lily.setlightingTexture(lightingTexture);
+		lily.setSensor(false);
+		lily.setDrawScale(scale);
+		lily.setTexture(lilyTexture);
+		addObject(lily);
+	}
+	
+	private void addLotus(Vector2 click) {
+		lotuses.add(click.cpy());
 		float rad = lilyTexture.getRegionWidth()/scale.x/2;
 		TetherModel lily = new TetherModel(click.x, click.y, rad);
 		lily.setBodyType(BodyDef.BodyType.StaticBody);
@@ -592,7 +613,7 @@ public class LevelEditor extends WorldController {
 			obj.setFriction(BASIC_FRICTION);
 			obj.setRestitution(BASIC_RESTITUTION);
 			obj.setDrawScale(scale);
-			obj.setTexture(earthTile);
+			obj.setTexture(shoreTile);
 			obj.setName("shore");
 			addObject(obj);
 			return;
@@ -665,13 +686,14 @@ public class LevelEditor extends WorldController {
 		ArrayList<Vector2> g = goal;
 		HashMap<String,ArrayList<Vector2>> e = enemies;
 		ArrayList<Vector2> li = lilypads;
-		ArrayList<Vector2> lo = lanterns;
+		ArrayList<Vector2> lo = lotuses;
+		ArrayList<Vector2> la = lanterns;
 		ArrayList<ArrayList<Vector2>> w = walls;
 		ArrayList<ArrayList<Vector2>> s = shores;
 		ArrayList<Vector4> wp = whirlpools;
 		ArrayList<Vector2> m = mapArea;
 		ArrayList<Vector2> r = rocks;
-		Level level = new Level(n,p,g,e,li,lo,w, s,wp, r ,m);
+		Level level = new Level(n,p,g,e,li,lo,la,w,s,wp,r,m);
 		try {
 			Gson gson = new GsonBuilder().setPrettyPrinting().create();
 			System.setOut(new PrintStream(new FileOutputStream(filename)));
@@ -753,7 +775,7 @@ public class LevelEditor extends WorldController {
 	    ArrayList<ArrayList<Vector2>> w = new ArrayList<ArrayList<Vector2>>();
 	    ArrayList<ArrayList<Vector2>> s = new ArrayList<ArrayList<Vector2>>();
 	    ArrayList<Vector2> r = new ArrayList<Vector2>();
-	    Level defaultLevel =  le.new Level(number, player, goal, enemiesLevel, lilypads, lotuses, w, s, wpools, r, map);
+	    Level defaultLevel =  le.new Level(number, player, goal, enemiesLevel, lilypads, lotuses, new ArrayList<Vector2>(), w, s, wpools, r, map);
 	    defaultLevel.walls = walls;
 	    return defaultLevel;
 	  }
@@ -769,13 +791,17 @@ public class LevelEditor extends WorldController {
 	    System.out.println(level);
 	    if (level == null) return;
 	    ArrayList<ArrayList<Vector2>> tempWalls = new ArrayList<ArrayList<Vector2>>();
-	    for (int i = 0; i < level.walls.size(); i++) {
-	      ArrayList<Vector2> wall = new ArrayList<Vector2>();
-	      for (int j = 0; j < level.walls.get(i).size(); j+=2) {
-	        wall.add(new Vector2(level.walls.get(i).get(j),
-	                   level.walls.get(i).get(j+1)));
-	      }
-	      tempWalls.add(wall);
+	    if (level.walls != null) {
+	    	for (int i = 0; i < level.walls.size(); i++) {
+	  	      ArrayList<Vector2> wall = new ArrayList<Vector2>();
+	  	      if (level.walls.get(i) != null) {
+	  	    	for (int j = 0; j < level.walls.get(i).size(); j+=2) {
+		  	        wall.add(new Vector2(level.walls.get(i).get(j),
+		  	                   level.walls.get(i).get(j+1)));
+		  	      }
+		  	      tempWalls.add(wall);
+	  	      }
+	  	    }
 	    }
 	    if (level.player != null) {
 	      addPlayer(level.player);
@@ -801,6 +827,17 @@ public class LevelEditor extends WorldController {
 	    }
 	    for (Vector2 lotus : level.lotuses) {
 	      addLantern(lotus);
+	    }
+	    if (level.lanterns != null) {
+	    	for (Vector2 lantern : level.lanterns) {
+		    	addLantern(lantern);
+		    }
+	    }
+	    
+	    if (level.rocks != null) {
+	    	for (Vector2 rock : level.rocks) {
+	    		addRock(rock);
+	    	}
 	    }
 	    
 	    for (ArrayList<Vector2> wall : tempWalls) {
@@ -840,15 +877,16 @@ public class LevelEditor extends WorldController {
 	class Level {
 		int number;
 		Vector2 player;
-		ArrayList<Vector2> goal;
-		HashMap<String,ArrayList<Vector2>> enemiesLevel;
-		ArrayList<Vector2> lilypads;
-		ArrayList<Vector2> lotuses;
-		ArrayList<ArrayList<Float>> walls;
-		ArrayList<ArrayList<Float>> shores;
-		ArrayList<Vector4> whirlpools;
-		ArrayList<Vector2> map;
-		ArrayList<Vector2> rocks;
+		ArrayList<Vector2> goal = new ArrayList<Vector2>();
+		HashMap<String,ArrayList<Vector2>> enemiesLevel = new HashMap<String,ArrayList<Vector2>>();;
+		ArrayList<Vector2> lilypads = new ArrayList<Vector2>();
+		ArrayList<Vector2> lotuses = new ArrayList<Vector2>();
+		ArrayList<Vector2> lanterns = new ArrayList<Vector2>();
+		ArrayList<ArrayList<Float>> walls = new ArrayList<ArrayList<Float>>();
+		ArrayList<ArrayList<Float>> shores = new ArrayList<ArrayList<Float>>();
+		ArrayList<Vector4> whirlpools = new ArrayList<Vector4>();
+		ArrayList<Vector2> map = new ArrayList<Vector2>();
+		ArrayList<Vector2> rocks = new ArrayList<Vector2>();
 
 		private Level(int n, 
 				Vector2 p, 
@@ -856,6 +894,7 @@ public class LevelEditor extends WorldController {
 				HashMap<String,ArrayList<Vector2>> e,
 				ArrayList<Vector2> li,
 				ArrayList<Vector2> lo,
+				ArrayList<Vector2> la,
 				ArrayList<ArrayList<Vector2>> w, 
 				ArrayList<ArrayList<Vector2>> s, 
 				ArrayList<Vector4> wp,
@@ -875,6 +914,7 @@ public class LevelEditor extends WorldController {
 			}
 			lilypads = li;
 			lotuses = lo;
+			lanterns = la;
 			whirlpools = wp;
 
 			walls = new ArrayList<ArrayList<Float>>();

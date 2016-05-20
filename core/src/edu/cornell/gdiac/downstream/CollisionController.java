@@ -61,7 +61,7 @@ public class CollisionController {
 		else if(sCollide.startsWith("rock")){return LETHAL_ROCKS;}
 		else if(sCollide.startsWith("shadow")){return LETHAL_SHADOWS;}
 		else if(sCollide.startsWith("enemy")){return LETHAL_ENEMIES;}
-		else if(sCollide.startsWith("wall") || sCollide.startsWith("shore")){
+		else if(sCollide.startsWith("wall")){
 			koi.setTethered(false);
 			koi.setAttemptingTether(false);
 			return LETHAL_WALLS;

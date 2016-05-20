@@ -89,6 +89,7 @@ public abstract class WorldController implements Screen {
 	protected static final String EARTH_FILE_N = "terrain/Grass_Night.jpg";
 	protected static final String EARTH_FILE_D = "terrain/Grass_Day.jpg";
 	protected static final String EARTH_FILE_S = "terrain/Grass_Sunset.jpg";
+	protected static final String SHORE_FILE = "terrain/shore.png";
 	/** References to the rock textures */
 	protected static final String ROCK_FILE_N = "terrain/Rock_Night.png";
 	protected static final String ROCK_FILE_D = "terrain/Rock_Day.png";
@@ -139,6 +140,7 @@ public abstract class WorldController implements Screen {
 	protected TextureRegion earthTileDay;
 	protected TextureRegion earthTileNight;
 	protected TextureRegion earthTileSunset;
+	protected TextureRegion shoreTile;
 	protected TextureRegion rockDay;
 	protected TextureRegion rockNight;
 	protected TextureRegion rockSunset;
@@ -299,6 +301,8 @@ public abstract class WorldController implements Screen {
 		assets.add(EARTH_FILE_N);
 		manager.load(EARTH_FILE_S,Texture.class);
 		assets.add(EARTH_FILE_S);
+		manager.load(SHORE_FILE,Texture.class);
+		assets.add(SHORE_FILE);
 
 		manager.load(ROCK_FILE_D,Texture.class);
 		assets.add(ROCK_FILE_D);
@@ -523,6 +527,7 @@ public abstract class WorldController implements Screen {
 		earthTileDay = createTexture(manager,EARTH_FILE_D, true);
 		earthTileNight = createTexture(manager,EARTH_FILE_N, true);
 		earthTileSunset = createTexture(manager,EARTH_FILE_S, true);
+		shoreTile = createTexture(manager,SHORE_FILE,true);
 
 		rockDay = createTexture(manager,ROCK_FILE_D, true);
 		rockNight = createTexture(manager,ROCK_FILE_N, true);

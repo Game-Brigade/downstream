@@ -480,7 +480,7 @@ public class DownstreamController extends WorldController implements ContactList
 		// Create the fish avatar
 		dwidth  = koiTexture.getRegionWidth()/scale.x;
 		dheight = koiTexture.getRegionHeight()/scale.y;
-//		System.out.println(dwidth + " " + dheight);
+		//		System.out.println(dwidth + " " + dheight);
 		koi = new PlayerModel(level.player.x, level.player.y, 2.5f, 0.925f);
 		koi.setDrawScale(scale);
 		koi.setName("koi");
@@ -488,9 +488,9 @@ public class DownstreamController extends WorldController implements ContactList
 		koi.setWhirled(false);
 		koi.ArrowTexture = Arrow;
 		addObject(koi);
-		
+
 		//create shadow(s)
-		if(level.lotuses.size() > 0){
+		if(level.lotuses.size() > 0 || level.lanterns != null && level.lanterns.size() > 0){
 			dwidth = shadowTexture.getRegionWidth()/scale.x*1.3f;
 			dheight = shadowTexture.getRegionHeight()/scale.y*1.3f;
 			ShadowModel shadow = new ShadowModel(goalPos.x, goalPos.y, dwidth, dheight, shadowDest);
@@ -509,34 +509,27 @@ public class DownstreamController extends WorldController implements ContactList
 		}
 
 
-		//		if (level.shores != null) {
-		//			for (ArrayList<Float> shore : level.shores) {
-		//				PolygonObstacle obj;
-		//				float[] shoreFloat = new float[shore.size()];
-		//				for (int i = 0; i < shore.size(); i++) shoreFloat[i] = shore.get(i);
-		//				obj = new PolygonObstacle(shoreFloat, 0, 0);
-		//				obj.setBodyType(BodyDef.BodyType.StaticBody);
-		//				obj.setDensity(BASIC_DENSITY);
-		//				obj.setFriction(BASIC_FRICTION);
-		//				obj.setRestitution(BASIC_RESTITUTION);
-		//				obj.setDrawScale(scale);
-		//				if (NDS == 0){
-		//					obj.setTexture(earthTileDay);
-		//				}
-		//				if (NDS == 1){
-		//					obj.setTexture(earthTileDay);
-		//				}
-		//				if (NDS == 2){
-		//					obj.setTexture(earthTileDay);
-		//				}
-		//				//obj.setTexture(earthTile);
-		//				obj.setName("shore");
-		//				ArrayList<Float> scaledShore = new ArrayList<Float>();
-		//				for (Float f : shore) scaledShore.add(f*scale.x);
-		//				walls.add(scaledShore);
-		//				addObject(obj);
-		//			}
-		//		}
+		if (level.shores != null) {
+			for (ArrayList<Float> shore : level.shores) {
+				PolygonObstacle obj;
+				float[] shoreFloat = new float[shore.size()];
+				for (int i = 0; i < shore.size(); i++) shoreFloat[i] = shore.get(i);
+				obj = new PolygonObstacle(shoreFloat, 0, 0);
+				obj.setBodyType(BodyDef.BodyType.StaticBody);
+				obj.setDensity(BASIC_DENSITY);
+				obj.setFriction(BASIC_FRICTION);
+				obj.setRestitution(BASIC_RESTITUTION);
+				obj.setDrawScale(scale);
+				obj.setTexture(shoreTile);
+				//obj.setTexture(earthTile);
+				obj.setName("shore");
+				obj.setSensor(true);
+				ArrayList<Float> scaledShore = new ArrayList<Float>();
+				for (Float f : shore) scaledShore.add(f*scale.x);
+//				walls.add(scaledShore);
+				addObject(obj);
+			}
+		}
 
 		for (ArrayList<Float> wall : level.walls) {
 			PolygonObstacle obj;
@@ -548,6 +541,7 @@ public class DownstreamController extends WorldController implements ContactList
 			obj.setFriction(BASIC_FRICTION);
 			obj.setRestitution(BASIC_RESTITUTION);
 			obj.setDrawScale(scale);
+//			obj.setTexture(shoreTile);
 			if (staticNDS == 0){
 				obj.setTexture(earthTileDay);
 				obj.setOverlay(earthTileSunset,levelAlpha);
@@ -600,22 +594,44 @@ public class DownstreamController extends WorldController implements ContactList
 			}
 		}	
 
-		for (Vector2 lotus : level.lotuses) {
-			TetherModel lantern = new TetherModel(lotus.x, lotus.y, rad, true);
-			lantern.setBodyType(BodyDef.BodyType.StaticBody);
-			lantern.setName("lotus"+ 1);
-			lantern.setDensity(TETHER_DENSITY);
-			lantern.setFriction(TETHER_FRICTION);
-			lantern.setRestitution(TETHER_RESTITUTION);
-			lantern.setSensor(sensorTethers);
-			lantern.setDrawScale(scale);
-			lantern.setTexture(lanternTexture);
-			lantern.setlightingTexture(lightingTexture);
-			lantern.setRotation(0);
-			lantern.setC2(levelAlpha);
-			addObject(lantern);
-			tethers.add(lantern);
-			lanterns.add(lantern);
+		if (level.lanterns != null) {
+			for (Vector2 lotus : level.lanterns) {
+				TetherModel lantern = new TetherModel(lotus.x, lotus.y, rad, true);
+				lantern.setBodyType(BodyDef.BodyType.StaticBody);
+				lantern.setName("lotus"+ 1);
+				lantern.setDensity(TETHER_DENSITY);
+				lantern.setFriction(TETHER_FRICTION);
+				lantern.setRestitution(TETHER_RESTITUTION);
+				lantern.setSensor(sensorTethers);
+				lantern.setDrawScale(scale);
+				lantern.setTexture(lanternTexture);
+				lantern.setlightingTexture(lightingTexture);
+				lantern.setRotation(0);
+				lantern.setC2(levelAlpha);
+				addObject(lantern);
+				tethers.add(lantern);
+				lanterns.add(lantern);
+			}
+		}
+
+		if (level.lotuses != null) {
+			for (Vector2 lotus : level.lotuses) {
+				TetherModel lantern = new TetherModel(lotus.x, lotus.y, rad, true);
+				lantern.setBodyType(BodyDef.BodyType.StaticBody);
+				lantern.setName("lotus"+ 1);
+				lantern.setDensity(TETHER_DENSITY);
+				lantern.setFriction(TETHER_FRICTION);
+				lantern.setRestitution(TETHER_RESTITUTION);
+				lantern.setSensor(sensorTethers);
+				lantern.setDrawScale(scale);
+				lantern.setTexture(lanternTexture);
+				lantern.setlightingTexture(lightingTexture);
+				lantern.setRotation(0);
+				lantern.setC2(levelAlpha);
+				addObject(lantern);
+				tethers.add(lantern);
+				lanterns.add(lantern);
+			}
 		}
 
 		//		System.out.println(levelAlpha(this.level).a);
@@ -917,11 +933,10 @@ public class DownstreamController extends WorldController implements ContactList
 			//TETHER IN PATH
 			for (TetherModel tether : tethers) {
 				tether.inpath = false;
-				if (koi.willIntersectTether(tether.getPosition(), TetherModel.TETHER_DEFAULT_RANGE)) {
+				if (koi.willIntersectTether(tether.getPosition(), TetherModel.TETHER_DEFAULT_RANGE * 1.3f)) {
 					tether.inpath = true;
 				}
 			}
-
 
 			// TETHER FORCE CODE
 			Vector2 closeTeth = getClosestTether().getPosition();

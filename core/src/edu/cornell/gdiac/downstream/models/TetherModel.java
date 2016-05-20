@@ -26,7 +26,7 @@ public class TetherModel extends WheelObstacle {
 	public static final float TETHER_DEFAULT_ORBIT = 3f;  
 
 	/** The range at which the player can enter orbit around this tether */
-	public static final int TETHER_DEFAULT_RANGE = 8;
+	public static final int TETHER_DEFAULT_RANGE = 10;
 	
 	private static final String LIGHTTEXTURE = "tethers/lotusLight.png";
 	private static final String LIGHTTEXTURE2 = "tethers/lotusLight2.png";
@@ -203,7 +203,7 @@ public class TetherModel extends WheelObstacle {
 			findCircle();
 			if (lightingTexture != null)
 				canvas.draw(lightingTexture,new Color(255, 255, 255, alpha), lightingTexture.getRegionWidth()/2, lightingTexture.getRegionHeight()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),sparkSize,sparkSize);
-			if (inrange){
+			if (inrange || inpath){
 				drawLight(canvas);
 			}
 			else if (inpath){
