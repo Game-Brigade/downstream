@@ -1061,13 +1061,18 @@ public class DownstreamController extends WorldController implements ContactList
 					if (w.shouldTether(koi)){
 						koi.free();
 						koi.setWhirled(true);
+						whirlSound.setVolume(.6f);
+						whirlSound.play();
 						w.circulate(koi);
+						
 					}
 					else{
-						koi.setWhirled(false);
 						w.nullK();
 					}
 				}
+			}
+			if(!isWhirled() && whirlSound.isPlaying()){
+				whirlSound.stop();
 			}
 			koi.resolveDirection();
 

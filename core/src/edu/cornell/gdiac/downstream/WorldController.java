@@ -163,10 +163,12 @@ public abstract class WorldController implements Screen {
 	protected static final String LIGHTING_SOUND = "Final_Assets/Sounds/lotus_light.mp3";
 	protected static final String MENU_CLICK_SOUND = "Final_Assets/Sounds/menu_click.mp3";
 	protected static final String FAIL_SOUND = "Final_Assets/Sounds/fail_level.mp3";
+	protected static final String WHIRL_SOUND = "Final_Assets/Sounds/whirlpool_sound.mp3";
 	
 	protected Music lightingSound;
 	protected Music clickSound;
 	protected Music failSound;
+	protected Music whirlSound;
 
 	private static int dayTime = 0;
 
@@ -621,6 +623,10 @@ public abstract class WorldController implements Screen {
 		
 		failSound = Gdx.audio.newMusic(Gdx.files.internal(FAIL_SOUND));
 		failSound.setLooping(false);
+		
+		whirlSound = Gdx.audio.newMusic(Gdx.files.internal(WHIRL_SOUND));
+		whirlSound.setLooping(false);
+		whirlSound.setPosition(7);
 		
 		worldAssetState = AssetState.COMPLETE;
 	}
