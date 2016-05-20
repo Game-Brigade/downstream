@@ -269,8 +269,8 @@ public class PlayerModel extends BoxObstacle {
 
 	public boolean willIntersect(Vector2 target) {
 		Vector2 time = timeToIntersect(target);
-		return time.x > -0.009 && time.y > -0.009;
-		//return getLinearVelocity().isCollinear(target.sub(getPosition()), .09f);
+		//return time.x > -0.009 && time.y > -0.009;
+		return getLinearVelocity().isCollinear(target.sub(getPosition()), .09f);
 	}
 
 	public boolean willIntersectTether(Vector2 tether, float tetherRange) {

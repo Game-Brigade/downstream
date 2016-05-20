@@ -13,7 +13,9 @@ import com.badlogic.gdx.controllers.PovDirection;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
@@ -29,7 +31,12 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 	private static final String SELECT_FILE = "Final_Assets/Menus/level_button.png";
 	private static final String SELECT_HOVER_FILE = "Final_Assets/Menus/level_button_gold.png";
 	//private static final String LOAD_FILE = "Final_Assets/Menus/now_loading.jpg";
-	//private static final String EDIT_FILE = "Final_Assets/Menus/levelbuild.png";
+	private static final String EDIT_FILE = "Final_Assets/Menus/levelbuild.png";
+	
+	protected Animation koiCAnimation; // #3
+	protected Texture koiCSheet; // #4
+	protected TextureRegion[] koiCFrames; // #5
+	protected TextureRegion koiCcurrentFrame; // #7
 	
 	private static final String MENU_CLICK_SOUND = "Final_Assets/Sounds/menu_click.mp3";
 	private Music clickSound;
@@ -43,7 +50,7 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 	private Texture select;
 	private Texture selectHover;
 	/** Edit texture */
-	//private Texture edit;
+	private Texture edit;
 	//private Texture load;
 	
 	
@@ -66,21 +73,25 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 	private int editState;
 	/** Scaling factor for when the student changes the resolution. */
 	private float scale;
+	private boolean editor = true;
 	
 	/** Standard window size (for scaling) */
 	private static int STANDARD_WIDTH  = 800;
 	/** Standard window height (for scaling) */
 	private static int STANDARD_HEIGHT = 700;
+	private double angle = 0;
 	
 	/** Positions of buttons */
 	
 	private static Vector2 playPos = new Vector2();
-	//private static Vector2 editPos = new Vector2();
+	private static Vector2 editPos = new Vector2();
 	private static Vector2 selectPos = new Vector2();
 	private static Vector2 bgPos = new Vector2();
 	//private static Vector2 loadPos = new Vector2();
-	
-	
+	private static Vector2 koiPos = new Vector2();
+	private float stateTime;
+	private static Vector2 origin = new Vector2();
+		
 	
 
 	/**
@@ -97,20 +108,40 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 		resize(canvas.getWidth(),canvas.getHeight());
 		
 
+	
 		// Load images immediately.
 		play = new Texture(PLAY_FILE);
 		playHover = new Texture(PLAY_HOVER_FILE);
-		//edit = new Texture(EDIT_FILE);
+		if(editor){edit = new Texture(EDIT_FILE);}
 		select = new Texture(SELECT_FILE);
 		selectHover = new Texture(SELECT_HOVER_FILE);
 		background = new Texture(BACKGROUND_FILE);
 		//load = new Texture(LOAD_FILE);
-		
+		koiPos.set(new Vector2((float)canvas.getWidth()/7*2,(float)canvas.getHeight()/5+45));
 		bgPos.set(new Vector2((float)canvas.getWidth()/2,(float)canvas.getHeight()/2));
 		playPos.set(new Vector2((float)canvas.getWidth()/7*5 - 82,(float)canvas.getHeight()/5+45));
 		selectPos.set(new Vector2((float)canvas.getWidth()/7*5,(float)canvas.getHeight()/9 + 30));
-		//editPos.set(new Vector2((float)canvas.getWidth()/8*7,(float)canvas.getHeight()/8*7));
+		if(editor){editPos.set(new Vector2((float)canvas.getWidth()/8*7,(float)canvas.getHeight()/8*7));}
+		origin.set(new Vector2((float)canvas.getWidth()/7*2 - 100,(float)canvas.getHeight()/5+35));
+
 		//loadPos.set(new Vector2((float)canvas.getWidth()/2,(float)canvas.getHeight()/2));
+		
+		//animation
+		koiCSheet = new Texture(Gdx.files.internal("koi/curved_koi.png"));
+		int cols = 31;
+		int rows = 1;
+		TextureRegion[][] tmpkoiC = TextureRegion.split(koiCSheet, koiCSheet.getWidth()/cols, koiCSheet.getHeight()/rows); 
+		koiCFrames = new TextureRegion[cols * rows];
+		int index = 0;
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				koiCFrames[index] = tmpkoiC[i][j];
+				index++;
+			}
+		}
+		koiCAnimation = new Animation(.02f, koiCFrames); 
+		koiCcurrentFrame = koiCFrames[0];
+		
 		
 		clickSound = Gdx.audio.newMusic(Gdx.files.internal(MENU_CLICK_SOUND));
 		clickSound.setLooping(false);
@@ -131,7 +162,7 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 	 */
 	public void dispose() {
 		
-		//edit.dispose();
+		if(editor){edit.dispose();}
 		select.dispose();
 		selectHover.dispose();
 		play.dispose();
@@ -150,12 +181,19 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 	 * will talk about why we prefer this in lecture.
 	 */
 	private void draw() {
+		stateTime += Gdx.graphics.getDeltaTime();
+		koiCcurrentFrame = koiCAnimation.getKeyFrame(stateTime, true);
 		canvas.beginMENU();
 		canvas.clear();
-		
 		canvas.draw(background, Color.WHITE, background.getWidth() / 2, background.getHeight() / 2, bgPos.x, bgPos.y, 0,
 				scale * .98f, scale * .98f);
-
+		if (koiCcurrentFrame != null){
+			angle = angle + .04;
+			koiPos.x = (float) (origin.x + Math.cos(angle) * 150);
+			koiPos.y = (float) (origin.y + Math.sin(angle) * 150);
+			canvas.draw(koiCcurrentFrame, Color.WHITE, koiCcurrentFrame.getRegionWidth()/2, koiCcurrentFrame.getRegionHeight()/2, koiPos.x, koiPos.y
+				, (float) angle + 180, scale * .3f, scale * .3f);
+		}
 		if (playHovered == true) {
 			canvas.draw(playHover, Color.WHITE, playHover.getWidth() / 2, playHover.getHeight() / 2, playPos.x,
 					playPos.y, 0, scale * .6f, scale * .6f);
@@ -174,7 +212,7 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 		
 		
 		
-		//canvas.draw(edit, Color.WHITE, edit.getWidth()/2, edit.getHeight()/2, editPos.x, editPos.y, 0, scale*0.9f, scale*0.9f);
+		if(editor){canvas.draw(edit, Color.WHITE, edit.getWidth()/2, edit.getHeight()/2, editPos.x, editPos.y, 0, scale*0.9f, scale*0.9f);}
 		canvas.end();
 	}
 
@@ -323,7 +361,13 @@ public class MainMenuMode implements Screen, InputProcessor, ControllerListener 
 			selectState = 1;
 		}
 		
-		
+		if(editor){
+			dx = Math.abs(screenX - editPos.x);
+			dy = Math.abs(screenY - editPos.y);
+			if (dx < scale*edit.getWidth()/2 && dy < scale*edit.getHeight()/2) {
+				editState = 1;
+			}
+		}
 		
 		return false;
 	}

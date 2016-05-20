@@ -103,7 +103,7 @@ public class WModel2 extends WheelObstacle {
 		
 
 		//code for debugging
-		if (koi != null && false){
+		/*if (koi != null && false){
 			if(startK != null){
 
 				canvas.draw(this.texture, Color.RED, 0, 0, startK.x * drawScale.x, startK.y * drawScale.x, 0, .1f, .1f);
@@ -115,8 +115,7 @@ public class WModel2 extends WheelObstacle {
 					canvas.draw(this.texture, new Color (255, 255, 255, .01f), 0, 0, bez.x * drawScale.x, bez.y * drawScale.y, 0, .4f, .4f);
 				}
 			}
-
-		}
+		}*/
 	}
 
 	/***

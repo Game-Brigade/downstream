@@ -243,7 +243,6 @@ public abstract class WorldController implements Screen {
 	protected Animation koiCAnimation; // #3
 	protected Texture koiCSheet; // #4
 	protected TextureRegion[] koiCFrames; // #5
-	protected SpriteBatch koiCspriteBatch; // #6
 	protected TextureRegion koiCcurrentFrame; // #7
 
 	protected Animation koiCAnimationFlipped;
@@ -533,7 +532,6 @@ public abstract class WorldController implements Screen {
 		}
 		koiCAnimation = new Animation(.02f, koiCFrames); 
 		koiCAnimationFlipped = new Animation(.02f, koiCFramesFlipped);
-		koiCspriteBatch = new SpriteBatch(); 
 
 
 
@@ -589,7 +587,7 @@ public abstract class WorldController implements Screen {
 		setBackground(createTexture(manager, BACKGROUND_FILE_D, false).getTexture(), 0);
 		getBackground(0).setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
 
-		setBackground(createTexture(manager, BACKGROUND_FILE_N, false).getTexture(), 1);
+		setBackground(createTexture(manager, BACKGROUND_FILE_S, false).getTexture(), 1);
 		getBackground(1).setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
 
 		overlay = createTexture(manager, OVERLAY_FILE, true).getTexture();
