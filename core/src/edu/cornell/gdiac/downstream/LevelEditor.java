@@ -725,7 +725,7 @@ public class LevelEditor extends WorldController {
 		//	    return defaultLevel();
 		Gson gson = new Gson();
 		try {
-			filename = lvl + ".json";
+			filename = "levels/"+lvl + ".json";
 			JsonReader reader = new JsonReader(new InputStreamReader(new FileInputStream(filename)));
 			Level level = gson.fromJson(reader, Level.class);
 //			System.out.println(level.rocks);
