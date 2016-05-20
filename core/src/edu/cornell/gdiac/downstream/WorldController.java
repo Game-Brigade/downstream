@@ -299,6 +299,12 @@ public abstract class WorldController implements Screen {
 
 		manager.load(LILY_TEXTURE, Texture.class);
 		assets.add(LILY_TEXTURE);
+		
+		manager.load(LILY_TEXTURE_N, Texture.class);
+		assets.add(LILY_TEXTURE_N);
+		
+		manager.load(LILY_TEXTURE_S, Texture.class);
+		assets.add(LILY_TEXTURE_S);
 
 		manager.load(LANTERN_TEXTURE, Texture.class);
 		assets.add(LANTERN_TEXTURE);
@@ -454,7 +460,7 @@ public abstract class WorldController implements Screen {
 		lilyFrames = splice(4, 12, 47, LILY_TEXTURE);
 		//lilyFramesDay = splice(47, "tethers/Lily_Day.png");
 		lilyFramesNight = splice(47, 1, LILY_TEXTURE_N);
-		//lilyFramesSunset = splice(47, LILY_TEXTURE_S);
+//		lilyFramesSunset = splice(47, LILY_TEXTURE_S);
 		goalFrames = splice(4,20, GOAL_TEXTURE);
 		goalAnimation = new Animation(.01f, goalFrames);
 		//lilyAnimation = new Animation(.2f, lilyFrames);
