@@ -476,11 +476,11 @@ public class DownstreamController extends WorldController implements ContactList
 		Vector2 shadowDest = level.goal.get(1);
 
 		cache = shadowDest.cpy().sub(goalPos).nor().scl(2);
-		dwidth  = goalTexture.getRegionWidth()/scale.x;
-		dheight = goalTexture.getRegionHeight()/scale.y;
+		dwidth  = goalTexture.getRegionWidth()/scale.x*1.25f;
+		dheight = goalTexture.getRegionHeight()/scale.y*1.25f;
 		goalTexture.setRegionHeight(goalTexture.getRegionHeight());
 		goalTexture.setRegionWidth(goalTexture.getRegionWidth());
-		goalTile = new BoxObstacle(goalPos.x, goalPos.y, dwidth/2, dheight/2);
+		goalTile = new BoxObstacle(goalPos.x, goalPos.y, dwidth/2*1.25f, dheight/2*1.25f);
 		goalTile.setName("goal");
 		goalTile.setDrawScale(scale);
 		goalTile.setTexture(goalTexture);
@@ -659,6 +659,18 @@ public class DownstreamController extends WorldController implements ContactList
 			lily.setSensor(sensorTethers);
 			lily.setDrawScale(scale);
 			lily.setTexture(lilyTexture);
+//			if(staticNDS == 0){
+//				lily.setTexture(lilyTextureDay);
+//				lily.setOverlay(lilyTextureSunset, levelAlpha);
+//			}
+//			else if(staticNDS == 1){
+//				lily.setTexture(lilyTextureSunset);
+//				lily.setOverlay(lilyTextureNight, levelAlpha);
+//			}
+//			else{
+//				//AFTER LEVEL 15
+//				lily.setTexture(lilyTextureNight);
+//			}
 			lily.setC2(levelAlpha);
 			addObject(lily);
 			tethers.add(lily);
