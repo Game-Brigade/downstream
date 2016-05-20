@@ -243,7 +243,6 @@ public abstract class WorldController implements Screen {
 	protected Animation koiCAnimation; // #3
 	protected Texture koiCSheet; // #4
 	protected TextureRegion[] koiCFrames; // #5
-	protected SpriteBatch koiCspriteBatch; // #6
 	protected TextureRegion koiCcurrentFrame; // #7
 
 	protected Animation koiCAnimationFlipped;
@@ -527,7 +526,6 @@ public abstract class WorldController implements Screen {
 		}
 		koiCAnimation = new Animation(.02f, koiCFrames); 
 		koiCAnimationFlipped = new Animation(.02f, koiCFramesFlipped);
-		koiCspriteBatch = new SpriteBatch(); 
 
 
 
