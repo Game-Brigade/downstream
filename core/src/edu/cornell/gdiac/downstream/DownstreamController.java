@@ -105,8 +105,8 @@ public class DownstreamController extends WorldController implements ContactList
 	private int respawnTimer = RESPAWN_TIME;
 	private TetherModel checkpoint0;
 	private int tillNextLevel = 0;
-	private ArrayList<Vector2> enemyPos8;
-	private ArrayList<ArrayList<Vector2>> enemyPath8;
+	private Vector2 enemyPos8;
+	private ArrayList<Vector2> enemyPath8;
 
 	/**
 	 * Preloads the assets for this controller.
@@ -463,11 +463,11 @@ public class DownstreamController extends WorldController implements ContactList
 			eFish.setGoal(0, 0);
 			addObject(eFish);
 			enemies.add(eFish);
-			/*
-			if (this.level == 12 || this.level == 10){
-				enemyPos8.add(enemyPos);
-				enemyPath8.add(enemyPath);
-			}*/
+			
+			if (this.level == 12){
+				enemyPos8 = enemyPos;
+				enemyPath8 =enemyPath;
+			}
 		}
 
 		//Create goal tile
@@ -724,31 +724,76 @@ public class DownstreamController extends WorldController implements ContactList
 			/*HUD.setTutorialTexture(tutorial2);
 			HUD.setHelpTexture(helpTexture);
 			HUD.setTutorialStatus(true);*/
-			TutorialItems t1 = new TutorialItems(18, 15, tutorial2.getRegionHeight(), tutorial1.getRegionWidth());
-			t1.setBodyType(BodyDef.BodyType.StaticBody);
-			t1.setName("tutorial"+ 1);
-			t1.setDensity(TETHER_DENSITY);
-			t1.setFriction(TETHER_FRICTION);
-			t1.setRestitution(TETHER_RESTITUTION);
-			t1.setSensor(sensorTethers);
-			t1.setDrawScale(scale);
-			t1.setTexture(tutorial1);
-			objects.add(t1);
+			TutorialItems t2 = new TutorialItems(18, 15, tutorial2.getRegionHeight(), tutorial1.getRegionWidth());
+			t2.setBodyType(BodyDef.BodyType.StaticBody);
+			t2.setName("tutorial"+ 1);
+			t2.setDensity(TETHER_DENSITY);
+			t2.setFriction(TETHER_FRICTION);
+			t2.setRestitution(TETHER_RESTITUTION);
+			t2.setSensor(sensorTethers);
+			t2.setDrawScale(scale);
+			t2.setTexture(tutorial2);
+			objects.add(t2);
 		}
 		else if (this.level == 6){
-			HUD.setTutorialTexture(tutorial3);
+			/*HUD.setTutorialTexture(tutorial3);
 			HUD.setHelpTexture(helpTexture);
-			HUD.setTutorialStatus(true);
+			HUD.setTutorialStatus(true);*/
+			TutorialItems t3 = new TutorialItems(-13, 18, tutorial3.getRegionHeight(), tutorial1.getRegionWidth());
+			t3.setBodyType(BodyDef.BodyType.StaticBody);
+			t3.setName("tutorial"+ 1);
+			t3.setDensity(TETHER_DENSITY);
+			t3.setFriction(TETHER_FRICTION);
+			t3.setRestitution(TETHER_RESTITUTION);
+			t3.setSensor(sensorTethers);
+			t3.setDrawScale(scale);
+			t3.setTexture(tutorial3);
+			objects.add(t3);
 		}
 		else if (this.level == 4){
-			HUD.setTutorialTexture(tutorial4);
+			/*HUD.setTutorialTexture(tutorial4);
 			HUD.setHelpTexture(helpTexture);
-			HUD.setTutorialStatus(true);
+			HUD.setTutorialStatus(true);*/
+			TutorialItems t4 = new TutorialItems(10, 3, tutorial4.getRegionHeight(), tutorial1.getRegionWidth());
+			t4.setBodyType(BodyDef.BodyType.StaticBody);
+			t4.setName("tutorial"+ 1);
+			t4.setDensity(TETHER_DENSITY);
+			t4.setFriction(TETHER_FRICTION);
+			t4.setRestitution(TETHER_RESTITUTION);
+			t4.setSensor(sensorTethers);
+			t4.setDrawScale(scale);
+			t4.setTexture(tutorial4);
+			objects.add(t4);
 		}
-		else if(this.level == 8){
-			HUD.setTutorialTexture(tutorial6);
+		else if (this.level == 7){
+			/*HUD.setTutorialTexture(tutorial4);
 			HUD.setHelpTexture(helpTexture);
-			HUD.setTutorialStatus(true);
+			HUD.setTutorialStatus(true);*/
+			TutorialItems t6 = new TutorialItems(11, 3, tutorial4.getRegionHeight(), tutorial1.getRegionWidth());
+			t6.setBodyType(BodyDef.BodyType.StaticBody);
+			t6.setName("tutorial"+ 1);
+			t6.setDensity(TETHER_DENSITY);
+			t6.setFriction(TETHER_FRICTION);
+			t6.setRestitution(TETHER_RESTITUTION);
+			t6.setSensor(sensorTethers);
+			t6.setDrawScale(scale);
+			t6.setTexture(tutorial6);
+			objects.add(t6);
+		}
+		else if(this.level == 14){
+			/*HUD.setTutorialTexture(tutorial6);
+			HUD.setHelpTexture(helpTexture);
+			HUD.setTutorialStatus(true);*/
+			TutorialItems t5 = new TutorialItems(-25, 0, tutorial5.getRegionHeight(), tutorial1.getRegionWidth());
+			t5.setBodyType(BodyDef.BodyType.StaticBody);
+			t5.setName("tutorial"+ 1);
+			t5.setDensity(TETHER_DENSITY);
+			t5.setFriction(TETHER_FRICTION);
+			t5.setRestitution(TETHER_RESTITUTION);
+			t5.setSensor(sensorTethers);
+			t5.setDrawScale(scale);
+			t5.setTexture(tutorial5);
+			objects.add(t5);
 		}
 		/*else if(this.level == 7){
 			HUD.setTutorialTexture(tutorial5);
@@ -794,9 +839,9 @@ public class DownstreamController extends WorldController implements ContactList
 		respawnTimer--;
 	}
 
-	private void level8Fish(EnemyModel e, int q){
-		e.setPosition(enemyPos8.get(q));
-		e.patrol(enemyPath8.get(q));
+	private void level8Fish(EnemyModel e){
+		e.setPosition(enemyPos8);
+		e.patrol(enemyPath8);
 
 	}
 
@@ -874,12 +919,9 @@ public class DownstreamController extends WorldController implements ContactList
 			for (TetherModel t : tethers) {
 				t.setTethered(false);
 			}
-			/*if (this.level == 12 || this.level == 10){
-				for(int i = 0; i < enemies.size(); i++){
-					level8Fish(enemies.get(i), i);
-				}
-
-			}*/
+			if (this.level == 12){
+					level8Fish(enemies.get(0));
+			}
 			respawn();
 		} else {
 			// ZOOM IN TO PLAYER AT START OF LEVEL
