@@ -590,12 +590,12 @@ public class DownstreamController extends WorldController implements ContactList
 				obj.setSensor(true);
 				obj.setDrawScale(scale);
 				if(staticNDS == 0){
-					obj.setTexture(rockDay);
-//					obj.setOverlay(rockSunset, levelAlpha);
+					obj.setTexture(rockSunset);
+					obj.setOverlay(rockSunset, levelAlpha);
 				}
 				else if(staticNDS == 1){
 					obj.setTexture(rockSunset);
-//					obj.setOverlay(rockNight, levelAlpha);
+					obj.setOverlay(rockNight, levelAlpha);
 				}
 				else{
 					//AFTER LEVEL 15
