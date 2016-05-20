@@ -320,39 +320,39 @@ public class DownstreamController extends WorldController implements ContactList
 		//animation is a bitch
 		if (!tetherFade){
 			if (animationNDS == 0){
-				lilyAnimation = new Animation(.05f, lilyFrames);
+				lilyAnimation = new Animation(.05f, lilyFramesDay);
 				openingFlowerAnimation = new Animation(.2f, openingFlowerFramesDay);
 				closingFlowerAnimation = new Animation(.2f, closingFlowerFramesDay);
 				closedFlowerAnimation = new Animation(.2f, closedFlowerFramesDay);
 				openFlowerAnimation = new Animation(.2f, openFlowerFramesDay);
 
-				lilyAnimation2 = new Animation(.1f, lilyFrames);
+				lilyAnimation2 = new Animation(.1f, lilyFramesDay);
 				openingFlowerAnimation2 = new Animation(.2f, openingFlowerFramesDay);
 				closingFlowerAnimation2 = new Animation(.2f, closingFlowerFramesDay);
 				closedFlowerAnimation2 = new Animation(.2f, closedFlowerFramesDay);
 				openFlowerAnimation2 = new Animation(.2f, openFlowerFramesDay);
 			}
 			else if (animationNDS == 1){
-				lilyAnimation = new Animation(.05f, lilyFrames);
+				lilyAnimation = new Animation(.05f, lilyFramesSunset);
 				openingFlowerAnimation = new Animation(.2f, openingFlowerFramesSunset);
 				closingFlowerAnimation = new Animation(.2f, closingFlowerFramesSunset);
 				closedFlowerAnimation = new Animation(.2f, closedFlowerFramesSunset);
 				openFlowerAnimation = new Animation(.2f, openFlowerFramesSunset);
 
-				lilyAnimation2 = new Animation(.1f, lilyFrames);
+				lilyAnimation2 = new Animation(.1f, lilyFramesSunset);
 				openingFlowerAnimation2 = new Animation(.2f, openingFlowerFramesSunset);
 				closingFlowerAnimation2 = new Animation(.2f, closingFlowerFramesSunset);
 				closedFlowerAnimation2 = new Animation(.2f, closedFlowerFramesSunset);
 				openFlowerAnimation2 = new Animation(.2f, openFlowerFramesSunset);
 			}
 			else{
-				lilyAnimation = new Animation(.05f, lilyFrames);
+				lilyAnimation = new Animation(.05f, lilyFramesNight);
 				openingFlowerAnimation = new Animation(.2f, openingFlowerFramesNight);
 				closingFlowerAnimation = new Animation(.2f, closingFlowerFramesNight);
 				closedFlowerAnimation = new Animation(.2f, closedFlowerFramesNight);
 				openFlowerAnimation = new Animation(.2f, openFlowerFramesNight);
 
-				lilyAnimation2 = new Animation(.1f, lilyFrames);
+				lilyAnimation2 = new Animation(.1f, lilyFramesNight);
 				openingFlowerAnimation2 = new Animation(.2f, openingFlowerFramesNight);
 				closingFlowerAnimation2 = new Animation(.2f, closingFlowerFramesNight);
 				closedFlowerAnimation2 = new Animation(.2f, closedFlowerFramesNight);
@@ -363,13 +363,13 @@ public class DownstreamController extends WorldController implements ContactList
 			//if overlaying time change
 			if (staticNDS == 0){
 				//day
-				lilyAnimation = new Animation(.1f, lilyFrames);
+				lilyAnimation = new Animation(.1f, lilyFramesDay);
 				openingFlowerAnimation = new Animation(.2f, openingFlowerFramesDay);
 				closingFlowerAnimation = new Animation(.2f, closingFlowerFramesDay);
 				closedFlowerAnimation = new Animation(.2f, closedFlowerFramesDay);
 				openFlowerAnimation = new Animation(.2f, openFlowerFramesDay);
 
-				lilyAnimation2 = new Animation(.1f, lilyFrames);
+				lilyAnimation2 = new Animation(.1f, lilyFramesSunset);
 				openingFlowerAnimation2 = new Animation(.2f, openingFlowerFramesSunset);
 				closingFlowerAnimation2 = new Animation(.2f, closingFlowerFramesSunset);
 				closedFlowerAnimation2 = new Animation(.2f, closedFlowerFramesSunset);
@@ -377,13 +377,13 @@ public class DownstreamController extends WorldController implements ContactList
 			}
 			else if(staticNDS == 1){
 				//night
-				lilyAnimation = new Animation(.1f, lilyFrames);
+				lilyAnimation = new Animation(.1f, lilyFramesSunset);
 				openingFlowerAnimation = new Animation(.2f, openingFlowerFramesSunset);
 				closingFlowerAnimation = new Animation(.2f, closingFlowerFramesSunset);
 				closedFlowerAnimation = new Animation(.2f, closedFlowerFramesSunset);
 				openFlowerAnimation = new Animation(.2f, openFlowerFramesSunset);
 
-				lilyAnimation2 = new Animation(.1f, lilyFrames);
+				lilyAnimation2 = new Animation(.1f, lilyFramesNight);
 				openingFlowerAnimation2 = new Animation(.2f, openingFlowerFramesNight);
 				closingFlowerAnimation2 = new Animation(.2f, closingFlowerFramesNight);
 				closedFlowerAnimation2 = new Animation(.2f, closedFlowerFramesNight);
@@ -391,13 +391,13 @@ public class DownstreamController extends WorldController implements ContactList
 			}
 			else{
 				//keep level night after 15
-				lilyAnimation = new Animation(.1f, lilyFrames);
+				lilyAnimation = new Animation(.1f, lilyFramesSunset);
 				openingFlowerAnimation = new Animation(.2f, openingFlowerFramesSunset);
 				closingFlowerAnimation = new Animation(.2f, closingFlowerFramesSunset);
 				closedFlowerAnimation = new Animation(.2f, closedFlowerFramesSunset);
 				openFlowerAnimation = new Animation(.2f, openFlowerFramesSunset);
 
-				lilyAnimation2 = new Animation(.1f, lilyFrames);
+				lilyAnimation2 = new Animation(.1f, lilyFramesNight);
 				openingFlowerAnimation2 = new Animation(.2f, openingFlowerFramesNight);
 				closingFlowerAnimation2 = new Animation(.2f, closingFlowerFramesNight);
 				closedFlowerAnimation2 = new Animation(.2f, closedFlowerFramesNight);
@@ -415,6 +415,7 @@ public class DownstreamController extends WorldController implements ContactList
 		float dwidth;
 		float dheight;
 		float rad = lilyTexture.getRegionWidth()/scale.x/2;
+		lilyTexture = lilyAnimation.getKeyFrame(stateTime);
 
 		boolean sensorTethers = true;
 		boolean sensorPools = true;
