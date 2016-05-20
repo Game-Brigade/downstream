@@ -1098,14 +1098,17 @@ public class DownstreamController extends WorldController implements ContactList
 			KoiCcurrentFrameFlipped = koiCAnimationFlipped.getKeyFrame(stateTime, true);
 			goalCurrentFrame = goalAnimation.getKeyFrame(stateTime, true);
 			enemyCurrentFrame = enemyAnimation.getKeyFrame(stateTime, true);
+			openFlowercurrentFrame = openFlowerAnimation.getKeyFrame(stateTime, true);
+			closedFlowercurrentFrame = closedFlowerAnimation.getKeyFrame(stateTime, true);
 
 
 			for(int i = 0; i < enemies.size(); i++){
 				enemies.get(i).setTexture(enemyCurrentFrame);
 			}
+			/*
 			lilycurrentFrame2 = lilyAnimation2.getKeyFrame(stateTime, true);
 			closedFlowercurrentFrame2 = closedFlowerAnimation2.getKeyFrame(stateTime, true);
-			openFlowercurrentFrame2 = openFlowerAnimation2.getKeyFrame(stateTime, true);
+			openFlowercurrentFrame2 = openFlowerAnimation2.getKeyFrame(stateTime, true);*/
 
 
 			if (isWhirled() || isTethered()) {

@@ -213,6 +213,19 @@ public abstract class WorldController implements Screen {
 	protected TextureRegion[] closingFlowerFramesNight; // #5
 	protected TextureRegion[] closingFlowerFramesSunset; // #5
 	protected TextureRegion closingFlowercurrentFrame; // #7
+	
+	protected Animation closingFlowerAnimationT; // #3
+	protected Animation openingFlowerAnimationT; // #3
+	protected Animation openFlowerAnimationT; // #3
+	protected Animation closedFlowerAnimationT; // #3
+	protected TextureRegion[] openingFlowerFramesT; // #5
+	protected TextureRegion[] closingFlowerFramesT; // #5
+	protected TextureRegion[] openFlowerFramesT; // #5
+	protected TextureRegion[] closedFlowerFramesT; // #5
+	protected TextureRegion openingFlowercurrentFrameT; // #7
+	protected TextureRegion closingFlowercurrentFrameT; // #7
+	protected TextureRegion openFlowercurrentFrameT; // #7
+	protected TextureRegion closedFlowercurrentFrameT; // #7
 
 	protected Animation koiSAnimation; // #3
 	protected Texture koiSSheet; // #4
@@ -449,6 +462,7 @@ public abstract class WorldController implements Screen {
 		closedFlowerFramesDay = splice(26, 1, "tethers/Floating_Closed_Day_small.png");
 		closedFlowerFramesNight = splice(26, 1, "tethers/Floating_Closed_Night_small.png");
 		closedFlowerFramesSunset = splice(26, 1, "tethers/Floating_Closed_Sunset_small.png");
+		closedFlowerFramesT = splice(23, 1, "tethers/Floating_Closed_Sunset2.png");
 
 
 		int index = 0;
@@ -456,6 +470,7 @@ public abstract class WorldController implements Screen {
 		openFlowerFramesDay = splice(26, 1, "tethers/Floating_Open_Day_small.png");
 		openFlowerFramesNight = splice(26, 1, "tethers/Floating_Open_Night_small.png");
 		openFlowerFramesSunset = splice(26, 1, "tethers/Floating_Open_Sunset_small.png");
+		openFlowerFramesT = splice(23, 1, "tethers/Floating_Open_Sunset2.png");
 
 
 		cols = 8; 
@@ -463,11 +478,12 @@ public abstract class WorldController implements Screen {
 		openingFlowerFramesDay = splice(26, 1, "tethers/Opening_Flower_Day_small.png" );
 		openingFlowerFramesNight = splice(26, 1, "tethers/Opening_Flower_Night_small.png");
 		openingFlowerFramesSunset = splice(26, 1, "tethers/Opening_Flower_Sunset_small.png");
+		openingFlowerFramesT = splice(26, 1, "tethers/Opening_Flower_Sunset2.png");
 
 		closingFlowerFramesDay = splice(26, 1, "tethers/Closing_Flower_Day_small.png");
 		closingFlowerFramesNight = splice(26, 1, "tethers/Closing_Flower_Night_small.png");
 		closingFlowerFramesSunset = splice(26, 1, "tethers/Closing_Flower_Sunset_small.png");
-
+		closingFlowerFramesT = splice(26, 1, "tethers/Opening_Flower_Sunset2.png");
 
 		cols = 12;
 		koiSSheet = new Texture(Gdx.files.internal("koi/Straight_Koi.png"));

@@ -86,7 +86,13 @@ public class TetherModel extends WheelObstacle {
 
 	public TetherModel(float x, float y, float r, boolean b){
 		super(x,y, TETHER_DEFAULT_RANGE);
-		setType(TetherType.Lantern);
+		setType(TetherType.Lotus);
+		setBodyType(TETHER_BODY_TYPE);
+	}
+	
+	public TetherModel(float x, float y, float r, boolean b, TetherType type){
+		super(x,y, TETHER_DEFAULT_RANGE);
+		setType(type);
 		setBodyType(TETHER_BODY_TYPE);
 	}
 
