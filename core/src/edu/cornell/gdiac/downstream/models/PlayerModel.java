@@ -273,7 +273,7 @@ public class PlayerModel extends BoxObstacle {
 		//return getLinearVelocity().isCollinear(target.sub(getPosition()), .09f);
 	}
 
-	public boolean willIntersectTether(Vector2 tether, int tetherRange) {
+	public boolean willIntersectTether(Vector2 tether, float tetherRange) {
 		Vector2 initialTangent = getInitialTangentPoint(tether);
 		Vector2 difference = new Vector2(tether.x - getX(), tether.y - getY());
 		boolean timeIsPositive = Math.signum(difference.x) == Math.signum(getVX()) && 

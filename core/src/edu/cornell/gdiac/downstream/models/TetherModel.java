@@ -26,7 +26,7 @@ public class TetherModel extends WheelObstacle {
 	public static final float TETHER_DEFAULT_ORBIT = 3f;  
 
 	/** The range at which the player can enter orbit around this tether */
-	public static final int TETHER_DEFAULT_RANGE = 8;
+	public static final int TETHER_DEFAULT_RANGE = 10;
 	
 	private static final String LIGHTTEXTURE = "tethers/lotusLight.png";
 	private static final String LIGHTTEXTURE2 = "tethers/lotusLight2.png";
@@ -87,6 +87,12 @@ public class TetherModel extends WheelObstacle {
 	public TetherModel(float x, float y, float r, boolean b){
 		super(x,y, TETHER_DEFAULT_RANGE);
 		setType(TetherType.Lantern);
+		setBodyType(TETHER_BODY_TYPE);
+	}
+	
+	public TetherModel(float x, float y, float r, boolean b, TetherType type){
+		super(x,y, TETHER_DEFAULT_RANGE);
+		setType(type);
 		setBodyType(TETHER_BODY_TYPE);
 	}
 
@@ -173,21 +179,16 @@ public class TetherModel extends WheelObstacle {
 	
 	public void draw(GameCanvas canvas) {
 		
-		if (texture != null) {
+		if (overlayTexture != null){
+			//canvas.draw(overlayTexture,c2,overlayTexture.getRegionHeight()/2,overlayTexture.getRegionWidth()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),.35f,.35f);
 			if (type == TetherType.Lilypad){
-				canvas.draw(texture,Color.WHITE,texture.getRegionHeight()/2,texture.getRegionWidth()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),.4f,.4f);
-				
+				canvas.draw(texture,c2,texture.getRegionHeight()/2,texture.getRegionWidth()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),.4f,.4f);
 			}
 			if (type == TetherType.Lantern || type == TetherType.Lotus){
-				canvas.draw(texture,Color.WHITE,texture.getRegionHeight()/2,texture.getRegionWidth()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),.35f,.35f);
-				if (sparkSize < 2 && this.set){
-					sparkSize += .01f;
-				}
-				if (sparkSize < 2 && !this.set && !(sparkSize <= 0)){
-					sparkSize += -.01f;
-				}
-
+				canvas.draw(texture,c2,texture.getRegionHeight()/2,texture.getRegionWidth()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),.35f,.35f);
 			}
+		}
+		if (texture != null) {
 			if (sparkSize >= 2){
 				lit = true;
 				sparkSize = 2f;
@@ -201,24 +202,35 @@ public class TetherModel extends WheelObstacle {
 				sparkSize = 0;
 			}
 			findCircle();
-			if (lightingTexture != null)
-				canvas.draw(lightingTexture,new Color(255, 255, 255, alpha), lightingTexture.getRegionWidth()/2, lightingTexture.getRegionHeight()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),sparkSize,sparkSize);
+			if (lightingTexture != null){
+				if (!lit){
+					canvas.draw(lightingTexture,Color.ORANGE, lightingTexture.getRegionWidth()/2, lightingTexture.getRegionHeight()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),sparkSize,sparkSize);
+				}
+				else{
+					canvas.draw(lightingTexture,new Color(255, 255, 255, alpha), lightingTexture.getRegionWidth()/2, lightingTexture.getRegionHeight()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),sparkSize,sparkSize);
+				}
+			}
 			if (inrange){
 				drawLight(canvas);
 			}
 			else if (inpath){
-				drawLight2(canvas);
+				drawLight(canvas);
 			}
-		}
-		if (overlayTexture != null){
-			canvas.draw(overlayTexture,c2,overlayTexture.getRegionHeight()/2,overlayTexture.getRegionWidth()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),.35f,.35f);
 			if (type == TetherType.Lilypad){
-				canvas.draw(texture,c2,texture.getRegionHeight()/2,texture.getRegionWidth()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),.4f,.4f);
+				canvas.draw(texture,Color.WHITE,texture.getRegionHeight()/2,texture.getRegionWidth()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),.4f,.4f);
 			}
 			if (type == TetherType.Lantern || type == TetherType.Lotus){
-				canvas.draw(texture,c2,texture.getRegionHeight()/2,texture.getRegionWidth()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),.35f,.35f);
+				canvas.draw(texture,Color.WHITE,texture.getRegionHeight()/2,texture.getRegionWidth()/2,getX()*drawScale.x,getY()*drawScale.x,getAngle(),.35f,.35f);
+				if (sparkSize < 2 && this.set){
+					sparkSize += .02f;
+				}
+				if (sparkSize < 2 && !this.set && !(sparkSize <= 0)){
+					sparkSize += -.01f;
+				}
+
 			}
 		}
+		
 	}
 	
 	
