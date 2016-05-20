@@ -48,8 +48,11 @@ public class GDXRoot extends Game implements ScreenListener {
 	/** Player mode for level editing */
 	private LevelEditor editor;
 	/** Background music */
-	private static final String BACKGROUND_SOUND = "SOUNDS/background_sound.mp3";
+	protected static final String MAIN_THEME_SOUND = "Final_Assets/Sounds/Downstream_Main_Theme.mp3";
 	private Music backgroundMusic;
+	
+	protected static final String PASS_LEVEL_SOUND = "Final_Assets/Sounds/pass_level.mp3";
+	private Music winSound;
 	
 	/**
 	 * Creates a new game from the configuration settings.
@@ -101,8 +104,10 @@ public class GDXRoot extends Game implements ScreenListener {
 		canvas = null;
 	
 		// Unload all of the resources
+		
 		manager.clear();
 		manager.dispose();
+		
 		super.dispose();
 	}
 	
@@ -169,9 +174,10 @@ public class GDXRoot extends Game implements ScreenListener {
 			mainMenu.dispose();
 			mainMenu = null;
 			if(backgroundMusic == null){
-				backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal(BACKGROUND_SOUND));
+				backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal(MAIN_THEME_SOUND));
 				backgroundMusic.setLooping(true);
-				//backgroundMusic.play();
+				backgroundMusic.setVolume(.4f);
+				backgroundMusic.play();
 			}
 
 		} 
@@ -196,9 +202,10 @@ public class GDXRoot extends Game implements ScreenListener {
 			levelSelect.dispose();
 			levelSelect = null;
 			if(backgroundMusic == null){
-				backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal(BACKGROUND_SOUND));
+				backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal(MAIN_THEME_SOUND));
 				backgroundMusic.setLooping(true);
-				//backgroundMusic.play();
+				backgroundMusic.setVolume(.4f);
+				backgroundMusic.play();
 			}
 		}
 		else if (screen == playGame && exitCode == WorldController.EXIT_MAIN){
@@ -209,6 +216,18 @@ public class GDXRoot extends Game implements ScreenListener {
 			mainMenu.setScreenListener(this);
 			setScreen(mainMenu);
 			Gdx.input.setInputProcessor(mainMenu);
+		}
+		else if (exitCode == WorldController.EXIT_WIN){
+			if(backgroundMusic != null && backgroundMusic.isPlaying()){
+				backgroundMusic.stop();
+				winSound = Gdx.audio.newMusic(Gdx.files.internal(PASS_LEVEL_SOUND));
+				winSound.setLooping(false);
+				//winSound.setVolume();
+				winSound.play();
+			}
+		}
+		else if (exitCode == WorldController.EXIT_WIN_DONE){
+			backgroundMusic.play();
 		}
 		else if (screen == playGame){
 			playGame.unloadContent(manager);
@@ -227,6 +246,7 @@ public class GDXRoot extends Game implements ScreenListener {
 		}
 
 	}
+	
 	
 	
 
