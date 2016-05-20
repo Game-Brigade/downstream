@@ -50,7 +50,7 @@ public class HUDitems extends Obstacle {
 		TotalLotus = lotuses;
 		LotusLit = 0;
 		Energy = 2f;
-		//font = displayFont;
+		font = displayFont;
 		//font = new BitmapFont();
 		//font.setColor(Color.WHITE);
 		Lilypad = lily;
