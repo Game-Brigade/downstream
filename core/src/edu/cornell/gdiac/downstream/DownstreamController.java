@@ -307,7 +307,6 @@ public class DownstreamController extends WorldController implements ContactList
 		}
 
 		setLevelAlpha(levelAlpha(this.level));
-
 		tillNextLevel = 0;
 		tetherFade = false;
 		//animation is a bitch
@@ -403,7 +402,8 @@ public class DownstreamController extends WorldController implements ContactList
 
 
 		cameraController = new CameraController(canvas.getCamera());
-
+		cameraController.setWon(false);
+		
 		float dwidth;
 		float dheight;
 		float rad = lilyTexture.getRegionWidth()/scale.x/2;
@@ -834,6 +834,7 @@ public class DownstreamController extends WorldController implements ContactList
 		}
 		if (collisionController.didWin()) {
 			listener.exitScreen(this, WorldController.EXIT_WIN);
+			cameraController.setWon(true);
 			
 			setComplete(true);
 			tillNextLevel++;

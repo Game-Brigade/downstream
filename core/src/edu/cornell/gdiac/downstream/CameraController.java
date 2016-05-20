@@ -25,6 +25,7 @@ public class CameraController {
 	private OrthographicCamera saveCamera;
 	private float speed;
 	private int initialPause;
+	private boolean didWin;
 	
 	public CameraController(OrthographicCamera cam) {
 		camera = cam;
@@ -37,6 +38,7 @@ public class CameraController {
 		mapCenter = new Vector2();
 		saveCamera = new OrthographicCamera();
 		speed = 1;
+		didWin = false;
 	}
 	
 	public void reset(){
@@ -113,6 +115,10 @@ public class CameraController {
 		camera.update();
 	}
 	
+	public void setWon(boolean newState) {
+		didWin = newState;
+	}
+	
 	public void saveState() {
 		saveCamera.position.x = camera.position.x;
 		saveCamera.position.y = camera.position.y;
@@ -172,6 +178,7 @@ public class CameraController {
 	
 	public void moveCameraTowards(Vector2 newPosition) {
 //		System.out.println(currentVelocity);
+		if (didWin) return;
 		currentVelocity = Math.min(currentVelocity+ACCELERATION,MAX_VELOCITY*speed);
 		moveCameraTowards(newPosition, currentVelocity);
 	}
